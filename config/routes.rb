@@ -1,5 +1,5 @@
 HcsvlabWeb::Application.routes.draw do
-  root :to => "catalog#index"
+  #root :to => "catalog#index"
 
   Blacklight.add_routes(self)
   HydraHead.add_routes(self)
