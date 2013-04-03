@@ -10,17 +10,17 @@
   <% end %>
 
   <div class="util-links-other">
-    <%= link_to "Edit My Details", search_history_path %>
-    |
-    <%= link_to "Change My Password", search_history_path %>
     <% if current_or_guest_user %>
+      <%= link_to "Edit My Details", edit_user_registration_path %>
+      |
+      <%= link_to "Change My Password", users_edit_password_path %>
 	  |
 	  <%= link_to t('blacklight.header_links.bookmarks'), bookmarks_path %>
     <% end %>
     <% if has_user_authentication_provider? and current_user %>
       |
-      <%= link_to t('blacklight.header_links.saved_searches'), saved_searches_path %>
+	  <%= link_to t('blacklight.header_links.saved_searches'), saved_searches_path %>
+	  |
+      <%= link_to t('blacklight.header_links.search_history'), search_history_path %>
     <% end %>
-    |
-    <%= link_to t('blacklight.header_links.search_history'), search_history_path %>
   </div>
