@@ -1,0 +1,1 @@
+APP_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/hcsvlab-web_config.yml")[Rails.env]
