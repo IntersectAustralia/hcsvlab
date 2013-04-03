@@ -1,4 +1,8 @@
 class User < ActiveRecord::Base
+# Connects this user object to Hydra behaviors. 
+ include Hydra::User
+# Connects this user object to Blacklights Bookmarks. 
+ include Blacklight::User
   # Include devise modules
   devise :database_authenticatable, :registerable, :lockable, :recoverable, :trackable, :validatable, :timeoutable
 

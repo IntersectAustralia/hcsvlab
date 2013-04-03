@@ -57,7 +57,7 @@ end
 
 gem "haml"
 gem "haml-rails"
-gem "bootstrap-sass"
+# gem "bootstrap-sass"
 gem "simple_form"
 gem "devise"
 gem "email_spec", :group => :test
@@ -65,3 +65,10 @@ gem "cancan"
 gem "capistrano-ext"
 gem "capistrano"
 gem "capistrano_colors"
+
+# blacklight and hydra gems
+gem 'blacklight'
+gem 'hydra-head', '6.0.0.rc4'
+gem 'jettywrapper'
+
+gem "bootstrap-sass"

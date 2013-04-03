@@ -1,4 +1,9 @@
 HcsvlabWeb::Application.routes.draw do
+  root :to => "catalog#index"
+
+  Blacklight.add_routes(self)
+  HydraHead.add_routes(self)
+
   devise_for :users, controllers: {registrations: "user_registers", passwords: "user_passwords"}
 devise_scope :user do
   get "/users/profile", :to => "user_registers#profile" #page which gives options to edit details or change password
