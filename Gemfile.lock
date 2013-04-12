@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/ruby-rdf/rdf-raptor.git
+  revision: c7e0c9a0d5716b2f0ad32a6df21a21b1075004f7
+  specs:
+    rdf-raptor (1.0.0.beta1)
+      ffi (>= 1.0)
+      rdf (>= 0.3.8)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -200,7 +208,7 @@ GEM
       nokogiri (>= 1.4.2)
       solrizer (~> 3.0.0)
     orm_adapter (0.4.0)
-    pg (0.15.0)
+    pg (0.15.1)
     polyglot (0.3.3)
     rack (1.4.5)
     rack-cache (1.2)
@@ -341,6 +349,7 @@ DEPENDENCIES
   launchy
   pg
   rails (= 3.2.13)
+  rdf-raptor!
   rspec-rails
   sass-rails (~> 3.2.3)
   shoulda
