@@ -51,7 +51,7 @@ group :development, :test do
 end
 
 group :test do
-  gem "cucumber-rails", require: false
+  gem "cucumber-rails", :require => false
   gem "shoulda"
 end
 
@@ -72,3 +72,6 @@ gem 'hydra-head', '6.0.0.rc4'
 gem 'jettywrapper'
 
 gem "bootstrap-sass"
+
+gem 'rdf-raptor', :git => 'git://github.com/ruby-rdf/rdf-raptor.git'
+
