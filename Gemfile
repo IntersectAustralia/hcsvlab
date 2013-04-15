@@ -73,5 +73,5 @@ gem 'jettywrapper'
 
 gem "bootstrap-sass"
 
-gem 'rdf-raptor', :git => 'git://github.com/ruby-rdf/rdf-raptor.git'
-
+gem "rdf-raptor"
+gem "rdf-turtle"
