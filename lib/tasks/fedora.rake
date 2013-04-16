@@ -3,7 +3,7 @@ namespace :fedora do
 	
 	task :ingest => :environment do
 
-		corpus_dir = ARGV[1] unless ARGV[1].nil?
+		corpus_dir  = ARGV[1] unless ARGV[1].nil?
 
 		if (corpus_dir.nil?) || (! Dir.exists?(corpus_dir))
 			puts "Usage: rake fedora:ingest <corpus folder>"
@@ -12,13 +12,15 @@ namespace :fedora do
 
 		puts "Ingesting corpus from " + corpus_dir.to_s
 
-		Dir.glob( corpus_dir + '/*metadata.rdf') do |rdf_file|
+		Dir.glob( corpus_dir + '/*-metadata.rdf') do |rdf_file|
 
 			puts "Ingesting: " + rdf_file.to_s
 
 			item = Item.new
 
 			item.descMetadata.graph.load( rdf_file, :format => :ttl )
+
+			item.label = item.descMetadata.graph.statements.first.subject
 
 			item.save!
 
