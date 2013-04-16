@@ -17,15 +17,47 @@ namespace :fedora do
 			puts "Ingesting: " + rdf_file.to_s
 
 			item = Item.new
-
 			item.descMetadata.graph.load( rdf_file, :format => :ttl )
-
 			item.label = item.descMetadata.graph.statements.first.subject
-
 			item.save!
 
-		end
+			#Text
+			query = RDF::Query.new({
+				:document => {
+					RDF::URI("http://purl.org/dc/terms/type") => "Text",
+					RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
+					RDF::URI("http://purl.org/dc/terms/source") => :source,
+					RDF::URI("http://purl.org/dc/terms/title") => :title
+				}
+			})
 
+			query.execute(item.descMetadata.graph).each do |result|
+				doc = Document.new
+				doc.descMetadata.graph.load( rdf_file, :format => :ttl )
+				doc.label = result.source
+				doc.item = item
+				doc.file.content = File.open(corpus_dir + "/" + result.identifier.to_s)
+				doc.save
+			end
+
+			# Audio
+			query = RDF::Query.new({
+				:document => {
+					RDF::URI("http://purl.org/dc/terms/type") => "Audio",
+					RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
+					RDF::URI("http://purl.org/dc/terms/source") => :source,
+					RDF::URI("http://purl.org/dc/terms/title") => :title
+				}
+			})
+
+			query.execute(item.descMetadata.graph).each do |result|
+				doc = Document.new
+				doc.descMetadata.graph.load( rdf_file, :format => :ttl )
+				doc.label = result.source
+				doc.item = item
+				doc.save
+			end
+		end
 	end
 
 	task :clear => :environment do
@@ -33,13 +65,14 @@ namespace :fedora do
 		puts "Emptying Fedora"
 
 		Item.find_each do | item |
-
 			puts item.pid.to_s
-
 			item.delete
-
 		end
-		
-	end
 
+		Document.find_each do | doc |
+			puts doc.pid.to_s
+			doc.delete
+		end
+
+	end
 end
