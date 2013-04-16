@@ -1,7 +1,6 @@
 
 namespace :fedora do
 	
-
 	task :ingest => :environment do
 
 		corpus_dir = ARGV[1] unless ARGV[1].nil?
