@@ -1,4 +1,7 @@
 
+
+ENABLE_SOLR_UPDATES = false
+
 namespace :fedora do
 	
 	task :ingest_one => :environment do
