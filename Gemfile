@@ -68,10 +68,9 @@ gem "capistrano_colors"
 
 # blacklight and hydra gems
 gem 'blacklight'
-gem 'hydra-head', '6.0.0.rc4'
+gem 'hydra-head', "~>6.0.0"
 gem 'jettywrapper'
 
 gem "bootstrap-sass"
 
-gem "rdf-raptor"
 gem "rdf-turtle"
