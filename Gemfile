@@ -74,3 +74,7 @@ gem 'jettywrapper'
 gem "bootstrap-sass"
 
 gem "rdf-turtle"
+
+gem "daemons"
+gem "celluloid"
+gem "activemessaging"
