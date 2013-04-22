@@ -11,6 +11,7 @@ end
 
 module HcsvlabWeb
   class Application < Rails::Application
+      config.autoload_paths += %W(#{config.root}/app/processors)
     config.autoload_paths += %W( #{config.root}/lib )
     config.generators do |g|  
       g.stylesheets false
