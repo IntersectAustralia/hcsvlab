@@ -1,0 +1,16 @@
+development:
+    adapter: stomp
+    host: localhost
+    port: 61613
+ 
+test:
+    adapter: test
+    reliable: false
+    host: localhost
+    port: 61613
+    reliable: true
+    reconnectDelay: 5
+ 
+production:
+    adapter: prod
+    reliable: true
