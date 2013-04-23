@@ -3,7 +3,8 @@ rvm:
   - "2.0.0-p0"
 before_script:
   - psql -c "create user hcsvlab with password 'hcsvlab';" -U postgres
-  - psql -c 'create database hcsvlab_test owner hcsvlab;' -U postgres
+  - psql -c 'create database hcsvlab_test;' -U postgres
+  - psql -c 'alter database ownder to hcsvlab;' -U postgres
   - rake db:create db:migrate db:seed db:populate db:test:prepare
 env:
   - DB=postgresql
