@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #
 # Helper class for interpreting the XML we get from the Fedora message queues.
 # Naive implementation based on regexp matching.
