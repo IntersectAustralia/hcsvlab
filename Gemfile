@@ -78,3 +78,5 @@ gem 'celluloid'
 gem 'daemons'
 gem 'activemessaging'
 gem "rdf-turtle"
+gem 'coveralls', require: false
+
