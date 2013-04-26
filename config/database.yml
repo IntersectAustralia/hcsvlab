@@ -26,4 +26,4 @@ cucumber:
 
 qa: &qa
   <<: *common
-  database: hcsvlab_test
+  database: hcsvlab
