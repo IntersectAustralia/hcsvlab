@@ -15,7 +15,8 @@ set :rvm_type, :user
 
 # Deploy using copy for now
 set :scm, 'git'
-set :git_enable_submodules, 1
+# Uncomment to enable Jetty submodule
+# set :git_enable_submodules, 1
 set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
 set :deploy_via, :copy
 set :copy_exclude, [".git/*"]
@@ -244,12 +245,6 @@ task :generate_database_yml, :roles => :app do
   # buffer.delete('spec')
 
   # Populate production password
-  puts "======"
-  puts stage
-  puts buffer[stage]
-  puts rails_env
-  puts buffer[rails_env]
-  puts "======"
   buffer[rails_env]['password'] = production_database_password
 
 
