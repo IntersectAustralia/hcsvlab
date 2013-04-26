@@ -81,3 +81,6 @@ gem 'activemessaging'
 gem "rdf-turtle"
 gem 'coveralls', require: false
 
+gem 'solrizer'
+gem 'rsolr'
+gem "linkeddata"

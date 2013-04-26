@@ -45,35 +45,32 @@ class TestProcessor < ApplicationProcessor
   @@cache = {}
  
   def on_message(message)
-#    logger.debug "TestProcessor received: " + message
     x = XMLHelper.new(message)
     logger.debug "TestProcessor received message, title: #{x.title}, content: #{x.content}, summary: #{x.summary}"
 
-    #
-    # Make sure the cache has an entry for this object
-    #
-    if ! @@cache.has_key?(x.summary)
-      @@cache[x.summary] = {}
-      logger.debug "\tFirst mention of #{x.summary}"
-    end
-
     if x.rels_ext?
-      @@cache[x.summary][:relsExt] = true
-      logger.debug "\tcache[#{x.summary}] = #{@@cache[x.summary]}"
+      symbol = :relsExt
+    elsif x.desc_metadata?
+      symbol = :descMetadata
+    else
+      symbol = nil
     end
       
-    if x.desc_metadata?
-      @@cache[x.summary][:descMetadata] = true
-      logger.debug "\tcache[#{x.summary}] = #{@@cache[x.summary]}"
-    end
-     
-    if @@cache[x.summary].size == 2
-      send_message(x.summary) 
+    if !symbol.nil?
+      if ! @@cache.has_key?(x.summary)
+        @@cache[x.summary] = {}
+      end
+
+      @@cache[x.summary][symbol] = true
+      
+      if @@cache[x.summary].size == 2
+        send_message(x.summary) 
+      end
     end
   end
 
   def send_message(objectID)
-    logger.debug "TestProcessor sending message to index #{objectID}"
+    logger.debug "TestProcessor sending instruction to solr_worker: index #{objectID}"
     publish :solr_worker, "index #{objectID}"
     @@cache.delete(objectID)
   end
