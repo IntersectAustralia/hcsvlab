@@ -23,3 +23,7 @@ production:
 
 cucumber:
   <<: *test
+
+qa: &qa
+  <<: *common
+  database: hcsvlab_test
