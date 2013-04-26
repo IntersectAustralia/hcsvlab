@@ -246,8 +246,10 @@ task :generate_database_yml, :roles => :app do
   puts "======"
   puts stage
   puts buffer[stage]
+  puts rails_env
+  puts buffer[rails_env]
   puts "======"
-  buffer[stage]['password'] = production_database_password
+  buffer[rails_env]['password'] = production_database_password
 
 
   put YAML::dump(buffer), "#{release_path}/config/database.yml", :mode => 0664
