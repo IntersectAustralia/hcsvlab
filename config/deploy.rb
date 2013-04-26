@@ -1,3 +1,4 @@
+$: << File.expand_path('./lib', ENV['rvm_path'])
 require 'bundler/capistrano'
 require 'capistrano/ext/multistage'
 require 'capistrano_colors'
@@ -242,6 +243,7 @@ task :generate_database_yml, :roles => :app do
   buffer.delete('spec')
 
   # Populate production password
+  "Test"
   buffer[rails_env]['password'] = production_database_password
 
   put YAML::dump(buffer), "#{release_path}/config/database.yml", :mode => 0664
