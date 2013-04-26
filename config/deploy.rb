@@ -1,4 +1,3 @@
-$:.unshift(File.expand_path('./lib', ENV['rvm_path']))
 require 'bundler/capistrano'
 require 'capistrano/ext/multistage'
 require 'capistrano_colors'
@@ -48,7 +47,7 @@ namespace :server_setup do
     end
   end
   task :gem_install, :roles => :app do
-    run "gem install bundler passenger"
+    run "gem install bundler passenger:4.0.0.rc6"
   end
   task :passenger, :roles => :app do
     run "passenger-install-apache2-module -a"

@@ -63,14 +63,12 @@ GEM
       mocha (~> 0.13.2)
     builder (3.0.4)
     cancan (1.6.9)
-    capistrano (2.14.2)
+    capistrano (2.15.3)
       highline
       net-scp (>= 1.0.0)
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
-    capistrano-ext (1.2.1)
-      capistrano (>= 1.0.0)
     capistrano_colors (0.5.5)
     capybara (2.1.0)
       mime-types (>= 1.16)
@@ -89,6 +87,13 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.2)
+    colorize (0.5.8)
+    coveralls (0.6.7)
+      colorize
+      multi_json (~> 1.3)
+      rest-client
+      simplecov (>= 0.7)
+      thor
     cucumber (1.2.5)
       builder (>= 2.1.2)
       diff-lcs (>= 1.1.3)
@@ -272,6 +277,8 @@ GEM
       mime-types
       nokogiri
       rest-client
+    rvm-capistrano (1.3.0)
+      capistrano (>= 2.0.0)
     sass (3.2.7)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -287,6 +294,10 @@ GEM
     simple_form (2.1.0)
       actionpack (~> 3.0)
       activemodel (~> 3.0)
+    simplecov (0.7.1)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.7.1)
+    simplecov-html (0.7.1)
     solrizer (3.0.0)
       activesupport
       daemons
@@ -329,12 +340,11 @@ DEPENDENCIES
   blacklight
   bootstrap-sass
   cancan
-  capistrano
-  capistrano-ext
   capistrano_colors
   capybara
   celluloid
   coffee-rails (~> 3.2.1)
+  coveralls
   cucumber
   cucumber-rails
   daemons
@@ -352,6 +362,7 @@ DEPENDENCIES
   rails (= 3.2.13)
   rdf-turtle
   rspec-rails
+  rvm-capistrano
   sass-rails (~> 3.2.3)
   shoulda
   simple_form
