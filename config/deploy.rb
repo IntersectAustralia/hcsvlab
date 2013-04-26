@@ -237,10 +237,10 @@ task :generate_database_yml, :roles => :app do
 
   buffer = YAML::load_file('config/database.yml')
   # get rid of unneeded configurations
-  buffer.delete('test')
-  buffer.delete('development')
-  buffer.delete('cucumber')
-  buffer.delete('spec')
+  # buffer.delete('test')
+  # buffer.delete('development')
+  # buffer.delete('cucumber')
+  # buffer.delete('spec')
 
   # Populate production password
   buffer[stage.to_s]['password'] = production_database_password
