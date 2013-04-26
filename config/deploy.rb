@@ -15,6 +15,7 @@ set :rvm_type, :user
 
 # Deploy using copy for now
 set :scm, 'git'
+set :git_enable_submodules, 1
 set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
 set :deploy_via, :copy
 set :copy_exclude, [".git/*"]
