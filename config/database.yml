@@ -17,6 +17,10 @@ test: &test
   <<: *common
   database: hcsvlab_test
 
+staging:
+  <<: *common
+  database: hcsvlab
+
 production:
   <<: *common
   database: hcsvlab
@@ -28,8 +32,3 @@ qa: &qa
   <<: *common
   database: hcsvlab
 
-staging: &staging
-  <<: *common
-  database: hcsvlab
-  username: hcsvlab
-  password: hcsvlab
