@@ -47,13 +47,30 @@ class CatalogController < ApplicationController
     #
     # :show may be set to false if you don't want the facet to be drawn in the 
     # facet bar
-    config.add_facet_field solr_name('object_type', :facetable), :label => 'Format' 
-    config.add_facet_field solr_name('pub_date', :facetable), :label => 'Publication Year' 
-    config.add_facet_field solr_name('subject_topic', :facetable), :label => 'Topic', :limit => 20 
-    config.add_facet_field solr_name('language', :facetable), :label => 'Language', :limit => true 
-    config.add_facet_field solr_name('lc1_letter', :facetable), :label => 'Call Number' 
-    config.add_facet_field solr_name('subject_geo', :facetable), :label => 'Region' 
-    config.add_facet_field solr_name('subject_era', :facetable), :label => 'Era'  
+
+# http://ns.ausnc.org.au/schemas/ausnc_md_model/mode
+# http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style
+# http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity
+# http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context
+# http://ns.ausnc.org.au/schemas/ausnc_md_model/audience
+# http://www.language-archives.org/OLAC/1.1/discourse_type
+# http://purl.org/dc/terms/isPartOf
+
+
+    config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/mode', :facetable), :label => 'Mode' 
+    config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style', :facetable), :label => 'Speech Style' 
+    config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity', :facetable), :label => 'Interactivity' 
+    config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context', :facetable), :label => 'Communication Context' 
+    config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/audience', :facetable), :label => 'Audience' 
+    config.add_facet_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :facetable), :label => 'Discourse Type' 
+    config.add_facet_field solr_name('http://purl.org/dc/terms/isPartOf', :facetable), :label => 'Corpus' 
+    #config.add_facet_field solr_name('object_type', :facetable), :label => 'Format' 
+    #config.add_facet_field solr_name('pub_date', :facetable), :label => 'Publication Year' 
+    #config.add_facet_field solr_name('subject_topic', :facetable), :label => 'Topic', :limit => 20 
+    #config.add_facet_field solr_name('language', :facetable), :label => 'Language', :limit => true 
+    #config.add_facet_field solr_name('lc1_letter', :facetable), :label => 'Call Number' 
+    #config.add_facet_field solr_name('subject_geo', :facetable), :label => 'Region' 
+    #config.add_facet_field solr_name('subject_era', :facetable), :label => 'Era'  
 
     # Have BL send all facet field names to Solr, which has been the default
     # previously. Simply remove these lines if you'd rather use Solr request
