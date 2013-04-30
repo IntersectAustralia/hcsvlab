@@ -413,3 +413,4 @@ DEPENDENCIES
   stomp
   therubyracer
   uglifier (>= 1.0.3)
+  xml-simple

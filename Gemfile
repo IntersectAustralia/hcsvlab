@@ -84,3 +84,4 @@ gem 'coveralls', require: false
 gem 'solrizer'
 gem 'rsolr'
 gem "linkeddata"
+gem "xml-simple"
