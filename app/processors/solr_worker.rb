@@ -17,13 +17,18 @@ public
   MODE                  = RDF::URI(BASE_URI + 'mode')
   SPEECH_STYLE          = RDF::URI(BASE_URI + 'speech_style')
 
+  def stripped()
+    str = self.to_s
+    return str[BASE_URI.length..str.length]
+  end
+
 end
 
 
 #
 # Constants for OLAC
 #
-module OLAC
+class OLAC
 
 private
   BASE_URI = 'http://www.language-archives.org/OLAC/1.1/'
@@ -31,13 +36,18 @@ private
 public  
   DISCOURSE_TYPE = RDF::URI(BASE_URI + 'discourse_type')
 
+  def stripped()
+    str = self.to_s
+    return str[BASE_URI.length..str.length]
+  end
+
 end
 
 
 #
 # Constants for PURL
 #
-module PURL
+class PURL
 
 private
   BASE_URI = 'http://purl.org/dc/terms/'
@@ -45,8 +55,31 @@ private
 public  
   IS_PART_OF = RDF::URI(BASE_URI + 'isPartOf')
 
+  def stripped()
+    str = self.to_s
+    return str[BASE_URI.length..str.length]
+  end
+
 end
 
+
+#
+# Constants for FEDORA
+#
+class FEDORA
+
+private
+  BASE_URI = 'info:fedora/fedora-system:def/relations-external#'
+
+public  
+  IS_MEMBER_OF = RDF::URI(BASE_URI + 'isMemberOf')
+
+  def stripped()
+    str = self.to_s
+    return str[BASE_URI.length..str.length]
+  end
+
+end
 
 #
 # Helper class for interpreting the RELS-EXT we get from the Fedora message
@@ -126,38 +159,59 @@ private
   @@solr = nil
 
   #
-  # Determine if the Fedora object is something we should be indexing or not, based on
-  # what its RELS-EXT tells us about whether it's a Document (no) or an Item (yes).
+  # Find the name of the Fedora object's parent object. In other words, if object
+  # represents a Document, return the id of the Item of which it is a part. If it
+  # is an Item, return nil. This is based on the isMemberOf field in its RELS-EXT
+  # datastream.
   #
-  def shouldIndex?(object)
+  def parent_object(object)
     uri = buildURI(object, 'RELS-EXT')
-    rdf = nil
+    graph = RDF::Graph.load(uri)
+    query = RDF::Query.new({:description => {FEDORA::IS_MEMBER_OF => :is_member_of}})
+    individual_result = query.execute(graph)
 
-    open(uri) { |f| rdf = f.string }
-    x = RDFHelper.new(rdf)
-    return x.type =~ /Item$/
+    return nil if individual_result.size == 0
+    return last_bit(individual_result[0][:is_member_of])
   end
 
   #
-  # Do the actual indexing
+  # Do the indexing for an Item
   #
-  def actuallyIndex(object)
+  def index_item(object)
     uri = buildURI(object, 'descMetadata')
     graph = RDF::Graph.load(uri)
-    fields = interesting_fields()
-    results = query_graph(graph, fields)
-    store_results(object, results)
+
+    # Find the identity of the Item
+    query = RDF::Query.new({:document => {PURL::IS_PART_OF => :corpus}})
+    results = query.execute(graph)
+
+    unless results.size == 0
+      # Now find all the triplets which have the Item as the subject
+      # and add them all to the index
+      document = results[0][:document]
+      query = RDF::Query.new({document => {:predicate => :object}})
+      results = query.execute(graph)
+      store_results(object, results)
+    end
   end
 
   #
-  # Invoked when we get the "index" command. Not everything should be indexed, so
-  # check if the object should be, and do it if appropriate.
+  # Do the indexing for a Document
+  #
+  def index_document(object)
+    logger.debug "\tIndex document #{object}"
+    return nil
+  end
+
+  #
+  # Invoked when we get the "index" command. Determine the type of object it is
+  # and item it accordingly.
   #
   def index(object)
-    if shouldIndex?(object)
-      actuallyIndex(object)
+    if parent_object(object).nil?
+      index_item(object)
     else
-      logger.debug "\t#{object} is not an Item, not indexing"
+      index_document(object)
     end
   end
 
@@ -165,6 +219,7 @@ private
   # Build the URL of a particular datastream of the given Fedora object
   #
   def buildURI(object, datastream)
+    # TODO: get base URI from a config file
     return "http://localhost:8983/fedora/objects/#{object}/datastreams/#{datastream}/content"
   end
 
@@ -180,7 +235,7 @@ private
       query = RDF::Query.new({:document => {key => value}})
       individual_result = query.execute(graph)
       unless individual_result.size == 0
-        result[key] = individual_result[0][value]
+        result[key] = last_bit(individual_result[0][value])
       end
     }
 
@@ -191,6 +246,7 @@ private
   # Build a description of the fields to index.
   #
   def interesting_fields
+    # TODO: read from a config file
     return {
       AUSNC::MODE                  => :mode,
       AUSNC::SPEECH_STYLE          => :speech_style,
@@ -203,14 +259,16 @@ private
   end
 
   #
-  # Make a Solr document from information extracted from theItem
+  # Make a Solr document from information extracted from the Item
   #
   def make_solr_document(object, results)
     result = {}
 
-    results.keys.each { |field| 
-      logger.debug "\tAddng field #{field.to_s} with value #{results[field]}"
-      Solrizer.insert_field(result, field.to_s, results[field], :facetable)
+    results.each { |binding| 
+      field = binding[:predicate].to_s
+      value = last_bit(binding[:object])
+      logger.debug "\tAddng field #{field} with value #{value}"
+      Solrizer.insert_field(result, field, value, :facetable)
     }
     logger.debug "\tAddng index #{:id} with value #{object}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
@@ -230,6 +288,15 @@ private
     document = make_solr_document(object, results)
     @@solr.add(document)
     @@solr.commit
+  end
+
+
+  #
+  # Extract the last part of a path/URI/slash-separated-list-of-things
+  #
+  def last_bit(uri)
+    str = uri.to_s   # just in case it is not a String object
+    return str.split('/')[-1]
   end
 
 end

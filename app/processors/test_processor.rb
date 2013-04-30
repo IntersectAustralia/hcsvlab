@@ -47,6 +47,7 @@ class TestProcessor < ApplicationProcessor
   def on_message(message)
     x = XMLHelper.new(message)
     logger.debug "TestProcessor received message, title: #{x.title}, content: #{x.content}, summary: #{x.summary}"
+    #logger.debug message.gsub(/^/, "\t")
 
     if x.rels_ext?
       symbol = :relsExt
