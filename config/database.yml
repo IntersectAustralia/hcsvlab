@@ -27,3 +27,7 @@ cucumber:
 qa: &qa
   <<: *common
   database: hcsvlab
+
+staging: &staging
+  <<: *common
+  database: hcsvlab
