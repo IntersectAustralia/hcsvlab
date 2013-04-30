@@ -1,7 +1,7 @@
 # Your HTTP server, Apache/etc
-role :web, 'hcsvlab-changeme'
+role :web, 'ic2-hcsvlab-staging1-vm.intersect.org.au'
 # This may be the same as your Web server
-role :app, 'hcsvlab-changeme'
+role :app, 'ic2-hcsvlab-staging1-vm.intersect.org.au'
 # This is where Rails migrations will run
-role :db,  'hcsvlab-changeme', :primary => true
+role :db,  'ic2-hcsvlab-staging1-vm.intersect.org.au', :primary => true
 

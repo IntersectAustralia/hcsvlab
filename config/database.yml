@@ -17,6 +17,10 @@ test: &test
   <<: *common
   database: hcsvlab_test
 
+staging:
+  <<: *common
+  database: hcsvlab
+
 production:
   <<: *common
   database: hcsvlab
@@ -27,3 +31,4 @@ cucumber:
 qa: &qa
   <<: *common
   database: hcsvlab
+
