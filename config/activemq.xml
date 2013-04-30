@@ -34,6 +34,12 @@
     -->
     <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" dataDirectory="${activemq.data}">
 
+      <destinations>
+        <queue physicalName="fedora.apim.update"/>
+        <queue physicalName="fedora.apim.access"/>
+        <queue physicalName="hcsvlab.solr.worker"/>
+      </destinations>
+
         <!--
             For better performances use VM cursor and small memory limit.
             For more information, see:
@@ -44,10 +50,7 @@
             For more information, see:
             http://activemq.apache.org/producer-flow-control.html
         -->
-        <destinations>
-            <queue physicalName="fedora.apim.update"/>
-            <queue physicalName="fedora.apim.access"/>
-        </destinations>
+
         <destinationPolicy>
             <policyMap>
               <policyEntries>
@@ -143,13 +146,13 @@
 
             http://activemq.apache.org/configuring-transports.html
         -->
-
         <transportConnectors>
             <!-- DOS protection, limit concurrent connections to 1000 and frame size to 100MB -->
             <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/>
             <transportConnector name="stomp" uri="stomp://0.0.0.0:61613"/>
             <transportConnector name="amqp" uri="amqp://0.0.0.0:61614?maximumConnections=1000&amp;wireformat.maxFrameSize=104857600"/>
         </transportConnectors>
+
         <!-- destroy the spring context on shutdown to stop jetty -->
         <shutdownHooks>
             <bean xmlns="http://www.springframework.org/schema/beans" class="org.apache.activemq.hooks.SpringContextHook" />
