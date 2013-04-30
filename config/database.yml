@@ -31,3 +31,5 @@ qa: &qa
 staging: &staging
   <<: *common
   database: hcsvlab
+  username: hcsvlab
+  password: hcsvlab
