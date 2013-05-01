@@ -11,5 +11,8 @@ ActiveMessaging::Gateway.define do |s|
   s.destination :fedora_access, '/queue/fedora.apim.access'
  
   s.destination :solr_worker, '/queue/hcsvlab.solr.worker'
- 
+
+  s.processor_group :fedora_group, :fedora_worker
+  s.processor_group :solr_group, :solr_worker
+
 end

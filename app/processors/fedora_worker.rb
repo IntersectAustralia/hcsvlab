@@ -37,7 +37,7 @@ end
 #
 # Basic processor for incoming messages from Fedora
 #
-class TestProcessor < ApplicationProcessor
+class FedoraWorker < ApplicationProcessor
 
   subscribes_to :fedora_update
 #  subscribes_to :fedora_access

@@ -422,7 +422,7 @@
     <comment>Fedora's Java Messaging Service (JMS) Module</comment>
     <param name="enabled" value="true"/>
     <param name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-    <param name="java.naming.provider.url" value="vm:(broker:(tcp://localhost:61616))"/>
+    <param name="java.naming.provider.url" value="tcp://localhost:61616/"/>
     <param name="datastore1" value="apimUpdateMessages">
       <comment>A datastore representing a JMS Destination for APIM events which update the repository</comment>
     </param>
@@ -934,7 +934,7 @@
             &quot;apimAccess&quot; are the only supported message types.</comment>
     </param>
     <param name="name" value="fedora.apim.update"/>
-    <param name="type" value="topic">
+    <param name="type" value="queue">
       <comment>Optional, defaults to topic.</comment>
     </param>
   </datastore>
@@ -946,7 +946,7 @@
             &quot;apimAccess&quot; are the only supported message types.</comment>
     </param>
     <param name="name" value="fedora.apim.access"/>
-    <param name="type" value="topic">
+    <param name="type" value="queue">
       <comment>Optional, defaults to topic.</comment>
     </param>
   </datastore>
