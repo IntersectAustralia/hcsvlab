@@ -140,6 +140,8 @@ class Solr_Worker < ApplicationProcessor
     case command
     when "index"
       index(object)
+    when "delete"
+      delete(object)
     else
       logger.debug "\tunknown instruction: #{command}"
       return
@@ -150,9 +152,10 @@ class Solr_Worker < ApplicationProcessor
 private
 
   #
-  # Class variables for information about Solr
-  @@solr_config = nil
-  @@solr = nil
+  # =============================================================================
+  # Indexing
+  # =============================================================================
+  #
 
   #
   # Find the name of the Fedora object's parent object. In other words, if object
@@ -293,11 +296,11 @@ private
       field = binding[:predicate].to_s
       value = last_bit(binding[:object])
       logger.debug "\tAdding field #{field} with value #{value}"
-      Solrizer.insert_field(result, field, value, :facetable)
+      Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
     }
     unless parent.nil?
       logger.debug "\tAdding field Item with value #{parent}"
-      Solrizer.insert_field(result, 'Item', parent, :facetable)
+      Solrizer.insert_field(result, 'Item', parent, :facetable, :stored_searchable)
     end
     logger.debug "\tAdding index #{:id} with value #{object}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
@@ -309,16 +312,69 @@ private
   # Update Solr with the information we've found
   #
   def store_results(object, results, parent = nil)
-    if @@solr_config.nil?
-      @@solr_config = Blacklight.solr_config
-      @@solr        = RSolr.connect(@@solr_config)
-    end
-
+    get_solr_connection()
     document = make_solr_document(object, results, parent)
     @@solr.add(document)
     @@solr.commit
   end
 
+  #
+  # End of Indexing
+  # -----------------------------------------------------------------------------
+  #
+
+
+  #
+  # =============================================================================
+  # Deleting
+  # =============================================================================
+  #
+
+  #
+  # Invoked when we get the "delete" command.
+  #
+  def delete(object)
+    get_solr_connection()
+    @@solr.delete_by_id(object)
+  end
+
+  #
+  # End of Deleting
+  # -----------------------------------------------------------------------------
+  #
+
+
+  #
+  # =============================================================================
+  # Solr
+  # =============================================================================
+  #
+
+  #
+  # Class variables for information about Solr
+  @@solr_config = nil
+  @@solr = nil
+
+  #
+  # Initialise the connection to Solr
+  #
+  def get_solr_connection
+    if @@solr_config.nil?
+      @@solr_config = Blacklight.solr_config
+      @@solr        = RSolr.connect(@@solr_config)
+    end
+  end
+
+  #
+  # End of Solr
+  # -----------------------------------------------------------------------------
+  #
+
+  #
+  # =============================================================================
+  # Utility methods
+  # =============================================================================
+  #
 
   #
   # Extract the last part of a path/URI/slash-separated-list-of-things
@@ -328,26 +384,10 @@ private
     return str.split('/')[-1]
   end
 
-  def print_graph(graph, label)
-    logger.debug("Graph #{label}, with #{graph.count} statement(s)")
-    graph.each { |statement|
-      s = nil
-      p = nil
-      o = nil
-      if statement.has_subject?
-        s = statement.subject
-      end
-      if statement.has_predicate?
-        p = statement.predicate
-      end
-      if statement.has_object?
-        o = statement.object
-      end
-      logger.debug("> Subject #{s}, Predicate #{p}, Object #{o} (#{o.class})")
-    }
-  end
 
-
+  #
+  # Print out the results of an RDF query
+  #
   def print_results(results, label)
     logger.debug("Results #{label}, with #{results.count} solutions(s)")
     results.each { |result|
@@ -357,5 +397,10 @@ private
       logger.debug("")
     }
   end
+
+  #
+  # End of Utility methods
+  # -----------------------------------------------------------------------------
+  #
 
 end

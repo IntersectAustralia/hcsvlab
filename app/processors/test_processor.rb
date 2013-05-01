@@ -49,31 +49,40 @@ class TestProcessor < ApplicationProcessor
     logger.debug "TestProcessor received message, title: #{x.title}, content: #{x.content}, summary: #{x.summary}"
     #logger.debug message.gsub(/^/, "\t")
 
-    if x.rels_ext?
+    case x.title
+    when "addDatastream"
+      index(x)
+    when "purgeObject"
+      send_solr_message("delete", x.summary)
+    end
+  end
+
+  def index(xmlHelper)
+    if xmlHelper.rels_ext?
       symbol = :relsExt
-    elsif x.desc_metadata?
+    elsif xmlHelper.desc_metadata?
       symbol = :descMetadata
     else
       symbol = nil
     end
       
     if !symbol.nil?
-      if ! @@cache.has_key?(x.summary)
-        @@cache[x.summary] = {}
+      if ! @@cache.has_key?(xmlHelper.summary)
+        @@cache[xmlHelper.summary] = {}
       end
 
-      @@cache[x.summary][symbol] = true
+      @@cache[xmlHelper.summary][symbol] = true
       
-      if @@cache[x.summary].size == 2
-        send_message(x.summary) 
+      if @@cache[xmlHelper.summary].size == 2
+        send_solr_message("index", xmlHelper.summary) 
+        @@cache.delete(xmlHelper.summary)
       end
     end
   end
 
-  def send_message(objectID)
-    logger.debug "TestProcessor sending instruction to solr_worker: index #{objectID}"
-    publish :solr_worker, "index #{objectID}"
-    @@cache.delete(objectID)
+  def send_solr_message(command, objectID)
+    logger.debug "TestProcessor sending instruction to solr_worker: #{command} #{objectID}"
+    publish :solr_worker, "#{command} #{objectID}"
   end
 
 end
