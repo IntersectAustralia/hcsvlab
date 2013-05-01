@@ -97,8 +97,8 @@ class CatalogController < ApplicationController
     # config.add_index_field solr_name('http://purl.org/dc/terms/publisher', :stored_searchable, type: :string), :label => 'Publisher:'
 
     # config.add_index_field solr_name('http://purl.org/dc/terms/extent', :stored_searchable, type: :string), :label => 'Extent:'
-    # config.add_index_field solr_name('http://purl.org/dc/terms/source', :stored_searchable, type: :string), :label => 'Source:'
-    # config.add_index_field solr_name('http://purl.org/dc/terms/type', :stored_searchable, type: :string), :label => 'Type:'
+    config.add_index_field solr_name('http://purl.org/dc/terms/source', :stored_searchable, type: :string), :label => 'Source:'
+    config.add_index_field solr_name('http://purl.org/dc/terms/type', :stored_searchable, type: :string), :label => 'Type:'
     config.add_index_field solr_name('Item', :stored_searchable, type: :string), :label => 'Item:'
 
     # solr fields to be displayed in the show (single result) view

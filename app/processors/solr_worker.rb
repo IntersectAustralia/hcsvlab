@@ -1,4 +1,3 @@
-require 'rdf'
 require 'linkeddata'
 require 'xmlsimple'
 
@@ -46,6 +45,7 @@ private
 
 public  
   IS_PART_OF = RDF::URI(BASE_URI + 'isPartOf')
+  TYPE       = RDF::URI(BASE_URI + 'type')
 
 end
 
@@ -181,16 +181,34 @@ private
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item
-    query = RDF::Query.new({:document => {PURL::IS_PART_OF => :corpus}})
+    query = RDF::Query.new({:item => {PURL::IS_PART_OF => :corpus}})
     results = query.execute(graph)
 
     unless results.size == 0
       # Now find all the triplets which have the Item as the subject
       # and add them all to the index
-      document = results[0][:document]
-      query = RDF::Query.new({document => {:predicate => :object}})
+      item = results[0][:item]
+      query = RDF::Query.new({item => {:predicate => :object}})
+      basic_results = query.execute(graph) 
+
+      # Finally look for references to Documents within the metadata and
+      # find their types.
+      query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
       results = query.execute(graph)
-      store_results(object, results)
+
+      extras = {PURL::TYPE => []}
+      results.each { |result|
+        document = result[:document]
+        query = RDF::Query.new({document => {PURL::TYPE => :type}})
+        inner_results = query.execute(graph)
+        unless inner_results.size == 0
+          inner_results.each { |inner_result|
+            extras[PURL::TYPE] << inner_result[:type].to_s
+          }
+        end
+      }
+
+      store_results(object, basic_results, extras)
     end
   end
 
@@ -225,7 +243,7 @@ private
       document = results[0][:document]
       query = RDF::Query.new({document => {:predicate => :object}})
       results = query.execute(graph)
-      store_results(object, results, item)
+      store_results(object, results, {'Item' => [item]})
     end
 
   end
@@ -239,7 +257,8 @@ private
     if parent.nil?
       index_item(object)
     else
-      index_document(object, parent)
+      # index_document(object, parent)
+      logger.debug "Not indexing the Document #{object}"
     end
   end
 
@@ -289,7 +308,7 @@ private
   #
   # Make a Solr document from information extracted from the Item
   #
-  def make_solr_document(object, results, parent)
+  def make_solr_document(object, results, extras)
     result = {}
 
     results.each { |binding| 
@@ -298,9 +317,14 @@ private
       logger.debug "\tAdding field #{field} with value #{value}"
       Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
     }
-    unless parent.nil?
-      logger.debug "\tAdding field Item with value #{parent}"
-      Solrizer.insert_field(result, 'Item', parent, :facetable, :stored_searchable)
+    unless extras.nil?
+      extras.keys.each { |key|
+        values = extras[key]
+        values.each { |value|
+          logger.debug "\tAdding field #{key} with value #{value}"
+          Solrizer.insert_field(result, key, value, :facetable, :stored_searchable)
+        }
+      }
     end
     logger.debug "\tAdding index #{:id} with value #{object}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
@@ -311,9 +335,9 @@ private
   #
   # Update Solr with the information we've found
   #
-  def store_results(object, results, parent = nil)
+  def store_results(object, results, extras = nil)
     get_solr_connection()
-    document = make_solr_document(object, results, parent)
+    document = make_solr_document(object, results, extras)
     @@solr.add(document)
     @@solr.commit
   end
