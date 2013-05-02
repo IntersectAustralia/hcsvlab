@@ -198,6 +198,37 @@ namespace :deploy do
     restart
   end
 
+  desc "Start the jetty server"
+    task :start_jetty, :roles => :app do
+      run "cd #{current_path} && rake jetty:config", :env => {'RAILS_ENV' => stage}
+      run "cd #{current_path} && rake jetty:start", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Stop the jetty server"
+  task :stop_jetty, :roles => :app do
+    run "cd #{current_path} && rake jetty:stop", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Start the a13g pollers"
+  task :start_a13g_pollers, :roles => :app do
+    run "cd #{current_path} && rake a13g:start_pollers", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Stop the a13g pollers"
+  task :stop_a13g_pollers, :roles => :app do
+    run "cd #{current_path} && rake a13g:stop_pollers", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Start ActiveMQ"
+  task :start_activemq, :roles => :app do
+    run "cd $ACTIVEMQ_HOME && bin/activemq start", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Stop ActiveMQ"
+  task :stop_activemq, :roles => :app do
+    run "cd $ACTIVEMQ_HOME && bin/activemq stop", :env => {'RAILS_ENV' => stage}
+  end
+
 end
 
 namespace :backup do
@@ -230,7 +261,6 @@ task :do_set_password, :roles => :app do
   buffer = Hash[:password => custom_sample_password]
   put YAML::dump(buffer), "#{shared_path}/env_config/sample_password.yml", :mode => 0664
 end
-
 
 desc "After updating code we need to populate a new database.yml"
 task :generate_database_yml, :roles => :app do
