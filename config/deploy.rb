@@ -198,10 +198,24 @@ namespace :deploy do
     restart
   end
 
+  desc "Start ActiveMQ, Jetty, the A13g workers"
+  task :start_services, :roles => :app do
+    start_activemq
+    start_jetty
+    start_a13g_pollers
+  end
+
+  desc "Stop ActiveMQ, Jetty, the A13g workers"
+  task :stop_services, :roles => :app do
+    stop_a13g_pollers
+    stop_jetty
+    stop_activemq
+  end
+
   desc "Start the jetty server"
-    task :start_jetty, :roles => :app do
-      run "cd #{current_path} && rake jetty:config", :env => {'RAILS_ENV' => stage}
-      run "cd #{current_path} && rake jetty:start", :env => {'RAILS_ENV' => stage}
+  task :start_jetty, :roles => :app do
+    run "cd #{current_path} && rake jetty:config", :env => {'RAILS_ENV' => stage}
+    run "cd #{current_path} && rake jetty:start", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Stop the jetty server"
