@@ -200,7 +200,7 @@ namespace :deploy do
 
   desc "Start ActiveMQ, Jetty, the A13g workers"
   task :start_services, :roles => :app do
-    start_activemq
+    #start_activemq
     start_jetty
     start_a13g_pollers
   end
@@ -209,7 +209,7 @@ namespace :deploy do
   task :stop_services, :roles => :app do
     stop_a13g_pollers
     stop_jetty
-    stop_activemq
+    #stop_activemq
   end
 
   desc "Start the jetty server"
