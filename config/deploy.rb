@@ -200,7 +200,7 @@ namespace :deploy do
 
   desc "Start ActiveMQ, Jetty, the A13g workers"
   task :start_services, :roles => :app do
-    #start_activemq
+    start_activemq
     start_jetty
     start_a13g_pollers
   end
@@ -209,13 +209,13 @@ namespace :deploy do
   task :stop_services, :roles => :app do
     stop_a13g_pollers
     stop_jetty
-    #stop_activemq
+    stop_activemq
   end
 
   desc "Start the jetty server"
   task :start_jetty, :roles => :app do
     run "cd #{current_path} && rake jetty:config", :env => {'RAILS_ENV' => stage}
-    run "cd #{current_path} && rake jetty:start", :env => {'RAILS_ENV' => stage}
+    run "cd #{current_path} && nohup rake jetty:start > nohup_jetty.out 2>&1", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Stop the jetty server"
@@ -225,7 +225,7 @@ namespace :deploy do
 
   desc "Start the a13g pollers"
   task :start_a13g_pollers, :roles => :app do
-    run "cd #{current_path} && rake a13g:start_pollers", :env => {'RAILS_ENV' => stage}
+    run "cd #{current_path} && nohup rake a13g:start_pollers > nohup_a13g_pollers.out 2>&1", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Stop the a13g pollers"
@@ -235,7 +235,7 @@ namespace :deploy do
 
   desc "Start ActiveMQ"
   task :start_activemq, :roles => :app do
-    run "cd $ACTIVEMQ_HOME && bin/activemq start", :env => {'RAILS_ENV' => stage}
+    run "cd $ACTIVEMQ_HOME && nohup bin/activemq start > nohup_activemq.out 2>&1", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Stop ActiveMQ"
