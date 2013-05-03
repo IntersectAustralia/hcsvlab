@@ -58,6 +58,8 @@ namespace :fedora do
 		item.label = item.descMetadata.graph.statements.first.subject
 		item.save!
 
+		puts "Item= " + item.pid.to_s
+
 		#Text
 		query = RDF::Query.new({
 			:document => {
@@ -75,6 +77,7 @@ namespace :fedora do
 			doc.item = item
 			doc.file.content = File.open(corpus_dir + "/" + result.identifier.to_s)
 			doc.save
+			puts "Text Document= " + doc.pid.to_s
 		end
 
 		# Audio
@@ -93,6 +96,7 @@ namespace :fedora do
 			doc.label = result.source
 			doc.item = item
 			doc.save
+			puts "Audio Document= " + doc.pid.to_s
 		end
 	end
 
