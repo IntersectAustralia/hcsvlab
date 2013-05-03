@@ -132,6 +132,18 @@ test:
     reliable: true
     reconnectDelay: 5
  
+qa:
+    adapter: stomp
+    reliable: false
+    host: 127.0.0.1
+    port: 61613
+
+staging:
+    adapter: stomp
+    reliable: false
+    host: 127.0.0.1
+    port: 61613
+
 production:
     adapter: prod
     reliable: true
