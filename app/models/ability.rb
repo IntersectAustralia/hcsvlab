@@ -1,6 +1,8 @@
 class Ability
   include CanCan::Ability
 
+  require 'blacklight/catalog'
+
   def initialize(user)
     # alias edit_role to update_role so that they don't have to be declared separately
     alias_action :edit_role, :to => :update_role
@@ -30,6 +32,12 @@ class Ability
       can :reject, User
       can :approve, User
 
+    end
+
+    if user.is_superuser?
+        can :manage, Blacklight::Catalog
+    elsif user.is_researcher?
+        can :read, Blacklight::Catalog
     end
 
     #TODO: create more permissions here

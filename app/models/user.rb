@@ -114,6 +114,10 @@ class User < ActiveRecord::Base
     self.role == Role.find_by_name('hcsvlab-admin')
   end
 
+  def is_researcher?
+    self.role == Role.find_by_name('hcsvlab-researcher')
+  end
+
   def approve_access_request
     self.status = 'A'
     save!(:validate => false)

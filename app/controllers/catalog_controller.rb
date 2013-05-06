@@ -3,6 +3,9 @@ require 'blacklight/catalog'
 
 class CatalogController < ApplicationController  
 
+  before_filter :authenticate_user!
+  #load_and_authorize_resource
+
   include Blacklight::Catalog
   include Hydra::Controller::ControllerBehavior
   # These before_filters apply the hydra access controls
@@ -11,7 +14,6 @@ class CatalogController < ApplicationController
   #CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
   # This filters out objects that you want to exclude from search results, like FileAssets
   CatalogController.solr_search_params_logic += [:exclude_unwanted_models]
-
 
   configure_blacklight do |config|
     config.default_solr_params = { 
