@@ -16,4 +16,6 @@ qa:
   <<: *defaults
 
 staging:
-  <<: *defaults
+  password_reset_email_sender: jared@intersect.org.au, chrisk@intersect.org.au
+  account_request_user_status_email_sender: jared@intersect.org.au, chrisk@intersect.org.au
+  account_request_admin_notification_sender: jared@intersect.org.au, chrisk@intersect.org.au
