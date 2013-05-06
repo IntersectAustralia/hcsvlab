@@ -1,0 +1,61 @@
+     
+      <% # header bar for doc items in index view -%>
+      <div class="documentHeader clearfix">
+        
+        <% # main title container for doc partial view -%>
+          <h5 class="index_title">
+          	<%= t('blacklight.search.documents.counter', :counter => (document_counter + 1 + @response.params[:start].to_i)) %>
+            <span class="main_link_field">
+                <%= f1 = "http://purl.org/dc/terms/isPartOf_tesim"
+                    f2 = "http://purl.org/dc/terms/identifier_tesim"
+                    if document.has_key?(f1)
+                        l1 = link_to_document document, :label=>f1.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+                    else
+                        l1 = ""
+                    end
+                    if document.has_key?(f2)
+                        l2 = link_to_document document, :label=>f2.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+                    else
+                        l2 = ""
+                    end
+                    l1 + ":" + l2
+                %>
+            </span>
+            <span class="title_link_field">
+                <%= field = "http://purl.org/dc/terms/title_tesim"
+                    if document.has_key?(field)
+                        link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+                    else
+                        ""
+                    end
+                %>
+            </span>
+            <span class="created_link_field">
+                <%= field = "http://purl.org/dc/terms/created_tesim"
+                    if document.has_key?(field)
+                        link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+                    else
+                        ""
+                    end
+                %>
+            </span>
+            <span class="type_link_field">
+                <%= field = "http://purl.org/dc/terms/type_tesim"
+                    if document.has_key?(field)
+                        link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+                    else
+                        ""
+                    end
+                %>
+            </span>
+            <%
+                str = "|"
+                document.keys.sort.each { |k| str = str + " " + k.to_str + " |"}
+                str
+            %>
+           </h5>
+        
+        <% # bookmark functions for items/docs -%>
+        <%= render_index_doc_actions document, :wrapping_class => "documentFunctions span2" %>
+      </div> 
+      

@@ -20,7 +20,7 @@ class CatalogController < ApplicationController
     }
 
     # solr field configuration for search results/index views
-    config.index.show_link = 'title_tesim'
+    config.index.show_link = solr_name('http://purl.org/dc/terms/identifier', :stored_searchable, type: :string)
     config.index.record_tsim_type = 'has_model_ssim'
 
     # solr field configuration for document/show views
@@ -48,13 +48,15 @@ class CatalogController < ApplicationController
     # :show may be set to false if you don't want the facet to be drawn in the 
     # facet bar
 
-    config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/mode', :facetable), :label => 'Mode' 
+    config.add_facet_field solr_name('http://purl.org/dc/terms/isPartOf', :facetable), :label => 'Corpus' 
+    config.add_facet_field solr_name('http://purl.org/dc/terms/created', :facetable), :label => 'Created'
+    config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/mode', :facetable), :label => 'Mode'
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style', :facetable), :label => 'Speech Style' 
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity', :facetable), :label => 'Interactivity' 
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context', :facetable), :label => 'Communication Context' 
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/audience', :facetable), :label => 'Audience' 
     config.add_facet_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :facetable), :label => 'Discourse Type' 
-    config.add_facet_field solr_name('http://purl.org/dc/terms/isPartOf', :facetable), :label => 'Corpus' 
+    config.add_facet_field solr_name('http://purl.org/dc/terms/type', :facetable), :label => 'Type' 
 
     # Have BL send all facet field names to Solr, which has been the default
     # previously. Simply remove these lines if you'd rather use Solr request
@@ -68,18 +70,21 @@ class CatalogController < ApplicationController
     #   The ordering of the field names is the order of the display 
 
     #
-    # Item and Document fields
+    # Item fields
     #
-    config.add_index_field solr_name('http://purl.org/dc/terms/title', :stored_searchable, type: :string), :label => 'Title:'
-    config.add_index_field solr_name('http://purl.org/dc/terms/created', :stored_searchable, type: :string), :label => 'Created:'
 
-    config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/mode', :stored_searchable, type: :string), :label => 'Mode:'
-    config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style', :stored_searchable), :label => 'Speech Style:' 
-    config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity', :stored_searchable), :label => 'Interactivity:' 
-    config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context', :stored_searchable), :label => 'Communication Context:' 
-    config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/audience', :stored_searchable), :label => 'Audience:' 
-    config.add_index_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :stored_searchable), :label => 'Discourse Type:' 
-    config.add_index_field solr_name('http://purl.org/dc/terms/isPartOf', :stored_searchable), :label => 'Corpus:' 
+    # config.add_index_field solr_name('http://purl.org/dc/terms/isPartOf', :stored_searchable), :label => 'Corpus:' 
+    # config.add_index_field solr_name('http://purl.org/dc/terms/identifier', :stored_searchable, type: :string), :label => 'Identifier:'
+    # config.add_index_field solr_name('http://purl.org/dc/terms/title', :stored_searchable, type: :string), :label => 'Title:'
+    # config.add_index_field solr_name('http://purl.org/dc/terms/created', :stored_searchable, type: :string), :label => 'Created:'
+    # config.add_index_field solr_name('http://purl.org/dc/terms/type', :stored_searchable, type: :string), :label => 'Type:'
+
+    # config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/mode', :stored_searchable, type: :string), :label => 'Mode:'
+    # config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style', :stored_searchable), :label => 'Speech Style:' 
+    # config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity', :stored_searchable), :label => 'Interactivity:' 
+    # config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context', :stored_searchable), :label => 'Communication Context:' 
+    # config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/audience', :stored_searchable), :label => 'Audience:' 
+    # config.add_index_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :stored_searchable), :label => 'Discourse Type:' 
 
     # config.add_index_field solr_name('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', :stored_searchable, type: :string), :label => 'RDF Type:'
     # config.add_index_field solr_name('http://ns.ausnc.org.au/schemas/ace/genre', :stored_searchable, type: :string), :label => 'Genre:'
@@ -97,40 +102,39 @@ class CatalogController < ApplicationController
     # config.add_index_field solr_name('http://purl.org/dc/terms/publisher', :stored_searchable, type: :string), :label => 'Publisher:'
 
     # config.add_index_field solr_name('http://purl.org/dc/terms/extent', :stored_searchable, type: :string), :label => 'Extent:'
-    config.add_index_field solr_name('http://purl.org/dc/terms/source', :stored_searchable, type: :string), :label => 'Source:'
-    config.add_index_field solr_name('http://purl.org/dc/terms/type', :stored_searchable, type: :string), :label => 'Type:'
-    config.add_index_field solr_name('Item', :stored_searchable, type: :string), :label => 'Item:'
+    # config.add_index_field solr_name('http://purl.org/dc/terms/source', :stored_searchable, type: :string), :label => 'Source:'
+    # config.add_index_field solr_name('Item', :stored_searchable, type: :string), :label => 'Item:'
 
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display 
 
+    config.add_show_field solr_name('http://purl.org/dc/terms/isPartOf', :stored_searchable), :label => 'Corpus:' 
+    config.add_show_field solr_name('http://purl.org/dc/terms/identifier', :stored_searchable, type: :string), :label => 'Identifier:'
     config.add_show_field solr_name('http://purl.org/dc/terms/title', :stored_searchable, type: :string), :label => 'Title:'
     config.add_show_field solr_name('http://purl.org/dc/terms/created', :stored_searchable, type: :string), :label => 'Created:'
+    config.add_show_field solr_name('http://purl.org/dc/terms/type', :stored_searchable, type: :string), :label => 'Type:'
+    config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/document', :stored_searchable, type: :string), :label => 'Documents:'
+    config.add_show_field solr_name('http://purl.org/dc/terms/extent', :stored_searchable, type: :string), :label => 'Extent:'
+    config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/itemwordcount', :stored_searchable, type: :string), :label => 'Word Count'
 
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/mode', :stored_searchable, type: :string), :label => 'Mode:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style', :stored_searchable), :label => 'Speech Style:' 
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity', :stored_searchable), :label => 'Interactivity:' 
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context', :stored_searchable), :label => 'Communication Context:' 
     config.add_show_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :stored_searchable), :label => 'Discourse Type:' 
-    config.add_show_field solr_name('http://purl.org/dc/terms/isPartOf', :stored_searchable), :label => 'Corpus:' 
 
     config.add_show_field solr_name('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', :stored_searchable, type: :string), :label => 'RDF Type:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ace/genre', :stored_searchable, type: :string), :label => 'Genre:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/audience', :stored_searchable, type: :string), :label => 'Audience:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_setting', :stored_searchable, type: :string), :label => 'Communication Setting:'
-    config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/document', :stored_searchable, type: :string), :label => 'Documents:'
-    config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/itemwordcount', :stored_searchable, type: :string), :label => 'Word Count'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/plaintextversion', :stored_searchable, type: :string), :label => 'Plain Text:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/publication_status', :stored_searchable, type: :string), :label => 'Publication Status:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/source', :stored_searchable, type: :string), :label => 'Source:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/written_mode', :stored_searchable, type: :string), :label => 'Written Mode:'
     config.add_show_field solr_name('http://purl.org/dc/terms/contributor', :stored_searchable, type: :string), :label => 'Contributor:'
-    config.add_show_field solr_name('http://purl.org/dc/terms/identifier', :stored_searchable, type: :string), :label => 'Identifier:'
     config.add_show_field solr_name('http://purl.org/dc/terms/publisher', :stored_searchable, type: :string), :label => 'Publisher:'
 
-    config.add_show_field solr_name('http://purl.org/dc/terms/extent', :stored_searchable, type: :string), :label => 'Extent:'
     config.add_show_field solr_name('http://purl.org/dc/terms/source', :stored_searchable, type: :string), :label => 'Source:'
-    config.add_show_field solr_name('http://purl.org/dc/terms/type', :stored_searchable, type: :string), :label => 'Type:'
     config.add_show_field solr_name('Item', :stored_searchable, type: :string), :label => 'Item:'
 
     # solr fields to be displayed in the show (single result) view
@@ -159,48 +163,48 @@ class CatalogController < ApplicationController
     # case for a BL "search field", which is really a dismax aggregate
     # of Solr search fields. 
     
-    config.add_search_field('title') do |field|
-      # solr_parameters hash are sent to Solr as ordinary url query params. 
-      field.solr_parameters = { :'spellcheck.dictionary' => 'title' }
-
-      # :solr_local_parameters will be sent using Solr LocalParams
-      # syntax, as eg {! qf=$title_qf }. This is neccesary to use
-      # Solr parameter de-referencing like $title_qf.
-      # See: http://wiki.apache.org/solr/LocalParams
-      field.solr_local_parameters = { 
-        :qf => '$title_qf',
-        :pf => '$title_pf'
-      }
-    end
+#    config.add_search_field('title') do |field|
+#      # solr_parameters hash are sent to Solr as ordinary url query params. 
+#      field.solr_parameters = { :'spellcheck.dictionary' => 'title' }
+#
+#      # :solr_local_parameters will be sent using Solr LocalParams
+#      # syntax, as eg {! qf=$title_qf }. This is neccesary to use
+#      # Solr parameter de-referencing like $title_qf.
+#      # See: http://wiki.apache.org/solr/LocalParams
+#      field.solr_local_parameters = { 
+#        :qf => '$title_qf',
+#        :pf => '$title_pf'
+#      }
+#    end
     
-    config.add_search_field('author') do |field|
-      field.solr_parameters = { :'spellcheck.dictionary' => 'author' }
-      field.solr_local_parameters = { 
-        :qf => '$author_qf',
-        :pf => '$author_pf'
-      }
-    end
+#    config.add_search_field('author') do |field|
+#      field.solr_parameters = { :'spellcheck.dictionary' => 'author' }
+#      field.solr_local_parameters = { 
+#        :qf => '$author_qf',
+#        :pf => '$author_pf'
+#      }
+#    end
     
-    # Specifying a :qt only to show it's possible, and so our internal automated
-    # tests can test it. In this case it's the same as 
-    # config[:default_solr_parameters][:qt], so isn't actually neccesary. 
-    config.add_search_field('subject') do |field|
-      field.solr_parameters = { :'spellcheck.dictionary' => 'subject' }
-      field.qt = 'search'
-      field.solr_local_parameters = { 
-        :qf => '$subject_qf',
-        :pf => '$subject_pf'
-      }
-    end
+#    # Specifying a :qt only to show it's possible, and so our internal automated
+#    # tests can test it. In this case it's the same as 
+#    # config[:default_solr_parameters][:qt], so isn't actually neccesary. 
+#    config.add_search_field('subject') do |field|
+#      field.solr_parameters = { :'spellcheck.dictionary' => 'subject' }
+#      field.qt = 'search'
+#      field.solr_local_parameters = { 
+#        :qf => '$subject_qf',
+#        :pf => '$subject_pf'
+#      }
+#    end
 
     # "sort results by" select (pulldown)
     # label in pulldown is followed by the name of the SOLR field to sort by and
     # whether the sort is ascending or descending (it must be asc or desc
     # except in the relevancy case).
-    config.add_sort_field 'score desc, pub_date_dtsi desc, title_tesi asc', :label => 'relevance'
-    config.add_sort_field 'pub_date_dtsi desc, title_tesi asc', :label => 'year'
-    config.add_sort_field 'author_tesi asc, title_tesi asc', :label => 'author'
-    config.add_sort_field 'title_tesi asc, pub_date_dtsi desc', :label => 'title'
+    # config.add_sort_field 'score desc, pub_date_dtsi desc, title_tesi asc', :label => 'relevance'
+    # config.add_sort_field 'http://purl.org/dc/terms/isPartOf_tesim', :label => 'Corpus' 
+    # config.add_sort_field 'http://purl.org/dc/terms/created_tesim', :label => 'Created'
+    # config.add_sort_field 'http://purl.org/dc/terms/identifier_tesim', :label => 'Identifier'
 
     # If there are more than this many search results, no spelling ("did you 
     # mean") suggestion is offered.
