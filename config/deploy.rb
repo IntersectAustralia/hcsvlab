@@ -16,7 +16,7 @@ set :rvm_type, :user
 # Deploy using copy for now
 set :scm, 'git'
 # Uncomment to enable Jetty submodule
-set :git_enable_submodules, 1
+#set :git_enable_submodules, 1
 set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
 set :deploy_via, :copy
 set :copy_exclude, [".git/*"]
@@ -155,6 +155,12 @@ namespace :deploy do
     update
     rebundle
     refresh_db
+
+    configure_activemq
+    configure_fedora
+    configure_solr
+    configure_tomcat6
+
   end
 
   # Helper task which re-creates the database
@@ -201,7 +207,7 @@ namespace :deploy do
   desc "Start ActiveMQ, Jetty, the A13g workers"
   task :start_services, :roles => :app do
     start_activemq
-    start_jetty
+    #start_jetty
     start_tomcat6
     start_a13g_pollers
   end
@@ -209,7 +215,7 @@ namespace :deploy do
   desc "Stop ActiveMQ, Jetty, the A13g workers"
   task :stop_services, :roles => :app do
     stop_a13g_pollers
-    stop_jetty
+    #stop_jetty
     stop_tomcat6
     stop_activemq
   end
@@ -227,9 +233,7 @@ namespace :deploy do
 
   desc "Start the Tomcat 6 server"
   task :start_tomcat6, :roles => :app do
-    configure_fedora
-    configure_solr
-    configure_tomcat6
+  
     run "cd ${CATALINA_HOME} && nohup bin/startup.sh > nohup_tomcat.out 2>&1", :env => {'RAILS_ENV' => stage}
   end
 
@@ -270,7 +274,6 @@ namespace :deploy do
 
   desc "Start ActiveMQ"
   task :start_activemq, :roles => :app do
-    configure_activemq
     run "cd $ACTIVEMQ_HOME && nohup bin/activemq start > nohup_activemq.out 2>&1", :env => {'RAILS_ENV' => stage}
   end
 
