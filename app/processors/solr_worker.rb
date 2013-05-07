@@ -8,15 +8,15 @@ require 'xmlsimple'
 class AUSNC
   
 private
-  BASE_URI = 'http://ns.ausnc.org.au/schemas/ausnc_md_model/'
+  BASE_URI = 'http://ns.ausnc.org.au/schemas/ausnc_md_model/' unless const_defined?(:BASE_URI)
 
 public
-  AUDIENCE              = RDF::URI(BASE_URI + 'audience')
-  COMMUNICATION_CONTEXT = RDF::URI(BASE_URI + 'communication_context')
-  INTERACTIVITY         = RDF::URI(BASE_URI + 'interactivity')
-  MODE                  = RDF::URI(BASE_URI + 'mode')
-  SPEECH_STYLE          = RDF::URI(BASE_URI + 'speech_style')
-  DOCUMENT              = RDF::URI(BASE_URI + 'document')
+  AUDIENCE              = RDF::URI(BASE_URI + 'audience') unless const_defined?(:AUDIENCE)
+  COMMUNICATION_CONTEXT = RDF::URI(BASE_URI + 'communication_context') unless const_defined?(:COMMUNICATION_CONTEXT)
+  INTERACTIVITY         = RDF::URI(BASE_URI + 'interactivity') unless const_defined?(:INTERACTIVITY)
+  MODE                  = RDF::URI(BASE_URI + 'mode') unless const_defined?(:MODE)
+  SPEECH_STYLE          = RDF::URI(BASE_URI + 'speech_style') unless const_defined?(:SPEECH_STYLE)
+  DOCUMENT              = RDF::URI(BASE_URI + 'document') unless const_defined?(:DOCUMENT)
 
 end
 
@@ -27,10 +27,10 @@ end
 class OLAC
 
 private
-  BASE_URI = 'http://www.language-archives.org/OLAC/1.1/'
+  BASE_URI = 'http://www.language-archives.org/OLAC/1.1/' unless const_defined?(:BASE_URI)
 
 public  
-  DISCOURSE_TYPE = RDF::URI(BASE_URI + 'discourse_type')
+  DISCOURSE_TYPE = RDF::URI(BASE_URI + 'discourse_type') unless const_defined?(:DISCOURSE_TYPE)
 
 end
 
@@ -41,11 +41,11 @@ end
 class PURL
 
 private
-  BASE_URI = 'http://purl.org/dc/terms/'
+  BASE_URI = 'http://purl.org/dc/terms/' unless const_defined?(:BASE_URI)
 
 public  
-  IS_PART_OF = RDF::URI(BASE_URI + 'isPartOf')
-  TYPE       = RDF::URI(BASE_URI + 'type')
+  IS_PART_OF = RDF::URI(BASE_URI + 'isPartOf') unless const_defined?(:IS_PART_OF)
+  TYPE       = RDF::URI(BASE_URI + 'type') unless const_defined?(:TYPE)
 
 end
 
@@ -56,10 +56,10 @@ end
 class DC
 
 private
-  BASE_URI = 'http://purl.org/dc/elements/1.1/'
+  BASE_URI = 'http://purl.org/dc/elements/1.1/' unless const_defined?(:BASE_URI)
 
 public  
-  TITLE = RDF::URI(BASE_URI + 'title')
+  TITLE = RDF::URI(BASE_URI + 'title') unless const_defined?(:TITLE)
 
 end
 
@@ -70,10 +70,10 @@ end
 class FEDORA
 
 private
-  BASE_URI = 'info:fedora/fedora-system:def/relations-external#'
+  BASE_URI = 'info:fedora/fedora-system:def/relations-external#' unless const_defined?(:BASE_URI)
 
 public  
-  IS_MEMBER_OF = RDF::URI(BASE_URI + 'isMemberOf')
+  IS_MEMBER_OF = RDF::URI(BASE_URI + 'isMemberOf') unless const_defined?(:IS_MEMBER_OF)
 
 end
 
