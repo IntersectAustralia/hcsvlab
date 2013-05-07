@@ -119,6 +119,8 @@ end
 #
 class Solr_Worker < ApplicationProcessor
 
+  FEDORA_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env] unless const_defined?(:FEDORA_CONFIG)
+
   subscribes_to :solr_worker
 
   def on_message(message)
@@ -266,8 +268,7 @@ private
   # Build the URL of a particular datastream of the given Fedora object
   #
   def buildURI(object, datastream)
-    # TODO: get base URI from a config file
-    return "http://localhost:8983/fedora/objects/#{object}/datastreams/#{datastream}/content"
+    return FEDORA_CONFIG["url"].to_s + "/objects/#{object}/datastreams/#{datastream}/content"
   end
 
   #
