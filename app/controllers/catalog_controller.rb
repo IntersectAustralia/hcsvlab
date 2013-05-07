@@ -58,6 +58,7 @@ class CatalogController < ApplicationController
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context', :facetable), :label => 'Communication Context' 
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/audience', :facetable), :label => 'Audience' 
     config.add_facet_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :facetable), :label => 'Discourse Type' 
+    config.add_facet_field solr_name('http://www.language-archives.org/OLAC/1.1/language', :facetable), :label => 'Language (ISO 639-3 Code)' 
     config.add_facet_field solr_name('http://purl.org/dc/terms/type', :facetable), :label => 'Type' 
 
     # Have BL send all facet field names to Solr, which has been the default
@@ -124,6 +125,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity', :stored_searchable), :label => 'Interactivity:' 
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context', :stored_searchable), :label => 'Communication Context:' 
     config.add_show_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :stored_searchable), :label => 'Discourse Type:' 
+    config.add_show_field solr_name('http://www.language-archives.org/OLAC/1.1/language', :stored_searchable), :label => 'Language (ISO 639-3 Code):' 
 
     config.add_show_field solr_name('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', :stored_searchable, type: :string), :label => 'RDF Type:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ace/genre', :stored_searchable, type: :string), :label => 'Genre:'

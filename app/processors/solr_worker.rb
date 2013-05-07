@@ -31,6 +31,7 @@ private
 
 public  
   DISCOURSE_TYPE = RDF::URI(BASE_URI + 'discourse_type')
+  LANGUAGE       = RDF::URI(BASE_URI + 'language')
 
 end
 
@@ -46,6 +47,7 @@ private
 public  
   IS_PART_OF = RDF::URI(BASE_URI + 'isPartOf')
   TYPE       = RDF::URI(BASE_URI + 'type')
+  EXTENT     = RDF::URI(BASE_URI + 'extent')
 
 end
 
@@ -76,6 +78,7 @@ public
   IS_MEMBER_OF = RDF::URI(BASE_URI + 'isMemberOf')
 
 end
+
 
 #
 # Helper class for interpreting the RELS-EXT we get from the Fedora message
@@ -151,6 +154,7 @@ class Solr_Worker < ApplicationProcessor
 
 private
 
+
   #
   # =============================================================================
   # Indexing
@@ -192,18 +196,27 @@ private
       basic_results = query.execute(graph) 
 
       # Finally look for references to Documents within the metadata and
-      # find their types.
+      # find their types and extents.
       query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
       results = query.execute(graph)
 
-      extras = {PURL::TYPE => []}
+      extras = {PURL::TYPE => [], PURL::EXTENT => []}
       results.each { |result|
         document = result[:document]
-        query = RDF::Query.new({document => {PURL::TYPE => :type}})
-        inner_results = query.execute(graph)
+        type_query   = RDF::Query.new({document => {PURL::TYPE => :type}})
+        extent_query = RDF::Query.new({document => {PURL::EXTENT => :extent}})
+
+        inner_results = type_query.execute(graph)
         unless inner_results.size == 0
           inner_results.each { |inner_result|
             extras[PURL::TYPE] << inner_result[:type].to_s
+          }
+        end
+
+        inner_results = extent_query.execute(graph)
+        unless inner_results.size == 0
+          inner_results.each { |inner_result|
+            extras[PURL::EXTENT] << inner_result[:extent].to_s
           }
         end
       }
@@ -393,6 +406,27 @@ private
   # End of Solr
   # -----------------------------------------------------------------------------
   #
+
+
+
+  #
+  # =============================================================================
+  # Date Handling
+  # =============================================================================
+  #
+
+  #
+  # In order to handle the faceted search of date fields, we group them into
+  # decades.
+  #
+  def date_group(date)
+  end
+
+  #
+  # End of Date Handling
+  # -----------------------------------------------------------------------------
+  #
+
 
   #
   # =============================================================================
