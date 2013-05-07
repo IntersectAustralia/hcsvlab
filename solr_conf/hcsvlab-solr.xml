@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Context docBase="${SOLR_HOME}/hcsvlab/solr/apache-solr-4.0.0.war" 
+         debug="0" 
+         crossContext="true">
+    <Environment name="solr/home" 
+                 type="java.lang.String" 
+                 value="${SOLR_HOME}/hcsvlab/solr" 
+                 override="true"/>
+</Context>
