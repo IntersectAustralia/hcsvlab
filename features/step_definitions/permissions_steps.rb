@@ -17,11 +17,7 @@ Then /^I should get the following security outcomes$/ do |table|
 end
 
 Given /^I have the usual roles and permissions$/ do
-  
-  super_role = "hcsvlab-admin"
-  # TODO: adjust roles and permissions here
-  Role.create!(:name => super_role)
-  Role.create!(:name => "Researcher")
-
+  Role.create!(:name => Role::SUPERUSER_ROLE)
+  Role.create!(:name => Role::RESEARCHER_ROLE)
 end
 

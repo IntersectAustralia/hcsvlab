@@ -23,8 +23,8 @@ Given /^I have a user "([^"]*)" with an expired lock$/ do |email|
 end
 
 Given /^I have a user "([^"]*)" with role "([^"]*)"$/ do |email, role|
-  user            = FactoryGirl.create(:user, :email => email, :password => "Pas$w0rd", :status => 'A')
-  role         = Role.where(:name => role).first
+  user = FactoryGirl.create(:user, :email => email, :password => "Pas$w0rd", :status => 'A')
+  role = Role.where(:name => role).first
   user.role_id = role.id
   user.save!
 end
@@ -69,3 +69,12 @@ And /^I request a reset for "([^"]*)"$/ do |email|
   click_button "Send me reset password instructions"
 end
 
+Given(/^I have (\d+) (active|deactivated) users with role "(.*?)"$/) do |count, status, role_name|
+  count.to_i.times do |count|
+    status_str = status == 'active' ? 'A' : 'D'
+    user = FactoryGirl.create(:user, :password => "Pas$w0rd", :status => status_str)
+    role = Role.where(:name => role_name).first
+    user.role_id = role.id
+    user.save!
+  end
+end

@@ -30,6 +30,7 @@ class User < ActiveRecord::Base
   scope :approved, where(:status => 'A').order(:email)
   scope :deactivated_or_approved, where("status = 'D' or status = 'A' ").order(:email)
   scope :approved_superusers, joins(:role).merge(User.approved).merge(Role.superuser_roles)
+  scope :approved_researchers, joins(:role).merge(User.approved).merge(Role.researcher_roles)
 
   # Override Devise active for authentication method so that users must be approved before being allowed to log in
   # https://github.com/plataformatec/devise/wiki/How-To:-Require-admin-to-activate-account-before-sign_in
@@ -111,11 +112,11 @@ class User < ActiveRecord::Base
   end
 
   def is_superuser?
-    self.role == Role.find_by_name('hcsvlab-admin')
+    self.role == Role.find_by_name(Role::SUPERUSER_ROLE)
   end
 
   def is_researcher?
-    self.role == Role.find_by_name('hcsvlab-researcher')
+    self.role == Role.find_by_name(Role::RESEARCHER_ROLE)
   end
 
   def approve_access_request
