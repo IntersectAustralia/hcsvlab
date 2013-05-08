@@ -14,7 +14,7 @@
     <comment>Number of seconds Fedora http client will wait for data coming across an 
 		established http connection.</comment>
   </param>
-  <param name="fedoraServerHost" value="localhost">
+  <param name="fedoraServerHost" value="ic2-hcsvlab-staging1-vm.intersect.org.au">
     <comment>Defines the host name for the Fedora server, as seen from the 
 		outside world.</comment>
   </param>
@@ -57,7 +57,7 @@
 		this value must be less than the limit specified for the 
 		datastreamExpirationLimit.</comment>
   </param>
-  <param name="fedoraServerPort" value="8983">
+  <param name="fedoraServerPort" value="8080">
     <comment>Defines the port number on which the Fedora server runs; 
 		default is 8080.</comment>
   </param>
@@ -618,7 +618,7 @@
     <param name="dbPassword" value="fedoraAdmin">
       <comment>The database password.</comment>
     </param>
-    <param name="jdbcURL" value="jdbc:derby:fedora/default/derby/fedora3;create=true">
+    <param name="jdbcURL" value="jdbc:derby:/opt/fedora/default/derby/fedora3;create=true">
       <comment>The JDBC connection URL.</comment>
     </param>
     <param name="whenExhaustedAction" value="1">

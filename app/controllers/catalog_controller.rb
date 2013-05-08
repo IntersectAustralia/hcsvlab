@@ -3,7 +3,7 @@ require 'blacklight/catalog'
 
 class CatalogController < ApplicationController  
 
-  before_filter :authenticate_user!
+  before_filter :authenticate_user!, :except => [:index]
   #load_and_authorize_resource
 
   include Blacklight::Catalog

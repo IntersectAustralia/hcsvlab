@@ -16,7 +16,7 @@ set :rvm_type, :user
 # Deploy using copy for now
 set :scm, 'git'
 # Uncomment to enable Jetty submodule
-set :git_enable_submodules, 1
+#set :git_enable_submodules, 1
 set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
 set :deploy_via, :copy
 set :copy_exclude, [".git/*"]
@@ -155,6 +155,12 @@ namespace :deploy do
     update
     rebundle
     refresh_db
+
+    configure_activemq
+    configure_fedora
+    configure_solr
+    configure_tomcat6
+
   end
 
   # Helper task which re-creates the database
@@ -201,14 +207,16 @@ namespace :deploy do
   desc "Start ActiveMQ, Jetty, the A13g workers"
   task :start_services, :roles => :app do
     start_activemq
-    start_jetty
+    #start_jetty
+    start_tomcat6
     start_a13g_pollers
   end
 
   desc "Stop ActiveMQ, Jetty, the A13g workers"
   task :stop_services, :roles => :app do
     stop_a13g_pollers
-    stop_jetty
+    #stop_jetty
+    stop_tomcat6
     stop_activemq
   end
 
@@ -221,6 +229,37 @@ namespace :deploy do
   desc "Stop the jetty server"
   task :stop_jetty, :roles => :app do
     run "cd #{current_path} && rake jetty:stop", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Start the Tomcat 6 server"
+  task :start_tomcat6, :roles => :app do
+  
+    run "cd ${CATALINA_HOME} && nohup bin/startup.sh > nohup_tomcat.out 2>&1", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Configure Tomcat 6"
+  task :configure_tomcat6, :roles => :app do
+    run "cp -p #{current_path}/tomcat_conf/setenv.sh $CATALINA_HOME/bin/", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Configure Fedora"
+  task :configure_fedora, :roles => :app do
+    run "cp -p #{current_path}/fedora_conf/conf/#{stage}/fedora.fcfg $FEDORA_HOME/server/config/", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Configure Solr"
+  task :configure_solr, :roles => :app do
+    run "cp -p #{current_path}/solr_conf/hcsvlab-solr.xml $CATALINA_HOME/conf/Catalina/localhost/solr.xml", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Create the HCS vLab Solr core"
+  task :create_solr_core, :roles => :app do
+    run "cp -rp #{current_path}/solr_conf/hcsvlab $SOLR_HOME/", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Stop the Tomcat 6 server"
+  task :stop_tomcat6, :roles => :app do
+    run "cd ${CATALINA_HOME} && bin/shutdown.sh", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Start the a13g pollers"
@@ -236,6 +275,11 @@ namespace :deploy do
   desc "Start ActiveMQ"
   task :start_activemq, :roles => :app do
     run "cd $ACTIVEMQ_HOME && nohup bin/activemq start > nohup_activemq.out 2>&1", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Configure ActiveMQ"
+  task :configure_activemq, :roles => :app do
+    run "cp -p #{current_path}/activemq_conf/activemq.xml $ACTIVEMQ_HOME/conf/", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Stop ActiveMQ"
