@@ -19,13 +19,21 @@ Feature: Logging In
     Then I should see "Logged in successfully."
     And I should be on the home page
 
-  Scenario: Successful login from home page
+  Scenario: Home page shows login form if user not already logged in
     Given I am on the home page
     When I fill in "Email" with "georgina@intersect.org.au"
     And I fill in "Password" with "Pas$w0rd"
     And I press "Log in"
     Then I should see "Logged in successfully."
     And I should be on the home page
+
+  Scenario: Home page is the search page once logged in
+    Given I am on the login page
+    And I attempt to login with "georgina@intersect.org.au" and "Pas$w0rd"
+    # currently this is what is shown on the search page - this test may need to be changed later
+    Then I should see "Welcome!"
+    When I am on the home page
+    Then I should see "Welcome!"
 
   Scenario: Should be redirected to the login page when trying to access a secure page
     Given I am on the list users page

@@ -1,34 +1,42 @@
-<div id="sidebar" class="span3">
- <%= render :partial=>'facets' %>
-</div><!--/well -->
+<% if !user_signed_in? %>
+  <%= simple_form_for("user", :url => user_session_path) do |f| %>
+    <%= render(:partial => 'devise/sessions/form', :locals => { :f => f }) %>
+  <% end %>
 
-<div id="content" class="span9">
+<% else %>
 
-    <% unless has_search_parameters? %>
-	    <%# if there are no input/search related params, display the "home" partial -%>
-	    <%= render 'home' %>
-    <% else %>
+  <div id="sidebar" class="span3">
+   <%= render :partial=>'facets' %>
+  </div><!--/well -->
 
-      <h2 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h2>
+  <div id="content" class="span9">
 
-      <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
+      <% unless has_search_parameters? %>
+        <%# if there are no input/search related params, display the "home" partial -%>
+        <%= render 'home' %>
+      <% else %>
 
+        <h2 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h2>
 
-      <% extra_head_content << render_opensearch_response_metadata.html_safe %>
-
-	    <%= render :partial => 'did_you_mean' %>
-
-      <%= render :partial => 'constraints' %>
-
-	    <%= render 'sort_and_per_page' %>
-
-      <h2 class="hide-text"><%= t('blacklight.search.search_results') %></h2>
-	    <%= render_document_index %>
+        <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
 
 
-	    <%= render 'results_pagination' %>
+        <% extra_head_content << render_opensearch_response_metadata.html_safe %>
+
+        <%= render :partial => 'did_you_mean' %>
+
+        <%= render :partial => 'constraints' %>
+
+        <%= render 'sort_and_per_page' %>
+
+        <h2 class="hide-text"><%= t('blacklight.search.search_results') %></h2>
+        <%= render_document_index %>
 
 
-    <% end %>
+        <%= render 'results_pagination' %>
 
-</div>
+
+      <% end %>
+
+  </div>
+<% end %>
