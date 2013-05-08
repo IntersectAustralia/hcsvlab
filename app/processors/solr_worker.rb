@@ -48,6 +48,7 @@ public
   IS_PART_OF = RDF::URI(BASE_URI + 'isPartOf') unless const_defined?(:IS_PART_OF)
   TYPE       = RDF::URI(BASE_URI + 'type') unless const_defined?(:TYPE)
   EXTENT     = RDF::URI(BASE_URI + 'extent') unless const_defined?(:EXTENT)
+  CREATED    = RDF::URI(BASE_URI + 'created') unless const_defined?(:CREATED)
 
 end
 
@@ -195,14 +196,29 @@ private
       # and add them all to the index
       item = results[0][:item]
       query = RDF::Query.new({item => {:predicate => :object}})
-      basic_results = query.execute(graph) 
+      basic_results = query.execute(graph)
+
+      # Now we have the basic results, we have a guddle about for any
+      # extra information in which we're interested. Start by creating 
+      # the Hash into which we will accumulate this extra data.
+      extras = {PURL::TYPE => [], PURL::EXTENT => [], "date_group" => []}
+
+      # Look for any fields which we're going to group in the indexing.
+      # At the moment this is solely the Date field.
+      query = RDF::Query.new({item => {PURL::CREATED => :date}})
+      results = query.execute(graph)
+      results.each { |result|
+        date = result[:date]
+        group = date_group(date)
+        extras["date_group"] << group unless group.nil?
+      }
+
 
       # Finally look for references to Documents within the metadata and
       # find their types and extents.
       query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
       results = query.execute(graph)
 
-      extras = {PURL::TYPE => [], PURL::EXTENT => []}
       results.each { |result|
         document = result[:document]
         type_query   = RDF::Query.new({document => {PURL::TYPE => :type}})
@@ -416,11 +432,65 @@ private
   # =============================================================================
   #
 
+  def date_from_integer(y)
+    logger.debug "Trying to resolve integer #{y} into a Date"
+    y = y + 1900 if y < 100   # Y2K hack all over again?
+    date = Date.new(y)
+    return date
+  end
+
+
+  def date_from_string(string)
+    date = nil
+    begin
+      logger.debug "Trying to resolve string #{string} into a Date"
+      date = Date.parse(string)
+    rescue
+      logger.debug "OK, Trying to convert string #{string} into an Integer then a Date"
+      begin
+        y = string.to_i
+        date = date_from_integer(y)
+      rescue
+      end
+    end
+    return date
+  end
+
+
   #
   # In order to handle the faceted search of date fields, we group them into
   # decades.
   #
-  def date_group(date)
+  def date_group(field, resolution=10)
+    #
+    # Work out the date which field represents, whether it's a String or
+    # an Integer or some other hideous mess.
+    #
+    c = field.class
+
+    logger.debug "resolving #{c.to_s} date #{field} as a date"
+
+    case
+      when c == String
+        date = date_from_string(field)
+      when c == Fixnum
+        date = date_from_integer(field)
+      else
+        date = date_from_string(field.to_s)
+    end
+
+    return nil if date.nil?
+    
+    #
+    # Now work out the group into which it should fall and return a String
+    # denoting that.
+    #
+    y = date.year
+    y /= resolution
+    first = y * resolution
+    last  = first + resolution - 1
+    logger.debug "Range is #{first} - #{last}"
+    return "#{first} - #{last}"
   end
 
   #

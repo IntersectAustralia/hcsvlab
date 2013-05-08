@@ -51,7 +51,7 @@ class CatalogController < ApplicationController
     # facet bar
 
     config.add_facet_field solr_name('http://purl.org/dc/terms/isPartOf', :facetable), :label => 'Corpus' 
-    config.add_facet_field solr_name('http://purl.org/dc/terms/created', :facetable), :label => 'Created'
+    config.add_facet_field solr_name('date_group', :facetable), :label => 'Created'
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/mode', :facetable), :label => 'Mode'
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style', :facetable), :label => 'Speech Style' 
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity', :facetable), :label => 'Interactivity' 
