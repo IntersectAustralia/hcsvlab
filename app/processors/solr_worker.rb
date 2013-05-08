@@ -49,6 +49,10 @@ public
   TYPE       = RDF::URI(BASE_URI + 'type') unless const_defined?(:TYPE)
   EXTENT     = RDF::URI(BASE_URI + 'extent') unless const_defined?(:EXTENT)
   CREATED    = RDF::URI(BASE_URI + 'created') unless const_defined?(:CREATED)
+  IDENTIFIER = RDF::URI(BASE_URI + 'identifier') unless const_defined?(:IDENTIFIER)
+  SOURCE     = RDF::URI(BASE_URI + 'source') unless const_defined?(:SOURCE)
+  TITLE      = RDF::URI(BASE_URI + 'title') unless const_defined?(:TITLE)
+  TYPE       = RDF::URI(BASE_URI + 'type') unless const_defined?(:TYPE)
 
 end
 
@@ -128,7 +132,7 @@ class Solr_Worker < ApplicationProcessor
   subscribes_to :solr_worker
 
   def on_message(message)
-    # Expect message to me a command verb followed by the name of a Fedora object
+    # Expect message to be a command verb followed by the name of a Fedora object
     # and then do what the verb says to the object. Complain if the message is
     # badly formed, or we don't understand the command verb.
     
@@ -480,7 +484,7 @@ private
     end
 
     return nil if date.nil?
-    
+
     #
     # Now work out the group into which it should fall and return a String
     # denoting that.

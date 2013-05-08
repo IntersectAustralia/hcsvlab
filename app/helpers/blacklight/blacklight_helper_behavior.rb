@@ -206,7 +206,23 @@ module Blacklight::BlacklightHelperBehavior
   # Used in the show view for displaying the main solr document heading
   def document_heading document=nil
     document ||= @document
-    document[blacklight_config.show.heading] || document.id
+    begin
+      f1 = "http://purl.org/dc/terms/isPartOf_tesim"
+      f2 = "http://purl.org/dc/terms/identifier_tesim"
+      if document.has_key?(f1)
+        l1 = document[f1][0]
+      else
+        l1 = ""
+      end
+      if document.has_key?(f2)
+        l2 = document[f2][0]
+      else
+        l2 = ""
+      end
+      l1 + ":" + l2
+    rescue
+     document[blacklight_config.show.heading] || document.id
+    end
   end
 
   ##
@@ -600,6 +616,69 @@ module Blacklight::BlacklightHelperBehavior
       end
     end
     val
+  end
+
+  #
+  # Build the URL of a particular datastream of the given Fedora object
+  #
+  def buildURI(object, datastream)
+    config = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env]
+    return config["url"].to_s + "/objects/#{object}/datastreams/#{datastream}/content"
+  end
+
+  def item_documents(document, uris)
+    document_descriptors = []
+
+    uri = buildURI(document.id, 'descMetadata')
+    graph = RDF::Graph.load(uri)
+
+    # Find the identity of the Item
+    query = RDF::Query.new({:item => {PURL::IS_PART_OF => :corpus}})
+    item_results = query.execute(graph)
+
+    unless item_results.size == 0
+      item = item_results[0][:item]
+ 
+      # Look for references to Documents within the metadata and
+      # find their fields as specified in uris.
+      query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
+      document_results = query.execute(graph)
+
+      document_results.each { |result|
+        document = result[:document]
+        descriptor = {}
+
+        uris.each { |uri|
+          field_query = RDF::Query.new({document => {uri => :value}})
+          field_results = field_query.execute(graph)
+          unless field_results.size == 0
+            descriptor[uri] = field_results[0][:value]
+          end
+        }
+        document_descriptors << descriptor
+      }
+    end
+
+    return document_descriptors
+  end
+
+  def format_extent(value, unit, multiple = 1000)
+    prefix = ['E', 'P', 'T', 'G', 'M', 'k', '', 'm', 'u', 'n', 'p', 'f', 'a']
+    p_idx = prefix.find_index('')
+
+    value = 1.0 * value # force it to floating point
+    while value.abs > multiple
+      value /= multiple
+      p_idx -= 1
+      break if p_idx == 0
+    end
+    while value.abs <= 1.0
+      value *= multiple
+      p_idx += 1
+      break if p_idx == prefix.size-1
+    end
+
+    return sprintf("%4.1f %s%s", value, prefix[p_idx], unit)
   end
 
 

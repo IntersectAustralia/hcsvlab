@@ -111,13 +111,13 @@ class CatalogController < ApplicationController
     # solr fields to be displayed in the show (single result) view
     #   The ordering of the field names is the order of the display 
 
-    config.add_show_field solr_name('http://purl.org/dc/terms/isPartOf', :stored_searchable), :label => 'Corpus:' 
-    config.add_show_field solr_name('http://purl.org/dc/terms/identifier', :stored_searchable, type: :string), :label => 'Identifier:'
+    # config.add_show_field solr_name('http://purl.org/dc/terms/isPartOf', :stored_searchable), :label => 'Corpus:' 
+    # config.add_show_field solr_name('http://purl.org/dc/terms/identifier', :stored_searchable, type: :string), :label => 'Identifier:'
     config.add_show_field solr_name('http://purl.org/dc/terms/title', :stored_searchable, type: :string), :label => 'Title:'
     config.add_show_field solr_name('http://purl.org/dc/terms/created', :stored_searchable, type: :string), :label => 'Created:'
-    config.add_show_field solr_name('http://purl.org/dc/terms/type', :stored_searchable, type: :string), :label => 'Type:'
-    config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/document', :stored_searchable, type: :string), :label => 'Documents:'
-    config.add_show_field solr_name('http://purl.org/dc/terms/extent', :stored_searchable, type: :string), :label => 'Extent:'
+    # config.add_show_field solr_name('http://purl.org/dc/terms/type', :stored_searchable, type: :string), :label => 'Type:'
+    # config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/document', :stored_searchable, type: :string), :label => 'Documents:'
+    # config.add_show_field solr_name('http://purl.org/dc/terms/extent', :stored_searchable, type: :string), :label => 'Extent:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/itemwordcount', :stored_searchable, type: :string), :label => 'Word Count'
 
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/mode', :stored_searchable, type: :string), :label => 'Mode:'
@@ -127,7 +127,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :stored_searchable), :label => 'Discourse Type:' 
     config.add_show_field solr_name('http://www.language-archives.org/OLAC/1.1/language', :stored_searchable), :label => 'Language (ISO 639-3 Code):' 
 
-    config.add_show_field solr_name('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', :stored_searchable, type: :string), :label => 'RDF Type:'
+    # config.add_show_field solr_name('http://www.w3.org/1999/02/22-rdf-syntax-ns#type', :stored_searchable, type: :string), :label => 'RDF Type:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ace/genre', :stored_searchable, type: :string), :label => 'Genre:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/audience', :stored_searchable, type: :string), :label => 'Audience:'
     config.add_show_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_setting', :stored_searchable, type: :string), :label => 'Communication Setting:'
