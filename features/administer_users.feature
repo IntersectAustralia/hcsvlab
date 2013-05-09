@@ -16,18 +16,18 @@ Feature: Administer users
     Given "raul@intersect.org.au" is deactivated
     When I am on the list users page
     Then I should see "users" table with
-      | First name | Last name | Email                     | Role          | Status |
-      | Georgina   | Edwards   | georgina@intersect.org.au | hcsvlab-admin | Active |
+      | First name | Last name | Email                     | Role          | Status      |
+      | Georgina   | Edwards   | georgina@intersect.org.au | hcsvlab-admin | Active      |
       | Raul       | Carrizo   | raul@intersect.org.au     |               | Deactivated |
 
   Scenario: View user details
-    Given "raul@intersect.org.au" has role "Researcher"
+    Given "raul@intersect.org.au" has role "researcher"
     And I am on the list users page
     When I follow "View Details" for "raul@intersect.org.au"
     Then I should see field "Email" with value "raul@intersect.org.au"
     And I should see field "First name" with value "Raul"
     And I should see field "Last name" with value "Carrizo"
-    And I should see field "Role" with value "Researcher"
+    And I should see field "Role" with value "researcher"
     And I should see field "Status" with value "Active"
 
   Scenario: Go back from user details
@@ -37,7 +37,7 @@ Feature: Administer users
     Then I should be on the list users page
 
   Scenario: Edit role
-    Given "raul@intersect.org.au" has role "Researcher"
+    Given "raul@intersect.org.au" has role "researcher"
     And I am on the list users page
     When I follow "View Details" for "raul@intersect.org.au"
     And I follow "Edit role"
@@ -48,7 +48,7 @@ Feature: Administer users
     And I should see field "Role" with value "hcsvlab-admin"
 
   Scenario: Edit role from list page
-    Given "raul@intersect.org.au" has role "Researcher"
+    Given "raul@intersect.org.au" has role "researcher"
     And I am on the list users page
     When I follow "Edit role" for "raul@intersect.org.au"
     And I select "hcsvlab-admin" from "Role"
@@ -58,14 +58,14 @@ Feature: Administer users
     And I should see field "Role" with value "hcsvlab-admin"
 
   Scenario: Cancel out of editing roles
-    Given "raul@intersect.org.au" has role "Researcher"
+    Given "raul@intersect.org.au" has role "researcher"
     And I am on the list users page
     When I follow "View Details" for "raul@intersect.org.au"
     And I follow "Edit role"
     And I select "hcsvlab-admin" from "Role"
     And I follow "Back"
     Then I should be on the user details page for raul@intersect.org.au
-    And I should see field "Role" with value "Researcher"
+    And I should see field "Role" with value "researcher"
 
   Scenario: Role should be mandatory when editing Role
     And I am on the list users page
@@ -109,3 +109,9 @@ Feature: Administer users
     Then I should be on the list users page
     And I should see "Role can not be set. This user has previously been rejected as a spammer."
 
+  Scenario: Count of users with role 'researcher' is shown on user list page
+    Given I have 4 active users with role "researcher"
+    And I have 2 deactivated users with role "researcher"
+    And I have 3 active users with role "hcsvlab-admin"
+    When I am on the list users page
+    Then I should see "There are 4 registered users with role 'researcher'."

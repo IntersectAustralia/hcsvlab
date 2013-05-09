@@ -28,3 +28,5 @@
         = link_to "View Details", user, :id => "view_#{user.id}"
         - if can?(:update_role, User)
           = link_to 'Edit role', edit_role_user_path(user), :id => "edit_role_#{user.id}"
+
+= "There are #{@approved_researcher_count} registered users with role '#{Role::RESEARCHER_ROLE}'."

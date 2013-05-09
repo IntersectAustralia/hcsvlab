@@ -5,6 +5,7 @@ class UsersController < ApplicationController
 
   def index
     @users = User.deactivated_or_approved
+    @approved_researcher_count = User.approved_researchers.count
   end
 
   def show
@@ -20,7 +21,7 @@ class UsersController < ApplicationController
 
   def deactivate
     if !@user.check_number_of_superusers(params[:id], current_user.id) 
-      redirect_to(@user, :alert => "You cannot deactivate this account as it is the only account with hcsvlab-admin privileges.")
+      redirect_to(@user, :alert => "You cannot deactivate this account as it is the only account with #{Role::SUPERUSER_ROLE} privileges.")
     else
       @user.deactivate
       redirect_to(@user, :notice => "The user has been deactivated.")

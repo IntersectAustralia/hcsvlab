@@ -36,15 +36,27 @@ describe User do
       end
     end
     describe "Approved hcsvlab-admins Scope" do
-      it "should return users that are approved ordered by email address" do
-        super_role = FactoryGirl.create(:role, :name => "hcsvlab-admin")
-        other_role = FactoryGirl.create(:role, :name => "Other")
+      it "should return users with hcsvlab-admin role that are approved ordered by email address" do
+        super_role = FactoryGirl.create(:role, :name => Role::SUPERUSER_ROLE)
+        other_role = FactoryGirl.create(:role, :name => Role::RESEARCHER_ROLE)
         u1 = FactoryGirl.create(:user, :status => 'A', :role => super_role, :email => "fasdf1@intersect.org.au")
         u2 = FactoryGirl.create(:user, :status => 'A', :role => other_role)
         u3 = FactoryGirl.create(:user, :status => 'U', :role => super_role)
         u4 = FactoryGirl.create(:user, :status => 'R', :role => super_role)
         u5 = FactoryGirl.create(:user, :status => 'D', :role => super_role)
         User.approved_superusers.should eq([u1])
+      end
+    end
+    describe "Approved researchers Scope" do
+      it "should return users with researcher role that are approved ordered by email address" do
+        super_role = FactoryGirl.create(:role, :name => Role::SUPERUSER_ROLE)
+        researcher_role = FactoryGirl.create(:role, :name => Role::RESEARCHER_ROLE)
+        u1 = FactoryGirl.create(:user, :status => 'A', :role => researcher_role, :email => "fasdf1@intersect.org.au")
+        u2 = FactoryGirl.create(:user, :status => 'A', :role => super_role)
+        u3 = FactoryGirl.create(:user, :status => 'U', :role => researcher_role)
+        u4 = FactoryGirl.create(:user, :status => 'R', :role => researcher_role)
+        u5 = FactoryGirl.create(:user, :status => 'D', :role => researcher_role)
+        User.approved_researchers.should eq([u1])
       end
     end
   end
@@ -152,7 +164,7 @@ describe User do
 
   describe "Find the number of superusers method" do
     it "should return true if there are at least 2 superusers" do
-      super_role = FactoryGirl.create(:role, :name => 'hcsvlab-admin')
+      super_role = FactoryGirl.create(:role, :name => Role::SUPERUSER_ROLE)
       user_1 = FactoryGirl.create(:user, :role => super_role, :status => 'A', :email => 'user1@intersect.org.au')
       user_2 = FactoryGirl.create(:user, :role => super_role, :status => 'A', :email => 'user2@intersect.org.au')
       user_3 = FactoryGirl.create(:user, :role => super_role, :status => 'A', :email => 'user3@intersect.org.au')
@@ -160,13 +172,13 @@ describe User do
     end
 
     it "should return false if there is only 1 superuser" do
-      super_role = FactoryGirl.create(:role, :name => 'hcsvlab-admin')
+      super_role = FactoryGirl.create(:role, :name => Role::SUPERUSER_ROLE)
       user_1 = FactoryGirl.create(:user, :role => super_role, :status => 'A', :email => 'user1@intersect.org.au')
       user_1.check_number_of_superusers(1, 1).should eq(false)
     end
     
     it "should return true if the logged in user does not match the user record being modified" do  
-      super_role = FactoryGirl.create(:role, :name => 'hcsvlab-admin')
+      super_role = FactoryGirl.create(:role, :name => Role::SUPERUSER_ROLE)
       research_role = FactoryGirl.create(:role, :name => 'Researcher')
       user_1 = FactoryGirl.create(:user, :role => super_role, :status => 'A', :email => 'user1@intersect.org.au')
       user_2 = FactoryGirl.create(:user, :role => research_role, :status => 'A', :email => 'user2@intersect.org.au')
