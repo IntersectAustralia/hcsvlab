@@ -1,6 +1,8 @@
 
+require 'find'
 
 ENABLE_SOLR_UPDATES = false
+ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 
 namespace :fedora do
 	
@@ -59,11 +61,10 @@ namespace :fedora do
 		item.save!
 
 		puts "Item= " + item.pid.to_s
-
 		#Text
 		query = RDF::Query.new({
 			:document => {
-				RDF::URI("http://purl.org/dc/terms/type") => "Text",
+				RDF::URI("http://purl.org/dc/terms/type") => :type,
 				RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
 				RDF::URI("http://purl.org/dc/terms/source") => :source,
 				RDF::URI("http://purl.org/dc/terms/title") => :title
@@ -71,33 +72,23 @@ namespace :fedora do
 		})
 
 		query.execute(item.descMetadata.graph).each do |result|
-			doc = Document.new
-			doc.descMetadata.graph.load( rdf_file, :format => :ttl )
-			doc.label = result.source
-			doc.item = item
-			doc.file.content = File.open(corpus_dir + "/" + result.identifier.to_s)
-			doc.save
-			puts "Text Document= " + doc.pid.to_s
+			filepath = corpus_dir + "/" + result.identifier.to_s
+			if ALLOWED_DOCUMENT_TYPES.include? result.type.to_s
+				Find.find(corpus_dir) do |path|
+					if File.basename(path).eql? result.identifier.to_s and File.file? path 
+						doc = Document.new
+						doc.descMetadata.graph.load( rdf_file, :format => :ttl )
+						doc.label = result.source
+						doc.item = item
+						doc.file.content = File.open(path)
+						doc.save
+						puts "#{result.type.to_s} Document= " + doc.pid.to_s
+						break
+					end
+				end
+			end
 		end
 
-		# Audio
-		query = RDF::Query.new({
-			:document => {
-				RDF::URI("http://purl.org/dc/terms/type") => "Audio",
-				RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
-				RDF::URI("http://purl.org/dc/terms/source") => :source,
-				RDF::URI("http://purl.org/dc/terms/title") => :title
-			}
-		})
-
-		query.execute(item.descMetadata.graph).each do |result|
-			doc = Document.new
-			doc.descMetadata.graph.load( rdf_file, :format => :ttl )
-			doc.label = result.source
-			doc.item = item
-			doc.save
-			puts "Audio Document= " + doc.pid.to_s
-		end
 	end
 
 end
