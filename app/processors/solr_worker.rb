@@ -435,29 +435,61 @@ private
   # Date Handling
   # =============================================================================
   #
+  def output(string)
+    logger.debug(string)
+  end
 
-  def date_from_integer(y)
-    logger.debug "Trying to resolve integer #{y} into a Date"
+  def year_matching_regexp(string, regexp, match_idx)
+    match = regexp.match(string)
+    match = match[match_idx] unless match.nil?
+    return match
+  end
+
+  def year_from_integer(y)
     y = y + 1900 if y < 100   # Y2K hack all over again?
-    date = Date.new(y)
-    return date
+    return y
   end
 
 
-  def date_from_string(string)
-    date = nil
-    begin
-      logger.debug "Trying to resolve string #{string} into a Date"
-      date = Date.parse(string)
-    rescue
-      logger.debug "OK, Trying to convert string #{string} into an Integer then a Date"
-      begin
-        y = string.to_i
-        date = date_from_integer(y)
-      rescue
-      end
+  #
+  # Build a regular expression which looks for ^f1/f2/f3$ and records each element.
+  # The separator doesn't have to be a /, any non-digit will do (but we insist on
+  # the two separators being the same).
+  #
+  def make_regexp(f1, f2, f3)
+    string = '^('
+    string += f1
+    string += ')(\D)('
+    string += f2
+    string += ')\2('
+    string += f3
+    string += ')$'
+    return Regexp.new(string)
+  end
+
+
+  #
+  # Try (quite laboriously) to get a year from the given date string.
+  # Do this by matching against various regular expressions, which
+  # correspond to various date formats.
+  #
+  def year_from_string(string)
+    string = string.gsub('?', '') # Remove all doubt...
+    day_p   = '1|2|3|4|5|6|7|8|9|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31'
+    month_p = '1|2|3|4|5|6|7|8|9|01|02|03|04|05|06|07|08|09|10|11|12'
+    year_p  = '[12]\d\d\d|\d\d'
+    year ||= year_matching_regexp(string, make_regexp(day_p, month_p, year_p), 4)                 # 99/99/99 UK/Aus stylee
+    year ||= year_matching_regexp(string, make_regexp(month_p, day_p, year_p), 4)                 # 99/99/99 US stylee
+    year ||= year_matching_regexp(string, make_regexp(year_p, month_p, day_p), 1)                 # 99/99/99 Japan stylee
+
+    year ||= year_matching_regexp(string, /^(\d+)$/, 1)                                           # 9999
+    year ||= year_matching_regexp(string, /^\d+(\s)[[:alpha:]]+\1(\d+)/, 2)                       # 99 AAAAA 99
+    year ||= year_matching_regexp(string, /^(\d{4})-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\+\d{4})?/, 1)  # ISO
+    year ||= year_matching_regexp(string, /(\d+)$/, 1)  # Getting desperate, so look for digits at the end of the string
+    unless year == nil
+      year = year_from_integer(year.to_i)
     end
-    return date
+    return year
   end
 
 
@@ -472,28 +504,27 @@ private
     #
     c = field.class
 
-    logger.debug "resolving #{c.to_s} date #{field} as a date"
+    output "resolving #{c.to_s} date #{field} as a date"
 
     case
       when c == String
-        date = date_from_string(field)
+        year = year_from_string(field)
       when c == Fixnum
-        date = date_from_integer(field)
+        year = year_from_integer(field)
       else
-        date = date_from_string(field.to_s)
+        year = year_from_string(field.to_s)
     end
 
-    return nil if date.nil?
+    return "Unknown" if year.nil?
 
     #
     # Now work out the group into which it should fall and return a String
     # denoting that.
     #
-    y = date.year
-    y /= resolution
-    first = y * resolution
+    year /= resolution
+    first = year * resolution
     last  = first + resolution - 1
-    logger.debug "Range is #{first} - #{last}"
+    output "Range is #{first} - #{last}"
     return "#{first} - #{last}"
   end
 
