@@ -201,6 +201,7 @@ private
       item = results[0][:item]
       query = RDF::Query.new({item => {:predicate => :object}})
       basic_results = query.execute(graph)
+      print_results(basic_results, "bloody hell")
 
       # Now we have the basic results, we have a guddle about for any
       # extra information in which we're interested. Start by creating 
@@ -248,38 +249,33 @@ private
   end
 
   #
-  # Do the indexing for a Document
+  # Set the parent/child relationship for the document.
   #
-  def index_document(object, item)
-    # Find the title of the Document from its Dublin Core datastream
-    uri = URI(buildURI(object, 'DC'))
-    dc_xml = XmlSimple.xml_in(uri.open)
-    title = dc_xml["title"][0]
-    title = RDF::URI(title)
+  def link_document(document_id, item_id)
+    # Get the two objects
+    do_it = true   # until proven otherwise
 
-    # Now get the descMetadata for the Document (as this is the same as the
-    # Item's metadata, we need to do some guddling about to find the info
-    # we want, so start by getting the metadata.
-    uri = buildURI(object, 'descMetadata')
-    graph = RDF::Graph.load(uri)
-
-    # Now find the which <document> in the metadata corresponds to the
-    # Document. We do this by looking for the predicate which has the
-    # Document's URI as the object, assuming that will be relating the
-    # URI to one of the <document>s in the metadata.
-    query = RDF::Query.new({:document => {:predicate => title}})
-    results = query.execute(graph)
-
-    unless results.size == 0
-      # We've located one or more <documents> which link to the Document,
-      # in time-honoured tradition, we arbitrarily pick the first one.
-      # Now find all the triplets which have that first <document> as 
-      # their subject and add them to the index.
-      document = results[0][:document]
-      query = RDF::Query.new({document => {:predicate => :object}})
-      results = query.execute(graph)
-      store_results(object, results, {'Item' => [item]})
+    begin
+      item = Item.find(item_id)
+    rescue ActiveFedora::ObjectNotFoundError
+      logger.warning "Cannot find parent Item with id #{item_id}"
+      do_it = false
     end
+
+    begin
+      document = Document.find(document_id)
+    rescue ActiveFedora::ObjectNotFoundError
+      logger.warning "Cannot find Document with id #{document_id}"
+      do_it = false
+    end
+
+    return unless do_it
+
+    # We now have both the Item and the Document, so link them together
+    # and save the modified versions
+    logger.debug "Setting #{item_id} as the Item for Document #{document_id}"
+    document.item = item
+    document.save
 
   end
 
@@ -292,8 +288,7 @@ private
     if parent.nil?
       index_item(object)
     else
-      # index_document(object, parent)
-      logger.debug "Not indexing the Document #{object}"
+  #    link_document(object, parent)
     end
   end
 
@@ -346,16 +341,21 @@ private
     result = {}
 
     results.each { |binding| 
-      field = binding[:predicate].to_s
-      value = last_bit(binding[:object])
-      logger.debug "\tAdding field #{field} with value #{value}"
+      if binding[:predicate] == PURL::CREATED
+        field = binding[:predicate].to_s
+        value = binding[:object].to_s
+      else
+        field = binding[:predicate].to_s
+        value = last_bit(binding[:object])
+      end
+      logger.debug "\tAdding field #{field} with value #{value} (#{value.class})"
       Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
     }
     unless extras.nil?
       extras.keys.each { |key|
         values = extras[key]
         values.each { |value|
-          logger.debug "\tAdding field #{key} with value #{value}"
+          logger.debug "\tAdding field #{key} with value #{value} (#{value.class})"
           Solrizer.insert_field(result, key, value, :facetable, :stored_searchable)
         }
       }
@@ -504,8 +504,6 @@ private
     #
     c = field.class
 
-    output "resolving #{c.to_s} date #{field} as a date"
-
     case
       when c == String
         year = year_from_string(field)
@@ -524,7 +522,6 @@ private
     year /= resolution
     first = year * resolution
     last  = first + resolution - 1
-    output "Range is #{first} - #{last}"
     return "#{first} - #{last}"
   end
 
@@ -556,7 +553,7 @@ private
     logger.debug("Results #{label}, with #{results.count} solutions(s)")
     results.each { |result|
       result.each_binding { |name, value|
-        logger.debug("> #{name} -> #{value}")
+        logger.debug("> #{name} -> #{value} (#{value.class})")
       }
       logger.debug("")
     }
