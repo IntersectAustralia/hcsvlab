@@ -10,30 +10,72 @@
   <dt class="blacklight-fedora-id">Fedora ID:</dt>
   <dd class="blacklight-fedora-id"><%= document.id %></dd>
 </dl>
+
 <h2>Documents</h2>
-<table class="document-table">
-    <tr>
-        <th>Filename</th>
-        <th>Type</th>
-        <th>Size</th>
-    </tr>
-    <% uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE] %>
-    <% type = "" %>
-    <% document[PURL::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" } %>
-    <% item_documents(document, uris).each do |values| -%>
-    <tr>
-        <% if values.has_key?(PURL::SOURCE) %>
-            <td><a href="<%= values[PURL::SOURCE] %>"><%= values[PURL::IDENTIFIER] %></a></td>
-        <% else %>
-            <td><%= values[PURL::IDENTIFIER] %></td>
+<% if document[PURL::IS_PART_OF.to_s + "_tesim"][0] == "cooee" %>
+    <table class="document-table" border="1">
+        <tr>
+            <th>Filename</th>
+            <th>Type</th>
+            <th>Size</th>
+        </tr>
+        <% uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE] %>
+        <% type = nil %>
+        <% if document.has_key?(PURL::TYPE.to_s + "_tesim") %>
+        <% document[PURL::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" } %>
         <% end %>
-        <% if values[PURL::TYPE].to_s == type %>
-            <td><%= type + " (Plain)" %></td>
+        <% if type.nil? %>
+        <%   format = '%s' %>
         <% else %>
-            <td><%= type + " (" + values[PURL::TYPE].to_s + ")" %></td>
+        <%   format = type + '(%s)' %>
         <% end %>
-        <td><%= format_extent(values[PURL::EXTENT].to_i, 'B') %></td>
-    </tr>
-  <% end -%>
-</table>
+        <%  %>
+        <%  %>
+        <% item_documents(document, uris).each do |values| -%>
+        <tr>
+            <% if values.has_key?(PURL::SOURCE) %>
+                <td><a href="<%= values[PURL::SOURCE] %>"><%= values[PURL::IDENTIFIER] %></a></td>
+            <% else %>
+                <td><%= values[PURL::IDENTIFIER] %></td>
+            <% end %>
+            <% if values.has_key?(PURL::TYPE) %>
+            <%   field = values[PURL::TYPE] %>
+            <%   field = "unlabelled" if field == "" %>
+            <%   field = "Plain"   if field == type %>
+            <% else %>
+            <%   field = "unlabelled" %>
+            <% end %>
+            <td><%= sprintf(format, field) %></td>
+            <td><%= format_extent(values[PURL::EXTENT].to_i, 'B') %></td>
+        </tr>
+      <% end -%>
+    </table>
+<% else %>
+    <table class="document-table" border="1">
+        <tr>
+            <th>Filename</th>
+            <th>Type</th>
+            <th>Size</th>
+        </tr>
+        <% uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE] %>
+        <% item_documents(document, uris).each do |values| -%>
+        <tr>
+            <% if values.has_key?(PURL::SOURCE) %>
+                <td><a href="<%= values[PURL::SOURCE] %>"><%= values[PURL::IDENTIFIER] %></a></td>
+            <% else %>
+                <td><%= values[PURL::IDENTIFIER] %></td>
+            <% end %>
+            <% if values.has_key?(PURL::TYPE) %>
+            <%   field = values[PURL::TYPE] %>
+            <%   field = "unlabelled" if field == "" %>
+            <% else %>
+            <%   field = "unlabelled" %>
+            <% end %>
+            <td><%= field %></td>
+            <td><%= format_extent(values[PURL::EXTENT].to_i, 'B') %></td>
+        </tr>
+      <% end -%>
+    </table>
+<% end %>
+
 

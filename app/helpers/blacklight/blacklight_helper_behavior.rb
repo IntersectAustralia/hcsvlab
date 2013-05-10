@@ -666,19 +666,23 @@ module Blacklight::BlacklightHelperBehavior
     prefix = ['E', 'P', 'T', 'G', 'M', 'k', '', 'm', 'u', 'n', 'p', 'f', 'a']
     p_idx = prefix.find_index('')
 
-    value = 1.0 * value # force it to floating point
-    while value.abs > multiple
+     while value.abs > multiple
+      value = 1.0 * value # force it to floating point
       value /= multiple
       p_idx -= 1
       break if p_idx == 0
     end
-    while value.abs <= 1.0
-      value *= multiple
-      p_idx += 1
-      break if p_idx == prefix.size-1
+#    while value.abs <= 1.0
+#      value *= multiple
+#      p_idx += 1
+#      break if p_idx == prefix.size-1
+#    end
+    if value.is_a?(Fixnum)
+      return sprintf("%4d %s%s", value, prefix[p_idx], unit)
+    else
+      return sprintf("%4.1f %s%s", value, prefix[p_idx], unit)
     end
 
-    return sprintf("%4.1f %s%s", value, prefix[p_idx], unit)
   end
 
 
