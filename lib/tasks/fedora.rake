@@ -3,6 +3,7 @@ require 'find'
 
 ENABLE_SOLR_UPDATES = false
 ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
+STORE_DOCUMENT_TYPES = ['Text']
 
 namespace :fedora do
 	
@@ -73,14 +74,19 @@ namespace :fedora do
 
 		query.execute(item.descMetadata.graph).each do |result|
 			filepath = corpus_dir + "/" + result.identifier.to_s
+			# Only permit certain types (e.g. exlcude 'Raw' and 'Original')
 			if ALLOWED_DOCUMENT_TYPES.include? result.type.to_s
+				# Only create Documents if we have that file
 				Find.find(corpus_dir) do |path|
 					if File.basename(path).eql? result.identifier.to_s and File.file? path 
 						doc = Document.new
 						doc.descMetadata.graph.load( rdf_file, :format => :ttl )
 						doc.label = result.source
 						doc.item = item
-						doc.file.content = File.open(path)
+						# Only create a datastream for certain file types
+						if STORE_DOCUMENT_TYPES.include? result.type.to_s
+							doc.file.content = File.open(path)
+						end
 						doc.save
 						puts "#{result.type.to_s} Document= " + doc.pid.to_s
 						break
