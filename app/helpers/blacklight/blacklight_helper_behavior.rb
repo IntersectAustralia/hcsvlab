@@ -662,6 +662,15 @@ module Blacklight::BlacklightHelperBehavior
     return document_descriptors
   end
 
+  #
+  # =============================================================================
+  # Utility Formatting methods
+  # =============================================================================
+  #
+
+  #
+  # SI bsed formatting of a physical quantity (ie. a number with a unit).
+  #
   def format_extent(value, unit, multiple = 1000)
     prefix = ['E', 'P', 'T', 'G', 'M', 'k', '', 'm', 'u', 'n', 'p', 'f', 'a']
     p_idx = prefix.find_index('')
@@ -685,5 +694,25 @@ module Blacklight::BlacklightHelperBehavior
 
   end
 
+  def format_key(uri)
+    last_bit(uri).sub(/_tesim$/, '')
+  end
+
+  def format_value(list)
+    list.join
+  end
+
+  #
+  # Extract the last part of a path/URI/slash-separated-list-of-things
+  #
+  def last_bit(uri)
+    str = uri.to_s   # just in case it is not a String object
+    return str.split('/')[-1]
+  end
+
+  #
+  # End of Utility Formatting methods
+  # -----------------------------------------------------------------------------
+  #
 
 end
