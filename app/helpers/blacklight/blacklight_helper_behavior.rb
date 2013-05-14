@@ -759,6 +759,7 @@ module Blacklight::BlacklightHelperBehavior
   # "one (x2), two(x2), three".
   #
   def format_duplicates(list)
+    return "" if list.nil?
     hash = {}
     list.each { |item|
       if hash.has_key?(item)
