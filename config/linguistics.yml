@@ -1,12 +1,12 @@
 development:
   iso639_3_code_lookup_url: "http://www-01.sil.org/iso639-3/documentation.asp?id=%s"
-test: &TEST  
-  <<: *TEST
+test:
+  iso639_3_code_lookup_url: "http://www-01.sil.org/iso639-3/documentation.asp?id=%s"
 qa:
-  <<: *TEST
+  iso639_3_code_lookup_url: "http://www-01.sil.org/iso639-3/documentation.asp?id=%s"
 staging:
-  <<: *TEST
+  iso639_3_code_lookup_url: "http://www-01.sil.org/iso639-3/documentation.asp?id=%s"
 production:
-  <<: *TEST
+  iso639_3_code_lookup_url: "http://www-01.sil.org/iso639-3/documentation.asp?id=%s"
 cucumber:
-  <<: *TEST
+  iso639_3_code_lookup_url: "http://www-01.sil.org/iso639-3/documentation.asp?id=%s"
