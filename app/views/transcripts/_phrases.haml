@@ -1,0 +1,46 @@
+- i = 0
+- @transcript.phrases.each do |phrase|
+  %table.line
+    %tr
+      %td.controls{:title => "#{phrase.start_time} to #{phrase.end_time}"}
+        = "p#{i += 1}"
+        %br
+        = link_to image_tag('play.png'), "#t=#{phrase.start_time},#{phrase.end_time}", :class => 'play_button', 'data-start' => "#{phrase.start_time}", 'data-end' => "#{phrase.end_time}"
+      %td.tracks.phrase
+        - if phrase.original
+          .tier{:class => [phrase.phrase_id, 'transcription']}
+            = phrase.original
+
+        - words = phrase.words
+        - unless words.empty?
+          .tier{:class => ["#{phrase.phrase_id}_w", 'morphemes']}
+            - words.each do |word|
+              - morphemes = word.morphemes
+              - colspan = morphemes.empty? ? 1 : morphemes.size
+              %span
+                %table.word
+                  %tr
+                    %td{:colspan => colspan}
+                      %span.concordance{'data-type' => 'word', 'data-search' => word[:word], 'data-language-code' => @transcript.language_code, 'data-addr' => "/p#{phrase.transcript.phrases.index(phrase) + 1}/w#{word.position}"}
+                        = word[:word]
+
+                      - unless morphemes.empty?
+                        %tr
+                          - morphemes.each do |s|
+                            %td.morpheme
+                              %span.concordance{'data-type' => 'morpheme', 'data-search' => s.morpheme, 'data-language-code' => @transcript.language_code, 'data-addr' => "/p#{phrase.transcript.phrases.index(phrase) + 1}/w#{word.position}/m#{s.position}"}
+                                = s.morpheme
+
+                        %tr
+                          - morphemes.each do |s|
+                            %td.gloss= s.gloss
+
+        - if phrase.graid
+          .tier{:class => [phrase.phrase_id, 'graid']}
+            = phrase.graid
+
+        - if phrase.translation
+          .tier{:class => [phrase.phrase_id, 'translation']}
+            = phrase.translation
+
+

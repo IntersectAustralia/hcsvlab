@@ -20,7 +20,7 @@
     <% uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE] %>
     <% type = "" %>
     <% document[PURL::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" } %>
-    <% item_documents(document, uris).each do |values| -%>
+    <% item_documents(document.id, uris).each do |values| -%>
     <tr>
         <% if values.has_key?(PURL::SOURCE) %>
             <td><a href="<%= values[PURL::SOURCE] %>"><%= values[PURL::IDENTIFIER] %></a></td>
@@ -36,4 +36,5 @@
     </tr>
   <% end -%>
 </table>
+<%= link_to 'EOPAS', media_item_path %>
 

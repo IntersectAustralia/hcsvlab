@@ -1,0 +1,25 @@
+
+#transcript
+  %h2 Upload Transcript
+
+  = form_for @transcript, :html => { :multipart => true } do |f|
+    = error_messages @transcript
+
+    %fieldset
+
+    %table#metadata
+      %tr
+        %td.name
+          = f.label :source, 'Transcript'
+        %td.value
+          = f.file_field :source
+          = f.hidden_field :source_cache
+
+      %tr
+        %td.name
+          = f.label :transcript_format, 'Format'
+        %td.value
+          = f.select :transcript_format, options_for_select(Transcript::FORMATS, @transcript.transcript_format)
+
+
+    = f.submit "Validate"

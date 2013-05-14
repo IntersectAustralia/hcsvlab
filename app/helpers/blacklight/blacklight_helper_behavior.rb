@@ -626,10 +626,10 @@ module Blacklight::BlacklightHelperBehavior
     return config["url"].to_s + "/objects/#{object}/datastreams/#{datastream}/content"
   end
 
-  def item_documents(document, uris)
+  def item_documents(document_id, uris)
     document_descriptors = []
 
-    uri = buildURI(document.id, 'descMetadata')
+    uri = buildURI(document_id, 'descMetadata')
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item

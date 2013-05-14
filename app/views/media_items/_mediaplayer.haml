@@ -1,0 +1,9 @@
+.collapse_title
+  = image_tag 'minimize_grey.png', :class => 'collapse_icon'
+  Media Player
+
+.collapse_content
+  - if @media_item.format == 'video'
+    = media_item_video_tag @media_item, {:preload => 'auto'}
+  - else
+    = media_item_audio_tag @media_item, {:preload => 'auto'}

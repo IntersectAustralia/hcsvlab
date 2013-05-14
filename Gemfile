@@ -13,7 +13,9 @@ gem 'pg'
 group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
-
+  gem 'compass-rails'
+  gem 'compass-blueprint'
+  gem "therubyracer"
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
   # gem 'therubyracer', :platforms => :ruby
 
@@ -37,7 +39,8 @@ gem 'jquery-rails'
 # To use debugger
 # gem 'debugger'
     
-gem "therubyracer" # TODO should this be in group :assets ?
+
+
 group :development, :test do
   gem "rspec-rails"
   gem "factory_girl_rails"
@@ -48,6 +51,12 @@ group :development, :test do
   gem "database_cleaner"
   #gem "spork"
   gem "launchy"    # So you can do Then show me the page
+end
+
+group :development do
+  gem 'xray-rails'
+  gem 'pry'
+  gem 'pry-rails'
 end
 
 group :test do
@@ -73,6 +82,7 @@ gem 'hydra-head', "~>6.0.0"
 gem 'jettywrapper'
 
 gem "bootstrap-sass"
+
 
 gem 'stomp'
 gem 'celluloid'
