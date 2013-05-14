@@ -1,0 +1,58 @@
+
+h1 { font-weight: 200; }
+.footer { margin: 60px 0 0 0; padding: 20px 0 0 0; clear: both; border-top: 1px solid #DDD; color: #999; }
+.navbar-inner {
+  min-height: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: #f9f9f9;
+  background-image: -moz-linear-gradient(top, #2DB4B7, #2DB4B7);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#2DB4B7), to(#2DB4B7));
+  background-image: -webkit-linear-gradient(top, #2DB4B7, #2DB4B7);
+  background-image: -o-linear-gradient(top, #2DB4B7, #2DB4B7);
+  background-image: linear-gradient(to bottom, #2DB4B7, #2DB4B7);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFFFF', endColorstr='#FFF2F2F2', GradientType=0);
+  border: 1px solid #d4d4d4;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+}
+
+.navbar .brand {
+  width: 150px;
+  background: transparent url(/assets/hcsvlab.png) no-repeat top left;
+  display: inline-block;
+  text-indent: 0%;
+  white-space: nowrap;
+  overflow: visible;
+  padding-right: 0;
+  margin-right: 20px;
+  padding-left: 50px;
+  text-align: left;
+  color: #FFF;
+  text-shadow: 0 0px 0 white;
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle, .navbar .nav li.dropdown.active > .dropdown-toggle, .navbar .nav li.dropdown.open.active > .dropdown-toggle {
+background-color: #009999;
+color: #FFF;
+  text-shadow: 0 0px 0 white;
+}
+
+.navbar .nav > li > a {
+  float: none;
+  padding: 10px 15px 10px;
+  color: #FFF;
+  text-decoration: none;
+  text-shadow: 0 0px 0 white;
+}
+
+.navbar .nav > li > a:focus, .navbar .nav > li > a:hover {
+  background-color: transparent;
+  color: #EEE;
+  text-decoration: none;
+}

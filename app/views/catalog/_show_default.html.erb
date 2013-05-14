@@ -1,5 +1,5 @@
 <%# default partial to display solr document fields in catalog show view -%>
-<h2>Item Details</h2>
+<h3>Item Details</h3>
 <dl class="dl-horizontal  dl-invert">
     <% document_show_fields(document).each do |solr_fname, field| -%>
       <% if should_render_show_field? document, field %>
@@ -24,7 +24,7 @@
   <dd class="blacklight-fedora-id"><%= document.id %></dd>
 </dl>
 
-<h2>Documents</h2>
+<h3>Documents</h3>
 <% uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE] %>
 <% documents = item_documents(document, uris) %>
 <% if documents.empty? %>
@@ -68,12 +68,15 @@
           <% end -%>
         </table>
     <% else %>
-        <table class="document-table" border="1">
+        <table class="document-table table table-striped">
+          <thead>
             <tr>
                 <th>Filename</th>
                 <th>Type</th>
                 <th>Size</th>
             </tr>
+          </thead>
+          <tbody>
             <% documents.each do |values| -%>
             <tr>
                 <% if values.has_key?(PURL::SOURCE) %>
@@ -91,6 +94,7 @@
                 <td><%= format_extent(values[PURL::EXTENT].to_i, 'B') %></td>
             </tr>
           <% end -%>
+          </tbody>
         </table>
     <% end %>
 <% end %>

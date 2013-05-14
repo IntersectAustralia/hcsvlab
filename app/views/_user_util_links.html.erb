@@ -1,31 +1,43 @@
-  <% if has_user_authentication_provider? %>
-    <div class="util-links-login">
-      <% if current_user %>
-        <%= link_to t('blacklight.header_links.logout'), destroy_user_session_path %>
-        <%= "[#{ link_to current_user.email, edit_user_registration_path }]".html_safe unless current_user.to_s.blank? %>
-      <% else %>
-        <%= link_to t('blacklight.header_links.login'), new_user_session_path %>
-      <% end %>
-    </div>
+<li class='dropdown'>
+
+    <% if current_user %>
+      <a href='#' class='dropdown-toggle' data-toggle='dropdown'><%= current_user.email %> <b class="caret"></b></a>
+    <% else %>
+      <%= link_to t('blacklight.header_links.login'), new_user_session_path, :class => "dropdown-toggle" %>
+    <% end %>
+
+  <ul class="util-links-other dropdown-menu">
+
+  <% if has_user_authentication_provider? and current_user %>
+    <li><%= link_to t('blacklight.header_links.saved_searches'), saved_searches_path %></li>
+    <li><%= link_to t('blacklight.header_links.search_history'), search_history_path %></li>
+  <% end %>
+
+  <li class='divider'></li>
+
+  <% if current_or_guest_user %>
+    <li><%= link_to "Edit My Details", edit_user_registration_path %></li>
+    <li><%= link_to "Change My Password", users_edit_password_path %></li>
+    <li><%= link_to t('blacklight.header_links.bookmarks'), bookmarks_path %></li>
+
+    <li class='divider'></li>
+
+    <% if current_user.is_superuser? %>
+      <li><%= link_to "Admin", admin_users_path %></li>
+    <% end %>
 
   <% end %>
 
-  <div class="util-links-other">
-    <% if current_or_guest_user %>
-      <% if current_user.is_superuser? %>
-        <%= link_to "Admin", admin_users_path %>
-        |
-      <% end %>
-      <%= link_to "Edit My Details", edit_user_registration_path %>
-      |
-      <%= link_to "Change My Password", users_edit_password_path %>
-      |
-	    <%= link_to t('blacklight.header_links.bookmarks'), bookmarks_path %>
+  <li class='divider'></li>
+
+  <% if has_user_authentication_provider? %>
+    <% if current_user %>
+      <li><%= link_to t('blacklight.header_links.logout'), destroy_user_session_path %></li>
+      <%# <%= "[#{ link_to current_user.email, edit_user_registration_path }]".html_safe unless current_user.to_s.blank? %1> %>
+    <% else %>
+      <%= link_to t('blacklight.header_links.login'), new_user_session_path %>
     <% end %>
-    <% if has_user_authentication_provider? and current_user %>
-      |
-      <%= link_to t('blacklight.header_links.saved_searches'), saved_searches_path %>
-	    |
-      <%= link_to t('blacklight.header_links.search_history'), search_history_path %>
-    <% end %>
-  </div>
+  <% end %>
+
+  </ul>
+</li>
