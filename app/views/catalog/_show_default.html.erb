@@ -6,6 +6,8 @@
         <dt class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_label document, :field => solr_fname %></dt>
         <% if solr_fname == 'http://www.language-archives.org/OLAC/1.1/language_tesim' %>
           <dd class="blacklight-<%= solr_fname.parameterize %>"><%= raw render_language_codes document[solr_fname] %></dd>
+        <% elsif solr_fname == 'http://purl.org/dc/terms/type_tesim' %>
+          <dd class="blacklight-<%= solr_fname.parameterize %>"><%= format_duplicates(document[solr_name]) %></dd>
         <% else %>
           <dd class="blacklight-<%= solr_fname.parameterize %>"><%= render_document_show_field_value document, :field => solr_fname %></dd>
         <% end -%>
@@ -17,7 +19,11 @@
       <% v = document[k] %>
       <% unless do_not_display.has_key?(k) %>
         <dt class="blacklight"><%= format_key(k) %></dt>
-        <dd class="blacklight"><%= format_value(v) %></dd>
+        <% if k == 'http://purl.org/dc/terms/type_tesim' %>
+            <dd class="blacklight"><%= format_duplicates(v) %></dd>
+        <% else %>
+            <dd class="blacklight"><%= format_value(v) %></dd>
+        <% end %>
       <% end %>
     <% end -%>
   <dt class="blacklight-fedora-id">HCSvLab ID:</dt>
