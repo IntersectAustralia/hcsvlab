@@ -1,0 +1,12 @@
+development:
+  iso639_3_code_lookup_url: "http://www-01.sil.org/iso639-3/documentation.asp?id=%s"
+test: &TEST  
+  <<: *TEST
+qa:
+  <<: *TEST
+staging:
+  <<: *TEST
+production:
+  <<: *TEST
+cucumber:
+  <<: *TEST
