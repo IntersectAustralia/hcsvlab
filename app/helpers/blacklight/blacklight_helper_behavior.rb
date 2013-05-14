@@ -9,7 +9,6 @@ module Blacklight::BlacklightHelperBehavior
   include HtmlHeadHelper
   include FacetsHelper
 
-
   def application_name
     return Rails.application.config.application_name if Rails.application.config.respond_to? :application_name
 
@@ -378,6 +377,46 @@ module Blacklight::BlacklightHelperBehavior
     end
   end
 
+  def get_galaxy_bookmark_list documents = nil, locals = {}
+    documents = current_user.bookmarks.collect { |b| b.document }
+    
+    galaxy_list = ""
+    documents.each_with_index do |doc, index|
+      uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE]
+      item_documents(doc, uris).each do |values|
+        if values[PURL::TYPE] == "Text"
+          if index != (documents.size-1)
+            galaxy_list += (values[PURL::SOURCE] + ",")
+          else
+            galaxy_list += values[PURL::SOURCE]
+          end
+        end
+      end
+    end
+    
+    return galaxy_list
+  end
+
+  def get_galaxy_document_list documents = nil, locals = {}
+    documents ||= @document_list
+    
+    galaxy_list = ""
+    documents.each_with_index do |doc, index|
+      uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE]
+      item_documents(doc, uris).each do |values|
+        if values[PURL::TYPE] == "Text"
+          if index != (documents.size-1)
+            galaxy_list += (values[PURL::SOURCE] + ",")
+          else
+            galaxy_list += values[PURL::SOURCE]
+          end
+        end
+      end
+    end
+    
+    return galaxy_list
+  end
+
   def render_document_index documents = nil, locals = {}
     documents ||= @document_list
 
@@ -385,10 +424,6 @@ module Blacklight::BlacklightHelperBehavior
       # XXX rather than handling this logic through exceptions, maybe there's a Rails internals method
       # for determining if a partial template exists..
       begin
-        puts '================================================================'
-        puts str
-        puts (str % { :index_view_type => document_index_view_type })
-        puts '================================================================'
         return render(:partial => (str % { :index_view_type => document_index_view_type }), :locals => { :documents => documents })
       rescue ActionView::MissingTemplate
         nil
