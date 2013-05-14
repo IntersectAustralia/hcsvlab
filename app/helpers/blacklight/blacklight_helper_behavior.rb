@@ -526,6 +526,14 @@ module Blacklight::BlacklightHelperBehavior
     link_to label, doc, { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
   end
 
+  # link_literal_to_document(doc, :label=>'VIEW', :counter => 3)
+  # Use the catalog_path RESTful route to create a link to the show page for a specific item.
+  # catalog_path accepts a HashWithIndifferentAccess object. The solr query params are stored in the session,
+  # so we only need the +counter+ param here. We also need to know if we are viewing to document as part of search results.
+  def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true})
+    link_to label, doc, { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
+  end
+
   # link_back_to_catalog(:label=>'Back to Search')
   # Create a link back to the index screen, keeping the user's facet, query and paging choices intact by using session.
   def link_back_to_catalog(opts={:label=>nil})
@@ -743,6 +751,35 @@ module Blacklight::BlacklightHelperBehavior
   def last_bit(uri)
     str = uri.to_s   # just in case it is not a String object
     return str.split('/')[-1]
+  end
+
+  #
+  # Format a list of things with duplicates as a list showing counts
+  # e.g. ["one", "one", "two", "three", "two"] should come out as
+  # "one (x2), two(x2), three".
+  #
+  def format_duplicates(list)
+    hash = {}
+    list.each { |item|
+      if hash.has_key?(item)
+        hash[item] += 1
+      else
+        hash[item] = 1
+      end
+    }
+    new_list = []
+    list.each { |k|
+      if hash.has_key?(k)
+        count = hash[k]
+        if count == 1
+          new_list << k
+        else
+          new_list << "#{k} (x#{hash[k]})"
+        end
+        hash.delete(k)
+      end
+    }
+    return new_list.join(', ')
   end
 
   #

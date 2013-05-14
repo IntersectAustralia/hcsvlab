@@ -9,16 +9,17 @@
                 <%= f1 = "http://purl.org/dc/terms/isPartOf_tesim"
                     f2 = "http://purl.org/dc/terms/identifier_tesim"
                     if document.has_key?(f1)
-                        l1 = link_to_document document, :label=>f1.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+                        l1 = document[f1].join(', ')
                     else
                         l1 = ""
                     end
                     if document.has_key?(f2)
-                        l2 = link_to_document document, :label=>f2.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+                        l2 = document[f2].join(', ')
                     else
                         l2 = ""
                     end
                     l1 + ":" + l2
+                    link_literal_to_document document, l1 + ":" + l2, :counter => (document_counter + 1 + @response.params[:start].to_i)
                 %>
             </span>
             <span class="title_link_field">
@@ -42,17 +43,12 @@
             <span class="type_link_field">
                 <%= field = "http://purl.org/dc/terms/type_tesim"
                     if document.has_key?(field)
-                        link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+                        link_literal_to_document document, format_duplicates(document[field]), :counter => (document_counter + 1 + @response.params[:start].to_i)
                     else
                         ""
                     end
                 %>
             </span>
-            <%
-                str = "|"
-                document.keys.sort.each { |k| str = str + " " + k.to_str + " |"}
-                str
-            %>
            </h5>
         
         <% # bookmark functions for items/docs -%>
