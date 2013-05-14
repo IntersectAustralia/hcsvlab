@@ -699,7 +699,7 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   def format_value(list)
-    list.join
+    list.join(', ')
   end
 
   #
