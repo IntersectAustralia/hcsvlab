@@ -12,13 +12,15 @@
     <li><%= link_to t('blacklight.header_links.saved_searches'), saved_searches_path %></li>
     <li><%= link_to t('blacklight.header_links.search_history'), search_history_path %></li>
   <% end %>
+  <% if current_or_guest_user %>
+    <li><%= link_to t('blacklight.header_links.bookmarks'), bookmarks_path %></li>
+  <% end %>
 
   <li class='divider'></li>
 
   <% if current_or_guest_user %>
     <li><%= link_to "Edit My Details", edit_user_registration_path %></li>
     <li><%= link_to "Change My Password", users_edit_password_path %></li>
-    <li><%= link_to t('blacklight.header_links.bookmarks'), bookmarks_path %></li>
 
     <li class='divider'></li>
 
