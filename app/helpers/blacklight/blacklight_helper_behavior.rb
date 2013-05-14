@@ -750,4 +750,53 @@ module Blacklight::BlacklightHelperBehavior
   # -----------------------------------------------------------------------------
   #
 
+  #
+  # =============================================================================
+  # Language Code methods
+  # =============================================================================
+  #
+  def language_query_sil_base_uri()
+    return "http://www-01.sil.org/iso639-3/documentation.asp?id="
+  end
+
+  def language_query_ethnologue_base_uri()
+    return "http://www.ethnologue.com/language/"
+  end
+
+  def language_query_base_uri()
+    config = YAML.load_file("#{Rails.root.to_s}/config/linguistics.yml")[Rails.env]
+    return config["iso639_3_code_lookup_url"].to_s
+  end
+
+  def language_query_uri(iso639_3_code)
+    return URI(sprintf(language_query_base_uri, iso639_3_code))
+  end
+
+  #def language_regexp()
+  #  return /<h1 class="title" id="page-title">\s*(\S+)\s*<\/h1>/
+  #end
+
+  #def language_name(iso639_3_code)
+  #  begin
+  #    xml = language_query_uri(iso639_3_code).read
+  #    match = language_regexp().match(xml)
+  #    return iso639_3_code + " - regexp fail" if match.nil?
+  #    return match[1]
+  #  rescue
+  #    return iso639_3_code + " - rescue"
+  #  end
+  #end
+
+  def render_language_code(iso639_3_code)
+    return "<a href=\"#{language_query_uri(iso639_3_code)}\">#{iso639_3_code}</a>"
+  end
+
+  def render_language_codes(list)
+    return (list.map {|c| render_language_code(c)}).join(', ')
+  end
+  #
+  # End of Language Code methods
+  # -----------------------------------------------------------------------------
+  #
+
 end
