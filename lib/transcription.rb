@@ -1,4 +1,4 @@
-
+  
 # provides functions to deal with import and export of
 # interlinear text files in different formats
 
@@ -85,8 +85,10 @@ class Transcription
   end
 
   def import(transcript)
+    logger.warn 'Test 1'
     doc = to_eopas
     return if doc.nil?
+    logger.warn 'Test 2'
     eopas = doc.xpath('/eopas')
 
     metas = eopas.xpath('//meta')
@@ -108,7 +110,9 @@ class Transcription
     end
 
     phrases = eopas.xpath('interlinear/phrase')
+    logger.warn 'Test 3'
     phrases.each do |phrase|
+      logger.warn 'Test 4'
       # create new phrase
       ph = transcript.phrases.build
 

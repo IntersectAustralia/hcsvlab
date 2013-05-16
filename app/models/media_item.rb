@@ -1,8 +1,9 @@
-class MediaItem
+require 'activerecord-tableless'
 
-  class Person
-    attr_accessor :full_name
-  end
+class MediaItem < ActiveRecord::Base
+
+  has_no_table
+
   # belongs_to :depositor, :class_name => 'User'
   # has_many :transcripts, :dependent => :nullify
 
@@ -21,19 +22,7 @@ class MediaItem
   # mount_uploader :media, MediaUploader
   # process_in_background :media
 
-  attr_reader :title, :description, :recorded_on, :copyright, :license, :private, :format, :media, :media_cache, :depositor
-
-  def initialize(attributes)
-    @title = attributes['title']
-    @description = attributes['description']
-    @recorded_on = attributes['created']
-    @copyright = attributes['rights']
-    @license = attributes['accessRights']
-    @depositor = Person.new
-    @depositor.full_name = attributes['depositor']
-    @format = 'video'
-    @media = attributes['media']
-    # @media_cache
-  end
+  attr_accessor :title, :description, :recorded_on, :copyright, :license, :format, :media, :depositor
+  attr_accessible :title, :description, :recorded_on, :copyright, :license, :format, :media, :depositor 
 
 end

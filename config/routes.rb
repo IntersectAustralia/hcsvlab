@@ -32,7 +32,7 @@ HcsvlabWeb::Application.routes.draw do
     end
   end
 
-  resources :media_items
+  resources :media_items, :transcripts
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

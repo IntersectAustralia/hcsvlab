@@ -9,28 +9,27 @@ class MediaItemsController < ApplicationController
   include Blacklight::Catalog
   include Blacklight::BlacklightHelperBehavior
 
+  MEDIA_ITEM_FIELDS = %w(title   description recorded_on copyright license format media depositor)
+
   def show
-    document = get_solr_response_for_doc_id(params['id'])[0]
-    document = document['response']['docs'][0]
+    documents = get_solr_response_for_doc_id(params['id'])[0]
+    document = documents['response']['docs'][0]
+    attributes = document_to_attribues(document)
+    media = get_media('video', params['url'])
+    attributes['media'] = media
 
-    media = get_document_url params['id']
-    document = solr_doc_to_hash(document)   
-    document['media'] = media
-
-    logger.warn "Test: #{document}"
-
-
-    @media_item = MediaItem.new document
+    @media_item = MediaItem.new attributes
     
     file = OpenStruct.new
-    file.path = '/Users/ilya/workspace/Downloads/eoaps.xml'
+    # file.path = '/Users/ilya/Downloads/eopas.xml'
+    file.path = '/Users/ilya/Downloads/toukelauMov.xml' 
     source = OpenStruct.new
     source.file = file
-    params = {source: source, transcript_format: 'EOPAS', depositor: 'Steve', title: 'Test', date: '2000-04-07 00:00:00 UTC', country_code: 'AU', language_code: 'eng'}
-    # @transcripts = [Transcript.new(params)]
-    @transcripts = []
-    # logger.warn "Test: #{@media_item.media.video.url}"
-    logger.warn "Test: #{@transcripts.inspect}"
+    params = { source: source, transcript_format: 'EOPAS', depositor: 'Steve', title: 'Test', date: '2000-04-07 00:00:00 UTC', country_code: 'AU', language_code: 'eng'}
+
+    transcript = Transcript.new params
+    transcript.create_transcription
+    @transcripts = [transcript]
   end
 
 
@@ -44,23 +43,38 @@ class MediaItemsController < ApplicationController
     result
   end
 
-  def get_document_url document_id
-    uris = [PURL::TYPE, PURL::SOURCE]
-    # logger.warn "#Test: #{document[PURL::TYPE.to_s + "_tesim"]}"
-    # document[PURL::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" }
+  def get_media(type, url)
     media = OpenStruct.new
-    item_documents(document_id, uris).each do |values|
-      # logger.warn "Test: #{values}"
-      if values[PURL::TYPE] = 'Video'
-        video = OpenStruct.new
-        video.url = values[PURL::SOURCE].to_s
-        media.video = video
-        poster = OpenStruct.new
-        poster.url = 'http://konstantkitten.com/wp-content/uploads/kittne4.jpg'
-        media.poster = poster
-      end
+    if type == 'audio'
+      audio = OpenStruct.new
+      audio.url = url
+      media.audio = audio
+    elsif type == 'video'
+      video = OpenStruct.new
+      # video.url = url
+      video.url = 'file:///Users/ilya/Downloads/NT5-TokelauThatch-Vid104.ogg'
+      media.video = video
+      poster = OpenStruct.new
+      poster.url = 'http://konstantkitten.com/wp-content/uploads/kittne4.jpg'
+      media.poster = poster
     end
     media
+  end
+
+  def document_to_attribues(document)
+    attributes = solr_doc_to_hash(document)  
+    attributes['format'] = 'video'
+
+    attributes['recorded_on'] = attributes['created']
+    attributes['copyright'] = attributes['rights']
+    attributes['license'] = attributes['rights']
+
+    depositor = OpenStruct.new
+    depositor.full_name = attributes['depositor']
+    attributes['depositor'] = depositor
+
+    attributes.delete_if {|key, value| !MEDIA_ITEM_FIELDS.include? key}
+    attributes
   end
 
 end

@@ -16,6 +16,7 @@
         <th>Filename</th>
         <th>Type</th>
         <th>Size</th>
+        <th></th>
     </tr>
     <% uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE] %>
     <% type = "" %>
@@ -33,8 +34,11 @@
             <td><%= type + " (" + values[PURL::TYPE].to_s + ")" %></td>
         <% end %>
         <td><%= format_extent(values[PURL::EXTENT].to_i, 'B') %></td>
+        <% if ['Audio', 'Video'].include? values[PURL::TYPE].to_s %>
+            <td><%= link_to 'EOPAS', transcripts_path(:id => '66', :type => type.downcase, :url => values[PURL::SOURCE].to_s) %></td>
+        <% end %>
     </tr>
   <% end -%>
 </table>
-<%= link_to 'EOPAS', media_item_path %>
+<!-- <%= link_to 'EOPAS', media_item_path %> -->
 

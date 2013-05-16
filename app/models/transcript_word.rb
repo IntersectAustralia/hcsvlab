@@ -1,4 +1,6 @@
-class TranscriptWord < Tableless
+class TranscriptWord < ActiveRecord::Base
+  has_no_table
+  
   belongs_to :phrase, :class_name => 'TranscriptPhrase', :foreign_key => 'transcript_phrase_id'
 
   has_many :morphemes, :class_name => 'TranscriptMorpheme', :dependent => :destroy
@@ -9,4 +11,6 @@ class TranscriptWord < Tableless
 
   validates :position,    :presence => true, :numericality => true
   validates :word,        :presence => true
+
+  attr_accessor :transcript_phrase_id, :position, :word
 end

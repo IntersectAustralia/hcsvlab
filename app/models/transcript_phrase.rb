@@ -1,4 +1,6 @@
-class TranscriptPhrase < Tableless
+class TranscriptPhrase < ActiveRecord::Base
+  has_no_table
+  
   belongs_to :transcript
 
   has_many :words, :class_name => 'TranscriptWord', :dependent => :destroy
@@ -13,4 +15,7 @@ class TranscriptPhrase < Tableless
   validates :original,    :presence => true, :length => {:maximum => 4096}
   validates :translation, :length => {:maximum => 4096}
   validates :graid,       :length => {:maximum => 4096}
+
+  attr_accessor :transcript_id, :phrase_id, :start_time, :end_time, :original, :translation, :graid
+
 end

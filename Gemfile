@@ -82,7 +82,7 @@ gem 'hydra-head', "~>6.0.0"
 gem 'jettywrapper'
 
 gem "bootstrap-sass"
-
+gem 'activerecord-tableless'
 
 gem 'stomp'
 gem 'celluloid'
@@ -95,3 +95,5 @@ gem 'solrizer'
 gem 'rsolr'
 gem "linkeddata"
 gem "xml-simple"
+gem 'nokogiri'
+gem 'fileutils'

@@ -10,10 +10,10 @@
   - if @transcript
     %h3
       = @transcript.title
-      -if @transcript.country_code
-        - if @transcript.language_code
-          = "; " + CountryLanguage.find_by_country_code_and_code(@transcript.country_code, @transcript.language_code).name
-        = "; " + Country.find(@transcript.country_code).name
+      / -if @transcript.country_code
+      /   - if @transcript.language_code
+      /     = "; " + CountryLanguage.find_by_country_code_and_code(@transcript.country_code, @transcript.language_code).name
+      /   = "; " + Country.find(@transcript.country_code).name
 
   - if @media_item
     #media_display.collapse_box
@@ -23,18 +23,18 @@
       = render :partial => 'media_items/details'
   - else
     No media item attached
-    = link_to 'Link to Media Item', new_media_item_transcript_path(@transcript)
+    / = link_to 'Link to Media Item', new_media_item_transcript_path(@transcript)
 
   #metadata_display.collapse_box
     = render :partial => 'details'
 
 
-  - if current_user and (@transcript.depositor.id == current_user.id or current_user.admin?)
-    #actions
-      -if @media_item
-        = link_to 'Unlink Media Item', remove_media_item_transcript_path(@transcript), :confirm => "Are you sure?", :method => :delete
-        %br
-      = link_to 'Delete transcript', @transcript, :confirm => "Are you sure?", :method => :delete
+  / - if current_user and (@transcript.depositor.id == current_user.id or current_user.admin?)
+  /   #actions
+  /     -if @media_item
+  /       = link_to 'Unlink Media Item', remove_media_item_transcript_path(@transcript), :confirm => "Are you sure?", :method => :delete
+  /       %br
+  /     = link_to 'Delete transcript', @transcript, :confirm => "Are you sure?", :method => :delete
 
 #right_column
   #tiers_info

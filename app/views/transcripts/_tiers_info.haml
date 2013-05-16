@@ -7,26 +7,27 @@
     
 %form#tier_list
   -# We work this out off the first phrase
-  - first_phrase = @transcript.phrases.first
+  / - first_phrase = @transcript.phrases.first
+  / - first_phrase = @transcript.phrases[0]
 
-  - if first_phrase.original
-    %input.tier_info.hider{'data-hide-selector' => ".transcription", :type => 'checkbox', :checked => 'checked'}
-      Show transcription
-      %br
+  / - if first_phrase.original
+  /   %input.tier_info.hider{'data-hide-selector' => ".transcription", :type => 'checkbox', :checked => 'checked'}
+  /     Show transcription
+  /     %br
 
-  - if first_phrase.words.size > 0
-    %input.tier_info.hider{'data-hide-selector' => ".morphemes", :type => 'checkbox', :checked => 'checked'}
-      Show morphemes
-      %br
+  / - if first_phrase.words.size > 0
+  /   %input.tier_info.hider{'data-hide-selector' => ".morphemes", :type => 'checkbox', :checked => 'checked'}
+  /     Show morphemes
+  /     %br
 
-  - if first_phrase.graid
-    %input.tier_info.hider{'data-hide-selector' => ".graid", :type => 'checkbox', :checked => 'checked'}
-      Show GRAID annotation
-      %br
+  / - if first_phrase.graid
+  /   %input.tier_info.hider{'data-hide-selector' => ".graid", :type => 'checkbox', :checked => 'checked'}
+  /     Show GRAID annotation
+  /     %br
 
-  - if first_phrase.translation
-    %input.tier_info.hider{'data-hide-selector' => ".translation", :type => 'checkbox', :checked => 'checked'}
-      Show translation
-      %br
+  / - if first_phrase.translation
+  /   %input.tier_info.hider{'data-hide-selector' => ".translation", :type => 'checkbox', :checked => 'checked'}
+  /     Show translation
+  /     %br
 
 
