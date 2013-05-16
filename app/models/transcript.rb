@@ -23,7 +23,7 @@ class Transcript < ActiveRecord::Base
   has_no_table
 
   # belongs_to :depositor, :class_name => 'User'
-  # belongs_to :media_item
+  belongs_to :media_item
 
   has_many :phrases, :class_name => 'TranscriptPhrase', :dependent => :destroy
   has_many :participants, :dependent => :destroy
@@ -84,8 +84,6 @@ class Transcript < ActiveRecord::Base
     file_path = source.file.path
     @transcription = Transcription.new(:data => File.read(file_path).force_encoding('UTF-8'), :format => transcript_format)
     @transcription.import self
-    logger.warn "TR: #{@transcription.inspect}"
-    logger.warn "TR: #{phrases}"
   end
 
 end

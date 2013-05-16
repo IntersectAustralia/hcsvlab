@@ -22,18 +22,20 @@
                   %tr
                     %td{:colspan => colspan}
                       / %span.concordance{'data-type' => 'word', 'data-search' => word[:word], 'data-language-code' => @transcript.language_code, 'data-addr' => "/p#{phrase.transcript.phrases.index(phrase) + 1}/w#{word.position}"}
-                      /   = word[:word]
+                      %span.concordance{'data-type' => 'word', 'data-search' => word[:word], 'data-language-code' => @transcript.language_code}
+                        = word[:word]
 
-                      / - unless morphemes.empty?
-                      /   %tr
-                      /     - morphemes.each do |s|
-                      /       %td.morpheme
-                      /         %span.concordance{'data-type' => 'morpheme', 'data-search' => s.morpheme, 'data-language-code' => @transcript.language_code, 'data-addr' => "/p#{phrase.transcript.phrases.index(phrase) + 1}/w#{word.position}/m#{s.position}"}
-                      /           = s.morpheme
+                      - unless morphemes.empty?
+                        %tr
+                          - morphemes.each do |s|
+                            %td.morpheme
+                              / %span.concordance{'data-type' => 'morpheme', 'data-search' => s.morpheme, 'data-language-code' => @transcript.language_code, 'data-addr' => "/p#{phrase.transcript.phrases.index(phrase) + 1}/w#{word.position}/m#{s.position}"}
+                              %span.concordance{'data-type' => 'morpheme', 'data-search' => s.morpheme, 'data-language-code' => @transcript.language_code}
+                                = s.morpheme
 
-                      /   %tr
-                      /     - morphemes.each do |s|
-                      /       %td.gloss= s.gloss
+                        %tr
+                          - morphemes.each do |s|
+                            %td.gloss= s.gloss
 
         - if phrase.graid
           .tier{:class => [phrase.phrase_id, 'graid']}

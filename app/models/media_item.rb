@@ -5,7 +5,7 @@ class MediaItem < ActiveRecord::Base
   has_no_table
 
   # belongs_to :depositor, :class_name => 'User'
-  # has_many :transcripts, :dependent => :nullify
+  has_many :transcripts, :dependent => :nullify
 
   # # Access AREL so we can do an OR without writing SQL
   # scope :current_user_and_public, lambda { |user|
