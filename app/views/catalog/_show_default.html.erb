@@ -13,8 +13,12 @@
         <% end -%>
       <% end -%>
     <% end -%>
-    <% do_not_display = {'id' => nil, 'timestamp' => nil} %>
+    <% do_not_display = {'id' => nil,
+                         'timestamp' => nil,
+                         'http://www.w3.org/1999/02/22-rdf-syntax-ns#type_tesim' => nil,
+                         'date_group_tesim' => nil} %>
     <% do_not_display.merge!(document_show_fields(document)) %>
+
     <% document.keys.each do |k| -%>
       <% v = document[k] %>
       <% unless do_not_display.has_key?(k) %>
@@ -36,73 +40,61 @@
 <% if documents.empty? %>
     <em>This Item has no documents</em>
 <% else %>
-    <% if document[PURL::IS_PART_OF.to_s + "_tesim"][0] == "cooee" %>
-        <table class="document-table table table-striped" border="1">
-            <tr>
-                <th>Filename</th>
-                <th>Type</th>
-                <th>Size</th>
-            </tr>
-            <% type = nil %>
-            <% if document.has_key?(PURL::TYPE.to_s + "_tesim") %>
-            <% document[PURL::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" } %>
-            <% end %>
-            <% if type.nil? %>
-            <%   format = '%s' %>
-            <% else %>
-            <%   format = type + '(%s)' %>
-            <% end %>
-            <%  %>
-            <%  %>
-            <% documents.each do |values| -%>
-            <tr>
-                <% if values.has_key?(PURL::SOURCE) %>
-                    <td><a href="<%= values[PURL::SOURCE] %>"><%= values[PURL::IDENTIFIER] %></a></td>
-                <% else %>
-                    <td><%= values[PURL::IDENTIFIER] %></td>
-                <% end %>
-                <% if values.has_key?(PURL::TYPE) %>
-                <%   field = values[PURL::TYPE] %>
-                <%   field = "unlabelled" if field == "" %>
-                <%   field = "Plain"   if field == type %>
-                <% else %>
-                <%   field = "unlabelled" %>
-                <% end %>
-                <td><%= sprintf(format, field) %></td>
-                <td><%= format_extent(values[PURL::EXTENT].to_i, 'B') %></td>
-            </tr>
-          <% end -%>
-        </table>
+    <% is_cooee = document[PURL::IS_PART_OF.to_s + "_tesim"][0] == "cooee" %>
+    <% type = nil %>
+    <% if is_cooee %>
+        <% if document.has_key?(PURL::TYPE.to_s + "_tesim") %>
+        <%   document[PURL::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" } %>
+        <% end %>
+        <% if type.nil? %>
+        <%   type_format = '%s' %>
+        <% else %>
+        <%   type_format = type + '(%s)' %>
+        <% end %>
     <% else %>
-        <table class="document-table table table-striped">
-          <thead>
+        <% type_format = '%s' %>
+    <% end %>
+    <table class="document-table table table-striped" border="1">
+        <thead>
             <tr>
                 <th>Filename</th>
                 <th>Type</th>
                 <th>Size</th>
             </tr>
-          </thead>
-          <tbody>
+        </thead>
+        <tbody>
             <% documents.each do |values| -%>
-            <tr>
-                <% if values.has_key?(PURL::SOURCE) %>
-                    <td><a href="<%= values[PURL::SOURCE] %>"><%= values[PURL::IDENTIFIER] %></a></td>
-                <% else %>
-                    <td><%= values[PURL::IDENTIFIER] %></td>
-                <% end %>
-                <% if values.has_key?(PURL::TYPE) %>
-                <%   field = values[PURL::TYPE] %>
-                <%   field = "unlabelled" if field == "" %>
-                <% else %>
-                <%   field = "unlabelled" %>
-                <% end %>
-                <td><%= field %></td>
-                <td><%= format_extent(values[PURL::EXTENT].to_i, 'B') %></td>
-            </tr>
-          <% end -%>
-          </tbody>
-        </table>
-    <% end %>
+                <tr>
+                    <% if values.has_key?(PURL::SOURCE) %>
+                        <td><a href="<%= values[PURL::SOURCE] %>"><%= values[PURL::IDENTIFIER] %></a></td>
+                    <% else %>
+                        <td><%= values[PURL::IDENTIFIER] %></td>
+                    <% end %>
+        
+                    <% if values.has_key?(PURL::TYPE) %>
+                    <%   field = values[PURL::TYPE] %>
+                    <%   field = "unlabelled" if field == "" %>
+                    <%   field = "Plain"   if is_cooee && field == type %>
+                    <% else %>
+                    <%   field = "unlabelled" %>
+                    <% end %>
+                    <td><%= sprintf(type_format, field) %></td>
+        
+                    <% if values.has_key?(PURL::EXTENT) %>
+                    <%   field = values[PURL::EXTENT] %>
+                    <%   if field.nil? || field == "" %>
+                    <%     field = "unknown" %>
+                    <%   else %>
+                    <%     field = format_extent(field.to_i, 'B') %>
+                    <%   end %>
+                    <% else %>
+                    <%   field = "unknown" %>
+                    <% end %>
+                    <td><%= field %></td>
+                </tr>
+            <% end -%>
+        </tbody>
+    </table>
 <% end %>
 
 

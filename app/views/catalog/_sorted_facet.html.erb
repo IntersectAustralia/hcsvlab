@@ -1,0 +1,26 @@
+<ul>
+  <% paginator =    
+      Blacklight::Solr::FacetPaginator.new(display_facet.items,        
+        :limit => facet_limit_for(solr_field))
+  %>
+  <% order = paginator.items.sort! { | i1, i2 | i1.label <=> i2.label } %>
+  <% if order.size >= 10 %>
+    <div class="facet_box" style="overflow: auto; overflow-x: hidden; width:230px; height:240px; border:1px solid gray; padding:5px">
+  <% end %>
+  <% order.each do |item| -%>
+    <li>
+    <% if facet_in_params?( solr_field, item.value ) %>              
+        <%= render_selected_facet_value(solr_field, item) %>              
+      <% else %>              
+        <%= render_facet_value(solr_field, item) %>              
+    <% end -%>
+    </li>
+  <% end %>
+  <% if order.size >= 10 %>
+    </div>
+  <% end %>
+  <% if(paginator.has_next?)  %>
+    <li class="more_facets_link"><%= link_to(t('blacklight.search.facets.more'), params.merge(:id => solr_field, :action=>"facet", :page => nil), :class => "more_facets_link") %></li>
+  <% end %>
+
+</ul>
