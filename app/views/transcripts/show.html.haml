@@ -23,18 +23,18 @@
       = render :partial => 'media_items/details'
   - else
     No media item attached
-    / = link_to 'Link to Media Item', new_media_item_transcript_path(@transcript)
+    -# = link_to 'Link to Media Item', new_media_item_transcript_path(@transcript)
 
   #metadata_display.collapse_box
     = render :partial => 'details'
 
 
-  / - if current_user and (@transcript.depositor.id == current_user.id or current_user.admin?)
-  /   #actions
-  /     -if @media_item
-  /       = link_to 'Unlink Media Item', remove_media_item_transcript_path(@transcript), :confirm => "Are you sure?", :method => :delete
-  /       %br
-  /     = link_to 'Delete transcript', @transcript, :confirm => "Are you sure?", :method => :delete
+  -# - if current_user and (@transcript.depositor.id == current_user.id or current_user.admin?)
+  -#   #actions
+  -#     -if @media_item
+  -#       = link_to 'Unlink Media Item', remove_media_item_transcript_path(@transcript), :confirm => "Are you sure?", :method => :delete
+  -#       %br
+  -#     = link_to 'Delete transcript', @transcript, :confirm => "Are you sure?", :method => :delete
 
 #right_column
   #tiers_info

@@ -204,7 +204,7 @@ $(document).ready(function() {
 
   // Transcript box 
   // do_onResize();
-  $(window).resize(do_onResize);
+  // $(window).resize(do_onResize);
 
   // Form bits
   // setup_transcript_media_item();

@@ -7,7 +7,6 @@
     
 %form#tier_list
   -# We work this out off the first phrase
-  / - first_phrase = @transcript.phrases.first
   - first_phrase = @transcript.phrases[0]
 
   - if first_phrase.original
