@@ -16,16 +16,16 @@
         <%= render 'home' %>
       <% else %>
       
-      <% document_list = get_galaxy_document_list %>
-      <% if document_list != "" %>
-      	<form method="post" action="<%= Rails.application.config.galaxy_url %>" >
-      		<input type="hidden" value="hcsvlab_importer" name="tool_id"/>
-      		<input type="hidden" value="<%= document_list %>" name="url_paste" />
-      		<input type="hidden" value="HCSVLAB data" name="job_name" />
-      		<input type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL" />
-      		<input type="submit" value="Use Search Results in Galaxy" />
-      	</form>
-      <% end %>
+      <%# <% document_list = get_galaxy_document_list %1> %>
+      <%# <% if document_list != "" %1> %>
+      <%# 	<form method="post" action="<%= Rails.application.config.galaxy_url %1>" > %>
+      <%# 		<input type="hidden" value="hcsvlab_importer" name="tool_id"/> %>
+      <%# 		<input type="hidden" value="<%= document_list %1>" name="url_paste" /> %>
+      <%# 		<input type="hidden" value="HCSVLAB data" name="job_name" /> %>
+      <%# 		<input type="hidden" value="<%= Rails.application.config.galaxy_url %1>" name="URL" /> %>
+      <%# 		<input type="submit" value="Use Search Results in Galaxy" /> %>
+      <%# 	</form> %>
+      <%# <% end %1> %>
 
         <h3 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h3>
 
