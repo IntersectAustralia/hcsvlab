@@ -60,7 +60,8 @@ class TranscriptsController < ApplicationController
     elsif type == 'video'
       video = OpenStruct.new
       # video.url = url
-      video.url = 'file:///Users/ilya/Downloads/NT5-TokelauThatch-Vid104.ogg'
+      video.url = 'http://eopas.rnld.unimelb.edu.au/system/media_item/originals/21/video/NT5-TokelauThatch-Vid104.ogg'
+      # video.url = 'file:///Users/ilya/Downloads/NT5-TokelauThatch-Vid104.ogg'
       media.video = video
       poster = OpenStruct.new
       poster.url = 'http://konstantkitten.com/wp-content/uploads/kittne4.jpg'
