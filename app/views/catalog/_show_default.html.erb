@@ -35,10 +35,9 @@
         <% end %>
         <td><%= format_extent(values[PURL::EXTENT].to_i, 'B') %></td>
         <% if ['Audio', 'Video'].include? values[PURL::TYPE].to_s %>
-            <td><%= link_to 'EOPAS', transcripts_path(:id => '66', :type => type.downcase, :url => values[PURL::SOURCE].to_s) %></td>
+            <td><%= link_to 'EOPAS', eopas_path(:type => type.downcase, :url => values[PURL::SOURCE].to_s) %></td>
         <% end %>
     </tr>
   <% end -%>
 </table>
-<!-- <%= link_to 'EOPAS', media_item_path %> -->
 

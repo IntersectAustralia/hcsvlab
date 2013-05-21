@@ -1,5 +1,3 @@
-require 'activerecord-tableless'
-
 class MediaItem < ActiveRecord::Base
 
   has_no_table

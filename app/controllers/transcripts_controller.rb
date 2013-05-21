@@ -8,6 +8,8 @@ class TranscriptsController < ApplicationController
   include Blacklight::Catalog
   include Blacklight::BlacklightHelperBehavior
 
+  before_filter :authenticate_user!
+
   MEDIA_ITEM_FIELDS = %w(title description recorded_on copyright license format media depositor)
 
   def show
@@ -59,9 +61,8 @@ class TranscriptsController < ApplicationController
       media.audio = audio
     elsif type == 'video'
       video = OpenStruct.new
-      # video.url = url
+      video.url = url
       video.url = 'http://eopas.rnld.unimelb.edu.au/system/media_item/originals/21/video/NT5-TokelauThatch-Vid104.ogg'
-      # video.url = 'file:///Users/ilya/Downloads/NT5-TokelauThatch-Vid104.ogg'
       media.video = video
       poster = OpenStruct.new
       poster.url = 'http://konstantkitten.com/wp-content/uploads/kittne4.jpg'
