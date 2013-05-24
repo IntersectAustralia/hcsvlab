@@ -12,7 +12,7 @@ namespace :fedora do
 		corpus_rdf  = ARGV[1] unless ARGV[1].nil?
 
 		if (corpus_rdf.nil?) || (! File.exists?(corpus_rdf))
-			puts "Usage: rake fedora:ingest_one <corpus rdf file"
+			puts "Usage: rake fedora:ingest_one <corpus rdf file>"
 			exit 1
 		end
 
@@ -30,10 +30,39 @@ namespace :fedora do
 		end
 
 		puts "Ingesting corpus from " + corpus_dir.to_s
+		errors = {}
+		success_count = 0
 
 		Dir.glob( corpus_dir + '/*-metadata.rdf') do |rdf_file|
-			ingest_rdf_file(corpus_dir, rdf_file)
+			begin
+				ingest_rdf_file(corpus_dir, rdf_file)
+				success_count += 1
+			rescue => e
+				errors[rdf_file] = e.message
+			end
 		end
+
+		logfile   = "ingest_#{File.basename(corpus_dir)}.log"
+		logstream = File.open(logfile, "w")
+
+        message = "Successfully ingested #{success_count} Item#{success_count==1? '': 's'}"
+		message += ", and rejected #{errors.size} Item#{errors.size==1? '': 's'}" unless errors.empty?
+        puts message
+		puts "Summary written to #{logfile}"
+
+		if errors.empty?
+        	logstream << message << "\n"
+		else
+        	logstream << "Ingest of #{corpus_dir}" << "\n\n"
+        	logstream << message << "\n\n"
+			logstream << "Error Summary" << "\n"
+			logstream << "=============" << "\n"
+        	errors.each { |item, message|
+        		logstream << "\nItem #{item}:" << "\n\n"
+        		logstream << "#{message}" << "\n"
+        	}
+    	end
+		logstream.close
 	end
 
 	task :clear => :environment do
@@ -57,7 +86,7 @@ namespace :fedora do
 		puts "Ingesting item: " + rdf_file.to_s
 
 		item = Item.new
-		item.descMetadata.graph.load( rdf_file, :format => :ttl )
+		item.descMetadata.graph.load( rdf_file, :format => :ttl, :validate => true )
 		item.label = item.descMetadata.graph.statements.first.subject
 		item.save!
 
@@ -67,8 +96,7 @@ namespace :fedora do
 			:document => {
 				RDF::URI("http://purl.org/dc/terms/type") => :type,
 				RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
-				RDF::URI("http://purl.org/dc/terms/source") => :source,
-				RDF::URI("http://purl.org/dc/terms/title") => :title
+				RDF::URI("http://purl.org/dc/terms/source") => :source
 			}
 		})
 
@@ -88,7 +116,7 @@ namespace :fedora do
 							doc.file.content = File.open(path)
 						end
 						doc.save
-						puts "#{result.type.to_s} Document= " + doc.pid.to_s
+						puts "#{result.type.to_s} Document= #{doc.pid.to_s}"
 						break
 					end
 				end
