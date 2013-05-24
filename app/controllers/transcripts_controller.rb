@@ -1,8 +1,9 @@
 require 'blacklight/catalog'
-
+require 'open-uri'
 require 'ostruct'
 
 class TranscriptsController < ApplicationController
+
   respond_to :html, :xml
 
   include Blacklight::Catalog
@@ -11,35 +12,40 @@ class TranscriptsController < ApplicationController
   before_filter :authenticate_user!
 
   MEDIA_ITEM_FIELDS = %w(title description recorded_on copyright license format media depositor)
+  TRANSCRIPT_FIELDS = %w(title date depositor country_code language_code copyright license private 
+      source source_cache transcript_format participants_attributes description format recorded_on)
 
   def show
-    @transcript = load_transcript
-    @media_item = load_media params['id']
-
-    logger.warn "Test: #{@media_item.inspect}"    
+    attributes = document_to_attribues params['id'] 
+    @transcript = load_transcript attributes
+    @media_item = load_media attributes
+    logger.warn "Test: {@media_item.inspect}"
   end
 
+  def load_transcript(attributes)
+    data = open(attributes['transcription']).read.force_encoding('UTF-8')
+    file_format = detect_format data
+    
+    attributes = filter_attributes(attributes, TRANSCRIPT_FIELDS)
 
-  def load_transcript
-    file = OpenStruct.new
-    file.path = '/Users/ilya/Downloads/eopas.xml'
-    source = OpenStruct.new
-    source.file = file
-    depositor = OpenStruct.new
-    depositor.full_name = "Joe Bloggs"
-    params = { source: source, transcript_format: 'EOPAS', depositor: depositor, title: 'Test', date: '2000-04-07 00:00:00 UTC', country_code: 'AU', language_code: 'eng'}
-    transcript = Transcript.new params
-    transcript.create_transcription
+    transcript = Transcript.new attributes
+    transcript.create_transcription(data, file_format)
     transcript
   end
 
-  def load_media(item_id)
+  def get_solr_document(item_id)
     documents = get_solr_response_for_doc_id(item_id)[0]
     document = documents['response']['docs'][0]
-    attributes = document_to_attribues(document)
-    media = get_media('video', params['url'])
+    document
+  end
+
+  def load_media(attributes)
+    # media = get_media(params['type'], params['url'])
+    media = get_media(attributes['format'], params['url'])
     attributes['media'] = media
+    attributes = filter_attributes(attributes, MEDIA_ITEM_FIELDS)
     media_item = MediaItem.new attributes
+    puts attributes
     media_item
   end
 
@@ -62,17 +68,48 @@ class TranscriptsController < ApplicationController
     elsif type == 'video'
       video = OpenStruct.new
       video.url = url
-      video.url = 'http://eopas.rnld.unimelb.edu.au/system/media_item/originals/21/video/NT5-TokelauThatch-Vid104.ogg'
       media.video = video
       poster = OpenStruct.new
-      poster.url = 'http://konstantkitten.com/wp-content/uploads/kittne4.jpg'
+      poster.url = ''
       media.poster = poster
     end
     media
   end
 
-  def document_to_attribues(document)
-    attributes = solr_doc_to_hash(document)  
+  def detect_format(data)
+    result = nil
+    flattened = data.downcase
+    if flattened.include? '<time_slot'  
+      result = 'elan'
+    elsif flattened.include? '<txgroup'
+      result = 'toolbox'
+    elsif flattened.include? '<sync'
+      result = 'transciber'
+    elsif flattened.include? '<eopas'
+      result = 'eopas'
+    end
+    result
+  end
+
+  def find_transcription(attributes)
+    result = ''
+    # HACK: this should really find the document via dc:source
+    attributes['document'].each do |filename|  
+      if File.extname(filename) == '.xml'
+        result = "http://#{request.host}:8080/#{attributes['isPartOf']}/#{filename}"
+        break
+      end
+    end
+    result
+  end
+
+  def filter_attributes(attributes, filter)
+    attributes.select {|key, value| filter.include? key}
+  end
+
+  def document_to_attribues(item_id)
+    document = get_solr_document item_id
+    attributes = solr_doc_to_hash(document)
     attributes['format'] = 'video'
 
     attributes['recorded_on'] = attributes['created']
@@ -82,8 +119,8 @@ class TranscriptsController < ApplicationController
     depositor = OpenStruct.new
     depositor.full_name = attributes['depositor']
     attributes['depositor'] = depositor
+    attributes['transcription'] = find_transcription attributes
 
-    attributes.delete_if {|key, value| !MEDIA_ITEM_FIELDS.include? key}
     attributes
   end
 

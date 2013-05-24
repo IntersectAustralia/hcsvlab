@@ -137,7 +137,6 @@ class Transcription
       w.position = word_position
       word_position += 1
       w.word = word.xpath('text').first.content
-      logger.warn "Word: #{w.word}"
       morphemes = word.xpath('morphemelist/morpheme')
 
       morpeheme_position = 1

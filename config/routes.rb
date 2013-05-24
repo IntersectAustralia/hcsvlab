@@ -33,7 +33,7 @@ HcsvlabWeb::Application.routes.draw do
   end
 
   # resources :media_items, :transcripts
-  match '/eapas/:id' => 'transcripts#show', :as => 'eopas'
+  match '/eopas/:id' => 'transcripts#show', :as => 'eopas'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

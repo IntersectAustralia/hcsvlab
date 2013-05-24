@@ -20,15 +20,17 @@ require 'transcription'
 # end
 
 class Transcript < ActiveRecord::Base
+  
   has_no_table
 
   # belongs_to :depositor, :class_name => 'User'
   belongs_to :media_item
 
-  has_many :phrases, :class_name => 'TranscriptPhrase', :dependent => :destroy
-  has_many :participants, :dependent => :destroy
+  has_many :phrases, class_name: 'TranscriptPhrase', dependent: :destroy
+  has_many :participants, dependent: :destroy
 
-  accepts_nested_attributes_for :participants, :allow_destroy => true, :reject_if => lambda { |participant| participant[:name].blank? }
+  accepts_nested_attributes_for :participants, allow_destroy: true,
+      reject_if: lambda { |participant| participant[:name].blank? }
 
   accepts_nested_attributes_for :phrases
 
@@ -46,8 +48,13 @@ class Transcript < ActiveRecord::Base
 
   # mount_uploader :source, TranscriptUploader
 
-  attr_accessible :title, :date, :depositor, :country_code, :language_code, :copyright, :license, :private, :source, :source_cache, :transcript_format, :participants_attributes, :description
-  attr_accessor :title, :date, :depositor, :country_code, :language_code, :copyright, :license, :private, :source, :source_cache, :transcript_format, :participants_attributes, :description
+  attr_accessible :title, :date, :depositor, :country_code, :language_code, :copyright, :license,
+      :private, :source, :source_cache, :transcript_format, :participants_attributes, :description,
+      :format, :recorded_on
+
+  attr_accessor :title, :date, :depositor, :country_code, :language_code, :copyright, :license,
+      :private, :source, :source_cache, :transcript_format, :participants_attributes, :description,
+      :format, :recorded_on
 
   # FORMATS = ['ELAN', 'Toolbox', 'Transcriber', 'EOPAS']
 
@@ -74,15 +81,8 @@ class Transcript < ActiveRecord::Base
   #   end
   # end
 
-  # def initialize(file_path, transcript_format)
-  #   @transcription = Transcription.new(:data => File.read(file_path).force_encoding('UTF-8'), :format => transcript_format)
-  #   @transcription.import self
-  # end
-
-  def create_transcription
-    # return unless new_record?
-    file_path = source.file.path
-    @transcription = Transcription.new(:data => File.read(file_path).force_encoding('UTF-8'), :format => transcript_format)
+  def create_transcription(data, format)
+    @transcription = Transcription.new(data: data, format: format)
     @transcription.import self
   end
 

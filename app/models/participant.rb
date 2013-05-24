@@ -10,9 +10,9 @@ class Participant < ActiveRecord::Base
     transcriber translator
   )
 
-  validates :name, :presence => true
-  validates :role, :inclusion => {:in => ROLES}
-  validates :transcript, :presence => true
+  validates :name, presence: true
+  validates :role, inclusion: {in: ROLES}
+  validates :transcript, presence: true
 
   attr_accessible :name, :role, :transcript_id
   attr_accessor :name, :role, :transcript_id
