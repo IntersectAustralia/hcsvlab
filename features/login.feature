@@ -30,10 +30,9 @@ Feature: Logging In
   Scenario: Home page is the search page once logged in
     Given I am on the login page
     And I attempt to login with "georgina@intersect.org.au" and "Pas$w0rd"
-    # currently this is what is shown on the search page - this test may need to be changed later
-    Then I should see "Welcome!"
+    Then I should see "Human Communication Science Virtual Laboratory"
     When I am on the home page
-    Then I should see "Welcome!"
+    Then I should see "Human Communication Science Virtual Laboratory"
 
   Scenario: Should be redirected to the login page when trying to access a secure page
     Given I am on the list users page

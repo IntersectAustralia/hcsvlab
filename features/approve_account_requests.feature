@@ -54,8 +54,8 @@ Feature: Approve access requests
     When I follow "View Details" for "diego@intersect.org.au"
     Then I should see "diego@intersect.org.au"
     Then I should see field "Email" with value "diego@intersect.org.au"
-    Then I should see field "First name" with value "Diego"
-    Then I should see field "Last name" with value "Alonso de Marcos"
+    Then I should see field "First Name" with value "Diego"
+    Then I should see field "Last Name" with value "Alonso de Marcos"
     Then I should see field "Role" with value ""
     Then I should see field "Status" with value "Pending Approval"
 

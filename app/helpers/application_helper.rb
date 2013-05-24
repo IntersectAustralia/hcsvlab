@@ -8,6 +8,10 @@ module ApplicationHelper
     render_field_content(label, (h value))
   end
 
+  def render_field_table(label, value)
+    render_field_table_content(label, (h value))
+  end
+
   def render_field_if_not_empty(label, value)
     render_field_content(label, (h value)) if value != nil && !value.empty?
   end
@@ -16,6 +20,11 @@ module ApplicationHelper
   def render_field_with_block(label, &block)
     content = with_output_buffer(&block)
     render_field_content(label, content)
+  end
+
+  def render_field_table_with_block(label, &block)
+    content = with_output_buffer(&block)
+    render_field_table_content(label, content)
   end
 
   def user_dropdown_menu
@@ -38,5 +47,18 @@ module ApplicationHelper
     html.html_safe
   end
 
+  def render_field_table_content(label, content)
+    div_class = cycle("field_bg","field_nobg")
+    div_id = label.tr(" ,", "_").downcase
+    html = "<tr class='#{div_class} inlineblock' id='display_#{div_id}'>"
+    html << '<td class="label_view">'
+    html << (h label)
+    html << '</td>'
+    html << '<td class="field_value">'
+    html << content
+    html << '</td>'
+    html << '</tr>'
+    html.html_safe
+  end
 
 end

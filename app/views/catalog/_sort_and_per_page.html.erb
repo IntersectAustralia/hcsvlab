@@ -1,0 +1,20 @@
+<div id="sortAndPerPage">
+
+   <div class="page_links">
+     <%= render :partial => "paginate_compact" %>
+   </div>
+    <%= render :partial => 'sort_widget' %>
+
+<%= render :partial => 'per_page_widget' %>
+      <% document_list = get_galaxy_document_list %>
+       <% if document_list != "" %>
+      	<form class="pull-right" method="post" action="<%= Rails.application.config.galaxy_url %>" >
+      		<input class='btn' type="hidden" value="hcsvlab_importer" name="tool_id"/>
+      		<input class='btn' type="hidden" value="<%= document_list %>" name="url_paste" />
+      		<input class='btn' type="hidden" value="HCSVLAB data" name="job_name" />
+      		<input class='btn' type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL" />
+      		<input class='btn' type="submit" value="Analyse Current Page of Search Results in Galaxy " />
+      	</form>
+      <% end %>
+
+</div>

@@ -25,8 +25,8 @@ Feature: Administer users
     And I am on the list users page
     When I follow "View Details" for "raul@intersect.org.au"
     Then I should see field "Email" with value "raul@intersect.org.au"
-    And I should see field "First name" with value "Raul"
-    And I should see field "Last name" with value "Carrizo"
+    And I should see field "First Name" with value "Raul"
+    And I should see field "Last Name" with value "Carrizo"
     And I should see field "Role" with value "researcher"
     And I should see field "Status" with value "Active"
 

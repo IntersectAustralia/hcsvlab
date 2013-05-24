@@ -37,35 +37,23 @@
       = link_to 'Back', users_path, :class => "btn"
 
 %table#userdetails.table.table-striped
-  %tr
-    %td Email
-    %td= render_field "", @user.email
-  %tr
-    %td First Name
-    %td= render_field "", @user.first_name
-  %tr
-    %td Last Name
-    %td= render_field "", @user.last_name
+  = render_field_table('Email', @user.email)
+  = render_field_table('First Name', @user.first_name)
+  = render_field_table('Last Name', @user.last_name)
   - if !@user.pending_approval?
-    %tr
-      = render_field_with_block "Last Logged In" do
-        - if @user.last_sign_in_at.nil?
-          %td Never logged in
-        - else
-          %td= @user.last_sign_in_at.localtime.strftime("%d/%m/%Y %I:%M%p")
-  %tr
-    %td Role
-    %td= render_field "", (@user.role ? @user.role.name : "")
-  %tr
-    %td Status
-    %td
-      = render_field_with_block "" do
-        - if @user.status == 'A'
-          Active
-        - elsif @user.status == 'D'
-          Deactivated
-        - elsif @user.status == 'U'
-          Pending Approval
-        - elsif @user.status == 'R'
-          Rejected
-          </table>
+    = render_field_table_with_block "Last Logged In" do
+      - if @user.last_sign_in_at.nil?
+        = 'Never logged in'
+      - else
+        = @user.last_sign_in_at.localtime.strftime("%d/%m/%Y %I:%M%p")
+  = render_field_table('Role', (@user.role ? @user.role.name : ''))
+  = render_field_table_with_block 'Status' do
+    - if @user.status == 'A'
+      Active
+    - elsif @user.status == 'D'
+      Deactivated
+    - elsif @user.status == 'U'
+      Pending Approval
+    - elsif @user.status == 'R'
+      Rejected
+      </table>
