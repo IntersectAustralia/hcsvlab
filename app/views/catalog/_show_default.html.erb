@@ -91,6 +91,11 @@
                     <%   field = "unknown" %>
                     <% end %>
                     <td><%= field %></td>
+                    <td>
+                    <% if ['Audio', 'Video'].include? values[PURL::TYPE].to_s %>
+                        <%= link_to 'EOPAS', eopas_path(:type => values[PURL::TYPE].to_s.downcase, :url => values[PURL::SOURCE].to_s) %>
+                    <% end %>
+                    </td>
                 </tr>
             <% end -%>
         </tbody>

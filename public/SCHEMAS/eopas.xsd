@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+      EOPAS 2010 Annotation Format
+      version 2.2
+      March 2013
+      Schema by Ronald Schroeter (itee - uq) 2006, v1.0
+      Adapted by Silvia Pfeiffer, John Ferlito
+    </xsd:documentation>
+  </xsd:annotation>
+  
+  <!-- ********************** ROOT  ********************** -->
+  <xsd:element name="eopas">
+    <xsd:annotation>
+      <xsd:documentation>Root segment of the "EthnoER online presentation and annotation system" EOPAS archival format</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="header" type="headType"/>
+        <xsd:element name="interlinear" type="interlinearTextType"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- ********************** HEADER METADATA ********************** -->
+  <xsd:complexType name="headType">
+    <xsd:annotation>
+      <xsd:documentation>The header containing metadata about the interlinear transcript</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="meta" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                 <xsd:whiteSpace value="replace"/>
+              </xsd:restriction>
+            </xs:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="value" type="xsd:string"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ********************** Interlinear TEXT LEVEL ********************** -->
+  <xsd:complexType name="interlinearTextType">
+    <xsd:sequence>
+      <xsd:element name="phrase" type="phraseType" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ********************** Phrase LEVEL ********************** -->
+  <xsd:complexType name="phraseType">
+    <xsd:annotation>
+      <xsd:documentation>Wrapper element for phrases</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="transcription"  type="xsd:string"  minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="wordlist" type="wordsType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="graid" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="translation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+    <xsd:attribute name="startTime" type="xsd:string" use="required"/>
+    <xsd:attribute name="endTime" type="xsd:string" use="required"/>
+    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="participant" type="xsd:string" />
+  </xsd:complexType>
+
+  <!-- ********************** WORDS LEVEL ********************** -->
+  <xsd:complexType name="wordsType">
+    <xsd:annotation>
+      <xsd:documentation>Wrapper element for structured phrases</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="word" type="wordType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ********************** WORD LEVEL ********************** -->
+  <xsd:complexType name="wordType">
+    <xsd:annotation>
+      <xsd:documentation>Wrapper element for structured words</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="text"      type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="morphemelist" type="morphemesType" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ********************** MORPHEMES LEVEL ********************** -->
+  <xsd:complexType name="morphemesType">
+    <xsd:annotation>
+      <xsd:documentation>Wrapper element for morphemeslist</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="morpheme" type="morphemeType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ********************** MORPHEME LEVEL ********************** -->
+  <xsd:complexType name="morphemeType">
+    <xsd:annotation>
+      <xsd:documentation>Wrapper element for morpheme or gloss structure</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="text" type="morphemeTextType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ********************** MORPHEME TEXT LEVEL ********************** -->
+  <xsd:complexType name="morphemeTextType">
+    <xsd:annotation>
+      <xsd:documentation>Wrapper element for morpheme text</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="kind" use="optional"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+</xsd:schema>

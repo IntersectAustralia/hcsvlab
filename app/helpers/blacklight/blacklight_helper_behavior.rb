@@ -664,9 +664,9 @@ module Blacklight::BlacklightHelperBehavior
   #
   # Build the URL of a particular datastream of the given Fedora object
   #
-  def buildURI(object, datastream)
+  def buildURI(object_id, datastream)
     config = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env]
-    return config["url"].to_s + "/objects/#{object}/datastreams/#{datastream}/content"
+    return config["url"].to_s + "/objects/#{object_id}/datastreams/#{datastream}/content"
   end
 
   def item_documents(document, uris)
