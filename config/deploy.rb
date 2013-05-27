@@ -21,6 +21,19 @@ set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
 set :deploy_via, :copy
 set :copy_exclude, [".git/*"]
 
+
+#version tagging
+set :branch do
+  require 'colorize'
+  default_tag = 'HEAD'
+
+  puts "Availible tags:".colorize(:yellow)
+  puts `git tag`
+  tag = Capistrano::CLI.ui.ask "Tag to deploy (make sure to push the branch/tag first) or HEAD?: [#{default_tag}] ".colorize(:yellow)
+  tag = default_tag if tag.empty?
+  tag
+end
+
 set(:user) { "#{defined?(user) ? user : 'devel'}" }
 set(:group) { "#{defined?(group) ? group : user}" }
 set(:user_home) { "/home/#{user}" }
@@ -98,6 +111,11 @@ after 'deploy:finalize_update' do
 end
 
 namespace :deploy do
+
+  desc "Write the tag that was deployed to a file on the server so we can display it on the app"
+  task :write_tag do
+    put branch, "#{release_path}/app/views/shared/_tag.html.haml"
+  end
 
   # Passenger specifics: restart by touching the restart.txt file
   task :start, :roles => :app, :except => {:no_release => true} do

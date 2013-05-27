@@ -1,0 +1,10 @@
+.row-fluid.clearfix
+  .span12
+    - if Rails.env.development?
+      #dev
+      %p HCSvLab Env: Development.
+    - else
+      %p 
+        Developed by Intersect Australia Ltd.  Version: 
+        = render 'shared/tag'
+  
