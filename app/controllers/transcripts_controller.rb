@@ -8,24 +8,25 @@ class TranscriptsController < ApplicationController
 
   include Blacklight::Catalog
   include Blacklight::BlacklightHelperBehavior
+  include EopasHelper
 
   before_filter :authenticate_user!
 
   MEDIA_ITEM_FIELDS = %w(title description recorded_on copyright license format media depositor)
-  TRANSCRIPT_FIELDS = %w(title date depositor country_code language_code copyright license private 
+  TRANSCRIPT_FIELDS = %w(title date depositor country_code language_code copyright license private
       source source_cache transcript_format participants_attributes description format recorded_on)
 
   def show
-    attributes = document_to_attribues params['id'] 
+    attributes = document_to_attribues params['id']
     @transcript = load_transcript attributes
     @media_item = load_media attributes
-    logger.warn "Test: {@media_item.inspect}"
   end
 
   def load_transcript(attributes)
+    puts "Trans: #{attributes['transcription']}"
     data = open(attributes['transcription']).read.force_encoding('UTF-8')
     file_format = detect_format data
-    
+
     attributes = filter_attributes(attributes, TRANSCRIPT_FIELDS)
 
     transcript = Transcript.new attributes
@@ -40,12 +41,11 @@ class TranscriptsController < ApplicationController
   end
 
   def load_media(attributes)
-    # media = get_media(params['type'], params['url'])
-    media = get_media(attributes['format'], params['url'])
+    url = find_doc_by_extension('ogg')
+    media = get_media(attributes['format'], url)
     attributes['media'] = media
     attributes = filter_attributes(attributes, MEDIA_ITEM_FIELDS)
     media_item = MediaItem.new attributes
-    puts attributes
     media_item
   end
 
@@ -76,28 +76,14 @@ class TranscriptsController < ApplicationController
     media
   end
 
-  def detect_format(data)
+  def find_doc_by_extension(ext)
+    # FIX: document is opened multiple times, this could be reduced to one time
+    documents = item_documents_from_id(params['id'], [PURL::SOURCE])
     result = nil
-    flattened = data.downcase
-    if flattened.include? '<time_slot'  
-      result = 'elan'
-    elsif flattened.include? '<txgroup'
-      result = 'toolbox'
-    elsif flattened.include? '<sync'
-      result = 'transciber'
-    elsif flattened.include? '<eopas'
-      result = 'eopas'
-    end
-    result
-  end
-
-  def find_transcription(attributes)
-    result = ''
-    # HACK: this should really find the document via dc:source
-    puts attributes
-    attributes['document'].each do |filename|  
-      if File.extname(filename) == '.xml'
-        result = "http://#{request.host}:8080/#{attributes['isPartOf']}/#{filename}"
+    documents.each do |document|
+      uri = document[PURL::SOURCE]
+      if uri.ends_with? ext
+        result = uri
         break
       end
     end
@@ -111,6 +97,9 @@ class TranscriptsController < ApplicationController
   def document_to_attribues(item_id)
     document = get_solr_document item_id
     attributes = solr_doc_to_hash(document)
+    puts "Attr: #{attributes}"
+    # TODO: mimetype can't be distinguished between audio and video
+    # if the extension is .ogg
     attributes['format'] = 'video'
 
     attributes['recorded_on'] = attributes['created']
@@ -120,7 +109,7 @@ class TranscriptsController < ApplicationController
     depositor = OpenStruct.new
     depositor.full_name = attributes['depositor']
     attributes['depositor'] = depositor
-    attributes['transcription'] = find_transcription attributes
+    attributes['transcription'] = find_doc_by_extension 'xml'
 
     attributes
   end
