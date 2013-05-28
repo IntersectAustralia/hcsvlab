@@ -705,6 +705,45 @@ module Blacklight::BlacklightHelperBehavior
     return document_descriptors
   end
 
+  # NOTE: this method duplicates that above with the exception of passing an id in rather than the
+  # document. Since the above only uses the document for it's id, this method could replace all 
+  # references of the above
+  def item_documents_from_id(document_id, uris)
+    document_descriptors = []
+
+    uri = buildURI(document_id, 'descMetadata')
+    graph = RDF::Graph.load(uri)
+
+    # Find the identity of the Item
+    query = RDF::Query.new({:item => {PURL::IS_PART_OF => :corpus}})
+    item_results = query.execute(graph)
+
+    unless item_results.size == 0
+      item = item_results[0][:item]
+ 
+      # Look for references to Documents within the metadata and
+      # find their fields as specified in uris.
+      query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
+      document_results = query.execute(graph)
+
+      document_results.each { |result|
+        document = result[:document]
+        descriptor = {}
+
+        uris.each { |uri|
+          field_query = RDF::Query.new({document => {uri => :value}})
+          field_results = field_query.execute(graph)
+          unless field_results.size == 0
+            descriptor[uri] = field_results[0][:value]
+          end
+        }
+        document_descriptors << descriptor
+      }
+    end
+
+    return document_descriptors
+  end
+
   #
   # =============================================================================
   # Utility Formatting methods
