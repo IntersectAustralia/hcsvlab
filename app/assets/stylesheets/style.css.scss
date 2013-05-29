@@ -199,3 +199,104 @@ max-width: 75%;
 }
 
 
+.environment {
+position: fixed;
+bottom: 0;
+margin: 0 auto;
+display: inline-block;
+height: 20px;
+text-align: right;
+color: #CCC;
+}
+.environment p {
+margin: 0 auto;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// EOPAS
+
+#right_column, #left_column {
+padding: 0px;
+border: 0px solid #cfd6de;
+overflow: auto;
+clear: right;
+}
+
+#left_column {
+  position: fixed;
+  top: 80px;
+  bottom: 20px;
+  float: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 330px;
+}
+
+#transcript_display {
+  position: fixed;
+  top: 140px;
+  bottom: 20px;
+  float: none;
+  overflow: auto;
+  border: 0px solid #333;
+border-top: 1px solid #BBB;
+border-bottom: 1px solid #BBB;
+}
+
+
+.collapse_box {
+border: 0px solid black;
+padding: 0;
+margin: 10px 0;
+width: 330px;
+}
+
+.collapse_box .collapse_title {
+  padding: 5px 0;
+background-color: #333;
+color: #FFF;
+font-weight: 200;
+height: auto;
+padding-left: 5px;
+}
+
+.collapse_box .collapse_content {
+background-color: whitesmoke;
+padding: 7px 5px 3px 5px;
+margin: 0;
+}
+
+
+#transcript_display .line {
+margin: 0 0 10px 0;
+border-spacing: 0px;
+}
+
+#transcript_display .line .controls {
+margin: 2px 0px 1px 2px;
+padding: 2px;
+width: 25px;
+text-align: center;
+background-color: #DDD;
+}
+
+#transcript_display .line .tracks {
+background-color: whitesmoke;
+padding: 0px;
+margin: 1px 2px 2px 2px;
+text-align: left;
+}
+
+#transcript_display .line .tracks .tier span table tr td.morpheme, #transcript_display .line .tracks .tier span table tr td.gloss {
+background-color: #DDD;
+}
