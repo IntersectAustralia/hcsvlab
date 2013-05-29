@@ -91,6 +91,7 @@ gem "rdf-turtle"
 gem 'coveralls', require: false
 
 gem 'solrizer'
+# gem 'solrizer-fedora', "3.0.0.pre1"
 gem 'rsolr'
 gem "linkeddata"
 gem "xml-simple"

@@ -86,9 +86,10 @@ namespace :fedora do
 		puts "Ingesting item: " + rdf_file.to_s
 
 		item = Item.new
+		item.save!
+
 		item.descMetadata.graph.load( rdf_file, :format => :ttl, :validate => true )
 		item.label = item.descMetadata.graph.statements.first.subject
-		item.save!
 
 		puts "Item= " + item.pid.to_s
 		#Text
@@ -113,7 +114,12 @@ namespace :fedora do
 						doc.item = item
 						# Only create a datastream for certain file types
 						if STORE_DOCUMENT_TYPES.include? result.type.to_s
-							doc.file.content = File.open(path)
+							case result.type.to_s
+							when 'Text'
+								item.primary_text.content = File.open(path)
+							else
+								puts "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item"
+							end
 						end
 						doc.save
 						puts "#{result.type.to_s} Document= #{doc.pid.to_s}"
@@ -122,6 +128,8 @@ namespace :fedora do
 				end
 			end
 		end
+
+		item.save!		
 
 	end
 

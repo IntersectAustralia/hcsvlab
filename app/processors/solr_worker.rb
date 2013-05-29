@@ -207,6 +207,7 @@ private
       # extra information in which we're interested. Start by creating 
       # the Hash into which we will accumulate this extra data.
       extras = {PURL::TYPE => [], PURL::EXTENT => [], "date_group" => []}
+      full_text = nil
 
       # Look for any fields which we're going to group in the indexing.
       # At the moment this is solely the Date field.
@@ -218,6 +219,11 @@ private
         extras["date_group"] << group unless group.nil?
       }
 
+      # Get the full text, if there is any
+      fed_item = Item.find(object)
+      unless fed_item.nil? || fed_item.primary_text.nil?
+        full_text = fed_item.primary_text.content
+      end 
 
       # Finally look for references to Documents within the metadata and
       # find their types and extents.
@@ -244,7 +250,7 @@ private
         end
       }
 
-      store_results(object, basic_results, extras)
+      store_results(object, basic_results, full_text, extras)
     end
   end
 
@@ -337,7 +343,7 @@ private
   #
   # Make a Solr document from information extracted from the Item
   #
-  def make_solr_document(object, results, extras)
+  def make_solr_document(object, results, full_text, extras)
     result = {}
 
     results.each { |binding| 
@@ -360,6 +366,10 @@ private
         }
       }
     end
+    unless full_text.nil?
+      logger.debug "\tAdding field full_text with value #{full_text} (#{full_text.class})"
+      Solrizer.insert_field(result, "full_text", full_text, :searchable)
+    end
     logger.debug "\tAdding index #{:id} with value #{object}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
 
@@ -369,9 +379,9 @@ private
   #
   # Update Solr with the information we've found
   #
-  def store_results(object, results, extras = nil)
+  def store_results(object, results, full_text, extras = nil)
     get_solr_connection()
-    document = make_solr_document(object, results, extras)
+    document = make_solr_document(object, results, full_text, extras)
     @@solr.add(document)
     @@solr.commit
   end
