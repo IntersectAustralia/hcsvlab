@@ -1,9 +1,9 @@
 HcsvlabWeb::Application.configure do
 
   # TODO: set your own correct URL for action mailer
-  config.action_mailer.default_url_options = { :host => 'hcsvlab-v1-webapp.intersect.org.au:3000' }
+  config.action_mailer.default_url_options = { :host => 'ic2-hcsvlab-v1-webapp-vm.intersect.org.au' }
   
-  config.galaxy_url = 'hcsvlab-v1-galaxy.intersect.org.au:8080'
+  config.galaxy_url = 'ic2-hcsvlab-v1-galaxy-vm.intersect.org.au:8080'
 
   # Settings specified here will take precedence over those in config/application.rb
 
@@ -56,6 +56,11 @@ HcsvlabWeb::Application.configure do
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
+
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = { :host => "localhost", :port => 25 }
 
   # Enable threaded mode
   # config.threadsafe!
