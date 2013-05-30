@@ -47,7 +47,7 @@ class FedoraWorker < ApplicationProcessor
   def on_message(message)
     x = XMLHelper.new(message)
     logger.debug "Fedora_Worker received message, title: #{x.title}, content: #{x.content}, summary: #{x.summary}"
-    logger.debug message.gsub(/^/, "\t")
+#    logger.debug message.gsub(/^/, "\t")
 
     case x.title
     when "addDatastream"
