@@ -201,7 +201,7 @@ private
       item = results[0][:item]
       query = RDF::Query.new({item => {:predicate => :object}})
       basic_results = query.execute(graph)
-      print_results(basic_results, "bloody hell")
+#      print_results(basic_results, "bloody hell")
 
       # Now we have the basic results, we have a guddle about for any
       # extra information in which we're interested. Start by creating 
@@ -354,21 +354,21 @@ private
         field = binding[:predicate].to_s
         value = last_bit(binding[:object])
       end
-      logger.debug "\tAdding field #{field} with value #{value} (#{value.class})"
+      logger.debug "\tAdding field #{field} with value #{value}"
       Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
     }
     unless extras.nil?
       extras.keys.each { |key|
         values = extras[key]
         values.each { |value|
-          logger.debug "\tAdding field #{key} with value #{value} (#{value.class})"
+          logger.debug "\tAdding field #{key} with value #{value}"
           Solrizer.insert_field(result, key, value, :facetable, :stored_searchable)
         }
       }
     end
     unless full_text.nil?
-      logger.debug "\tAdding field full_text with value #{full_text} (#{full_text.class})"
-      Solrizer.insert_field(result, "full_text", full_text, :searchable)
+      logger.debug "\tAdding field #{:full_text} with value #{trim(full_text, 128)}"
+      ::Solrizer::Extractor.insert_solr_field_value(result, :full_text, full_text)
     end
     logger.debug "\tAdding index #{:id} with value #{object}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
@@ -567,6 +567,14 @@ private
       }
       logger.debug("")
     }
+  end
+
+  #
+  # Trim a string to no more than the given number of characters
+  #
+  def trim(string, num)
+    return string if string.length <= num
+    return string[0, num-3] + "..."
   end
 
   #
