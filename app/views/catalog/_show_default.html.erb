@@ -30,8 +30,6 @@
         <% end %>
       <% end %>
     <% end -%>
-  <dt class="blacklight-fedora-id">HCSvLab ID:</dt>
-  <dd class="blacklight-fedora-id"><%= document.id %></dd>
 </dl>
 
 <h3>Documents</h3>
@@ -49,7 +47,7 @@
         <% if type.nil? %>
         <%   type_format = '%s' %>
         <% else %>
-        <%   type_format = type + '(%s)' %>
+        <%   type_format = type + ' (%s)' %>
         <% end %>
     <% else %>
         <% type_format = '%s' %>
