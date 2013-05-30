@@ -17,6 +17,7 @@ def create_test_users
   create_user(:email => "ilya", :first_name => "ilya", :last_name => "Anisimoff")
   create_user(:email => "chrisk@intersect.org.au", :first_name => "Chris", :last_name => "Kenward")
   create_user(:email => "jared@intersect.org.au", :first_name => "Jared", :last_name => "Berghold")
+  create_user(:email => "davidc@intersect.org.au", :first_name => "David", :last_name => "Clarke")
   create_unapproved_user(:email => "unapproved1@intersect.org.au", :first_name => "Unapproved", :last_name => "One")
   create_unapproved_user(:email => "unapproved2@intersect.org.au", :first_name => "Unapproved", :last_name => "Two")
   set_role("sean@intersect.org.au", Role::SUPERUSER_ROLE)
@@ -28,6 +29,7 @@ def create_test_users
   set_role("theeban@intersect.org.au", Role::SUPERUSER_ROLE)
   set_role("chrisk@intersect.org.au", Role::SUPERUSER_ROLE)
   set_role("jared@intersect.org.au", Role::SUPERUSER_ROLE)
+  set_role("davidc@intersect.org.au", Role::SUPERUSER_ROLE)
 end
 
 def set_role(email, role)
