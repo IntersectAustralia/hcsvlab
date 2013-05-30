@@ -91,7 +91,7 @@ namespace :fedora do
 		item.descMetadata.graph.load( rdf_file, :format => :ttl, :validate => true )
 		item.label = item.descMetadata.graph.statements.first.subject
 
-		puts "Item= " + item.pid.to_s
+		puts "Item = " + item.pid.to_s
 		#Text
 		query = RDF::Query.new({
 			:document => {
@@ -122,7 +122,7 @@ namespace :fedora do
 							end
 						end
 						doc.save
-						puts "#{result.type.to_s} Document= #{doc.pid.to_s}"
+						puts "#{result.type.to_s} Document = #{doc.pid.to_s}"
 						break
 					end
 				end
