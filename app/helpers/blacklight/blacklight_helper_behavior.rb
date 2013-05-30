@@ -781,6 +781,7 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   def format_value(list)
+    return list unless list.is_a?(Array)
     list.join(', ')
   end
 
