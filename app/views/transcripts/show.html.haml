@@ -6,7 +6,7 @@
       = image_tag 'minimize_grey.png', :class => 'collapse_icon'
       Concordance
     .collapse_content
-
+  = link_to 'Back to Item Details', catalog_path
   - if @transcript
     %h3
       = @transcript.title
