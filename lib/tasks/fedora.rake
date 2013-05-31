@@ -81,6 +81,28 @@ namespace :fedora do
 
 	end
 
+	task :clear_corpus do
+
+        corpus = ENV['corpus']
+
+		if (corpus.nil?)
+			puts "Usage: rake fedora:clear_corpus corpus=<corpus name>"
+			exit 1
+		end
+
+		objects = ActiveFedora::Base.find_with_conditions( {'http\:\/\/purl.org\/dc\/terms\/isPartOf_tesim' => corpus }, :rows => 1000000 )
+
+		puts "Removing " + objects.count.to_s + " objects"
+
+		objects.each do |obj|
+  			id = obj["id"].to_s
+  			puts "Removing: " + id.to_s
+  			fobj=ActiveFedora::Base.find(id)
+  			fobj.delete
+		end
+
+	end
+
 	def ingest_rdf_file(corpus_dir, rdf_file)
 
 		puts "Ingesting item: " + rdf_file.to_s
