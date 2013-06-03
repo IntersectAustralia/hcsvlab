@@ -213,6 +213,7 @@ GEM
     metaclass (0.0.1)
     method_source (0.8.1)
     mime-types (1.23)
+    mimemagic (0.2.0)
     mocha (0.13.3)
       metaclass (~> 0.0.1)
     multi_json (1.7.2)
@@ -419,6 +420,7 @@ DEPENDENCIES
   jquery-rails
   launchy
   linkeddata
+  mimemagic
   nokogiri
   pg
   pry
