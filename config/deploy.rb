@@ -269,7 +269,7 @@ namespace :deploy do
   desc "Configure Solr"
   task :configure_solr, :roles => :app do
     run "cp -p #{current_path}/solr_conf/hcsvlab-solr.xml $CATALINA_HOME/conf/Catalina/localhost/solr.xml", :env => {'RAILS_ENV' => stage}
-    run "cp -p #{current_path}/solr_conf/schema.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
+    run "cp -p #{current_path}/solr_conf/conf/schema.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Create the HCS vLab Solr core"
