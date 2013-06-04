@@ -101,6 +101,8 @@ after 'deploy:update' do
   server_setup.config.apache
   deploy.restart
   deploy.additional_symlinks
+
+  deploy.write_tag
 end
 
 after 'deploy:finalize_update' do
