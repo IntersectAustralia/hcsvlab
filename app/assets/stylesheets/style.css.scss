@@ -3,7 +3,7 @@ a { color: rgb(0, 171, 255); }
 a:hover { color: #0D6B9F; }
 
 
-h1 { font-weight: 200; }
+h1 { font-weight: 200; font-size: 38.5px; margin-bottom: 20px; }
 h2 { font-weight: 200; margin: 0 0 10px 0; }
 h3 { font-weight: 200; }
 
@@ -276,7 +276,7 @@ box-shadow: inset 0 8px 8px -8px #CCC, inset 0 -8px 8px -8px #CCC;
   position: fixed;
   top: 80px;
   bottom: 20px;
-  width: 808px;
+  width: 800px;
 }
 
 #right_column #tiers_info {
@@ -284,7 +284,7 @@ box-shadow: inset 0 8px 8px -8px #CCC, inset 0 -8px 8px -8px #CCC;
   float: none;
   width: 100%;
   margin-bottom: 1em;
-  background-color: #CCC;
+  background-color: transparent;
   -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
 }
 
@@ -321,7 +321,7 @@ width: 330px;
 
 .collapse_box .collapse_title {
   padding: 5px 0;
-background-color: #333;
+background-color: #666;
 color: #FFF;
 font-weight: 200;
 height: auto;
@@ -330,9 +330,15 @@ padding-left: 5px;
 
 .collapse_box .collapse_content {
 background-color: whitesmoke;
-padding: 7px 5px 3px 5px;
+padding: 10px;
 margin: 0;
 }
+
+.collapse_box .collapse_content textarea {
+  width: 290px;
+}
+
+.collapse_content table tr { }
 
 
 #transcript_display .line {
@@ -345,18 +351,73 @@ margin: 2px 0px 1px 2px;
 padding: 2px;
 width: 25px;
 text-align: center;
-background-color: #DDD;
+color: whitesmoke;
+background-color: #333;
 }
 
 #transcript_display .line .tracks {
 background-color: whitesmoke;
-padding: 0px;
+padding: 10px;
 margin: 1px 2px 2px 2px;
 text-align: left;
 }
 
+#transcript_display .line .tracks.hilight {
+background-color: #FFD875;
+margin: 1px 2px 2px 2px;
+text-align: left;
+border: 0px solid #f2bc00;
+}
+
+.tier.transcription {
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.tier.translation { font-size: 16px; color: #333;}
+#transcript_display .line .tracks .translation {
+  margin: 10px 0;
+  color: #999;
+  font-style: italic;
+  font-size: 16px; 
+  font-weight: 300;
+}
+
+#transcript_display .line .tracks.hilight .translation {
+  color: #9B5B00;
+}
+
+
+#transcript_display .line .tracks .tier span table tr td {
+  margin: 1px;
+  padding: 2px 5px;
+  white-space: nowrap;
+  font-family: Arial;
+}
+// .concordance { font-weight: bold; }
+
 #transcript_display .line .tracks .tier span table tr td.morpheme, #transcript_display .line .tracks .tier span table tr td.gloss {
-background-color: #DDD;
+background-color: #CCC;
+color: #666;
+}
+
+#transcript_display .line .tracks.hilight .tier span table tr td.morpheme, #transcript_display .line .tracks.hilight .tier span table tr td.gloss {
+background-color: #FFF;
+color: #333;
 }
 
 #url { display: inline-block; }
+
+
+.dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a {
+  text-decoration: none;
+  color: white;
+  background-color: #0081c2;
+  background-image: -moz-linear-gradient(top, #333, #333);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333), to(#333));
+  background-image: -webkit-linear-gradient(top, #333, #333);
+  background-image: -o-linear-gradient(top, #333, #333);
+  background-image: linear-gradient(to bottom, #333, #333);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#333', endColorstr='#333', GradientType=0);
+}
