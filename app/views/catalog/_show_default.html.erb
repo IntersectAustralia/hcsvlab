@@ -1,4 +1,35 @@
 <%# default partial to display solr document fields in catalog show view -%>
+<h3>Primary Document</h3>
+<%	uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::SOURCE] 
+	documents = item_documents(document, uris)
+	if documents.empty? %>
+    	<em>This Item has no primary document</em>
+<%	else
+		if has_one_document?(document)
+			doc = documents[0]
+			type = doc[PURL::TYPE].to_s
+			if type == "Text" %>
+				<textarea rows="8" style="width:70%;" readonly><%= get_primary_text(document) %></textarea>
+<%			elsif type == "Image" %>
+				<img src="<%= doc[PURL::SOURCE] %>" style="max-width:50%;" />
+<%			elsif type == "Video"
+				#TODO: in future, display video
+			elsif type == "Audio" %>
+					<audio controls style="width:450px">
+						<source src="<%= doc[PURL::SOURCE] %>" type="audio/wav">
+						<source src="<%= doc[PURL::SOURCE] %>" type="audio/mpeg">
+						<embed height="50" width="100" src="<%= doc[PURL::SOURCE] %>">
+					</audio>
+<%			else %>
+				<em>This Item has no primary document</em>
+<%			end
+		elsif has_only_text_documents?(document) %>
+			<textarea rows="8" style="width:70%;" readonly><%= get_primary_text(document) %></textarea>
+<%		else %>	
+			<em>This Item has no primary document</em>
+<%		end
+	end %>
+
 <h3>Item Details</h3>
 <dl class="dl-horizontal  dl-invert">
     <% document_show_fields(document).each do |solr_fname, field| -%>
