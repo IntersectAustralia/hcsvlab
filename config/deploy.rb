@@ -27,8 +27,18 @@ set :branch do
   require 'colorize'
   default_tag = 'HEAD'
 
+  availableLocalBranches = `git branch`.split (/\r?\n/)
+  availableLocalBranches.map! { |s|  "(local) " + s.strip}
+
+  availableRemoteBranches = `git branch -r`.split (/\r?\n/)
+  availableRemoteBranches.map! { |s|  "(remote) " + s.split('/')[-1].strip}
+
   puts "Availible tags:".colorize(:yellow)
   puts `git tag`
+  puts "Availible branches:".colorize(:yellow)
+  availableLocalBranches.each {|s| puts s}
+  availableRemoteBranches.each {|s| puts s.colorize(:red)}
+
   tag = Capistrano::CLI.ui.ask "Tag to deploy (make sure to push the branch/tag first) or HEAD?: [#{default_tag}] ".colorize(:yellow)
   tag = default_tag if tag.empty?
   tag
@@ -116,7 +126,18 @@ namespace :deploy do
 
   desc "Write the tag that was deployed to a file on the server so we can display it on the app"
   task :write_tag do
-    current_deployed_version = "HEAD".eql?(branch) ? "#{branch} (sha1:" + `git rev-parse --short HEAD`.strip + ")" : branch
+    availableTags = `git tag`.split( /\r?\n/ )
+    haveToShowHash = !availableTags.any? { |s| s.include?(branch) }
+
+    if (haveToShowHash)
+      availableBranches = `git branch -a`.split( /\r?\n/ )
+      fullBranchName = availableBranches.select { |s| s.include?(branch) }.first.to_s.strip
+      current_deployed_version = "#{branch} (sha1:" + `git rev-parse --short #{fullBranchName}`.strip + ")"
+    else
+      current_deployed_version = branch
+    end
+    #current_deployed_version = "HEAD".eql?(branch) ? "#{branch} (sha1:" + `git rev-parse --short HEAD`.strip + ")" : branch
+
     put current_deployed_version, "#{current_path}/app/views/shared/_tag.html.haml"
   end
 
