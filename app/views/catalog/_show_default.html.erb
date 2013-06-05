@@ -16,7 +16,8 @@
     <% do_not_display = {'id' => nil,
                          'timestamp' => nil,
                          'http://www.w3.org/1999/02/22-rdf-syntax-ns#type_tesim' => nil,
-                         'date_group_tesim' => nil} %>
+                         'date_group_tesim' => nil,
+                         'all_metadata' => nil} %>
     <% do_not_display.merge!(document_show_fields(document)) %>
 
     <% document.keys.each do |k| -%>
