@@ -45,6 +45,12 @@
           all_text_timv^10
         </str>
 
+       <str name="all_fields_qf">
+        all_metadata
+        full_text
+       </str>
+       <str name="all_fields_pf">
+       </str>
        <str name="author_qf">
        </str>
        <str name="author_pf">
