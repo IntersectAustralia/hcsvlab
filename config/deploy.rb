@@ -41,6 +41,8 @@ set :branch do
 
   tag = Capistrano::CLI.ui.ask "Tag to deploy (make sure to push the branch/tag first) or HEAD?: [#{default_tag}] ".colorize(:yellow)
   tag = default_tag if tag.empty?
+  tag = nil if "HEAD".eql?(tag)
+
   tag
 end
 
@@ -121,22 +123,24 @@ after 'deploy:finalize_update' do
   #solved in Capfile
   #run "cd #{release_path}; RAILS_ENV=#{stage} rake assets:precompile"
 end
+#set :branch, nil
 
 namespace :deploy do
 
   desc "Write the tag that was deployed to a file on the server so we can display it on the app"
   task :write_tag do
-    availableTags = `git tag`.split( /\r?\n/ )
-    haveToShowHash = !availableTags.any? { |s| s.include?(branch) }
+    branchName = branch.nil? ? "HEAD" : branch
 
+    availableTags = `git tag`.split( /\r?\n/ )
+    haveToShowHash = !availableTags.any? { |s| s.include?(branchName) }
+
+    current_deployed_version = branchName
     if (haveToShowHash)
       availableBranches = `git branch -a`.split( /\r?\n/ )
-      fullBranchName = availableBranches.select { |s| s.include?(branch) }.first.to_s.strip
-      current_deployed_version = "#{branch} (sha1:" + `git rev-parse --short #{fullBranchName}`.strip + ")"
-    else
-      current_deployed_version = branch
+      fullBranchName = ("HEAD".eql?(branchName)) ? branchName : availableBranches.select { |s| s.include?(branchName) }.first.to_s.strip
+
+      current_deployed_version += " (sha1:" + `git rev-parse --short #{fullBranchName}`.strip + ")"
     end
-    #current_deployed_version = "HEAD".eql?(branch) ? "#{branch} (sha1:" + `git rev-parse --short HEAD`.strip + ")" : branch
 
     put current_deployed_version, "#{current_path}/app/views/shared/_tag.html.haml"
   end
