@@ -160,14 +160,35 @@ class CatalogController < ApplicationController
     # solr request handler? The one set in config[:default_solr_parameters][:qt],
     # since we aren't specifying it otherwise. 
     
-    config.add_search_field 'all_fields', :label => 'All Fields'
+#    config.add_search_field 'all_fields', :label => 'All Fields'
+    config.add_search_field('all_fields', :label => 'All Fields') { |field|
+#      field.solr_parameters = { :'spellcheck.dictionary' => 'full text' }
+      field.solr_local_parameters = { 
+        :qf => '$all_fields_qf',
+        :pf => '$all_fields_pf'
+      }
+    }
     
+#    config.add_search_field('all_metadata', :label => 'All Metadata') { |field|
+##      field.solr_parameters = { :'spellcheck.dictionary' => 'full text' }
+#      field.solr_local_parameters = { 
+#        :qf => 'all_metadata',
+#        :pf => ''
+#      }
+#    }
+#    config.add_search_field('full_text', :label => 'Text Document') { |field|
+##      field.solr_parameters = { :'spellcheck.dictionary' => 'full text' }
+#      field.solr_local_parameters = { 
+#        :qf => 'full_text',
+#        :pf => ''
+#      }
+#    }
 
     # Now we see how to over-ride Solr request handler defaults, in this
     # case for a BL "search field", which is really a dismax aggregate
     # of Solr search fields. 
     
-#    config.add_search_field('title') do |field|
+#    config.add_search_field('Title') do |field|
 #      # solr_parameters hash are sent to Solr as ordinary url query params. 
 #      field.solr_parameters = { :'spellcheck.dictionary' => 'title' }
 #
@@ -181,34 +202,35 @@ class CatalogController < ApplicationController
 #      }
 #    end
     
-#    config.add_search_field('author') do |field|
-#      field.solr_parameters = { :'spellcheck.dictionary' => 'author' }
+    # Specifying a :qt only to show it's possible, and so our internal automated
+    # tests can test it. In this case it's the same as 
+    # config[:default_solr_parameters][:qt], so isn't actually neccesary. 
+#    config.add_search_field('author', :label => 'Author') do |field|
+#      # field.solr_parameters = { :'spellcheck.dictionary' => 'contributor' }
+#      field.qt = 'search'
 #      field.solr_local_parameters = { 
 #        :qf => '$author_qf',
 #        :pf => '$author_pf'
 #      }
 #    end
-    
-#    # Specifying a :qt only to show it's possible, and so our internal automated
-#    # tests can test it. In this case it's the same as 
-#    # config[:default_solr_parameters][:qt], so isn't actually neccesary. 
-#    config.add_search_field('subject') do |field|
-#      field.solr_parameters = { :'spellcheck.dictionary' => 'subject' }
-#      field.qt = 'search'
+#
+#    config.add_search_field('full_text', :label => "Full Text") do |field|
+#      # field.solr_parameters = { :'spellcheck.dictionary' => 'full text' }
 #      field.solr_local_parameters = { 
-#        :qf => '$subject_qf',
-#        :pf => '$subject_pf'
+#        :qf => 'full_text',
+#        :pf => '$full_text_pf'
 #      }
 #    end
+    
 
     # "sort results by" select (pulldown)
     # label in pulldown is followed by the name of the SOLR field to sort by and
     # whether the sort is ascending or descending (it must be asc or desc
     # except in the relevancy case).
-    # config.add_sort_field 'score desc, pub_date_dtsi desc, title_tesi asc', :label => 'relevance'
-    # config.add_sort_field 'http://purl.org/dc/terms/isPartOf_tesim', :label => 'Corpus' 
-    # config.add_sort_field 'http://purl.org/dc/terms/created_tesim', :label => 'Created'
-    # config.add_sort_field 'http://purl.org/dc/terms/identifier_tesim', :label => 'Identifier'
+#    config.add_sort_field 'score desc, pub_date_dtsi desc, title_tesi asc', :label => 'relevance'
+#    config.add_sort_field 'http://purl.org/dc/terms/isPartOf_sim', :label => 'Corpus' 
+#    config.add_sort_field 'http://purl.org/dc/terms/title_tesim', :label => 'Title'
+#    config.add_sort_field 'http://purl.org/dc/terms/contributor', :label => 'Contributor'
 
     # If there are more than this many search results, no spelling ("did you 
     # mean") suggestion is offered.
