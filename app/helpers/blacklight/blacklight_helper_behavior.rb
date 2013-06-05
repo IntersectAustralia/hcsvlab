@@ -1,3 +1,4 @@
+require 'open-uri'
 # -*- encoding : utf-8 -*-
 # -*- coding: utf-8 -*-
 #
@@ -667,6 +668,31 @@ module Blacklight::BlacklightHelperBehavior
   def buildURI(object_id, datastream)
     config = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env]
     return config["url"].to_s + "/objects/#{object_id}/datastreams/#{datastream}/content"
+  end
+  
+  def has_only_text_documents?(document)
+    uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::SOURCE]
+    documents = item_documents(document, uris)
+    text_types = ["Text", "Raw", "Original"]
+    documents.each do |doc|
+      return false unless text_types.include?(doc[PURL::TYPE].to_s)
+    end
+    return true
+  end
+  
+  def has_one_document?(document)
+    uris = [PURL::IDENTIFIER]
+    documents = item_documents(document, uris)
+    if documents.length == 1
+      return true
+    else
+      return false
+    end
+  end
+  
+  def get_primary_text(document)
+    uri = buildURI(document.id, 'primary_text')
+    return open(uri).read.strip.force_encoding("UTF-8")
   end
 
   def item_documents(document, uris)
