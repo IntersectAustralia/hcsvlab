@@ -10,5 +10,7 @@ qa:
   url: http://localhost:8080/solr/hcsvlab
 staging:
   url: http://localhost:8080/solr/hcsvlab
+staging2:
+  url: http://localhost:8080/solr/hcsvlab
 production:
   url: http://localhost:8080/solr/hcsvlab 
