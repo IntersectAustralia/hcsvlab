@@ -1,7 +1,9 @@
 class ItemListsController < ApplicationController
 
   before_filter :authenticate_user!
-  #load_and_authorize_resource
+
+  # Set itemList tab as current selected
+  set_tab :itemList
 
   def index
     @userItemLists = ItemList.where(:user_id => current_user.id)

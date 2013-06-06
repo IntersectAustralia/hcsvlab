@@ -1,3 +1,5 @@
+= render :partial => 'shared/catalog_tabs'
+
 .span3{:id=>"sidebar"}
   .facets.sidenav{:id => "facets"}
     %h4 Item List
@@ -5,3 +7,5 @@
       - @userItemLists.each do |itemList|
         .facet_limit
           %h5{:class => "twiddle"}= itemList.name
+
+=  render 'shared/nectar_attribution'
