@@ -11,3 +11,10 @@ function showMessage(message, classToUse) {
 	if (classToUse != null) options.useClass = classToUse;
 	$.bar(options);
 }
+
+function toggleItemList(main) {
+	checks = document.getElementsByClassName('toggle_item_list');
+	for (var i=0, n=checks.length; i<n; i++) {
+		checks[i].checked = main.checked;
+	}
+}
