@@ -42,7 +42,7 @@ namespace :fedora do
 			end
 		end
 
-		logfile   = "ingest_#{File.basename(corpus_dir)}.log"
+		logfile   = "log/ingest_#{File.basename(corpus_dir)}.log"
 		logstream = File.open(logfile, "w")
 
         message = "Successfully ingested #{success_count} Item#{success_count==1? '': 's'}"
