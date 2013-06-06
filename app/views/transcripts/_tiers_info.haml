@@ -1,32 +1,52 @@
-%button#tier_title.hider{'data-hide-selector' => "#tier_list"}
-  == Set Displayed Tracks
-
-%div#url
-  Current Segment URL:
-  %span#cur_url
+= link_to 'Back to Item Details', catalog_path, :class => "btn"
     
-%form#tier_list
-  -# We work this out off the first phrase
-  - first_phrase = @transcript.phrases[0]
+.btn-group.pull-right
+  -# %button#tier_title.hider.btn{'data-hide-selector' => "#tier_list"}
+  -#   == Set Displayed Tracks
+  %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
+    View Options
+    %span.caret
 
-  - if first_phrase.original
-    %input.tier_info.hider{'data-hide-selector' => ".transcription", :type => 'checkbox', :checked => 'checked'}
-      Show transcription
-      %br
+  %ul.dropdown-menu
+    %form#tier_list
 
-  - if first_phrase.words.size > 0
-    %input.tier_info.hider{'data-hide-selector' => ".morphemes", :type => 'checkbox', :checked => 'checked'}
-      Show morphemes
-      %br
+      -# We work this out off the first phrase
+      - first_phrase = @transcript.phrases[0]
 
-  - if first_phrase.graid
-    %input.tier_info.hider{'data-hide-selector' => ".graid", :type => 'checkbox', :checked => 'checked'}
-      Show GRAID annotation
-      %br
+      - if first_phrase.original
+        %li
+          %a
+            %label.checkbox
+              %input.tier_info.hider{'data-hide-selector' => ".transcription", :type => 'checkbox', :checked => 'checked'}
+                Show transcription
 
-  - if first_phrase.translation
-    %input.tier_info.hider{'data-hide-selector' => ".translation", :type => 'checkbox', :checked => 'checked'}
-      Show translation
-      %br
+      - if first_phrase.words.size > 0
+        %li
+          %a
+            %label.checkbox
+              %input.tier_info.hider{'data-hide-selector' => ".morphemes", :type => 'checkbox', :checked => 'checked'}
+              Show morphemes
+
+      - if first_phrase.graid
+        %li
+          %a
+            %label.checkbox
+              %input.tier_info.hider{'data-hide-selector' => ".graid", :type => 'checkbox', :checked => 'checked'}
+                Show GRAID annotation
+
+      - if first_phrase.translation
+        %li
+          %a
+            %label.checkbox
+              %input.tier_info.hider{'data-hide-selector' => ".translation", :type => 'checkbox', :checked => 'checked'}
+              Show translation
+
+      %li.divider
+      %li.disabled
+        %a
+          Current Segment URL:
+      %li#url
+        %a
+          %span#cur_url
 
 

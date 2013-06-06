@@ -41,7 +41,9 @@ class TranscriptsController < ApplicationController
   end
 
   def load_media(attributes)
+    # TODO change this to allow other formats
     url = find_doc_by_extension('ogg')
+    attributes['format'] = detect_media_format url
     media = get_media(attributes['format'], url)
     attributes['media'] = media
     attributes = filter_attributes(attributes, MEDIA_ITEM_FIELDS)
@@ -97,10 +99,6 @@ class TranscriptsController < ApplicationController
   def document_to_attribues(item_id)
     document = get_solr_document item_id
     attributes = solr_doc_to_hash(document)
-    puts "Attr: #{attributes}"
-    # TODO: mimetype can't be distinguished between audio and video
-    # if the extension is .ogg
-    attributes['format'] = 'video'
 
     attributes['recorded_on'] = attributes['created']
     attributes['copyright'] = attributes['rights']

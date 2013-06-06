@@ -95,3 +95,4 @@ gem "linkeddata"
 gem "xml-simple"
 gem 'nokogiri'
 gem 'fileutils'
+gem 'mimemagic'
