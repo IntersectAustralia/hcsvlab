@@ -1,0 +1,7 @@
+.span3{:id=>"sidebar"}
+  .facets.sidenav{:id => "facets"}
+    %h4 Item List
+    .facets-collapse
+      - @userItemLists.each do |itemList|
+        .facet_limit
+          %h5{:class => "twiddle"}= itemList.name

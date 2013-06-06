@@ -1,7 +1,10 @@
 # -*- encoding : utf-8 -*-
 require 'blacklight/catalog'
 
-class CatalogController < ApplicationController  
+class CatalogController < ApplicationController
+
+  # Set catalog tab as current selected
+  set_tab :catalog
 
   before_filter :authenticate_user!, :except => [:index]
   #load_and_authorize_resource
@@ -59,7 +62,7 @@ class CatalogController < ApplicationController
     config.add_facet_field solr_name('http://ns.ausnc.org.au/schemas/ausnc_md_model/audience', :facetable), :label => 'Audience', :limit => 2000, :partial => 'catalog/sorted_facet' 
     config.add_facet_field solr_name('http://www.language-archives.org/OLAC/1.1/discourse_type', :facetable), :label => 'Discourse Type', :limit => 2000, :partial => 'catalog/sorted_facet' 
     config.add_facet_field solr_name('http://www.language-archives.org/OLAC/1.1/language', :facetable), :label => 'Language (ISO 639-3 Code)', :limit => 2000, :partial => 'catalog/sorted_facet'
-    config.add_facet_field solr_name('http://purl.org/dc/terms/type', :facetable), :label => 'Type', :limit => 2000, :partial => 'catalog/sorted_facet' 
+    config.add_facet_field solr_name('http://purl.org/dc/terms/type', :facetable), :label => 'Type', :limit => 2000, :partial => 'catalog/sorted_facet'
 
     # Have BL send all facet field names to Solr, which has been the default
     # previously. Simply remove these lines if you'd rather use Solr request
