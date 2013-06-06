@@ -1,4 +1,18 @@
 <% # container for all documents in index view -%>
 <div id="documents">
-  <%= render documents, :as => :document %>
+  <table class="document-table">
+    <head>
+        <tr>
+            <th class="count_header"> ?</th>
+            <th class="main_header">Item</th>
+            <th class="title_header">Title</th>
+            <th class="created_header">Created</th>
+            <th class="type_header">Types</th>
+            <th class="bookmark_header">Bookmark</th>
+        </tr>
+    </head>
+    <body>
+        <%= render documents, :as => :document %>
+    </body>
+</table>
 </div>
