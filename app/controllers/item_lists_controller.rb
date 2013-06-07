@@ -10,7 +10,16 @@ class ItemListsController < ApplicationController
 
     @userItemLists = [] if @userItemLists.nil?
 
-    @response = ItemList.new.get_items
+    #@response = ItemList.new.get_items
+    #@document_list = @response["response"]["docs"]
+  end
+
+  def show
+    itemList = ItemList.find_by_id!(params[:id])
+
+    @response = itemList.get_items
     @document_list = @response["response"]["docs"]
+
+    render index
   end
 end
