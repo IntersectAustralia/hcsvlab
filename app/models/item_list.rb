@@ -1,7 +1,7 @@
 class ItemList < ActiveRecord::Base
   belongs_to :user
 
-  attr_accessible :name, :id
+  attr_accessible :name, :id, :user_id
 
   validates :name, presence: true
 
@@ -68,4 +68,5 @@ class ItemList < ActiveRecord::Base
     end
     value
   end
+
 end
