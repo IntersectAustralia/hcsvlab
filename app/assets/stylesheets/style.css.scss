@@ -428,3 +428,9 @@ color: #333;
 ul#searchbar { padding-top: 15px; padding-bottom: 15px; }
 
 .create_item_list_error { color:#F71111 }
+
+th.checkbox_header { padding-left: 0px; }
+th.checkbox_header span.btn { padding: 4px 5px; }
+th.checkbox_header span.btn input[type="checkbox"] { vertical-align: top; }
+
+#documents th { vertical-align: middle; }

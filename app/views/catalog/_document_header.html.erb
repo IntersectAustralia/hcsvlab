@@ -8,9 +8,9 @@
             <input type="checkbox" class="toggle_item_list" name="<%= document.id %>"/>
           </td>
         <% end %>
-            <td class="count_field">
-            	<%= t('blacklight.search.documents.counter', :counter => (document_counter + 1 + @response.params[:start].to_i)) %>
-            </td>
+            <%# <td class="count_field"> %>
+            <%# 	<%= t('blacklight.search.documents.counter', :counter => (document_counter + 1 + @response.params[:start].to_i)) %1> %>
+            <%# </td> %>
             <td class="main_link_field">
                 <%= f1 = "http://purl.org/dc/terms/isPartOf_tesim"
                     f2 = "http://purl.org/dc/terms/identifier_tesim"
