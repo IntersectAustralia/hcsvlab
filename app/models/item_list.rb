@@ -27,14 +27,19 @@ class ItemList < ActiveRecord::Base
 
     # The query is: give me items which have my item_list.id in their item_lists field
     params = {:start=>0, :q=>"item_lists:#{RSolr.escape(id.to_s)}", :fl=>"id"}
-    max_rows = 10
+    max_rows = 100
 
-    # Loop around the query upping the :rows we ask for until we have them all
-    begin
-        max_rows = max_rows * 10
-        params[:rows] = max_rows
+    # First stab at the query
+    params[:rows] = max_rows
+    response = @@solr.get('select', params: params)
+
+    # If there are more rows in Solr than we asked for, increase the number we're
+    # asking for and ask for them all this time. Sadly, there doesn't appear to be
+    # a "give me everything" value for the rows parameter.
+    if response["response"]["numFound"] < max_rows
+        params[:rows] = response["response"]["numFound"]
         response = @@solr.get('select', params: params)
-    end until response["response"]["numFound"] <= max_rows
+    end
 
     # Now extract the ids from the response
     return response["response"]["docs"].map { |thingy| thingy["id"] }
