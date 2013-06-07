@@ -138,6 +138,12 @@ qa:
     host: 127.0.0.1
     port: 61613
 
+qa2:
+    adapter: stomp
+    reliable: false
+    host: 127.0.0.1
+    port: 61613
+
 staging:
     adapter: stomp
     reliable: false

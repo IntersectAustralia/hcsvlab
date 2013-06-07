@@ -1,10 +1,10 @@
 HcsvlabWeb::Application.configure do
 
   # TODO: set your own correct URL for action mailer
-  config.action_mailer.default_url_options = { :host => 'ic2-hcsvlab-test4-vm.intersect.org.au' }
+  config.action_mailer.default_url_options = { :host => 'ic2-hcsvlab-staging2-vm.intersect.org.au' }
+  
+  config.galaxy_url = 'http://ic2-hcsvlab-galaxy-staging-vm.intersect.org.au:8080/root'
 
-  config.galaxy_url = 'http://ic2-hcsvlab-galaxy-qa-vm.intersect.org.au:8080/root'
- 
   # Settings specified here will take precedence over those in config/application.rb
 
   # Code is not reloaded between requests
@@ -21,7 +21,7 @@ HcsvlabWeb::Application.configure do
   config.assets.compress = true
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = true
+  config.assets.compile = false
 
   # Generate digests for assets URLs
   config.assets.digest = true
@@ -57,10 +57,10 @@ HcsvlabWeb::Application.configure do
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
 
-  #config.action_mailer.perform_deliveries = true
-  #config.action_mailer.raise_delivery_errors = true
-  #config.action_mailer.delivery_method = :smtp
-  #config.action_mailer.smtp_settings = { :host => "localhost", :port => 25 }
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = { :host => "localhost", :port => 25 }
 
   # Enable threaded mode
   # config.threadsafe!

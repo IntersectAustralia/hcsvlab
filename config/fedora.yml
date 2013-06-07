@@ -10,7 +10,15 @@ qa:
   user: fedoraAdmin
   password: fedoraAdmin
   url: http://127.0.0.1:8080/fedora
+qa2:
+  user: fedoraAdmin
+  password: fedoraAdmin
+  url: http://127.0.0.1:8080/fedora
 staging:
+  user: fedoraAdmin
+  password: fedoraAdmin
+  url: http://127.0.0.1:8080/fedora
+staging2:
   user: fedoraAdmin
   password: fedoraAdmin
   url: http://127.0.0.1:8080/fedora
