@@ -5,7 +5,7 @@ require 'capistrano_colors'
 require 'rvm/capistrano'
 
 set :application, 'hcsvlab-web'
-set :stages, %w(qa qa2 staging production)
+set :stages, %w(qa qa2 staging staging2 production)
 set :default_stage, "qa"
 set :rpms, "openssl openssl-devel curl-devel httpd-devel apr-devel apr-util-devel zlib zlib-devel libxml2 libxml2-devel libxslt libxslt-devel libffi mod_ssl mod_xsendfile"
 set :shared_children, shared_children + %w(log_archive)
