@@ -43,6 +43,8 @@
 				<%= f.label :name %>
 	      		<%= f.text_field :name %>
 	      		
+	      		<%= hidden_field_tag :document_ids %>
+	      		
 	      		<%= f.submit "Create and add items", class: "btn" %>
 	      		
       		<% end %>
@@ -58,6 +60,21 @@
 		}
 	});
 	
+	function generateDocumentIds() {
+		checks = document.getElementsByClassName('toggle_item_list');
+		for (var i=0, n=checks.length; i<n; i++) {
+			if (checks[i].checked) {
+				var existing = jQuery("#document_ids").val();
+				if (existing == "") {
+					jQuery("#document_ids").val(checks[i].name);
+				}
+				else {
+					jQuery("#document_ids").val(existing + "," + checks[i].name);
+				}
+			}
+		}
+	};
+	
 	function showNewItemListDialog()
 	{
 		jQuery("#create_list_drop_down").toggleClass("hovering");
@@ -72,12 +89,14 @@
 	        modal: true,
 	        close: function() {
 	        	jQuery("#create_list_drop_down").show();
+	        	jQuery("#document_ids").val("");
 	        }
 		});
 	    dialogTarget.dialog('open');
 	};
 	
 	jQuery("A[href='#create_item_list']").click( function() {
+		generateDocumentIds();
 		showNewItemListDialog();
 	});
 

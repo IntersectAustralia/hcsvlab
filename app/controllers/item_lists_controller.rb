@@ -16,6 +16,7 @@ class ItemListsController < ApplicationController
   
   def create
     @itemList = ItemList.new(:name => params[:item_list][:name].strip, :user_id => current_user.id)
+    @documents = params[:document_ids].split(",")
     if @itemList.save
       flash[:notice] = 'Item list created successfully'
       #TODO: call method to update solr items to link to this item list
