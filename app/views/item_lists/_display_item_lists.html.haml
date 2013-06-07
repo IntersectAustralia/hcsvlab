@@ -1,0 +1,8 @@
+.span3{:id=>"sidebar"}
+  .facets.sidenav{:id => "facets"}
+    %h4 Item List
+    .facets-collapse
+      - @userItemLists.each do |itemList|
+        .facet_limit
+          - selectedClass="currentSelected" if (itemList.id == (params[:id].to_i))
+          %h5{:class => "twiddle #{selectedClass}"}=link_to itemList.name, itemList_path(itemList)

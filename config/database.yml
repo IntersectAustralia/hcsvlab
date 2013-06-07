@@ -21,6 +21,10 @@ staging:
   <<: *common
   database: hcsvlab
 
+staging2:
+  <<: *common
+  database: hcsvlab
+
 production:
   <<: *common
   database: hcsvlab
@@ -32,3 +36,6 @@ qa: &qa
   <<: *common
   database: hcsvlab
 
+qa2: &qa2
+  <<: *common
+  database: hcsvlab

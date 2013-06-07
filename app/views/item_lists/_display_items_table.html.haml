@@ -1,0 +1,4 @@
+-if !@response.nil?
+  .span8{:id=>"content"}
+    = render_document_index nil, {}, {:showCheckbox => false}
+    = render 'results_pagination'
