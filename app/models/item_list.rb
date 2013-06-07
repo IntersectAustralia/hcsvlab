@@ -1,5 +1,4 @@
 class ItemList < ActiveRecord::Base
-
   belongs_to :user
 
   attr_accessible :name, :id
@@ -49,9 +48,24 @@ class ItemList < ActiveRecord::Base
     get_solr_connection
 
     params = {:start=>start, :rows => rows, :q=>"item_lists:#{RSolr.escape(id.to_s)}"}
-    response = @@solr.get('select', params: params)
+
+    solrResponse = @@solr.get('select', params: params)
+    response = Blacklight::SolrResponse.new(force_to_utf8(solrResponse), params)
 
     return response
   end
-  
+
+  private
+
+  def force_to_utf8(value)
+    case value
+      when Hash
+        value.each { |k, v| value[k] = force_to_utf8(v) }
+      when Array
+        value.each { |v| force_to_utf8(v) }
+      when String
+        value.force_encoding("utf-8")  if value.respond_to?(:force_encoding)
+    end
+    value
+  end
 end

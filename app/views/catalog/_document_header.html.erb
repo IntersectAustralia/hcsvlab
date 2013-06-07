@@ -3,9 +3,11 @@
       <tr class="documentHeadersdf clearfixsdf">
         
         <% # main title container for doc partial view -%>
-            <td class="checkbox_field">
-            	<input type="checkbox" class="toggle_item_list" name="<%= document.id %>"/>
-            </td>
+        <% if (extraRenderParams[:showCheckbox].nil? || extraRenderParams[:showCheckbox] == true) %>
+          <td class="checkbox_field">
+            <input type="checkbox" class="toggle_item_list" name="<%= document.id %>"/>
+          </td>
+        <% end %>
             <td class="count_field">
             	<%= t('blacklight.search.documents.counter', :counter => (document_counter + 1 + @response.params[:start].to_i)) %>
             </td>

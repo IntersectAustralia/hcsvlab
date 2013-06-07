@@ -3,7 +3,9 @@
   <table class="document-table" style="width:100%">
     <head>
         <tr>
-            <th class="checkbox_header"><input type="checkbox" onClick="toggleItemList(this)"/>All/None</th>
+            <% if (extraRenderParams[:showCheckbox].nil? || extraRenderParams[:showCheckbox] == true) %>
+              <th class="checkbox_header"><input type="checkbox" onClick="toggleItemList(this)"/>All/None</th>
+            <% end %>
             <th class="count_header"></th>
             <th class="main_header">Identifier</th>
             <th class="title_header">Title</th>
@@ -12,7 +14,7 @@
         </tr>
     </head>
     <body>
-        <%= render documents, :as => :document %>
+        <%= render :partial => "catalog/document", :collection => documents, :as => :document, :locals => { :extraRenderParams => extraRenderParams } %>
     </body>
 </table>
 </div>
