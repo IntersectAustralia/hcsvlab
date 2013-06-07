@@ -1,5 +1,3 @@
-= render :partial => 'shared/catalog_tabs'
-
 .span3{:id=>"sidebar"}
   .facets.sidenav{:id => "facets"}
     %h4 Item List
@@ -7,8 +5,9 @@
       - @userItemLists.each do |itemList|
         .facet_limit
           %h5{:class => "twiddle"}= itemList.name
-.span8{:id=>"content"}
-  = render_document_index nil, {}, {:showCheckbox => false}
-  = render 'results_pagination'
+-if !@response.nil?
+  .span8{:id=>"content"}
+    = render_document_index nil, {}, {:showCheckbox => false}
+    = render 'results_pagination'
 
 =  render 'shared/nectar_attribution'
