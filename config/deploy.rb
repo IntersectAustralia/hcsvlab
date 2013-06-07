@@ -123,7 +123,6 @@ after 'deploy:finalize_update' do
   #solved in Capfile
   #run "cd #{release_path}; RAILS_ENV=#{stage} rake assets:precompile"
 end
-#set :branch, nil
 
 namespace :deploy do
 
@@ -138,6 +137,9 @@ namespace :deploy do
     if (haveToShowHash)
       availableBranches = `git branch -a`.split( /\r?\n/ )
       fullBranchName = ("HEAD".eql?(branchName)) ? branchName : availableBranches.select { |s| s.include?(branchName) }.first.to_s.strip
+
+      #since git marc the current branch with a *, we need to remove that character from the branch name
+      fullBranchName.gsub!('*','').strip! if fullBranchName.include?('*')
 
       current_deployed_version += " (sha1:" + `git rev-parse --short #{fullBranchName}`.strip + ")"
     end
