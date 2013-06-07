@@ -32,7 +32,7 @@ HcsvlabWeb::Application.routes.draw do
     end
   end
 
-  resources :itemLists, :only => [:index, :show]
+  resources :itemLists, :only => [:index, :show, :create]
 
   # resources :media_items, :transcripts
   match '/eopas/:id' => 'transcripts#show', :as => 'eopas'

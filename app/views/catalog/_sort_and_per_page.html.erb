@@ -1,3 +1,5 @@
+<link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css"/>
+
 <div id="sortAndPerPage">
 
    <div class="page_links">
@@ -5,16 +7,97 @@
    </div>
     <%= render :partial => 'sort_widget' %>
 
-<%= render :partial => 'per_page_widget' %>
-      <% document_list = get_galaxy_document_list %>
-       <% if document_list != "" %>
-      	<form class="pull-right" method="post" action="<%= Rails.application.config.galaxy_url %>" >
-      		<input class='btn' type="hidden" value="hcsvlab_importer" name="tool_id"/>
-      		<input class='btn' type="hidden" value="<%= document_list %>" name="url_paste" />
-      		<input class='btn' type="hidden" value="HCSVLAB data" name="job_name" />
-      		<input class='btn' type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL" />
-      		<input class='btn' type="submit" value="Analyse Current Page of Search Results in Galaxy " />
-      	</form>
-      <% end %>
-
+	<%= render :partial => 'per_page_widget' %>
+      
+   <% document_list = get_galaxy_document_list %>
+   <% if document_list != "" %>
+  	<form class="pull-right" method="post" action="<%= Rails.application.config.galaxy_url %>" >
+  		<input class='btn' type="hidden" value="hcsvlab_importer" name="tool_id"/>
+  		<input class='btn' type="hidden" value="<%= document_list %>" name="url_paste" />
+  		<input class='btn' type="hidden" value="HCSVLAB data" name="job_name" />
+  		<input class='btn' type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL" />
+  		<input class='btn' type="submit" value="Analyse Current Page of Search Results in Galaxy " />
+  	</form>
+  <% end %>
+  
 </div>
+
+  <ul class="css-dropdown">
+    <li id="create_list_drop_down" class="btn">
+      <%= "Add Selected to Item List" %> <span class="caret"></span>
+      <ul>
+        <li><a href="#create_item_list" >Create new...</a></li>
+        
+      </ul>
+    </li>
+  </ul>
+
+  <div id="new_item_list_dialog" style="display: none;" title="New Item List">
+		<p>
+			Enter name for new item list
+			<br/>
+	      		<div id="item_list_error" > </div>
+			<br/>
+			<%= form_for(ItemList.new, :url => { :controller => "itemLists", :action => "create" })  do |f| %>
+			
+				<%= f.label :name %>
+	      		<%= f.text_field :name %>
+	      		
+	      		<%= hidden_field_tag :document_ids %>
+	      		
+	      		<%= f.submit "Create and add items", class: "btn" %>
+	      		
+      		<% end %>
+		</p>
+	</div>
+
+<script type="text/javascript">
+	
+	jQuery("#new_item_list").submit( function() {
+		if(jQuery("#item_list_name").val() == "") {
+			jQuery("#item_list_error").text("Name can't be blank");
+			return false;
+		}
+	});
+	
+	function generateDocumentIds() {
+		checks = document.getElementsByClassName('toggle_item_list');
+		for (var i=0, n=checks.length; i<n; i++) {
+			if (checks[i].checked) {
+				var existing = jQuery("#document_ids").val();
+				if (existing == "") {
+					jQuery("#document_ids").val(checks[i].name);
+				}
+				else {
+					jQuery("#document_ids").val(existing + "," + checks[i].name);
+				}
+			}
+		}
+	};
+	
+	function showNewItemListDialog()
+	{
+		jQuery("#create_list_drop_down").toggleClass("hovering");
+	    var dialogTarget = jQuery("#new_item_list_dialog");
+	    dialogTarget.dialog({
+	        bgiframe: true,
+	        autoOpen: false,
+	        height: 250,
+	        width: 400,
+	        resizable: false,
+	        closeOnEscape: false,
+	        modal: true,
+	        close: function() {
+	        	jQuery("#create_list_drop_down").show();
+	        	jQuery("#document_ids").val("");
+	        }
+		});
+	    dialogTarget.dialog('open');
+	};
+	
+	jQuery("A[href='#create_item_list']").click( function() {
+		generateDocumentIds();
+		showNewItemListDialog();
+	});
+
+</script>

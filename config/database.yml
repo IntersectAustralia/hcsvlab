@@ -36,3 +36,6 @@ qa: &qa
   <<: *common
   database: hcsvlab
 
+qa2: &qa2
+  <<: *common
+  database: hcsvlab

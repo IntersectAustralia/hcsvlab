@@ -3,19 +3,18 @@
 <div id="facets" class="facets sidenav">
 	
   <h4 data-toggle="collapse" data-target=".facets-collapse">
-
-      <a class="btn btn-navbar">
-                      <span class="icon-bar"></span>
-                      <span class="icon-bar"></span>
-                    </a>
-  	<%= t('blacklight.search.facets.title') %>
-
+    <a class="btn btn-navbar">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </a>
+    <%= t('blacklight.search.facets.title') %>
   </h4>
+
   <div class="facets-collapse">
   <% if user_signed_in? %>
-    <div class="span6 clearfix" id="searchbar">         
+    <ul class="clearfix" id="searchbar">         
       <%= render_search_bar  %>
-    </div>
+    </ul>
   <% end %>
   </div>
   <div class="facets-collapse">
