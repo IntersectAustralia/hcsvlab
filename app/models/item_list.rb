@@ -44,5 +44,14 @@ class ItemList < ActiveRecord::Base
     # Now extract the ids from the response
     return response["response"]["docs"].map { |thingy| thingy["id"] }
   end
+
+  def get_items(start = 0, rows = 20)
+    get_solr_connection
+
+    params = {:start=>start, :rows => rows, :q=>"item_lists:#{RSolr.escape(id.to_s)}"}
+    response = @@solr.get('select', params: params)
+
+    return response
+  end
   
 end
