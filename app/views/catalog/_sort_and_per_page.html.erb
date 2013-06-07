@@ -34,9 +34,7 @@
 
   <div id="new_item_list_dialog" style="display: none;" title="New Item List">
 		<p>
-			Enter name for new item list
-			<br/>
-	      		<div id="item_list_error" > </div>
+	      		<div id="item_list_error" class="create_item_list_error"> </div>
 			<br/>
 			<%= form_for(ItemList.new, :url => { :controller => "itemLists", :action => "create" })  do |f| %>
 			
@@ -47,6 +45,7 @@
 	      		
 	      		<%= f.submit "Create and add items", class: "btn" %>
 	      		
+	      		<a class="btn" onclick="dismissDialog();" >Dismiss</a>
       		<% end %>
 		</p>
 	</div>
@@ -75,6 +74,11 @@
 		}
 	};
 	
+	function dismissDialog() {
+		jQuery("#item_list_error").text("");
+		jQuery("#new_item_list_dialog").dialog('close');
+	};
+	
 	function showNewItemListDialog()
 	{
 		jQuery("#create_list_drop_down").toggleClass("hovering");
@@ -87,6 +91,9 @@
 	        resizable: false,
 	        closeOnEscape: false,
 	        modal: true,
+	        open: function(event, ui) {
+	        	jQuery(".ui-dialog-titlebar-close", ui.dialog).hide();
+	        },
 	        close: function() {
 	        	jQuery("#create_list_drop_down").show();
 	        	jQuery("#document_ids").val("");

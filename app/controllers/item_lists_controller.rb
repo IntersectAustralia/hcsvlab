@@ -29,7 +29,7 @@ class ItemListsController < ApplicationController
     if @itemList.save
       flash[:notice] = 'Item list created successfully'
       #TODO: call method to update solr items to link to this item list
-      redirect_to root_url
+      redirect_to itemList_path(@itemList)
     end
     
   end
