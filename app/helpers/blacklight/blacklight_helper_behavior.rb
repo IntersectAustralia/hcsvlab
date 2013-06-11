@@ -548,7 +548,7 @@ module Blacklight::BlacklightHelperBehavior
 
     opts[:label] ||= t('blacklight.back_to_search')
 
-    link_to opts[:label], link_url
+    link_to opts[:label], link_url, :class => "btn"
   end
 
   def params_for_search(options={})
