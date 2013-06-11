@@ -51,5 +51,21 @@ class ItemListsController < ApplicationController
       #TODO: call method to update solr items to link to this item list
     end
   end
-  
+
+  def clear
+    flash[:notice] = 'Clear Item List (will be implemented eventually)'
+#    itemList = ItemList.find_by_id!(params[:id])
+#    itemList.clear
+#    flash[:notice] = 'Item list cleared'
+    redirect_to itemList_path(itemList)
+  end
+
+  def destroy
+    flash[:notice] = 'Destroy Item List (will be implemented eventually)'
+#    itemList = ItemList.find_by_id!(params[:id])
+#    itemList.clear
+#    itemList.delete
+#    flash[:notice] = 'Item list deleted'
+  end
+
 end
