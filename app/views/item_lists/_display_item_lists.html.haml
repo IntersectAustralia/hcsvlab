@@ -1,11 +1,15 @@
 .span3{:id=>"sidebar"}
   .facets.sidenav{:id => "facets"}
     %h4 Item List
-    .facets-collapse
-      - @userItemLists.each do |itemList|
-        .facet_limit
+    - if (@userItemLists.empty?)
+      %div
+        %h5{} Empty
+    -else
+      .facets-collapse
+        - @userItemLists.each do |itemList|
           - selectedClass="selected" if (itemList.id == (params[:id].to_i))
-          %h5{:class => "twiddle"}
-            =link_to itemList_path(itemList) do
-              %span{:class => selectedClass}
-                =itemList.name
+          .facet_limit
+            %h5{:class => "twiddle"}
+              =link_to itemList_path(itemList) do
+                %span{:class => selectedClass}
+                  =itemList.name
