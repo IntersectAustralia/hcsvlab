@@ -28,10 +28,28 @@ class ItemListsController < ApplicationController
     @documents = params[:document_ids].split(",")
     if @itemList.save
       flash[:notice] = 'Item list created successfully'
-      #TODO: call method to update solr items to link to this item list
+
+      add_item_to_item_list(@itemList, @documents)
+
       redirect_to itemList_path(@itemList)
     end
     
+  end
+
+  def add_to_item_list
+    itemList = ItemList.find_by_id(params[:itemListId])
+    documents = params[:document_ids].split(",")
+
+    add_item_to_item_list(itemList, documents)
+    redirect_to itemList_path(itemList)
+  end
+
+  private
+
+  def add_item_to_item_list(itemList, documents_ids)
+    if (!itemList.nil?)
+      #TODO: call method to update solr items to link to this item list
+    end
   end
   
 end

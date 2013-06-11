@@ -26,11 +26,19 @@
     <li id="create_list_drop_down" class="btn">
       <%= "Add Selected to Item List" %> <span class="caret"></span>
       <ul>
+        <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
+          <li><a href="#add_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
+        <%}%>
         <li><a href="#create_item_list" >Create new...</a></li>
         
       </ul>
     </li>
   </ul>
+
+  <%= form_tag({:controller => "itemLists", :action => "add_to_item_list"}, :id => "add_to_item_list")  do %>
+    <%= hidden_field_tag :document_ids %>
+    <%= hidden_field_tag :itemListId %>
+  <% end %>
 
   <div id="new_item_list_dialog" style="display: none;" title="New Item List">
 		<p>
@@ -106,5 +114,13 @@
 		generateDocumentIds();
 		showNewItemListDialog();
 	});
+
+  jQuery("A[href='#add_to_existing_item_list']").click( function() {
+    generateDocumentIds();
+    itemListId=$(this).attr('id');
+    jQuery("#itemListId").val(itemListId);
+    jQuery("#add_to_item_list").submit();
+  });
+
 
 </script>

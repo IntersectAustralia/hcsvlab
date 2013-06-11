@@ -32,7 +32,12 @@ HcsvlabWeb::Application.routes.draw do
     end
   end
 
-  resources :itemLists, :only => [:index, :show, :create]
+  resources :itemLists, :only => [:index, :show, :create] do
+      collection do
+        post 'add_to_item_list'
+      end
+  end
+
 
   # resources :media_items, :transcripts
   match '/eopas/:id' => 'transcripts#show', :as => 'eopas'
