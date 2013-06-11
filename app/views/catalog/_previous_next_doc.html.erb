@@ -1,17 +1,17 @@
 <% #Using the Bootstrap Pagination class  -%>
 <% if @previous_document || @next_document %>
-	<div class="well clearfix" id="previousNextDocument">
-<div class="pull-left">
-  <%= link_back_to_catalog(:class=>"btn") %>
-</div>
+  <div class="well clearfix" id="previousNextDocument">
+    <div class="pull-left">
+      <%= link_back_to_catalog %>
+    </div>
     <%= link_to_previous_document @previous_document %> |
 
     <%= item_page_entry_info %> |
 
     <%= link_to_next_document @next_document %>
 
-<div class="pull-right">
+    <div class="pull-right">
       <%=link_to "#{t('blacklight.search.start_over')}", catalog_index_path, :id=>"startOverLink", :class => "btn"%>
+    </div>
   </div>
-	</div>
 <% end %>
