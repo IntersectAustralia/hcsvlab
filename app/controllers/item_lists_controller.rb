@@ -44,6 +44,18 @@ class ItemListsController < ApplicationController
     redirect_to itemList_path(itemList)
   end
 
+  def remove
+    itemList = ItemList.find_by_id(params[:id])
+    # Implement remove
+    redirect_to itemLists_path
+  end
+
+  def clear
+    itemList = ItemList.find_by_id(params[:id])
+    # Implement clear
+    redirect_to itemList_path(itemList)
+  end
+
   private
 
   def add_item_to_item_list(itemList, documents_ids)

@@ -36,6 +36,11 @@ HcsvlabWeb::Application.routes.draw do
       collection do
         post 'add_to_item_list'
       end
+
+      member do
+        get :remove
+        get :clear
+      end
   end
 
 

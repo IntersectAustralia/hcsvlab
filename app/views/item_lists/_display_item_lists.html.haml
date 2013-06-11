@@ -4,5 +4,8 @@
     .facets-collapse
       - @userItemLists.each do |itemList|
         .facet_limit
-          - selectedClass="currentSelected" if (itemList.id == (params[:id].to_i))
-          %h5{:class => "twiddle #{selectedClass}"}=link_to itemList.name, itemList_path(itemList)
+          - selectedClass="selected" if (itemList.id == (params[:id].to_i))
+          %h5{:class => "twiddle"}
+            =link_to itemList_path(itemList) do
+              %span{:class => selectedClass}
+                =itemList.name
