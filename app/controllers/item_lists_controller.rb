@@ -47,7 +47,7 @@ class ItemListsController < ApplicationController
   def clear
     itemList = ItemList.find_by_id!(params[:id])
     removed_set = itemList.clear
-    flash[:notice] = "#{removed_set.size} Item#{removed_set.size==1? 's': ''} cleared from Item List #{itemList.name}"
+    flash[:notice] = "#{removed_set.size} Item#{removed_set.size==1? 's': ''} cleared from item list #{itemList.name}"
     redirect_to itemList_path(itemList)
   end
 
