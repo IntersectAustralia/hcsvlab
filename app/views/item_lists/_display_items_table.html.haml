@@ -1,4 +1,7 @@
 -if !@response.nil?
   .span8{:id=>"content"}
+    .buttons
+      = button_to("Clear Item List", {:controller => "itemLists", :action => "clear", :method => 'PUT'}, :id => params[:id].to_i)
+      = button_to("Remove Item List", {:controller => "itemLists", :action => "destroy", :method => 'DELETE'}, :id => params[:id].to_i)
     = render_document_index nil, {}, {:showCheckbox => false}
     = render 'results_pagination'

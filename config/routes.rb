@@ -32,13 +32,14 @@ HcsvlabWeb::Application.routes.draw do
     end
   end
 
-  resources :itemLists, :only => [:index, :show, :create, :destroy] do
+  resources :itemLists, :only => [:index, :show, :create] do
       collection do
         post 'add_to_item_list'
       end
 
       member do
-        put 'clear'
+        post 'clear'
+        post 'destroy'
       end
   end
 

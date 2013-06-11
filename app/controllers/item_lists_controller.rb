@@ -44,28 +44,28 @@ class ItemListsController < ApplicationController
     redirect_to itemList_path(itemList)
   end
 
+  def clear
+    itemList = ItemList.find_by_id!(params[:id])
+    removed_set = itemList.clear
+    flash[:notice] = "#{removed_set.size} Item#{removed_set.size==1? 's': ''} cleared from Item List #{itemList.name}"
+    redirect_to itemList_path(itemList)
+  end
+
+  def destroy
+    itemList = ItemList.find_by_id!(params[:id])
+    name = itemList.name
+    itemList.clear
+    itemList.delete
+    flash[:notice] = "Item list #{name} deleted"
+    redirect_to itemLists_path
+  end
+
   private
 
   def add_item_to_item_list(itemList, documents_ids)
     if (!itemList.nil?)
       #TODO: call method to update solr items to link to this item list
     end
-  end
-
-  def clear
-    flash[:notice] = 'Clear Item List (will be implemented eventually)'
-#    itemList = ItemList.find_by_id!(params[:id])
-#    itemList.clear
-#    flash[:notice] = 'Item list cleared'
-    redirect_to itemList_path(itemList)
-  end
-
-  def destroy
-    flash[:notice] = 'Destroy Item List (will be implemented eventually)'
-#    itemList = ItemList.find_by_id!(params[:id])
-#    itemList.clear
-#    itemList.delete
-#    flash[:notice] = 'Item list deleted'
   end
 
 end
