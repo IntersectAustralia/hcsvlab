@@ -150,6 +150,12 @@ staging:
     host: 127.0.0.1
     port: 61613
 
+staging2:
+    adapter: stomp
+    reliable: false
+    host: 127.0.0.1
+    port: 61613
+
 production:
     adapter: prod
     reliable: true
