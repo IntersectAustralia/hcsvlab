@@ -145,9 +145,9 @@ class ItemList < ActiveRecord::Base
             if current_ids.empty?
                 clear_solr_field(item_id, :item_lists)
             else
-                udpate_solr_field(item_id, :item_lists, current_ids[0], 'set')
+                update_solr_field(item_id, :item_lists, current_ids[0], 'set')
                 current_ids[1..-1].each { |current_id|
-                    udpate_solr_document(item_id, :item_lists, current_id, 'add')
+                    update_solr_document(item_id, :item_lists, current_id, 'add')
                 }
             end
         end
@@ -179,7 +179,7 @@ class ItemList < ActiveRecord::Base
   def clear_solr_field(item_id, field_id)
     # TODO: ermm, this, properly (see http://wiki.apache.org/solr/UpdateXmlMessages#Optional_attributes_for_.22field.22
     # and https://github.com/mwmitchell/rsolr)
-    udpate_solr_field(item_id, field_id, '.', 'set')
+    update_solr_field(item_id, field_id, '.', 'set')
   end
 
 
