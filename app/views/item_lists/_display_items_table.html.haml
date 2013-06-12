@@ -6,5 +6,5 @@
         .alert.alert-info Item List is empty
       - else
         = button_to("Clear Item List", {:controller => "itemLists", :action => "clear", :method => 'PUT'}, :id => params[:id].to_i)
-        = render_document_index nil, {}, {:showCheckbox => false}
+        = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => true}
         = render 'results_pagination'

@@ -3,13 +3,13 @@
 <%	uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::SOURCE] 
 	documents = item_documents(document, uris)
 	if documents.empty? %>
-    	<em>This Item has no primary document</em>
+    	<%= raw render_no_primary_document%>
 <%	else
 		if has_one_document?(document)
 			doc = documents[0]
 			type = doc[PURL::TYPE].to_s
 			if type == "Text" %>
-				<textarea rows="8" style="width:70%;" readonly><%= get_primary_text(document) %></textarea>
+				<%= raw render_primary_text(document) %>
 <%			elsif type == "Image" %>
 				<img src="<%= doc[PURL::SOURCE] %>" style="max-width:50%;" />
 <%			elsif type == "Video"
@@ -21,12 +21,12 @@
 						<embed height="50" width="100" src="<%= doc[PURL::SOURCE] %>">
 					</audio>
 <%			else %>
-				<em>This Item has no primary document</em>
+				<%= raw render_no_primary_document%>
 <%			end
 		elsif has_only_text_documents?(document) %>
-			<textarea rows="8" style="width:70%;" readonly><%= get_primary_text(document) %></textarea>
-<%		else %>	
-			<em>This Item has no primary document</em>
+			<%= raw render_primary_text(document) %>
+<%		else %>
+			<%= raw render_no_primary_document%>
 <%		end
 	end %>
 

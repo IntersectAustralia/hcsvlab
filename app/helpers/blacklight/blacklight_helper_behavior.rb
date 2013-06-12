@@ -531,10 +531,15 @@ module Blacklight::BlacklightHelperBehavior
   # Use the catalog_path RESTful route to create a link to the show page for a specific item.
   # catalog_path accepts a HashWithIndifferentAccess object. The solr query params are stored in the session,
   # so we only need the +counter+ param here. We also need to know if we are viewing to document as part of search results.
-  def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true})
-    link_to label, doc, { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
+  def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true}, itemListOpts)
+      #link_to label, { :controller => 'catalog', :action => 'show', :id => doc.id }
+      if itemListOpts[:itemViewList]
+        link_to label, solr_document_path(doc[:id], :il =>true), { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
+      else
+        link_to label, doc, { :'data-counter' => itemListOpts[:counter] }.merge(itemListOpts.reject { |k,v| [:label, :counter, :results_view].include? k  })
+      end
   end
-
+  
   # link_back_to_catalog(:label=>'Back to Search')
   # Create a link back to the index screen, keeping the user's facet, query and paging choices intact by using session.
   def link_back_to_catalog(opts={:label=>nil})
@@ -690,9 +695,18 @@ module Blacklight::BlacklightHelperBehavior
     end
   end
   
-  def get_primary_text(document)
+  def render_primary_text(document)
     uri = buildURI(document.id, 'primary_text')
-    return open(uri).read.strip.force_encoding("UTF-8")
+    begin
+      text = open(uri).read.strip.force_encoding("UTF-8")
+      return "<textarea rows='8' style='width:70%;' readonly>#{text}</textarea>"
+    rescue => e
+      return render_no_primary_document
+    end
+  end
+  
+  def render_no_primary_document
+    return "<em>This Item has no primary document</em>"
   end
 
   def item_documents(document, uris)
