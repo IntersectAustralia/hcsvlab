@@ -3,5 +3,5 @@
     .buttons
       = link_to "Clear Item List", :controller => "itemLists", :action => "clear", :id => params[:id].to_i
       = link_to "Remove Item List", :controller => "itemLists", :action => "remove", :id => params[:id].to_i
-    = render_document_index nil, {}, {:showCheckbox => false}
+    = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => true}
     = render 'results_pagination'

@@ -49,7 +49,7 @@
 				<%= f.label :name %>
 	      		<%= f.text_field :name %>
 	      		
-	      		<%= hidden_field_tag :document_ids %>
+	      		<%= hidden_field_tag :sel_document_ids %>
 	      		
 	      		<%= f.submit "Create and add items", class: "btn" %>
 	      		
@@ -67,16 +67,16 @@
 		}
 	});
 	
-	function generateDocumentIds() {
+	function generateDocumentIds(field) {
 		checks = document.getElementsByClassName('toggle_item_list');
 		for (var i=0, n=checks.length; i<n; i++) {
 			if (checks[i].checked) {
-				var existing = jQuery("#document_ids").val();
+				var existing = jQuery(field).val();
 				if (existing == "") {
-					jQuery("#document_ids").val(checks[i].name);
+					jQuery(field).val(checks[i].name);
 				}
 				else {
-					jQuery("#document_ids").val(existing + "," + checks[i].name);
+					jQuery(field).val(existing + "," + checks[i].name);
 				}
 			}
 		}
@@ -84,6 +84,7 @@
 	
 	function dismissDialog() {
 		jQuery("#item_list_error").text("");
+		jQuery("#item_list_name").val("");
 		jQuery("#new_item_list_dialog").dialog('close');
 	};
 	
@@ -111,12 +112,12 @@
 	};
 	
 	jQuery("A[href='#create_item_list']").click( function() {
-		generateDocumentIds();
+		generateDocumentIds("#sel_document_ids");
 		showNewItemListDialog();
 	});
 
   jQuery("A[href='#add_to_existing_item_list']").click( function() {
-    generateDocumentIds();
+    generateDocumentIds("#document_ids");
     itemListId=$(this).attr('id');
     jQuery("#itemListId").val(itemListId);
     jQuery("#add_to_item_list").submit();
