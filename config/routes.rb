@@ -38,8 +38,8 @@ HcsvlabWeb::Application.routes.draw do
       end
 
       member do
-        get :remove
-        get :clear
+        post 'clear'
+        post 'destroy'
       end
   end
 

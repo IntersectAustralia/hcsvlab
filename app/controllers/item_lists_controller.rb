@@ -44,16 +44,20 @@ class ItemListsController < ApplicationController
     redirect_to itemList_path(itemList)
   end
 
-  def remove
-    itemList = ItemList.find_by_id(params[:id])
-    # Implement remove
-    redirect_to itemLists_path
+  def clear
+    itemList = ItemList.find_by_id!(params[:id])
+    removed_set = itemList.clear
+    flash[:notice] = "#{removed_set.size} Item#{removed_set.size==1? 's': ''} cleared from item list #{itemList.name}"
+    redirect_to itemList_path(itemList)
   end
 
-  def clear
-    itemList = ItemList.find_by_id(params[:id])
-    # Implement clear
-    redirect_to itemList_path(itemList)
+  def destroy
+    itemList = ItemList.find_by_id!(params[:id])
+    name = itemList.name
+    itemList.clear
+    itemList.delete
+    flash[:notice] = "Item list #{name} deleted"
+    redirect_to itemLists_path
   end
 
   private
@@ -63,5 +67,5 @@ class ItemListsController < ApplicationController
       itemList.add_items(documents_ids)
     end
   end
-  
+
 end

@@ -1,7 +1,10 @@
 -if !@response.nil?
   .span8{:id=>"content"}
     .buttons
-      = link_to "Clear Item List", :controller => "itemLists", :action => "clear", :id => params[:id].to_i
-      = link_to "Remove Item List", :controller => "itemLists", :action => "remove", :id => params[:id].to_i
-    = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => true}
-    = render 'results_pagination'
+      = button_to("Remove Item List", {:controller => "itemLists", :action => "destroy", :method => 'DELETE'}, :id => params[:id].to_i)
+      - if (@document_list.empty?)
+        .alert.alert-info Item List is empty
+      - else
+        = button_to("Clear Item List", {:controller => "itemLists", :action => "clear", :method => 'PUT'}, :id => params[:id].to_i)
+        = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => true}
+        = render 'results_pagination'

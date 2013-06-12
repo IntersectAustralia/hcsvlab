@@ -38,6 +38,7 @@ namespace :fedora do
 				ingest_rdf_file(corpus_dir, rdf_file)
 				success_count += 1
 			rescue => e
+				puts "Error! #{e.message}"
 				errors[rdf_file] = e.message
 			end
 		end
