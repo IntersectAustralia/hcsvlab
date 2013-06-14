@@ -488,6 +488,14 @@ background-color: #FFD875;
 }
 
 
+@media only screen and (max-width : 1200px) {
+#searchbar input { width: 140px; }
+}
+
+
+@media only screen and (max-width : 980px) {
+#searchbar input { width: 85px; }
+}
 
 
 
