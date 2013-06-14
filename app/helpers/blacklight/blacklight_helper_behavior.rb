@@ -531,12 +531,11 @@ module Blacklight::BlacklightHelperBehavior
   # Use the catalog_path RESTful route to create a link to the show page for a specific item.
   # catalog_path accepts a HashWithIndifferentAccess object. The solr query params are stored in the session,
   # so we only need the +counter+ param here. We also need to know if we are viewing to document as part of search results.
-  def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true}, itemListOpts)
-      #link_to label, { :controller => 'catalog', :action => 'show', :id => doc.id }
-      if itemListOpts[:itemViewList]
-        link_to label, solr_document_path(doc[:id], :il =>true), { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
+  def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true})
+      if opts[:itemViewList]
+        link_to label, solr_document_path(doc[:id], :il =>true)
       else
-        link_to label, doc, { :'data-counter' => itemListOpts[:counter] }.merge(itemListOpts.reject { |k,v| [:label, :counter, :results_view].include? k  })
+        link_to label, doc, { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
       end
   end
   
