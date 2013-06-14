@@ -60,6 +60,7 @@ group :test do
   gem "cucumber-rails", :require => false
   gem "shoulda"
   gem "brakeman"
+  gem "simplecov", ">=0.3.8", :require => false
   gem 'simplecov-rcov'
 end
 

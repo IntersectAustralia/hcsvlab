@@ -441,6 +441,7 @@ DEPENDENCIES
   sass-rails (~> 3.2.3)
   shoulda
   simple_form
+  simplecov (>= 0.3.8)
   simplecov-rcov
   solrizer
   stomp
