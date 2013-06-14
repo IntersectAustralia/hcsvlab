@@ -56,7 +56,7 @@ class ItemListsController < ApplicationController
     name = itemList.name
     itemList.clear
     itemList.delete
-    flash[:notice] = "Item list #{name} deleted"
+    flash[:notice] = "Item list #{name} deleted successfully"
     redirect_to itemLists_path
   end
 
