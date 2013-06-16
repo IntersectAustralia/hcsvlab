@@ -59,6 +59,9 @@ end
 group :test do
   gem "cucumber-rails", :require => false
   gem "shoulda"
+  gem "brakeman"
+  gem "simplecov", ">=0.3.8", :require => false
+  gem 'simplecov-rcov'
 end
 
 gem "haml"
@@ -86,7 +89,6 @@ gem 'celluloid'
 gem 'daemons'
 gem 'activemessaging'
 gem "rdf-turtle"
-gem 'coveralls', require: false
 
 gem 'solrizer'
 # gem 'solrizer-fedora', "3.0.0.pre1"

@@ -169,25 +169,30 @@ padding: 10px 0;
 .appliedFilter {
   margin: 10px 20px 10px 0;
   padding: 3px 3px 3px 10px;
-  background: #EEE;
+  background: #FFD875;
   color: #444;
-  border: 1px solid #BBB;
+  border: 1px solid #f6b717;
   display: inline-block;
   padding-right: 45px;
   position: relative;
   -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;
 }
 
+.appliedFilter .filterName {
+background: url(/assets/blacklight/separator.png) no-repeat right center;
+padding-right: 14px;
+}
+
 .appliedFilter .btnRemove {
-  background: url(/assets/blacklight/remove.gif) no-repeat center center;
+  background: url(/assets/blacklight/remove.png) no-repeat center center;
   border-bottom: none;
-  border-left: 1px solid #CCC;
+  border-left: 1px solid #f6b717;
   display: block;
   height: 100%;
   outline: none;
   position: absolute;
   right: 0;
-  text-indent: -99999px;
+  text-indent: -9999px;
   top: 0;
   width: 32px;
   z-index: 5;
@@ -488,7 +493,14 @@ background-color: #FFD875;
 }
 
 
+@media only screen and (max-width : 1200px) {
+#searchbar input { width: 140px; }
+}
 
+
+@media only screen and (max-width : 980px) {
+#searchbar input { width: 85px; }
+}
 
 
 
