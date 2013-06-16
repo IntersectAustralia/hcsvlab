@@ -40,14 +40,15 @@ class ItemListsController < ApplicationController
     itemList = ItemList.find_by_id(params[:itemListId])
     documents = params[:document_ids].split(",")
 
-    add_item_to_item_list(itemList, documents)
+    added_set = add_item_to_item_list(itemList, documents)
+    flash[:notice] = "#{added_set.size} Item#{added_set.size==1? '': 's'} added to item list #{itemList.name}"
     redirect_to itemList_path(itemList)
   end
 
   def clear
     itemList = ItemList.find_by_id!(params[:id])
     removed_set = itemList.clear
-    flash[:notice] = "#{removed_set.size} Item#{removed_set.size==1? 's': ''} cleared from item list #{itemList.name}"
+    flash[:notice] = "#{removed_set.size} Item#{removed_set.size==1? '': 's'} cleared from item list #{itemList.name}"
     redirect_to itemList_path(itemList)
   end
 
