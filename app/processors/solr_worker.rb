@@ -1,90 +1,6 @@
 require 'linkeddata'
 require 'xmlsimple'
 
-
-#
-# Constants for AUSNC
-#
-class AUSNC
-  
-private
-  BASE_URI = 'http://ns.ausnc.org.au/schemas/ausnc_md_model/' unless const_defined?(:BASE_URI)
-
-public
-  AUDIENCE              = RDF::URI(BASE_URI + 'audience') unless const_defined?(:AUDIENCE)
-  COMMUNICATION_CONTEXT = RDF::URI(BASE_URI + 'communication_context') unless const_defined?(:COMMUNICATION_CONTEXT)
-  INTERACTIVITY         = RDF::URI(BASE_URI + 'interactivity') unless const_defined?(:INTERACTIVITY)
-  MODE                  = RDF::URI(BASE_URI + 'mode') unless const_defined?(:MODE)
-  SPEECH_STYLE          = RDF::URI(BASE_URI + 'speech_style') unless const_defined?(:SPEECH_STYLE)
-  DOCUMENT              = RDF::URI(BASE_URI + 'document') unless const_defined?(:DOCUMENT)
-
-end
-
-
-#
-# Constants for OLAC
-#
-class OLAC
-
-private
-  BASE_URI = 'http://www.language-archives.org/OLAC/1.1/' unless const_defined?(:BASE_URI)
-
-public  
-  DISCOURSE_TYPE = RDF::URI(BASE_URI + 'discourse_type') unless const_defined?(:DISCOURSE_TYPE)
-  LANGUAGE       = RDF::URI(BASE_URI + 'language') unless const_defined?(:LANGUAGE)
-
-end
-
-
-#
-# Constants for PURL
-#
-class PURL
-
-private
-  BASE_URI = 'http://purl.org/dc/terms/' unless const_defined?(:BASE_URI)
-
-public  
-  IS_PART_OF = RDF::URI(BASE_URI + 'isPartOf') unless const_defined?(:IS_PART_OF)
-  TYPE       = RDF::URI(BASE_URI + 'type') unless const_defined?(:TYPE)
-  EXTENT     = RDF::URI(BASE_URI + 'extent') unless const_defined?(:EXTENT)
-  CREATED    = RDF::URI(BASE_URI + 'created') unless const_defined?(:CREATED)
-  IDENTIFIER = RDF::URI(BASE_URI + 'identifier') unless const_defined?(:IDENTIFIER)
-  SOURCE     = RDF::URI(BASE_URI + 'source') unless const_defined?(:SOURCE)
-  TITLE      = RDF::URI(BASE_URI + 'title') unless const_defined?(:TITLE)
-  TYPE       = RDF::URI(BASE_URI + 'type') unless const_defined?(:TYPE)
-
-end
-
-
-#
-# Constants for DC
-#
-class DC
-
-private
-  BASE_URI = 'http://purl.org/dc/elements/1.1/' unless const_defined?(:BASE_URI)
-
-public  
-  TITLE = RDF::URI(BASE_URI + 'title') unless const_defined?(:TITLE)
-
-end
-
-
-#
-# Constants for FEDORA
-#
-class FEDORA
-
-private
-  BASE_URI = 'info:fedora/fedora-system:def/relations-external#' unless const_defined?(:BASE_URI)
-
-public  
-  IS_MEMBER_OF = RDF::URI(BASE_URI + 'isMemberOf') unless const_defined?(:IS_MEMBER_OF)
-
-end
-
-
 #
 # Helper class for interpreting the RELS-EXT we get from the Fedora message
 # queues. Currently a naive implementation based on regexp matching.
@@ -105,7 +21,7 @@ class RDFHelper
 private
 
   def generate_regexp(tag, sub)
-    # We assume we're looking foreither:
+    # We assume we're looking for either:
     #   <ns0:#{tag} rdf:#{sub}="blah-blah-blah"></ns0:#{tag}>
     # and we extract the "blah-blah-blah" part. We also allow any number in
     # the namespace name, not just zero
@@ -128,6 +44,19 @@ end
 class Solr_Worker < ApplicationProcessor
 
   FEDORA_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env] unless const_defined?(:FEDORA_CONFIG)
+
+  @@configured_fields = Set.new([
+    'DC_is_part_of',
+    'date_group',
+    'AUSNC_mode',                 
+    'AUSNC_speech_style',         
+    'AUSNC_interactivity',        
+    'AUSNC_communication_context',
+    'AUSNC_audience',           
+    'OLAC_discourse_type',       
+    'OLAC_language',              
+    'DC_type'                    
+  ])
 
   subscribes_to :solr_worker
 
@@ -177,7 +106,7 @@ private
   def parent_object(object)
     uri = buildURI(object, 'RELS-EXT')
     graph = RDF::Graph.load(uri)
-    query = RDF::Query.new({:description => {FEDORA::IS_MEMBER_OF => :is_member_of}})
+    query = RDF::Query.new({:description => {MetadataHelper::IS_MEMBER_OF => :is_member_of}})
     individual_result = query.execute(graph)
 
     return nil if individual_result.size == 0
@@ -192,7 +121,7 @@ private
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item
-    query = RDF::Query.new({:item => {PURL::IS_PART_OF => :corpus}})
+    query = RDF::Query.new({:item => {MetadataHelper::IS_PART_OF => :corpus}})
     results = query.execute(graph)
 
     unless results.size == 0
@@ -206,12 +135,12 @@ private
       # Now we have the basic results, we have a guddle about for any
       # extra information in which we're interested. Start by creating 
       # the Hash into which we will accumulate this extra data.
-      extras = {PURL::TYPE => [], PURL::EXTENT => [], "date_group" => []}
+      extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group" => []}
       full_text = nil
 
       # Look for any fields which we're going to group in the indexing.
       # At the moment this is solely the Date field.
-      query = RDF::Query.new({item => {PURL::CREATED => :date}})
+      query = RDF::Query.new({item => {MetadataHelper::CREATED => :date}})
       results = query.execute(graph)
       results.each { |result|
         date = result[:date]
@@ -227,62 +156,31 @@ private
 
       # Finally look for references to Documents within the metadata and
       # find their types and extents.
-      query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
+      query = RDF::Query.new({item => {MetadataHelper::DOCUMENT => :document}})
       results = query.execute(graph)
 
       results.each { |result|
         document = result[:document]
-        type_query   = RDF::Query.new({document => {PURL::TYPE => :type}})
-        extent_query = RDF::Query.new({document => {PURL::EXTENT => :extent}})
+        type_query   = RDF::Query.new({document => {MetadataHelper::TYPE => :type}})
+        extent_query = RDF::Query.new({document => {MetadataHelper::EXTENT => :extent}})
 
         inner_results = type_query.execute(graph)
         unless inner_results.size == 0
           inner_results.each { |inner_result|
-            extras[PURL::TYPE] << inner_result[:type].to_s
+            extras[MetadataHelper::TYPE] << inner_result[:type].to_s
           }
         end
 
         inner_results = extent_query.execute(graph)
         unless inner_results.size == 0
           inner_results.each { |inner_result|
-            extras[PURL::EXTENT] << inner_result[:extent].to_s
+            extras[MetadataHelper::EXTENT] << inner_result[:extent].to_s
           }
         end
       }
 
       store_results(object, basic_results, full_text, extras)
     end
-  end
-
-  #
-  # Set the parent/child relationship for the document.
-  #
-  def link_document(document_id, item_id)
-    # Get the two objects
-    do_it = true   # until proven otherwise
-
-    begin
-      item = Item.find(item_id)
-    rescue ActiveFedora::ObjectNotFoundError
-      logger.warning "Cannot find parent Item with id #{item_id}"
-      do_it = false
-    end
-
-    begin
-      document = Document.find(document_id)
-    rescue ActiveFedora::ObjectNotFoundError
-      logger.warning "Cannot find Document with id #{document_id}"
-      do_it = false
-    end
-
-    return unless do_it
-
-    # We now have both the Item and the Document, so link them together
-    # and save the modified versions
-    logger.debug "Setting #{item_id} as the Item for Document #{document_id}"
-    document.item = item
-    document.save
-
   end
 
   #
@@ -293,8 +191,6 @@ private
     parent = parent_object(object)
     if parent.nil?
       index_item(object)
-    else
-  #    link_document(object, parent)
     end
   end
 
@@ -325,19 +221,19 @@ private
   end
 
   #
-  # Build a description of the fields to index.
+  # Add a field to the solr document we're building. Knows about the
+  # difference between dynamic and non-dynamic fields, and it maps the
+  # field name to the shortened form.
   #
-  def interesting_fields
-    # TODO: read from a config file
-    return {
-      AUSNC::MODE                  => :mode,
-      AUSNC::SPEECH_STYLE          => :speech_style,
-      AUSNC::INTERACTIVITY         => :interactivity,
-      AUSNC::COMMUNICATION_CONTEXT => :communication_context,
-      AUSNC::AUDIENCE              => :audience,
-      OLAC::DISCOURSE_TYPE         => :discourse_type,
-      PURL::IS_PART_OF             => :is_part_of
-    }
+  def add_field(result, field, value)
+    field = MetadataHelper::short_form(field)
+    if @@configured_fields.include?(field)
+      logger.debug "\tAdding configured field #{field} with value #{value}"
+      ::Solrizer::Extractor.insert_solr_field_value(result, field, value)
+    else
+      logger.debug "\tAdding dynamic field #{field} with value #{value}"
+      Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
+    end
   end
 
   #
@@ -347,30 +243,31 @@ private
     result = {}
 
     results.each { |binding| 
-      if binding[:predicate] == PURL::CREATED
+      if binding[:predicate] == MetadataHelper::CREATED
         field = binding[:predicate].to_s
         value = binding[:object].to_s
       else
         field = binding[:predicate].to_s
         value = last_bit(binding[:object])
       end
-      logger.debug "\tAdding field #{field} with value #{value}"
-      Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
+      add_field(result, field, value)
     }
     unless extras.nil?
       extras.keys.each { |key|
         values = extras[key]
         values.each { |value|
-          logger.debug "\tAdding field #{key} with value #{value}"
-          Solrizer.insert_field(result, key, value, :facetable, :stored_searchable)
+          add_field(result, key, value)
         }
       }
     end
     unless full_text.nil?
-      logger.debug "\tAdding field #{:full_text} with value #{trim(full_text, 128)}"
+      logger.debug "\tAdding configured field #{:full_text} with value #{trim(full_text, 128)}"
       ::Solrizer::Extractor.insert_solr_field_value(result, :full_text, full_text)
     end
-    logger.debug "\tAdding index #{:id} with value #{object}"
+    default_il = ['0']
+    logger.debug "\tAdding configured field #{:item_lists} with value #{default_il}"
+    ::Solrizer::Extractor.insert_solr_field_value(result, :item_lists, default_il)
+    logger.debug "\tAdding configured field #{:id} with value #{object}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
 
     return result
