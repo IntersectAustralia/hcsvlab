@@ -7,6 +7,18 @@
   <uniqueKey>id</uniqueKey>
   
   <fields>
+
+    <field name="DC_is_part_of"               type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="date_group"                  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_mode"                  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_speech_style"          type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_interactivity"         type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_communication_context" type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_audience"              type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="OLAC_discourse_type"         type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="OLAC_language"               type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="DC_type"                     type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+
     <field name="id" type="string" stored="true" indexed="true" multiValued="false" required="true"/>
     <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
     <field name="full_text" type="text" indexed="true" stored="false" multiValued="false"/>
@@ -325,8 +337,9 @@
   <copyField source="some_field" dest="all_text_timv" />
 -->
 
-    <!-- To enable search of all the indexed metadata fields, create an all_metadata field into which everything is copied --> 
+    <!-- To enable search of all the indexed metadata fields, create an all_metadata field into which everything is copied 
     <copyField source="*_tesim" dest="all_metadata" />
+     End of comment-out --> 
 
   <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" />
