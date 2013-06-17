@@ -10,7 +10,7 @@ module EopasHelper
     doc_count = 0
     media_count = 0
     documents.each do |document|
-      uri = document[PURL::SOURCE]
+      uri = document[MetadataHelper::SOURCE]
       if uri.ends_with? 'xml'
         xml = uri
         doc_count += 1
