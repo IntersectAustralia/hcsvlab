@@ -12,8 +12,8 @@
             <%# 	<%= t('blacklight.search.documents.counter', :counter => (document_counter + 1 + @response.params[:start].to_i)) %1> %>
             <%# </td> %>
             <td class="main_link_field">
-                <%= f1 = "http://purl.org/dc/terms/isPartOf_tesim"
-                    f2 = "http://purl.org/dc/terms/identifier_tesim"
+                <%= f1 = MetadataHelper::short_form(MetadataHelper::IS_PART_OF)
+                    f2 = MetadataHelper::short_form(MetadataHelper::IDENTIFIER) + "_tesim"
                     if document.has_key?(f1)
                         l1 = document[f1].join(', ')
                     else
@@ -29,7 +29,7 @@
                 %>
             </td>
             <td class="title_link_field">
-                <%= field = "http://purl.org/dc/terms/title_tesim"
+                <%= field = MetadataHelper::short_form(MetadataHelper::TITLE) + "_tesim"
                     if document.has_key?(field)
                         format_value(document[field])
                         #link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
@@ -39,7 +39,7 @@
                 %>
             </td>
             <td class="created_link_field">
-                <%= field = "http://purl.org/dc/terms/created_tesim"
+                <%= field = MetadataHelper::short_form(MetadataHelper::CREATED) + "_tesim"
                     if document.has_key?(field)
                         format_value(document[field])
                         #link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
@@ -49,7 +49,7 @@
                 %>
             </td>
             <td class="type_link_field">
-                <%= field = "http://purl.org/dc/terms/type_tesim"
+                <%= field = MetadataHelper::short_form(MetadataHelper::TYPE) + "_tesim"
                     if document.has_key?(field)
                          format_duplicates(document[field])
                         #link_literal_to_document document, format_duplicates(document[field]), :counter => (document_counter + 1 + @response.params[:start].to_i)
