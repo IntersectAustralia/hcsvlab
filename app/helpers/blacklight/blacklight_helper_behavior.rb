@@ -207,8 +207,8 @@ module Blacklight::BlacklightHelperBehavior
   def document_heading document=nil
     document ||= @document
     begin
-      f1 = "http://purl.org/dc/terms/isPartOf_tesim"
-      f2 = "http://purl.org/dc/terms/identifier_tesim"
+      f1 = MetadataHelper::short_form(MetadataHelper::IS_PART_OF)
+      f2 = MetadataHelper::short_form(MetadataHelper::IDENTIFIER) + "_tesim"
       if document.has_key?(f1)
         l1 = document[f1][0]
       else
@@ -403,13 +403,13 @@ module Blacklight::BlacklightHelperBehavior
     
     galaxy_list = ""
     documents.each_with_index do |doc, index|
-      uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE]
+      uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
       item_documents(doc, uris).each do |values|
-        if values[PURL::TYPE] == "Text"
+        if values[MetadataHelper::TYPE] == "Text"
           if index != (documents.size-1)
-            galaxy_list += (values[PURL::SOURCE] + ",")
+            galaxy_list += (values[MetadataHelper::SOURCE] + ",")
           else
-            galaxy_list += values[PURL::SOURCE]
+            galaxy_list += values[MetadataHelper::SOURCE]
           end
         end
       end
@@ -675,17 +675,17 @@ module Blacklight::BlacklightHelperBehavior
   end
   
   def has_only_text_documents?(document)
-    uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::SOURCE]
+    uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::SOURCE]
     documents = item_documents(document, uris)
     text_types = ["Text", "Raw", "Original"]
     documents.each do |doc|
-      return false unless text_types.include?(doc[PURL::TYPE].to_s)
+      return false unless text_types.include?(doc[MetadataHelper::TYPE].to_s)
     end
     return true
   end
   
   def has_one_document?(document)
-    uris = [PURL::IDENTIFIER]
+    uris = [MetadataHelper::IDENTIFIER]
     documents = item_documents(document, uris)
     if documents.length == 1
       return true
@@ -715,7 +715,7 @@ module Blacklight::BlacklightHelperBehavior
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item
-    query = RDF::Query.new({:item => {PURL::IS_PART_OF => :corpus}})
+    query = RDF::Query.new({:item => {MetadataHelper::IS_PART_OF => :corpus}})
     item_results = query.execute(graph)
 
     unless item_results.size == 0
@@ -723,7 +723,7 @@ module Blacklight::BlacklightHelperBehavior
  
       # Look for references to Documents within the metadata and
       # find their fields as specified in uris.
-      query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
+      query = RDF::Query.new({item => {MetadataHelper::DOCUMENT => :document}})
       document_results = query.execute(graph)
 
       document_results.each { |result|
@@ -816,7 +816,9 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   def format_key(uri)
-    last_bit(uri).sub(/_tesim$/, '')
+    uri = last_bit(uri).sub(/_tesim$/, '')
+    uri = uri.sub(/^([A-Z]+_)+/, '') unless uri.starts_with?('RDF')
+    return uri
   end
 
   def format_value(list)
