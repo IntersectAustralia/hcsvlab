@@ -1,5 +1,5 @@
 <% #Using the Bootstrap Pagination class  -%>
-<% if params[:il].nil? or params[:il] == 'false' %>
+<% if params[:il].nil? %>
 	<% if @previous_document || @next_document %>
 	  <div class="well clearfix" id="previousNextDocument">
 	    <div class="pull-left">
@@ -17,5 +17,5 @@
 	  </div>
 	<% end %>
 <% else %>
-	<%= link_to "Back to Item Lists", item_lists_path, :class => "btn" %>
+	<%= link_to "Back to Item List", item_list_path(params[:il]), :class => "btn" %>
 <% end %>

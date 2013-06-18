@@ -1,4 +1,6 @@
 class ItemList < ActiveRecord::Base
+  include Blacklight::BlacklightHelperBehavior
+
   belongs_to :user
 
   attr_accessible :name, :id, :user_id
@@ -21,6 +23,9 @@ class ItemList < ActiveRecord::Base
     end
   end
 
+  #
+  # Get the documents ids from given search parameters
+  #
   def getAllItemsFromSearch(query)
     get_solr_connection
 
@@ -31,6 +36,26 @@ class ItemList < ActiveRecord::Base
       docs.push(d["id"])
     end
     return docs
+  end
+
+  #
+  # Get list of URLs to send to galaxy
+  #
+  def get_galaxy_list
+    ids = get_item_ids
+
+    galaxy_list = ""
+    ids.each_with_index do |id, index|
+      if index == 0
+        uri = buildURI(id, 'primary_text')
+        galaxy_list += uri
+      else
+        uri = buildURI(id, 'primary_text')
+        galaxy_list += "," + uri
+      end
+    end
+
+    return galaxy_list
   end
 
   #

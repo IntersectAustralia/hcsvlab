@@ -400,7 +400,7 @@ module Blacklight::BlacklightHelperBehavior
 
   def get_galaxy_document_list documents = nil, locals = {}
     documents ||= @document_list
-    
+
     galaxy_list = ""
     documents.each_with_index do |doc, index|
       uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
@@ -532,8 +532,8 @@ module Blacklight::BlacklightHelperBehavior
   # catalog_path accepts a HashWithIndifferentAccess object. The solr query params are stored in the session,
   # so we only need the +counter+ param here. We also need to know if we are viewing to document as part of search results.
   def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true})
-      if opts[:itemViewList]
-        link_to label, solr_document_path(doc[:id], :il =>true)
+      if !opts[:itemViewList].nil?
+        link_to label, solr_document_path(doc[:id], :il =>opts[:itemViewList])
       else
         link_to label, doc, { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
       end
