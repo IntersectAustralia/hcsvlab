@@ -54,6 +54,7 @@ group :development do
   gem 'xray-rails'
   gem 'pry'
   gem 'pry-rails'
+  gem 'zeus'
 end
 
 group :test do

@@ -399,6 +399,8 @@ GEM
     xray-rails (0.1.5)
       coffee-rails
       rails (>= 3.1.0)
+    zeus (0.13.3)
+      method_source (>= 0.6.7)
 
 PLATFORMS
   ruby
@@ -452,3 +454,4 @@ DEPENDENCIES
   uglifier (>= 1.0.3)
   xml-simple
   xray-rails
+  zeus
