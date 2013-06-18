@@ -17,7 +17,7 @@ class ItemListsController < ApplicationController
   def show
     itemList = ItemList.find_by_id!(params[:id])
 
-    @response = itemList.get_items
+    @response = itemList.get_items(params[:page])
     @document_list = @response["response"]["docs"]
 
     render index
@@ -25,31 +25,38 @@ class ItemListsController < ApplicationController
   
   def create
     @itemList = ItemList.new(:name => params[:item_list][:name].strip, :user_id => current_user.id)
-    @documents = params[:sel_document_ids].split(",")
+    if params[:all_items] == 'true'
+      @documents = @itemList.getAllItemsFromSearch(params[:f])
+    else
+      @documents = params[:sel_document_ids].split(",")
+    end
     if @itemList.save
       flash[:notice] = 'Item list created successfully'
 
       add_item_to_item_list(@itemList, @documents)
 
-      redirect_to itemList_path(@itemList)
+      redirect_to item_list_path(@itemList)
     end
-    
   end
 
   def add_to_item_list
     itemList = ItemList.find_by_id(params[:itemListId])
-    documents = params[:document_ids].split(",")
+    if params[:add_all_items] == "true"
+      documents = itemList.getAllItemsFromSearch(params[:g])
+    else
+      documents = params[:document_ids].split(",")
+    end
 
     added_set = add_item_to_item_list(itemList, documents)
     flash[:notice] = "#{added_set.size} Item#{added_set.size==1? '': 's'} added to item list #{itemList.name}"
-    redirect_to itemList_path(itemList)
+    redirect_to item_list_path(itemList)
   end
 
   def clear
     itemList = ItemList.find_by_id!(params[:id])
     removed_set = itemList.clear
     flash[:notice] = "#{removed_set.size} Item#{removed_set.size==1? '': 's'} cleared from item list #{itemList.name}"
-    redirect_to itemList_path(itemList)
+    redirect_to item_list_path(itemList)
   end
 
   def destroy
@@ -58,7 +65,7 @@ class ItemListsController < ApplicationController
     itemList.clear
     itemList.delete
     flash[:notice] = "Item list #{name} deleted successfully"
-    redirect_to itemLists_path
+    redirect_to item_lists_path
   end
 
   private
