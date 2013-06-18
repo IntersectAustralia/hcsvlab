@@ -12,4 +12,8 @@
             %h5{:class => "twiddle"}
               =link_to itemList_path(itemList) do
                 %span{:class => selectedClass}
-                  =itemList.name
+                  %div{:style=>"display:inline-block;width:90%;"}
+                    =itemList.name
+              %div{:style=>"display:inline-block;"}
+                =link_to({:controller => "itemLists", :action => "destroy"}, :id => params[:id].to_i, :method => 'POST') do
+                  %i{:class=>"icon-trash"}
