@@ -6,17 +6,6 @@
     <%= render :partial => 'catalog/sort_widget' %>
 
 	<%= render :partial => 'catalog/per_page_widget' %>
-      
-   <% document_list = get_galaxy_document_list %>
-   <% if document_list != "" %>
-  	<form class="pull-right" method="post" action="<%= Rails.application.config.galaxy_url %>" >
-  		<input class='btn' type="hidden" value="hcsvlab_importer" name="tool_id"/>
-  		<input class='btn' type="hidden" value="<%= document_list %>" name="url_paste" />
-  		<input class='btn' type="hidden" value="HCSVLAB data" name="job_name" />
-  		<input class='btn' type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL" />
-  		<input class='btn' type="submit" value="Analyse Current Page of Search Results in Galaxy " />
-  	</form>
-  <% end %>
   
 </div>
 
@@ -50,8 +39,12 @@
     <%= hidden_field_tag :document_ids %>
     <%= hidden_field_tag :itemListId %>
     <%= hidden_field_tag :add_all_items %>
-    <% @response[:responseHeader][:params][:fq].each do |p| %>
-		<%= hidden_field_tag "g[]", p %>
+    <% begin %>
+    	<% @response[:responseHeader][:params][:fq].each do |p| %>
+			<%= hidden_field_tag "query_params[]", p %>
+		<% end %>
+	<% rescue %>
+		<%= hidden_field_tag "query_params[]", @response[:responseHeader][:params][:fq] %>
 	<% end %>
   <% end %>
 
@@ -66,10 +59,13 @@
 	      		
 	      		<%= hidden_field_tag :sel_document_ids %>
 	      		<%= hidden_field_tag :all_items %>
-	      		<% @response[:responseHeader][:params][:fq].each do |p| %>
-      				<%= hidden_field_tag "f[]", p %>
+	      		<% begin %>
+	      			<% @response[:responseHeader][:params][:fq].each do |p| %>
+      					<%= hidden_field_tag "query_all_params[]", p %>
+      				<% end %>
+      			<% rescue %>
+      				<%= hidden_field_tag "query_all_params[]", @response[:responseHeader][:params][:fq] %>
       			<% end %>
-
 	      		<%= f.submit "Create and add items", class: "btn" %>
 	      		
 	      		<a class="btn" onclick="dismissDialog();" >Dismiss</a>
