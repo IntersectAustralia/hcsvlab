@@ -10,10 +10,10 @@
           - selectedClass="selected" if (itemList.id == (params[:id].to_i))
           .facet_limit
             %h5{:class => "twiddle"}
-              =link_to itemList_path(itemList) do
+              =link_to item_list_path(itemList) do
                 %span{:class => selectedClass}
                   %div{:style=>"display:inline-block;width:90%;"}
                     =itemList.name
               %div{:style=>"display:inline-block;"}
-                =link_to({:controller => "itemLists", :action => "destroy"}, :id => params[:id].to_i, :method => 'POST') do
+                =link_to({:controller => "item_lists", :action => "destroy"}, :id => params[:id].to_i, :method => 'POST') do
                   %i{:class=>"icon-trash"}
