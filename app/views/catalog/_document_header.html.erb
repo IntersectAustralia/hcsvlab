@@ -49,7 +49,7 @@
                 %>
             </td>
             <td class="type_link_field">
-                <%= field = MetadataHelper::short_form(MetadataHelper::TYPE) + "_tesim"
+                <%= field = MetadataHelper::short_form(MetadataHelper::TYPE)
                     if document.has_key?(field)
                          format_duplicates(document[field])
                         #link_literal_to_document document, format_duplicates(document[field]), :counter => (document_counter + 1 + @response.params[:start].to_i)
