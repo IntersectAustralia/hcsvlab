@@ -21,6 +21,18 @@ class ItemList < ActiveRecord::Base
     end
   end
 
+  def getAllItemsFromSearch(query)
+    get_solr_connection
+
+    params = {:start=>0, :q=>query, :fl=>"id", :rows => 10000}
+    response = @@solr.get('select', params: params)
+    docs = Array.new
+    response["response"]["docs"].each do |d|
+      docs.push(d["id"])
+    end
+    return docs
+  end
+
   #
   # Get the list of Item ids which this ItemList contains.
   # Return an array of Strings.
@@ -53,10 +65,16 @@ class ItemList < ActiveRecord::Base
   # Items of this ItemList.
   # Return the response we get from Solr.
   #
-  def get_items(start = 0, rows = 20)
+  def get_items(start, rows = 20)
     get_solr_connection
 
-    params = {:start=>start, :rows => rows, :q=>"item_lists:#{RSolr.escape(id.to_s)}"}
+
+    if start.nil?
+      startValue = 0
+    else
+      startValue = (start.to_i-1)*20
+    end
+    params = {:start => startValue, :rows => rows, :q=>"item_lists:#{RSolr.escape(id.to_s)}"}
 
     solrResponse = @@solr.get('select', params: params)
     response = Blacklight::SolrResponse.new(force_to_utf8(solrResponse), params)

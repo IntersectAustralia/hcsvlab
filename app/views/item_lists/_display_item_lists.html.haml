@@ -10,6 +10,6 @@
           - selectedClass="selected" if (itemList.id == (params[:id].to_i))
           .facet_limit
             %h5{:class => "twiddle"}
-              =link_to itemList_path(itemList) do
+              =link_to item_list_path(itemList) do
                 %span{:class => selectedClass}
                   =itemList.name
