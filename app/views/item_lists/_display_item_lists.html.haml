@@ -15,5 +15,5 @@
                   %div{:style=>"display:inline-block;width:90%;"}
                     =itemList.name
               %div{:style=>"display:inline-block;"}
-                =link_to({:controller => "item_lists", :action => "destroy"}, :id => params[:id].to_i, :method => 'POST') do
+                =link_to({:controller => "item_lists", :action => "destroy"}, :id => params[:id].to_i, :method => 'POST', :confirm => 'Are you sure you want to remove the Item List "' + itemList.name + '"?') do
                   %i{:class=>"icon-trash"}

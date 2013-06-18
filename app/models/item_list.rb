@@ -165,7 +165,7 @@ class ItemList < ActiveRecord::Base
             else
                 update_solr_field(item_id, :item_lists, current_ids[0], 'set')
                 current_ids[1..-1].each { |current_id|
-                    update_solr_document(item_id, :item_lists, current_id, 'add')
+                    update_solr_field(item_id, :item_lists, current_id, 'add')
                 }
             end
         end

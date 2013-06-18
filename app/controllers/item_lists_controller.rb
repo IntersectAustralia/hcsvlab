@@ -26,7 +26,7 @@ class ItemListsController < ApplicationController
   def create
     @itemList = ItemList.new(:name => params[:item_list][:name].strip, :user_id => current_user.id)
     if params[:all_items] == 'true'
-      @documents = @itemList.getAllItemsFromSearch(params[:f])
+      @documents = @itemList.getAllItemsFromSearch(params[:query_all_params])
     else
       @documents = params[:sel_document_ids].split(",")
     end
@@ -42,7 +42,7 @@ class ItemListsController < ApplicationController
   def add_to_item_list
     itemList = ItemList.find_by_id(params[:itemListId])
     if params[:add_all_items] == "true"
-      documents = itemList.getAllItemsFromSearch(params[:g])
+      documents = itemList.getAllItemsFromSearch(params[:query_params])
     else
       documents = params[:document_ids].split(",")
     end
