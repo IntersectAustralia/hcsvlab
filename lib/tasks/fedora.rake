@@ -105,9 +105,16 @@ namespace :fedora do
 	end
 
 	def ingest_rdf_file(corpus_dir, rdf_file)
-
 		puts "Ingesting item: " + rdf_file.to_s
 
+		item = create_item_from_file(rdf_file)
+		look_for_annotations(item, rdf_file)
+		look_for_documents(item, corpus_dir, rdf_file)
+
+		item.save!
+	end
+
+    def create_item_from_file(rdf_file)
 		item = Item.new
 		item.save!
 
@@ -115,6 +122,10 @@ namespace :fedora do
 		item.label = item.descMetadata.graph.statements.first.subject
 
 		puts "Item = " + item.pid.to_s
+		return item
+    end
+
+	def look_for_documents(item, corpus_dir, rdf_file)
 		#Text
 		query = RDF::Query.new({
 			:document => {
@@ -151,9 +162,24 @@ namespace :fedora do
 				end
 			end
 		end
+	end
 
-		item.save!		
-
+	def look_for_annotations(item, metadata_filename)
+		annotation_filename = metadata_filename.sub("metadata", "ann")
+		if File.exists?(annotation_filename)
+			doc = Document.new
+			doc.descMetadata.graph.load( annotation_filename, :format => :ttl )
+			query = RDF::Query.new({
+				:annotation => {
+					RDF::URI("http://purl.org/dada/schema/0.2#partof") => :part_of
+				}
+			})
+			results = query.execute(doc.descMetadata.graph)
+			doc.label = results[0][:part_of] unless results.size == 0
+			doc.item = item
+			doc.save
+			puts "Annotation Document = #{doc.pid.to_s}"
+		end
 	end
 
 end
