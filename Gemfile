@@ -55,6 +55,7 @@ group :development do
   gem 'pry'
   gem 'pry-rails'
   gem 'zeus'
+  gem 'newrelic_rpm'
 end
 
 group :test do
