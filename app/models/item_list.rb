@@ -135,6 +135,7 @@ class ItemList < ActiveRecord::Base
         else
             #... and if we did, update it
             update_solr_field(item_id, :item_lists, id)
+            patch_after_update(item_id)
         end
     }
 
@@ -193,6 +194,7 @@ class ItemList < ActiveRecord::Base
                     update_solr_field(item_id, :item_lists, current_id, 'add')
                 }
             end
+            patch_after_update(item_id)
         end
     }
 
@@ -207,6 +209,23 @@ class ItemList < ActiveRecord::Base
   end
 
   private
+
+  #
+  # When you update the Solr document of an Item, it appears to throw
+  # away the indexing of the Item's primary text. So, this patch will
+  # regenerate the index. However, it does it slowly, we need to find a
+  # much better way.
+  #
+  # Incidentally, Solr may well throw away other indexing, too, but
+  # this has not manifested (yet).
+  #
+  def patch_after_update(item_id)
+    item = Item.find(item_id)
+    unless item.primary_text.content.nil?
+      update_solr_field(item_id, :full_text, item.primary_text.content, 'set')
+    end
+  end
+
 
   def update_solr_field(item_id, field_id, field_value, mode='add')
     doc1 = {:id => item_id, field_id => field_value}
