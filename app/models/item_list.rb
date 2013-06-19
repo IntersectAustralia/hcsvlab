@@ -76,7 +76,7 @@ class ItemList < ActiveRecord::Base
     # If there are more rows in Solr than we asked for, increase the number we're
     # asking for and ask for them all this time. Sadly, there doesn't appear to be
     # a "give me everything" value for the rows parameter.
-    if response["response"]["numFound"] < max_rows
+    if response["response"]["numFound"] > max_rows
         params[:rows] = response["response"]["numFound"]
         response = @@solr.get('select', params: params)
     end
