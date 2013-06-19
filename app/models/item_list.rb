@@ -26,11 +26,22 @@ class ItemList < ActiveRecord::Base
   #
   # Get the documents ids from given search parameters
   #
-  def getAllItemsFromSearch(query)
+  def getAllItemsFromSearch(search_params)
     get_solr_connection
 
-    params = {:start=>0, :q=>query, :fl=>"id", :rows => 10000}
+    params = eval(search_params)
+    max_rows = 1000
+    params['rows'] = max_rows
     response = @@solr.get('select', params: params)
+
+    # If there are more rows in Solr than we asked for, increase the number we're
+    # asking for and ask for them all this time. Sadly, there doesn't appear to be
+    # a "give me everything" value for the rows parameter.
+    if response["response"]["numFound"] > max_rows
+        params['rows'] = response["response"]["numFound"]
+        response = @@solr.get('select', params: params)
+    end
+
     docs = Array.new
     response["response"]["docs"].each do |d|
       docs.push(d["id"])
@@ -220,9 +231,13 @@ class ItemList < ActiveRecord::Base
   # this has not manifested (yet).
   #
   def patch_after_update(item_id)
-    item = Item.find(item_id)
-    unless item.primary_text.content.nil?
-      update_solr_field(item_id, :full_text, item.primary_text.content, 'set')
+    begin
+      item = Item.find(item_id)
+      unless item.primary_text.content.nil?
+        update_solr_field(item_id, :full_text, item.primary_text.content, 'set')
+      end
+    rescue
+      puts "error reindexing full text with item: " + item_id.to_s
     end
   end
 

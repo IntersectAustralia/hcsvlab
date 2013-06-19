@@ -39,13 +39,7 @@
     <%= hidden_field_tag :document_ids %>
     <%= hidden_field_tag :itemListId %>
     <%= hidden_field_tag :add_all_items %>
-    <% begin %>
-    	<% @response[:responseHeader][:params][:fq].each do |p| %>
-			<%= hidden_field_tag "query_params[]", p %>
-		<% end %>
-	<% rescue %>
-		<%= hidden_field_tag "query_params[]", @response[:responseHeader][:params][:fq] %>
-	<% end %>
+	<%= hidden_field_tag "query_params", @response[:responseHeader][:params].inspect %>
   <% end %>
 
   <div id="new_item_list_dialog" style="display: none;" title="New Item List">
@@ -59,13 +53,7 @@
 	      		
 	      		<%= hidden_field_tag :sel_document_ids %>
 	      		<%= hidden_field_tag :all_items %>
-	      		<% begin %>
-	      			<% @response[:responseHeader][:params][:fq].each do |p| %>
-      					<%= hidden_field_tag "query_all_params[]", p %>
-      				<% end %>
-      			<% rescue %>
-      				<%= hidden_field_tag "query_all_params[]", @response[:responseHeader][:params][:fq] %>
-      			<% end %>
+				<%= hidden_field_tag "query_all_params", @response[:responseHeader][:params].inspect %>
 	      		<%= f.submit "Create and add items", class: "btn" %>
 	      		
 	      		<a class="btn" onclick="dismissDialog();" >Dismiss</a>
