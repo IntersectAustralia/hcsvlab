@@ -63,4 +63,15 @@ class UserRegistersController < Devise::RegistrationsController
     end
   end
 
+  def generate_token
+    current_user.reset_authentication_token!
+    redirect_to :back, :notice => "Your new API token has been generated."
+  end
+
+  def delete_token
+    current_user.authentication_token = nil
+    current_user.save!
+    redirect_to :back, :notice => "Your API token has been deleted."
+  end
+
 end

@@ -21,6 +21,23 @@
   <% if current_or_guest_user %>
     <li><%= link_to "Edit My Details", edit_user_registration_path %></li>
     <li><%= link_to "Change My Password", users_edit_password_path %></li>
+    <li class="dropdown-submenu">
+      <a href="#">Authorisation Token</a>
+      <ul class="dropdown-menu">
+        <% li_class = current_user.authentication_token.blank? ? "disabled" : "" %>
+        <% if li_class.present? %>
+          <li class="disabled"><a href="#"> No token generated</a></li>
+          <li><%= link_to 'Generate Token', users_generate_token_path, :method => :put %></li>
+        <% else %>
+          <li class="disabled"><a href="#"><%= current_user.authentication_token %></a></li>
+          <li><%= link_to 'Regenerate Token', users_generate_token_path, :method => :put, :confirm => 'Are you sure you want to regenerate your token? You will need to update any scripts that used the previous token.' %></li>
+          <li><%= link_to 'Delete Token', users_delete_token_path, :method => :delete, :confirm => 'Are you sure you want to delete your token? You will no longer be able to perform API actions.' %></li>
+        <% end %>
+        <li class='divider'></li>
+        <li class='<%= li_class %>'><a href="#">Copy to Clipboard</a></li>
+        <li class='<%= li_class %>'><a href="#">Download Token</a></li>
+      </ul>
+    </li>
 
     <li class='divider'></li>
 

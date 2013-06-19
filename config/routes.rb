@@ -9,6 +9,8 @@ HcsvlabWeb::Application.routes.draw do
     get "/users/profile", :to => "user_registers#profile" #page which gives options to edit details or change password
     get "/users/edit_password", :to => "user_registers#edit_password" #allow users to edit their own password
     put "/users/update_password", :to => "user_registers#update_password" #allow users to edit their own password
+    put "/users/generate_token", :to => "user_registers#generate_token" #allow users to generate an API token
+    delete "/users/delete_token", :to => "user_registers#delete_token" #allow users to delete their API token
   end
 
   resources :users, :only => [:show] do
