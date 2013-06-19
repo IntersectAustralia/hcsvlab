@@ -57,12 +57,16 @@ class ItemList < ActiveRecord::Base
 
     galaxy_list = ""
     ids.each_with_index do |id, index|
-      if index == 0
-        uri = buildURI(id, 'primary_text')
-        galaxy_list += uri
-      else
-        uri = buildURI(id, 'primary_text')
-        galaxy_list += "," + uri
+      begin
+        if index == 0
+          uri = buildURI(id, 'primary_text')
+          galaxy_list += uri
+        else
+          uri = buildURI(id, 'primary_text')
+          galaxy_list += "," + uri
+        end
+      rescue
+        Rails.logger.error("couldn't open primary text for item: " + id.to_s)
       end
     end
 
@@ -231,13 +235,10 @@ class ItemList < ActiveRecord::Base
   # this has not manifested (yet).
   #
   def patch_after_update(item_id)
-    begin
-      item = Item.find(item_id)
-      unless item.primary_text.content.nil?
-        update_solr_field(item_id, :full_text, item.primary_text.content, 'set')
-      end
-    rescue
-      puts "error reindexing full text with item: " + item_id.to_s
+    puts item_id
+    item = Item.find(item_id)
+    unless item.primary_text.content.nil?
+      update_solr_field(item_id, :full_text, item.primary_text.content, 'set')
     end
   end
 
