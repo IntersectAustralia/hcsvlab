@@ -398,26 +398,6 @@ module Blacklight::BlacklightHelperBehavior
     return galaxy_list
   end
 
-  def get_galaxy_document_list documents = nil, locals = {}
-    documents ||= @document_list
-
-    galaxy_list = ""
-    documents.each_with_index do |doc, index|
-      uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
-      item_documents(doc, uris).each do |values|
-        if values[MetadataHelper::TYPE] == "Text"
-          if index != (documents.size-1)
-            galaxy_list += (values[MetadataHelper::SOURCE] + ",")
-          else
-            galaxy_list += values[MetadataHelper::SOURCE]
-          end
-        end
-      end
-    end
-    
-    return galaxy_list
-  end
-
   def render_document_index documents = nil, locals = {}, extraRenderParams = {}
     documents ||= @document_list
 
