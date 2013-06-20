@@ -23,10 +23,10 @@
     <li><%= link_to "Change My Password", users_edit_password_path %></li>
     <li class="dropdown-submenu">
       <a href="#">Authorisation Token</a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" id="api_token_submenu">
         <% li_class = current_user.authentication_token.blank? ? "disabled" : "" %>
         <% if li_class.present? %>
-          <li class="disabled"><a href="#"> No token generated</a></li>
+          <li class="disabled"><a href="#" id="api_token_display"> No token generated</a></li>
           <li><%= link_to 'Generate Token', users_generate_token_path, :method => :put %></li>
         <% else %>
           <li class="disabled"><a href="#"><%= current_user.authentication_token %></a></li>
@@ -34,14 +34,13 @@
           <li><%= link_to 'Delete Token', users_delete_token_path, :method => :delete, :confirm => 'Are you sure you want to delete your token? You will no longer be able to perform API actions.' %></li>
         <% end %>
         <li class='divider'></li>
-        <li class='<%= li_class %>'><a href="#">Copy to Clipboard</a></li>
-        <li class='<%= li_class %>'><a href="#">Download Token</a></li>
+        <li class='<%= li_class %>'><a href="#" id="zc_copy_token" data-clipboard-text="<%= current_user.authentication_token %>">Copy to Clipboard</a></li>
+        <li class='<%= li_class %>'><a href="#"><%= link_to 'Download Token', users_download_token_path %></a></li>
       </ul>
     </li>
 
-    <li class='divider'></li>
-
     <% if current_user.is_superuser? %>
+      <li class='divider'></li>
       <li><%= link_to "Admin", admin_users_path %></li>
     <% end %>
 
@@ -60,3 +59,42 @@
 
   </ul>
 </li>
+
+<script type='text/javascript'>
+  $(document).ready( function() {
+    var clip = new ZeroClipboard($('#zc_copy_token'));
+    clip.on('complete', function ( client, args ) {
+      alert("Token copied to clipboard!");
+    });
+    clip.on('mouseout', function ( client, args ) {
+      $(this).removeClass("hovered");
+      $(this).closest('.dropdown-submenu').children('a').removeClass('hovered');
+    });
+  });
+
+  $('#zc_copy_token').mouseover(function(e) {
+    $(this).addClass("hovered");
+    $(this).closest('.dropdown-submenu').children('a').addClass('hovered');
+    $(this).closest('.dropdown-submenu').addClass('open');
+  });
+  $('#zc_copy_token').mouseout(function(e) {
+    $(this).addClass("hovered");
+    $(this).closest('.dropdown-submenu').children('a').addClass('hovered');
+    $(this).closest('.dropdown-submenu').addClass('open');
+  });
+
+  $('.dropdown-menu li a').mouseover(function(e) {
+    e.stopPropagation();
+    $(this).parent().parent().find('li').each(function() {
+      $(this).removeClass('open');
+    });
+    $(this).parent().addClass('open');
+  });
+
+  $('.dropdown-toggle').click(function(e) {
+    $(this).parent().find('li').each(function() {
+      $(this).removeClass('open');
+    });
+  });
+
+</script>

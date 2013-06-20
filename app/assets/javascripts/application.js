@@ -19,3 +19,4 @@
 //= require bootstrap
 //= require eopas
 //= require helpers
+//= require zeroclipboard

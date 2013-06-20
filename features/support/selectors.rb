@@ -11,6 +11,12 @@ module HtmlSelectorsHelpers
     when "the page"
       "html > body"
 
+    when "the api token display"
+      "#api_token_display"
+      
+    when "the api token dropdown"
+      "#api_token_submenu"
+
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #

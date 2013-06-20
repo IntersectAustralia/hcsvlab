@@ -5,43 +5,46 @@ module NavigationHelpers
   #
   # step definition in web_steps.rb
   #
-  def path_to(page_name)
+  def path_to(page_name, options = {})
     case page_name
 
     when /^the home\s?page$/
-      '/'
+      root_path(options)
 
         # User paths
     when /the login page/
-      new_user_session_path
+      new_user_session_path(options)
 
     when /the logout page/
-      destroy_user_session_path
+      destroy_user_session_path(options)
 
     when /the user profile page/
-      users_profile_path
+      users_profile_path(options)
 
     when /the request account page/
-      new_user_registration_path
+      new_user_registration_path(options)
 
     when /the edit my details page/
-      edit_user_registration_path
+      edit_user_registration_path(options)
 
     when /^the user details page for (.*)$/
-      user_path(User.where(:email => $1).first)
+      user_path(User.where(:email => $1).first, options)
 
     when /^the edit role page for (.*)$/
-      edit_role_user_path(User.where(:email => $1).first)
+      edit_role_user_path(User.where(:email => $1).first, options)
 
     when /^the reset password page$/
-      edit_user_password_path
+      edit_user_password_path(options)
 
     # Users paths
     when /the access requests page/
-      access_requests_users_path
+      access_requests_users_path(options)
 
     when /the list users page/
-      users_path
+      users_path(options)
+
+    when /the item lists page/
+      item_lists_path(options)
 
 # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

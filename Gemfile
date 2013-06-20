@@ -64,8 +64,9 @@ group :test do
   gem "brakeman"
   gem "simplecov", ">=0.3.8", :require => false
   gem 'simplecov-rcov'
+  gem "selenium-webdriver"
 end
-
+gem 'zeroclipboard-rails'
 gem "haml"
 gem "haml-rails"
 # gem "bootstrap-sass"

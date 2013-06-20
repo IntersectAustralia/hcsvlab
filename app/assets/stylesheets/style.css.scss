@@ -446,7 +446,7 @@ color: #333;
 #url { display: inline-block; }
 
 
-.dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a {
+.dropdown-menu li > a:hover, .dropdown-menu li > a:focus, .dropdown-submenu:hover > a, .dropdown-menu li > a.hovered, .dropdown-submenu > a.hovered {
   text-decoration: none;
   color: white;
   background-color: #0081c2;
