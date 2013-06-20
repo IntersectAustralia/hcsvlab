@@ -5,7 +5,10 @@ Feature: Create and manage authentication tokens
 
   Background:
     Given I have the usual roles and permissions
-    And I have a user "diego@intersect.org.au" with role "researcher"
+    Given I have users
+      | email                     | first_name | last_name |
+      | diego@intersect.org.au    | Diego       | Alonso   |
+    And "diego@intersect.org.au" has role "researcher"
     And I am logged in as "diego@intersect.org.au"
 
   Scenario: New user has no token
@@ -48,4 +51,11 @@ Feature: Create and manage authentication tokens
     Then I should see the api token displayed for user "diego@intersect.org.au"
     When I make a request for the item lists page with the API token for "diego@intersect.org.au"
     Then I should get a 401 response code
+
+  Scenario: Download a token
+    Given "diego@intersect.org.au" has an api token
+    And I am on the home page
+    Then I should see the api token displayed for user "diego@intersect.org.au"
+    And I follow "Download Token"
+    Then I should get the authentication token json file for "diego@intersect.org.au"
 

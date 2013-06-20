@@ -72,22 +72,3 @@ Given /^"([^"]*)" has an api token$/ do |email|
   user = User.where(:email => email).first
   user.reset_authentication_token!
 end
-
-Then /^I should see no api token$/ do
-  with_scope("the api token dropdown") do
-    page.should have_xpath("//li[@class='disabled']", :text => "No token generated")
-    page.should have_xpath("//li", :text => "Generate Token")
-    page.should have_xpath("//li[@class='disabled']", :text => "Copy to Clipboard")
-    page.should have_xpath("//li[@class='disabled']", :text => "Download Token")
-  end
-end
-
-Then /^I should see the api token displayed for user "([^"]*)"$/ do |email|
-  with_scope("the api token dropdown") do
-    user = User.find_by_email!(email)
-    page.should have_xpath("//li[@class='disabled']", :text => user.authentication_token)
-    page.should have_xpath("//li", :text => "Regenerate Token")
-    page.should have_xpath("//li", :text => "Copy to Clipboard")
-    page.should have_xpath("//li", :text => "Download Token")
-  end
-end
