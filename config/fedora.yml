@@ -9,22 +9,22 @@ test: &TEST
 qa:
   user: fedoraAdmin
   password: fedoraAdmin
-  url: http://127.0.0.1:8080/fedora
+  url: http://ic2-hcsvlab-test4-vm.intersect.org.au:8080/fedora
 qa2:
   user: fedoraAdmin
   password: fedoraAdmin
-  url: http://127.0.0.1:8080/fedora
+  url: http://ic2-hcsvlab-qa2-vm.intersect.org.au:8080/fedora
 staging:
   user: fedoraAdmin
   password: fedoraAdmin
-  url: http://127.0.0.1:8080/fedora
+  url: http://ic2-hcsvlab-staging1-vm.intersect.org.au:8080/fedora
 staging2:
   user: fedoraAdmin
   password: fedoraAdmin
-  url: http://127.0.0.1:8080/fedora
+  url: http://ic2-hcsvlab-staging2-vm.intersect.org.au:8080/fedora
 production:
   user: fedoraAdmin
   password: fedoraAdmin
-  url: http://127.0.0.1:8080/fedora
+  url: http://ic2-hcsvlab-v1-webapp-vm.intersect.org.au:8080/fedora
 cucumber:
   <<: *TEST

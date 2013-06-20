@@ -58,11 +58,10 @@ class ItemList < ActiveRecord::Base
     galaxy_list = ""
     ids.each_with_index do |id, index|
       begin
+        uri = buildURI(id, 'primary_text')
         if index == 0
-          uri = buildURI(id, 'primary_text')
           galaxy_list += uri
         else
-          uri = buildURI(id, 'primary_text')
           galaxy_list += "," + uri
         end
       rescue
