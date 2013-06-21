@@ -1,23 +1,23 @@
 <div id="sortAndPerPage">
 
-  <div class="btn-group css-dropdown pull-left">
-    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Add Selected <span class="caret"></span></a>
+  <div class="css-dropdown pull-left">
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Add Selected to list <span class="caret"></span></a>
     <ul id="create_list_drop_down" class="dropdown-menu">
       <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
         <li><a href="#add_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
       <%}%>
-      <li><a id="create_item_list" href="#new-item-list" role="button" data-toggle="modal">Create New List</a></li>
+      <li><a id="create_item_list" class="testclass" href="#new-item-list" role="button" data-toggle="modal">Create New List</a></li>
     </ul>
+  </div>
 
-    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Add All <span class="caret"></span></a>
+  <div class="css-dropdown pull-left">
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Add All to list <span class="caret"></span></a>
     <ul id="create_list_all_drop_down" class="dropdown-menu">
       <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
         <li><a href="#add_all_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
       <%}%>
-      <li><a id="create_all_iteam_list" href="#new-item-list" role="button" data-toggle="modal">Create new...</a></li>
-
+      <li><a id="create_all_item_list" href="#new-item-list" role="button" data-toggle="modal">Create new...</a></li>
     </ul>
-    <a class="btn disabled extra-last" href="#">to item list</a>
   </div>
 
   <div class="page_links">
@@ -51,12 +51,13 @@
     </div>
 
     <div class="modal-footer">
-      <a class="btn" onclick="dismissDialog();" data-dismiss="modal" aria-hidden="true()">Close</a>
+      <a class="btn" data-dismiss="modal" aria-hidden="true()">Close</a>
       <%= f.submit "Create List", class: "btn btn-primary" %>
     </div>
 
   <% end %>
 </div>
+
 
 
 <%= form_tag({:controller => "item_lists", :action => "add_to_item_list"}, :id => "add_to_item_list")  do %>
@@ -104,43 +105,17 @@ function generateDocumentIds(field) {
 function dismissDialog() {
   jQuery("#item_list_error").text("");
   jQuery("#item_list_name").val("");
-  jQuery("#new_item_list_dialog").dialog('close');
 };
 
-function showNewItemListDialog()
-{
-  var dialogTarget = jQuery("#new_item_list_dialog");
-  dialogTarget.dialog({
-bgiframe: true,
-autoOpen: false,
-height: 250,
-width: 400,
-resizable: false,
-closeOnEscape: false,
-modal: true,
-open: function(event, ui) {
-jQuery(".ui-dialog-titlebar-close", ui.dialog).hide();
-},
-close: function() {
-jQuery("#create_list_drop_down").show();
-jQuery("#document_ids").val("");
-}
-});
-dialogTarget.dialog('open');
-};
 
-jQuery("#create_item_list").click( function() {
+  jQuery("#create_item_list").click( function() {
     generateDocumentIds("#sel_document_ids");
     jQuery("#all_items").val("false");
-    jQuery("#create_list_drop_down").toggleClass("hovering");
-    <%# showNewItemListDialog(); %>
-    });
+  });
 
-jQuery("#create_all_item_list").click( function() {
+  jQuery("#create_all_item_list").click( function() {
     jQuery("#all_items").val("true");
-    jQuery("#create_list_all_drop_down").toggleClass("hovering");
-    <%# showNewItemListDialog(); %>
-    });
+  });
 
 jQuery("A[href='#add_to_existing_item_list']").click( function() {
     generateDocumentIds("#document_ids");
@@ -157,4 +132,4 @@ jQuery("A[href='#add_all_to_existing_item_list']").click( function() {
     jQuery("#add_to_item_list").submit();
     });
 
-  </script>
+</script>

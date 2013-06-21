@@ -678,7 +678,7 @@ module Blacklight::BlacklightHelperBehavior
     uri = buildURI(document.id, 'primary_text')
     begin
       text = open(uri).read.strip.force_encoding("UTF-8")
-      return "<div>#{text}</div>"
+      return "<div class='primary-text'>#{text}</div>"
     rescue => e
       return render_no_primary_document
     end
