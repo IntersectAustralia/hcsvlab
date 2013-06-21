@@ -678,7 +678,7 @@ module Blacklight::BlacklightHelperBehavior
     uri = buildURI(document.id, 'primary_text')
     begin
       text = open(uri).read.strip.force_encoding("UTF-8")
-      return "<textarea rows='8' style='width:70%;' readonly>#{text}</textarea>"
+      return "<div>#{text}</div>"
     rescue => e
       return render_no_primary_document
     end

@@ -1,154 +1,160 @@
 <div id="sortAndPerPage">
 
-   <div class="page_links">
-     <%= render :partial => "catalog/paginate_compact" %>
-   </div>
-    <%= render :partial => 'catalog/sort_widget' %>
+  <div class="btn-group css-dropdown pull-left">
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Add Selected <span class="caret"></span></a>
+    <ul id="create_list_drop_down" class="dropdown-menu">
+      <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
+        <li><a href="#add_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
+      <%}%>
+      <li><a id="create_item_list" href="#new-item-list" role="button" data-toggle="modal">Create New List</a></li>
+    </ul>
 
-	<%= render :partial => 'catalog/per_page_widget' %>
-  
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Add All <span class="caret"></span></a>
+    <ul id="create_list_all_drop_down" class="dropdown-menu">
+      <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
+        <li><a href="#add_all_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
+      <%}%>
+      <li><a id="create_all_iteam_list" href="#new-item-list" role="button" data-toggle="modal">Create new...</a></li>
+
+    </ul>
+    <a class="btn disabled extra-last" href="#">to item list</a>
+  </div>
+
+  <div class="page_links">
+    <%= render :partial => "catalog/paginate_compact" %>
+  </div>
+  <%= render :partial => 'catalog/sort_widget' %>
+
+  <%= render :partial => 'catalog/per_page_widget' %>
+
 </div>
 
-  <ul class="css-dropdown">
-    <li id="create_list_drop_down" class="btn">
-      <%= "Add Selected to Item List" %> <span class="caret"></span>
-      <ul>
-        <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
-          <li><a href="#add_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
-        <%}%>
-        <li><a href="#create_item_list" >Create new...</a></li>
-        
-      </ul>
-    </li>
-  </ul>
 
-  <ul class="css-dropdown">
-    <li id="create_list_all_drop_down" class="btn">
-      <%= "Add All to Item List" %> <span class="caret"></span>
-      <ul>
-        <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
-          <li><a href="#add_all_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
-        <%}%>
-        <li><a href="#create_all_item_list" >Create new...</a></li>
-        
-      </ul>
-    </li>
-  </ul>
+<div id="new-item-list" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <%= form_for(ItemList.new, :url => { :controller => "item_lists", :action => "create" })  do |f| %>
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">Create New Item List</h3>
+    </div>
+    <div id="new_item_list_dialog" class="modal-body" title="New Item List">
+      <p>
+        <div id="item_list_error" class="create_item_list_error"> </div>
+        <br/>
 
-  <%= form_tag({:controller => "item_lists", :action => "add_to_item_list"}, :id => "add_to_item_list")  do %>
-    <%= hidden_field_tag :document_ids %>
-    <%= hidden_field_tag :itemListId %>
-    <%= hidden_field_tag :add_all_items %>
-	<%= hidden_field_tag "query_params", @response[:responseHeader][:params].inspect %>
+        <%= f.label :name %>
+        <%= f.text_field :name %>
+
+        <%= hidden_field_tag :sel_document_ids %>
+        <%= hidden_field_tag :all_items %>
+        <%= hidden_field_tag "query_all_params", @response[:responseHeader][:params].inspect %>
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <a class="btn" onclick="dismissDialog();" data-dismiss="modal" aria-hidden="true()">Close</a>
+      <%= f.submit "Create List", class: "btn btn-primary" %>
+    </div>
+
   <% end %>
+</div>
 
-  <div id="new_item_list_dialog" style="display: none;" title="New Item List">
-		<p>
-	    <div id="item_list_error" class="create_item_list_error"> </div>
-			<br/>
-			<%= form_for(ItemList.new, :url => { :controller => "item_lists", :action => "create" })  do |f| %>
-			
-				<%= f.label :name %>
-	      		<%= f.text_field :name %>
-	      		
-	      		<%= hidden_field_tag :sel_document_ids %>
-	      		<%= hidden_field_tag :all_items %>
-				<%= hidden_field_tag "query_all_params", @response[:responseHeader][:params].inspect %>
-	      		<%= f.submit "Create and add items", class: "btn" %>
-	      		
-	      		<a class="btn" onclick="dismissDialog();" >Dismiss</a>
-      		<% end %>
-		</p>
-	</div>
+
+<%= form_tag({:controller => "item_lists", :action => "add_to_item_list"}, :id => "add_to_item_list")  do %>
+  <%= hidden_field_tag :document_ids %>
+  <%= hidden_field_tag :itemListId %>
+  <%= hidden_field_tag :add_all_items %>
+  <%= hidden_field_tag "query_params", @response[:responseHeader][:params].inspect %>
+<% end %>
+
 
 <script type="text/javascript">
-	
-	jQuery("#new_item_list").submit( function() {
-		var new_name = jQuery("#item_list_name").val().trim()
-		if(new_name == "") {
-			jQuery("#item_list_error").text("Name can't be blank");
-			return false;
-		}
-		var error = false;
-		jQuery('a[href$="add_to_existing_item_list"]').each(function() {
-			if(this.text.trim() == new_name) {
-				jQuery("#item_list_error").text("Item list name already exists");
-				error = true;
-			}
-		});
-		if(error)
-			return false;
-	});
-	
-	function generateDocumentIds(field) {
-		checks = document.getElementsByClassName('toggle_item_list');
-		for (var i=0, n=checks.length; i<n; i++) {
-			if (checks[i].checked) {
-				var existing = jQuery(field).val();
-				if (existing == "") {
-					jQuery(field).val(checks[i].name);
-				}
-				else {
-					jQuery(field).val(existing + "," + checks[i].name);
-				}
-			}
-		}
-	};
-	
-	function dismissDialog() {
-		jQuery("#item_list_error").text("");
-		jQuery("#item_list_name").val("");
-		jQuery("#new_item_list_dialog").dialog('close');
-	};
-	
-	function showNewItemListDialog()
-	{
-	    var dialogTarget = jQuery("#new_item_list_dialog");
-	    dialogTarget.dialog({
-	        bgiframe: true,
-	        autoOpen: false,
-	        height: 250,
-	        width: 400,
-	        resizable: false,
-	        closeOnEscape: false,
-	        modal: true,
-	        open: function(event, ui) {
-	        	jQuery(".ui-dialog-titlebar-close", ui.dialog).hide();
-	        },
-	        close: function() {
-	        	jQuery("#create_list_drop_down").show();
-	        	jQuery("#document_ids").val("");
-	        }
-		});
-	    dialogTarget.dialog('open');
-	};
-	
-	jQuery("A[href='#create_item_list']").click( function() {
-		generateDocumentIds("#sel_document_ids");
-		jQuery("#all_items").val("false");
-		jQuery("#create_list_drop_down").toggleClass("hovering");
-		showNewItemListDialog();
-	});
 
-	jQuery("A[href='#create_all_item_list']").click( function() {
-		jQuery("#all_items").val("true");
-		jQuery("#create_list_all_drop_down").toggleClass("hovering");
-		showNewItemListDialog();
-	});
+  jQuery("#new_item_list").submit( function() {
+      var new_name = jQuery("#item_list_name").val().trim()
+      if(new_name == "") {
+      jQuery("#item_list_error").text("Name can't be blank");
+      return false;
+      }
+      var error = false;
+      jQuery('a[href$="add_to_existing_item_list"]').each(function() {
+        if(this.text.trim() == new_name) {
+        jQuery("#item_list_error").text("Item list name already exists");
+        error = true;
+        }
+        });
+      if(error)
+      return false;
+      });
 
-  jQuery("A[href='#add_to_existing_item_list']").click( function() {
+function generateDocumentIds(field) {
+  checks = document.getElementsByClassName('toggle_item_list');
+  for (var i=0, n=checks.length; i<n; i++) {
+    if (checks[i].checked) {
+      var existing = jQuery(field).val();
+      if (existing == "") {
+        jQuery(field).val(checks[i].name);
+      }
+      else {
+        jQuery(field).val(existing + "," + checks[i].name);
+      }
+    }
+  }
+};
+
+function dismissDialog() {
+  jQuery("#item_list_error").text("");
+  jQuery("#item_list_name").val("");
+  jQuery("#new_item_list_dialog").dialog('close');
+};
+
+function showNewItemListDialog()
+{
+  var dialogTarget = jQuery("#new_item_list_dialog");
+  dialogTarget.dialog({
+bgiframe: true,
+autoOpen: false,
+height: 250,
+width: 400,
+resizable: false,
+closeOnEscape: false,
+modal: true,
+open: function(event, ui) {
+jQuery(".ui-dialog-titlebar-close", ui.dialog).hide();
+},
+close: function() {
+jQuery("#create_list_drop_down").show();
+jQuery("#document_ids").val("");
+}
+});
+dialogTarget.dialog('open');
+};
+
+jQuery("#create_item_list").click( function() {
+    generateDocumentIds("#sel_document_ids");
+    jQuery("#all_items").val("false");
+    jQuery("#create_list_drop_down").toggleClass("hovering");
+    <%# showNewItemListDialog(); %>
+    });
+
+jQuery("#create_all_item_list").click( function() {
+    jQuery("#all_items").val("true");
+    jQuery("#create_list_all_drop_down").toggleClass("hovering");
+    <%# showNewItemListDialog(); %>
+    });
+
+jQuery("A[href='#add_to_existing_item_list']").click( function() {
     generateDocumentIds("#document_ids");
     itemListId=$(this).attr('id');
     jQuery("#itemListId").val(itemListId);
     jQuery("#add_all_items").val("false");
     jQuery("#add_to_item_list").submit();
-  });
+    });
 
-  jQuery("A[href='#add_all_to_existing_item_list']").click( function() {
+jQuery("A[href='#add_all_to_existing_item_list']").click( function() {
     itemListId=$(this).attr('id');
     jQuery("#itemListId").val(itemListId);
     jQuery("#add_all_items").val("true");
     jQuery("#add_to_item_list").submit();
-  });
+    });
 
-</script>
+  </script>
