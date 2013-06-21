@@ -42,6 +42,7 @@ HcsvlabWeb::Application.routes.draw do
       member do
         post 'clear'
         post 'destroy'
+        post 'concordance_search'
       end
   end
 

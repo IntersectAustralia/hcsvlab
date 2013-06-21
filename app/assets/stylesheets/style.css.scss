@@ -492,6 +492,35 @@ background-color: #FFD875;
   // padding: 5px 0;
 }
 
+// Concordance search view
+.itemsFound {
+
+}
+
+.highlightings .documentTitle {
+  background-color: lightsteelblue;
+  margin-top:10px;
+}
+.highlightings .concordanceTable {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.highlightings .concordanceTable .highlighting {
+  color: red;
+}
+
+.highlightings .concordanceTable .leftColumn {
+  text-align:right;
+}
+
+.highlightings .concordanceTable .rightColumn {
+}
+
+.centerColumn {
+  padding:5px;
+}
+
 
 @media only screen and (max-width : 1200px) {
 #searchbar input { width: 140px; }

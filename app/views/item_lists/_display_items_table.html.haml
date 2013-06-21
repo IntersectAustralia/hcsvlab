@@ -9,6 +9,7 @@
           %li
             = link_to("Clear Item List", {:controller => "item_lists", :action => "clear"}, :method => 'POST', :id => params[:id].to_i)
             = link_to("Use Item List in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
+            =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
       - if (@document_list.empty?)
         .alert.alert-info Item List is empty
       - else

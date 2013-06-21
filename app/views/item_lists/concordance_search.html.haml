@@ -1,0 +1,20 @@
+= render 'display_item_lists'
+.span9
+  - if (!params[:id].nil?)
+    = render 'search_form'
+  - if (!@highlighting.nil? and !@highlighting.empty?)
+    .itemsFound
+      ="Found #{@document_list.size} matching documents"
+    .highlightings
+      - @highlighting.each do |key, value|
+        %div
+          %div{:class=>"documentTitle"}
+            =link_to key, solr_document_path(key)
+          %table{:class=> 'concordanceTable'}
+            - value.each do |key2, value2|
+              - value2.each do |hl|
+                %tr
+                  = hl.html_safe
+  - else
+    .alert.alert-info No documents matches with your search
+= render 'shared/nectar_attribution'

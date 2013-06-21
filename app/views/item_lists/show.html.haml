@@ -1,5 +1,8 @@
 = render 'display_item_lists'
-= render 'display_items_table'
+.span9
+  - if (!params[:id].nil?)
+    = render 'search_form'
+  = render 'display_items_table'
 = render 'shared/nectar_attribution'
 
 
