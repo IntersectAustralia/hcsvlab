@@ -1,21 +1,21 @@
-<% #Using the Bootstrap Pagination class  -%>
+<% #Using the Bootstrap Pagination class    -%>
 <% if params[:il].nil? %>
-	<% if @previous_document || @next_document %>
-	  <div class="well clearfix" id="previousNextDocument">
-	    <div class="pull-left">
-	      <%= link_back_to_catalog %>
-	    </div>
-	    <%= link_to_previous_document @previous_document %> |
-	
-	    <%= item_page_entry_info %> |
-	
-	    <%= link_to_next_document @next_document %>
-	
-	    <div class="pull-right">
-	      <%=link_to "#{t('blacklight.search.start_over')}", catalog_index_path, :id=>"startOverLink", :class => "btn"%>
-	    </div>
-	  </div>
-	<% end %>
+  <% if @previous_document || @next_document %>
+    <div class="well clearfix" id="previousNextDocument">
+      <div class="pull-left">
+        <%= link_back_to_catalog %>
+      </div>
+      <%= link_to_previous_document @previous_document %> |
+
+      <%= item_page_entry_info %> |
+
+      <%= link_to_next_document @next_document %>
+
+      <div class="pull-right">
+        <%= link_to "#{t('blacklight.search.start_over')}", catalog_index_path, :id => "startOverLink", :class => "btn" %>
+      </div>
+    </div>
+  <% end %>
 <% else %>
-	<%= link_to "Back to Item List", item_list_path(params[:il]), :class => "btn" %>
+  <%= link_to "Back to Item List", item_list_path(params[:il]), :class => "btn" %>
 <% end %>

@@ -1,62 +1,48 @@
-     
-      <% # header bar for doc items in index view -%>
-      <tr class="documentHeadersdf clearfixsdf">
-        
-        <% # main title container for doc partial view -%>
-        <% if (extraRenderParams[:showCheckbox].nil? || extraRenderParams[:showCheckbox] == true) %>
-          <td class="checkbox_field">
-            <input type="checkbox" class="toggle_item_list" name="<%= document.id %>"/>
-          </td>
-        <% end %>
-            <%# <td class="count_field"> %>
-            <%# 	<%= t('blacklight.search.documents.counter', :counter => (document_counter + 1 + @response.params[:start].to_i)) %1> %>
-            <%# </td> %>
-            <td class="main_link_field">
-                <%= f1 = MetadataHelper::short_form(MetadataHelper::IS_PART_OF)
-                    f2 = MetadataHelper::short_form(MetadataHelper::IDENTIFIER) + "_tesim"
-                    if document.has_key?(f1)
-                        l1 = document[f1].join(', ')
-                    else
-                        l1 = ""
-                    end
-                    if document.has_key?(f2)
-                        l2 = document[f2].join(', ')
-                    else
-                        l2 = ""
-                    end
-                    l1 + ":" + l2
-                    link_literal_to_document document, l1 + ":" + l2, {:counter => (document_counter + 1 + @response.params[:start].to_i), :itemViewList => extraRenderParams[:itemViewList]}
-                %>
-            </td>
-            <td class="title_link_field">
-                <%= field = MetadataHelper::short_form(MetadataHelper::TITLE) + "_tesim"
-                    if document.has_key?(field)
-                        format_value(document[field])
-                        #link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
-                    else
-                        ""
-                    end
-                %>
-            </td>
-            <td class="created_link_field">
-                <%= field = MetadataHelper::short_form(MetadataHelper::CREATED) + "_tesim"
-                    if document.has_key?(field)
-                        format_value(document[field])
-                        #link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
-                    else
-                        ""
-                    end
-                %>
-            </td>
-            <td class="type_link_field">
-                <%= field = MetadataHelper::short_form(MetadataHelper::TYPE)
-                    if document.has_key?(field)
-                         format_duplicates(document[field])
-                        #link_literal_to_document document, format_duplicates(document[field]), :counter => (document_counter + 1 + @response.params[:start].to_i)
-                    else
-                        ""
-                    end
-                %>
-            </td>
-      </tr> 
+<% # header bar for doc items in index view   -%>
+<tr class="documentHeadersdf clearfixsdf">
+
+  <% # main title container for doc partial view   -%>
+  <% if (extraRenderParams[:showCheckbox].nil? || extraRenderParams[:showCheckbox] == true) %>
+    <td class="checkbox_field">
+      <input type="checkbox" class="toggle_item_list" name="<%= document.id %>"/>
+    </td>
+  <% end %>
+  <%# <td class="count_field"> %>
+  <%# 	<%= t('blacklight.search.documents.counter', :counter => (document_counter + 1 + @response.params[:start].to_i)) %1> %>
+  <%# </td> %>
+  <td class="main_link_field">
+    <%= link_literal_to_document document, main_link_label(document), {:counter => (document_counter + 1 + @response.params[:start].to_i), :itemViewList => extraRenderParams[:itemViewList]}
+    %>
+  </td>
+  <td class="title_link_field">
+    <%= field = MetadataHelper::short_form(MetadataHelper::TITLE) + "_tesim"
+        if document.has_key?(field)
+          format_value(document[field])
+          #link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+        else
+          ""
+        end
+    %>
+  </td>
+  <td class="created_link_field">
+    <%= field = MetadataHelper::short_form(MetadataHelper::CREATED) + "_tesim"
+        if document.has_key?(field)
+          format_value(document[field])
+          #link_to_document document, :label=>field.to_sym, :counter => (document_counter + 1 + @response.params[:start].to_i)
+        else
+          ""
+        end
+    %>
+  </td>
+  <td class="type_link_field">
+    <%= field = MetadataHelper::short_form(MetadataHelper::TYPE)
+        if document.has_key?(field)
+          format_duplicates(document[field])
+          #link_literal_to_document document, format_duplicates(document[field]), :counter => (document_counter + 1 + @response.params[:start].to_i)
+        else
+          ""
+        end
+    %>
+  </td>
+</tr>
       

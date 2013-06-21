@@ -2,7 +2,6 @@
 require 'blacklight/catalog'
 
 class CatalogController < ApplicationController
-
   # Set catalog tab as current selected
   set_tab :catalog
 
@@ -240,6 +239,21 @@ class CatalogController < ApplicationController
     config.spell_max = 5
   end
 
-
+  # override default show method to allow for json response
+  def show
+    @response, @document = get_solr_response_for_doc_id    
+    respond_to do |format|
+      format.html {setup_next_and_previous_documents}
+      format.json {}
+      # Add all dynamically added (such as by document extensions)
+      # export formats.
+      @document.export_formats.each_key do | format_name |
+        # It's important that the argument to send be a symbol;
+        # if it's a string, it makes Rails unhappy for unclear reasons. 
+        format.send(format_name.to_sym) { render :text => @document.export_as(format_name), :layout => false }
+      end
+      
+    end
+  end
 
 end 

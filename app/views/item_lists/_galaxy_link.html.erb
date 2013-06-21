@@ -1,7 +1,7 @@
-<form id="galaxy_list" class="pull-right" style="display:none;" method="post" action="<%= Rails.application.config.galaxy_url %>" >
-	<input class='btn' type="hidden" value="hcsvlab_importer" name="tool_id"/>
-	<input class='btn' type="hidden" value="<%= ItemList.find(params[:id]).get_galaxy_list %>" name="url_paste" />
-	<input class='btn' type="hidden" value="HCSVLAB data" name="job_name" />
-	<input class='btn' type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL" />
-	<input class='btn' type="submit" value="<%= title %>" />
+<form id="galaxy_list" class="pull-right" style="display:none;" method="post" action="<%= Rails.application.config.galaxy_url %>">
+  <input class='btn' type="hidden" value="hcsvlab_importer" name="tool_id"/>
+  <input class='btn' type="hidden" value="<%= ItemList.find(params[:id]).get_galaxy_list %>" name="url_paste"/>
+  <input class='btn' type="hidden" value="HCSVLAB data" name="job_name"/>
+  <input class='btn' type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL"/>
+  <input class='btn' type="submit" value="<%= title %>"/>
 </form>

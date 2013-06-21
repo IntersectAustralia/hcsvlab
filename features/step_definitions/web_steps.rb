@@ -299,5 +299,5 @@ When /^I click "([^"]*)"$/ do |text|
 end
 
 When /^I hover over "([^"]*)"$/ do |text|
-  find(:xpath, "//*[contains(text(),'#{text}')]").hover
+  find(:xpath, "//a[contains(text(),'#{text}')]").hover
 end

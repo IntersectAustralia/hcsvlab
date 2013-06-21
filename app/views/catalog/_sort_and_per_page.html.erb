@@ -3,7 +3,7 @@
   <div class="css-dropdown pull-left">
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Add Selected to list <span class="caret"></span></a>
     <ul id="create_list_drop_down" class="dropdown-menu">
-      <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
+      <% current_user.item_lists.each {|aItemList|  %>
         <li><a href="#add_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
       <%}%>
       <li><a id="create_item_list" class="testclass" href="#new-item-list" role="button" data-toggle="modal">Create New List</a></li>
@@ -13,7 +13,7 @@
   <div class="css-dropdown pull-left">
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">Add All to list <span class="caret"></span></a>
     <ul id="create_list_all_drop_down" class="dropdown-menu">
-      <% ItemList.where(:user_id => current_user.id).each {|aItemList|  %>
+      <% current_user.item_lists.each {|aItemList|  %>
         <li><a href="#add_all_to_existing_item_list" id="<%=aItemList.id%>"> <%= aItemList.name %> </a></li>
       <%}%>
       <li><a id="create_all_item_list" href="#new-item-list" role="button" data-toggle="modal">Create new...</a></li>
@@ -31,7 +31,7 @@
 
 
 <div id="new-item-list" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <%= form_for(ItemList.new, :url => { :controller => "item_lists", :action => "create" })  do |f| %>
+  <%= form_for(ItemList.new)  do |f| %>
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
       <h3 id="myModalLabel">Create New Item List</h3>
@@ -60,9 +60,9 @@
 
 
 
-<%= form_tag({:controller => "item_lists", :action => "add_to_item_list"}, :id => "add_to_item_list")  do %>
+<%= form_tag({:controller => "item_lists", :action => "add_items"}, :id => "add_to_item_list")  do %>
   <%= hidden_field_tag :document_ids %>
-  <%= hidden_field_tag :itemListId %>
+  <%= hidden_field_tag :id, "", {id: "item_list_id"} %>
   <%= hidden_field_tag :add_all_items %>
   <%= hidden_field_tag "query_params", @response[:responseHeader][:params].inspect %>
 <% end %>
@@ -120,14 +120,14 @@ function dismissDialog() {
 jQuery("A[href='#add_to_existing_item_list']").click( function() {
     generateDocumentIds("#document_ids");
     itemListId=$(this).attr('id');
-    jQuery("#itemListId").val(itemListId);
+    jQuery("#item_list_id").val(itemListId);
     jQuery("#add_all_items").val("false");
     jQuery("#add_to_item_list").submit();
     });
 
 jQuery("A[href='#add_all_to_existing_item_list']").click( function() {
     itemListId=$(this).attr('id');
-    jQuery("#itemListId").val(itemListId);
+    jQuery("#item_list_id").val(itemListId);
     jQuery("#add_all_items").val("true");
     jQuery("#add_to_item_list").submit();
     });

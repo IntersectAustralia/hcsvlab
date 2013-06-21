@@ -100,13 +100,39 @@ class ItemList < ActiveRecord::Base
   end
 
   #
+  # Get the list of Item catalog urls which this ItemList contains.
+  # Return an array of Strings.
+  #
+  def get_item_urls(options = {})
+    get_solr_connection
+
+    # The query is: give me items which have my item_list.id in their item_lists field
+    params = {:start=>0, :q=>"item_lists:#{RSolr.escape(id.to_s)}", :fl=>"id"}
+    max_rows = 100
+
+    # First stab at the query
+    params[:rows] = max_rows
+    response = @@solr.get('select', params: params)
+
+    # If there are more rows in Solr than we asked for, increase the number we're
+    # asking for and ask for them all this time. Sadly, there doesn't appear to be
+    # a "give me everything" value for the rows parameter.
+    if response["response"]["numFound"] > max_rows
+        params[:rows] = response["response"]["numFound"]
+        response = @@solr.get('select', params: params)
+    end
+
+    # Now extract the ids from the response
+    return response["response"]["docs"].map { |thingy| thingy["id"] }.sort
+  end
+
+  #
   # Query Solr for all the Solr Documents describing the constituent
   # Items of this ItemList.
   # Return the response we get from Solr.
   #
   def get_items(start, rows = 20)
     get_solr_connection
-
 
     if start.nil?
       startValue = 0

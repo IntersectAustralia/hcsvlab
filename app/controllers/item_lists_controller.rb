@@ -4,8 +4,8 @@ require 'blacklight/catalog'
 class ItemListsController < ApplicationController
   FIXNUM_MAX = 2147483647
 
-
   before_filter :authenticate_user!
+  load_and_authorize_resource
 
   # Set itemList tab as current selected
   set_tab :itemList
@@ -13,69 +13,58 @@ class ItemListsController < ApplicationController
   include Blacklight::Catalog
 
   def index
-    retrieve_item_list_for_logged_user
-
-    #@response = ItemList.new.get_items
-    #@document_list = @response["response"]["docs"]
   end
 
   def show
-    itemList = ItemList.find_by_id!(params[:id])
-
-    @response = itemList.get_items(params[:page])
+    @response = @item_list.get_items(params[:page])
     @document_list = @response["response"]["docs"]
-
-    render index
+    respond_to do |format|
+      format.json
+      format.html { render :index }
+    end
+    
   end
   
   def create
-    @itemList = ItemList.new(:name => params[:item_list][:name].strip, :user_id => current_user.id)
     if params[:all_items] == 'true'
-      @documents = @itemList.getAllItemsFromSearch(params[:query_all_params])
+      documents = @item_list.getAllItemsFromSearch(params[:query_all_params])
     else
-      @documents = params[:sel_document_ids].split(",")
+      documents = params[:sel_document_ids].split(",")
     end
-    if @itemList.save
+    if @item_list.save
       flash[:notice] = 'Item list created successfully'
-
-      add_item_to_item_list(@itemList, @documents)
-
-      redirect_to item_list_path(@itemList)
+      add_item_to_item_list(@item_list, documents)
+      redirect_to @item_list
     end
   end
 
-  def add_to_item_list
-    itemList = ItemList.find_by_id(params[:itemListId])
+  def add_items
     if params[:add_all_items] == "true"
-      documents = itemList.getAllItemsFromSearch(params[:query_params])
+      documents = @item_list.getAllItemsFromSearch(params[:query_params])
     else
       documents = params[:document_ids].split(",")
     end
 
-    added_set = add_item_to_item_list(itemList, documents)
-    flash[:notice] = "#{added_set.size} Item#{added_set.size==1? '': 's'} added to item list #{itemList.name}"
-    redirect_to item_list_path(itemList)
+    added_set = add_item_to_item_list(@item_list, documents)
+    flash[:notice] = "#{view_context.pluralize(added_set.size, "")} added to item list #{@item_list.name}"
+    redirect_to @item_list
   end
 
   def clear
-    itemList = ItemList.find_by_id!(params[:id])
-    removed_set = itemList.clear
-    flash[:notice] = "#{removed_set.size} Item#{removed_set.size==1? '': 's'} cleared from item list #{itemList.name}"
-    redirect_to item_list_path(itemList)
+    removed_set = @item_list.clear
+    flash[:notice] = "#{view_context.pluralize(removed_set.size, "")} cleared from item list #{@item_list.name}"
+    redirect_to @item_list
   end
 
   def destroy
-    itemList = ItemList.find_by_id!(params[:id])
-    name = itemList.name
-    itemList.clear
-    itemList.delete
+    name = @item_list.name
+    @item_list.clear
+    @item_list.delete
     flash[:notice] = "Item list #{name} deleted successfully"
     redirect_to item_lists_path
   end
 
   def concordance_search
-    retrieve_item_list_for_logged_user
-
     if params[:search_for].split.size > 1
       flash[:notice] = "Concordance search allows only one word for searching"
       return
@@ -189,16 +178,8 @@ class ItemListsController < ApplicationController
   end
 =end
 
-  def retrieve_item_list_for_logged_user
-    @userItemLists = ItemList.where(:user_id => current_user.id)
-
-    @userItemLists = [] if @userItemLists.nil?
-  end
-
-  def add_item_to_item_list(itemList, documents_ids)
-    if (!itemList.nil?)
-      itemList.add_items(documents_ids)
-    end
+  def add_item_to_item_list(item_list, documents_ids)
+    item_list.add_items(documents_ids) unless item_list.nil?
   end
 
 end

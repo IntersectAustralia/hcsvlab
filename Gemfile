@@ -104,3 +104,7 @@ gem 'mimemagic'
 # gem for showing tabs on pages
 gem "tabs_on_rails"
 gem 'colorize'
+
+# ruby json builder
+gem 'rabl-rails'
+

@@ -1,27 +1,27 @@
-    <ul class="bookmarkTools well">
-      <%# <li class="cite"> %>
-      <%#   <%= link_to t('blacklight.tools.cite'), citation_catalog_path(:sort=>params[:sort], :per_page=>params[:per_page], :id => @bookmarks.collect{|doc| doc.document_id}), {:id => 'citeLink', :name => 'citation', :class => 'lightboxLink btn'} %1> %>
-      <%# </li> %>
-      <%# <li class="refworks"> %>
-      <%#   <%= render :partial => 'catalog/refworks_form', :locals => {:documents=>@bookmarks} %1> %>
-      <%# </li> %>
+<ul class="bookmarkTools well">
+  <%# <li class="cite"> %>
+  <%#   <%= link_to t('blacklight.tools.cite'), citation_catalog_path(:sort=>params[:sort], :per_page=>params[:per_page], :id => @bookmarks.collect{|doc| doc.document_id}), {:id => 'citeLink', :name => 'citation', :class => 'lightboxLink btn'} %1> %>
+  <%# </li> %>
+  <%# <li class="refworks"> %>
+  <%#   <%= render :partial => 'catalog/refworks_form', :locals => {:documents=>@bookmarks} %1> %>
+  <%# </li> %>
 
-      <%# <li class="endnote"> %>
-      <%#   <%= link_to t('blacklight.tools.endnote'), endnote_catalog_path(:sort=>params[:sort], :per_page=>params[:per_page], :id => @bookmarks.collect {|doc| doc.document_id}, :format => 'endnote'), {:class => 'btn'}%>
-      <%# </li> %>
-      <%# <li class="email"> %>
-      <%#   <%= link_to t('blacklight.tools.email'), email_catalog_path(:sort=>params[:sort], :per_page=>params[:per_page], :id => @bookmarks.collect {|doc| doc.document_id}), :class=>"lightboxLink btn", :id => "emailLink" %1> %>
-      <%# </li> %>
-      <li>
-        <%= link_to t('blacklight.bookmarks.clear.action_title'), clear_bookmarks_path, :method => :delete, :data => { :confirm => t('blacklight.bookmarks.clear.action_confirm') }, :class => 'btn' %>
-      </li>
-      <li>
-	      <form method="post" action="<%= Rails.application.config.galaxy_url %>" >
-		  	<input type="hidden" value="hcsvlab_importer" name="tool_id"/>
-		  	<input type="hidden" value="<%= get_galaxy_bookmark_list %>" name="url_paste" />
-		  	<input type="hidden" value="HCSVLAB data" name="job_name" />
-		  	<input type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL" />
-		  	<input type="submit" value="Analyse All Bookmarked Items in Galaxy" class="btn" />
-		  </form>
-	  </li>
+  <%# <li class="endnote"> %>
+  <%#   <%= link_to t('blacklight.tools.endnote'), endnote_catalog_path(:sort=>params[:sort], :per_page=>params[:per_page], :id => @bookmarks.collect {|doc| doc.document_id}, :format => 'endnote'), {:class => 'btn'}%>
+  <%# </li> %>
+  <%# <li class="email"> %>
+  <%#   <%= link_to t('blacklight.tools.email'), email_catalog_path(:sort=>params[:sort], :per_page=>params[:per_page], :id => @bookmarks.collect {|doc| doc.document_id}), :class=>"lightboxLink btn", :id => "emailLink" %1> %>
+  <%# </li> %>
+  <li>
+    <%= link_to t('blacklight.bookmarks.clear.action_title'), clear_bookmarks_path, :method => :delete, :data => {:confirm => t('blacklight.bookmarks.clear.action_confirm')}, :class => 'btn' %>
+  </li>
+  <li>
+    <form method="post" action="<%= Rails.application.config.galaxy_url %>">
+      <input type="hidden" value="hcsvlab_importer" name="tool_id"/>
+      <input type="hidden" value="<%= get_galaxy_bookmark_list %>" name="url_paste"/>
+      <input type="hidden" value="HCSVLAB data" name="job_name"/>
+      <input type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL"/>
+      <input type="submit" value="Analyse All Bookmarked Items in Galaxy" class="btn"/>
+    </form>
+  </li>
 </ul>

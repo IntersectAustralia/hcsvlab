@@ -1,8 +1,7 @@
 <div id="content" class="span9 show-document">
 
-      <%= render_document_heading(:h1).html_safe %>
+  <%= render_document_heading(:h1).html_safe %>
   <%= render 'previous_next_doc' %>
-
 
   <% @page_title = t('blacklight.search.show.title', :document_title => document_show_html_title, :application_name => application_name) %>
   <% extra_head_content << render_link_rel_alternates %>
@@ -11,19 +10,14 @@
   <%# this should be in a partial -%>
   <div id="document" class="<%= render_document_class %>">
     <div id="doc_<%= @document.id.to_s.parameterize %>">
-
-
       <% # bookmark/folder functions -%>
 
       <div class="document">
         <%= render_document_partial @document, :show %>
       </div>
 
-
     </div>
   </div>
-
-
 
   <% if @document.respond_to?(:export_as_openurl_ctx_kev) %>
     <!-- 

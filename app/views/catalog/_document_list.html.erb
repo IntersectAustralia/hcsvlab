@@ -1,10 +1,12 @@
-<% # container for all documents in index view -%>
+<% # container for all documents in index view   -%>
 <div id="documents">
   <table class="table table-condensed">
     <head>
       <tr>
         <% if (extraRenderParams[:showCheckbox].nil? || extraRenderParams[:showCheckbox] == true) %>
-          <th class="checkbox_header"><label for="allnonecheckbox"><span class="btn"><input id="allnonecheckbox" type="checkbox" onClick="toggleItemList(this)"/></span></label></th>
+          <th class="checkbox_header">
+            <label for="allnonecheckbox"><span class="btn"><input id="allnonecheckbox" type="checkbox" onClick="toggleItemList(this)"/></span></label>
+          </th>
         <% end %>
         <th class="main_header">Identifier</th>
         <th class="title_header">Title</th>
@@ -13,7 +15,7 @@
       </tr>
     </head>
     <body>
-      <%= render :partial => "catalog/document", :collection => documents, :as => :document, :locals => { :extraRenderParams => extraRenderParams } %>
+    <%= render :partial => "catalog/document", :collection => documents, :as => :document, :locals => {:extraRenderParams => extraRenderParams} %>
     </body>
-</table>
+  </table>
 </div>

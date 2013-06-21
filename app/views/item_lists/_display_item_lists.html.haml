@@ -1,6 +1,7 @@
 .span3{:id=>"sidebar"}
   .facets.sidenav{:id => "facets"}
     %h4 Item List
+    - @userItemLists = current_user.item_lists
     - if (@userItemLists.empty?)
       %div
         %h5{} Empty
@@ -15,5 +16,5 @@
                   %div{:style=>"display:inline-block;width:90%;"}
                     =itemList.name
               %div{:style=>"display:inline-block;"}
-                =link_to({:controller => "item_lists", :action => "destroy", :id => itemList.id}, :method => 'POST', :confirm => 'Are you sure you want to remove the Item List "' + itemList.name + '"?') do
+                =link_to(itemList, :method => :delete, :confirm => 'Are you sure you want to remove the Item List "' + itemList.name + '"?') do
                   %i{:class=>"icon-trash"}

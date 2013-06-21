@@ -225,6 +225,22 @@ module Blacklight::BlacklightHelperBehavior
     end
   end
 
+  def main_link_label(document)
+    f1 = MetadataHelper::short_form(MetadataHelper::IS_PART_OF)
+    f2 = MetadataHelper::short_form(MetadataHelper::IDENTIFIER) + "_tesim"
+    if document.has_key?(f1)
+      l1 = document[f1].join(', ')
+    else
+      l1 = ""
+    end
+    if document.has_key?(f2)
+      l2 = document[f2].join(', ')
+    else
+      l2 = ""
+    end
+    l1 + ":" + l2
+  end
+
   ##
   # Render the document "heading" (title) in a content tag
   # @overload render_document_heading(tag)
@@ -535,6 +551,23 @@ module Blacklight::BlacklightHelperBehavior
     link_to opts[:label], link_url, :class => "btn"
   end
 
+  def get_type_format(document, is_cooee)
+    type = nil
+    if is_cooee
+      if document.has_key?(MetadataHelper::TYPE.to_s + "_tesim")
+        document[MetadataHelper::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" } 
+      end
+      if type.nil?
+        type_format = '%s'
+      else
+        type_format = type + ' (%s)'
+      end
+    else
+      type_format = '%s'
+    end
+    type_format
+  end
+
   def params_for_search(options={})
     # special keys
     # params hash to mutate
@@ -703,7 +736,7 @@ module Blacklight::BlacklightHelperBehavior
  
       # Look for references to Documents within the metadata and
       # find their fields as specified in uris.
-      query = RDF::Query.new({item => {MetadataHelper::DOCUMENT => :document}})
+      query = RDF::Query.new({:item => {MetadataHelper::DOCUMENT => :document}})
       document_results = query.execute(graph)
 
       document_results.each { |result|

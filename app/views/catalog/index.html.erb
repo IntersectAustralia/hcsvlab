@@ -1,44 +1,44 @@
 <% if !user_signed_in? %>
   <%= simple_form_for("user", :url => user_session_path) do |f| %>
-    <%= render(:partial => 'devise/sessions/form', :locals => { :f => f }) %>
+    <%= render(:partial => 'devise/sessions/form', :locals => {:f => f}) %>
   <% end %>
 
 <% else %>
 
   <div id="sidebar" class="span3">
-   <%= render :partial=>'facets' %>
+    <%= render :partial => 'facets' %>
   </div><!--/well -->
 
   <div id="content" class="span9">
 
-      <% unless has_search_parameters? %>
-        <%# if there are no input/search related params, display the "home" partial -%>
-        <%= render 'home' %>
-      <% else %>
+    <% unless has_search_parameters? %>
+      <%# if there are no input/search related params, display the "home" partial -%>
+      <%= render 'home' %>
+    <% else %>
 
-        <h3 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h3>
+      <h3 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h3>
 
-        <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
-
-
-        <% extra_head_content << render_opensearch_response_metadata.html_safe %>
-
-        <%= render :partial => 'did_you_mean' %>
-
-        <%= render :partial => 'constraints' %>
-
-        <%= render 'sort_and_per_page' %>
-
-        <h2 class="hide-text"><%= t('blacklight.search.search_results') %></h2>
-        <%= render_document_index %>
+      <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
 
 
-        <%= render 'results_pagination' %>
+      <% extra_head_content << render_opensearch_response_metadata.html_safe %>
+
+      <%= render :partial => 'did_you_mean' %>
+
+      <%= render :partial => 'constraints' %>
+
+      <%= render 'sort_and_per_page' %>
+
+      <h2 class="hide-text"><%= t('blacklight.search.search_results') %></h2>
+      <%= render_document_index %>
 
 
-      <% end %>
+      <%= render 'results_pagination' %>
+
+
+    <% end %>
 
   </div>
 <% end %>
 
-<%=  render 'shared/nectar_attribution' %>
+<%= render 'shared/nectar_attribution' %>
