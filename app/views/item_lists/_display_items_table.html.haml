@@ -1,19 +1,21 @@
 -if !@response.nil?
-  .span8{:id=>"content"}
-    .buttons
-      .btn-group
+  #content.span8
+    .well.clearfix
+      .btn-group.pull-left
         %a{:class=>"btn dropdown-toggle", :'data-toggle'=>"dropdown", :href=>"#"}
-          Item List Actions
-          %span{:class=>"caret"}
-        %ul{:class=>"dropdown-menu"}
+          List Actions
+          %span.caret
+        %ul.dropdown-menu
           %li
             = link_to("Clear Item List", {:controller => "item_lists", :action => "clear"}, :method => 'POST', :id => params[:id].to_i)
             = link_to("Use Item List in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
       - if (@document_list.empty?)
-        .alert.alert-info Item List is empty
       - else
-        = render 'galaxy_link', :title => "Use Item List in Galaxy "
         = render 'catalog/paginate_compact'
-        = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => params[:id]}
-        = render 'results_pagination'
+    - if (@document_list.empty?)
+      .alert.alert-info Item List is empty
+    - else
+      = render 'galaxy_link', :title => "Use Item List in Galaxy "
+      = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => params[:id]}
+      = render 'results_pagination'
