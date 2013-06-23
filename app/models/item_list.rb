@@ -175,7 +175,7 @@ class ItemList < ActiveRecord::Base
         else
             #... and if we did, update it
             update_solr_field(item_id, :item_lists, id)
-            patch_after_update(item_id)
+            #patch_after_update(item_id)
         end
     }
 
@@ -234,7 +234,7 @@ class ItemList < ActiveRecord::Base
                     update_solr_field(item_id, :item_lists, current_id, 'add')
                 }
             end
-            patch_after_update(item_id)
+            #patch_after_update(item_id)
         end
     }
 
@@ -259,6 +259,10 @@ class ItemList < ActiveRecord::Base
   # Incidentally, Solr may well throw away other indexing, too, but
   # this has not manifested (yet).
   #
+  # NOTE: This method is no longer needed since we are storing the primary text
+  # and in that way solr is not loosing the indexes
+  #
+=begin
   def patch_after_update(item_id)
     puts item_id
     item = Item.find(item_id)
@@ -266,7 +270,7 @@ class ItemList < ActiveRecord::Base
       update_solr_field(item_id, :full_text, item.primary_text.content, 'set')
     end
   end
-
+=end
 
   def update_solr_field(item_id, field_id, field_value, mode='add')
     doc1 = {:id => item_id, field_id => field_value}
