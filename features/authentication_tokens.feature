@@ -20,30 +20,18 @@ Feature: Create and manage authentication tokens
     And I should not see link "Generate Token"
     And I should see link "Regenerate Token"
 
-  @javascript
   Scenario: Regenerate a token
     Given "diego@intersect.org.au" has an api token
     And I am on the home page
-    And I click "diego@intersect.org.au"
-    And I hover over "Authorisation Token"
+    Then I should see the api token displayed for user "diego@intersect.org.au"
     And I follow "Regenerate Token"
-    Then The popup text should contain "Are you sure you want to regenerate your token? You will need to update any scripts that used the previous token."
-    When I confirm the popup
-    And I click "diego@intersect.org.au"
-    And I hover over "Authorisation Token"    
     Then I should see the api token displayed for user "diego@intersect.org.au"
 
-  @javascript
   Scenario: Delete a token
     Given "diego@intersect.org.au" has an api token
     And I am on the home page
-    And I click "diego@intersect.org.au"
-    And I hover over "Authorisation Token"
+    Then I should see the api token displayed for user "diego@intersect.org.au"
     And I follow "Delete Token"
-    Then The popup text should contain "Are you sure you want to delete your token? You will no longer be able to perform API actions."
-    When I confirm the popup
-    And I click "diego@intersect.org.au"
-    And I hover over "Authorisation Token"
     Then I should see no api token
 
   Scenario: Tokens can't be used on non-API actions
