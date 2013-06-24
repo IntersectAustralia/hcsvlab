@@ -102,18 +102,20 @@ function generateDocumentIds(field) {
   }
 };
 
-function dismissDialog() {
+function clearData() {
   jQuery("#item_list_error").text("");
   jQuery("#item_list_name").val("");
 };
 
 
   jQuery("#create_item_list").click( function() {
+  	clearData();
     generateDocumentIds("#sel_document_ids");
     jQuery("#all_items").val("false");
   });
 
   jQuery("#create_all_item_list").click( function() {
+  	clearData();
     jQuery("#all_items").val("true");
   });
 
