@@ -18,9 +18,9 @@ class CatalogController < ApplicationController
   CatalogController.solr_search_params_logic += [:exclude_unwanted_models]
 
   configure_blacklight do |config|
-    config.default_solr_params = { 
-      :qt => 'search',
-      :rows => 20 
+    config.default_solr_params = {
+        :qt => 'search',
+        :rows => 20
     }
 
     # solr field configuration for search results/index views
@@ -57,9 +57,9 @@ class CatalogController < ApplicationController
     config.add_facet_field 'AUSNC_mode', :label => 'Mode', :limit => 2000, :partial => 'catalog/sorted_facet'
     config.add_facet_field 'AUSNC_speech_style', :label => 'Speech Style', :limit => 2000, :partial => 'catalog/sorted_facet'
     config.add_facet_field 'AUSNC_interactivity', :label => 'Interactivity', :limit => 2000, :partial => 'catalog/sorted_facet'
-    config.add_facet_field 'AUSNC_communication_context', :label => 'Communication Context', :limit => 2000, :partial => 'catalog/sorted_facet' 
-    config.add_facet_field 'AUSNC_audience', :label => 'Audience', :limit => 2000, :partial => 'catalog/sorted_facet' 
-    config.add_facet_field 'OLAC_discourse_type', :label => 'Discourse Type', :limit => 2000, :partial => 'catalog/sorted_facet' 
+    config.add_facet_field 'AUSNC_communication_context', :label => 'Communication Context', :limit => 2000, :partial => 'catalog/sorted_facet'
+    config.add_facet_field 'AUSNC_audience', :label => 'Audience', :limit => 2000, :partial => 'catalog/sorted_facet'
+    config.add_facet_field 'OLAC_discourse_type', :label => 'Discourse Type', :limit => 2000, :partial => 'catalog/sorted_facet'
     config.add_facet_field 'OLAC_language', :label => 'Language (ISO 639-3 Code)', :limit => 2000, :partial => 'catalog/sorted_facet'
     config.add_facet_field 'DC_type', :label => 'Type', :limit => 2000, :partial => 'catalog/sorted_facet'
 
@@ -121,12 +121,12 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('AUSNC_itemwordcount', :stored_searchable, type: :string), :label => 'Word Count'
 
     config.add_show_field 'AUSNC_mode', :label => 'Mode:'
-    config.add_show_field 'AUSNC_speech_style', :label => 'Speech Style:' 
-    config.add_show_field 'AUSNC_interactivity', :label => 'Interactivity:' 
-    config.add_show_field 'AUSNC_communication_context', :label => 'Communication Context:' 
-    config.add_show_field solr_name('AUSNC_discourse_type', :stored_searchable), :label => 'Discourse Type:' 
-    config.add_show_field 'OLAC_discourse_type', :label => 'Discourse Type:' 
-    config.add_show_field 'OLAC_language', :label => 'Language (ISO 639-3 Code):' 
+    config.add_show_field 'AUSNC_speech_style', :label => 'Speech Style:'
+    config.add_show_field 'AUSNC_interactivity', :label => 'Interactivity:'
+    config.add_show_field 'AUSNC_communication_context', :label => 'Communication Context:'
+    config.add_show_field solr_name('AUSNC_discourse_type', :stored_searchable), :label => 'Discourse Type:'
+    config.add_show_field 'OLAC_discourse_type', :label => 'Discourse Type:'
+    config.add_show_field 'OLAC_language', :label => 'Language (ISO 639-3 Code):'
 
     config.add_show_field solr_name('ACE_genre', :stored_searchable, type: :string), :label => 'Genre:'
     config.add_show_field 'AUSNC_audience', :label => 'Audience:'
@@ -161,16 +161,16 @@ class CatalogController < ApplicationController
     # This one uses all the defaults set by the solr request handler. Which
     # solr request handler? The one set in config[:default_solr_parameters][:qt],
     # since we aren't specifying it otherwise. 
-    
-#    config.add_search_field 'all_fields', :label => 'All Fields'
+
+    #    config.add_search_field 'all_fields', :label => 'All Fields'
     config.add_search_field('all_fields', :label => 'All Fields') { |field|
 #      field.solr_parameters = { :'spellcheck.dictionary' => 'full text' }
-      field.solr_local_parameters = { 
-        :qf => '$all_fields_qf',
-        :pf => '$all_fields_pf'
+      field.solr_local_parameters = {
+          :qf => '$all_fields_qf',
+          :pf => '$all_fields_pf'
       }
     }
-    
+
 #    config.add_search_field('all_metadata', :label => 'All Metadata') { |field|
 ##      field.solr_parameters = { :'spellcheck.dictionary' => 'full text' }
 #      field.solr_local_parameters = { 
@@ -186,10 +186,10 @@ class CatalogController < ApplicationController
 #      }
 #    }
 
-    # Now we see how to over-ride Solr request handler defaults, in this
-    # case for a BL "search field", which is really a dismax aggregate
-    # of Solr search fields. 
-    
+# Now we see how to over-ride Solr request handler defaults, in this
+# case for a BL "search field", which is really a dismax aggregate
+# of Solr search fields.
+
 #    config.add_search_field('Title') do |field|
 #      # solr_parameters hash are sent to Solr as ordinary url query params. 
 #      field.solr_parameters = { :'spellcheck.dictionary' => 'title' }
@@ -203,10 +203,10 @@ class CatalogController < ApplicationController
 #        :pf => '$title_pf'
 #      }
 #    end
-    
-    # Specifying a :qt only to show it's possible, and so our internal automated
-    # tests can test it. In this case it's the same as 
-    # config[:default_solr_parameters][:qt], so isn't actually neccesary. 
+
+# Specifying a :qt only to show it's possible, and so our internal automated
+# tests can test it. In this case it's the same as
+# config[:default_solr_parameters][:qt], so isn't actually neccesary.
 #    config.add_search_field('author', :label => 'Author') do |field|
 #      # field.solr_parameters = { :'spellcheck.dictionary' => 'contributor' }
 #      field.qt = 'search'
@@ -223,37 +223,62 @@ class CatalogController < ApplicationController
 #        :pf => '$full_text_pf'
 #      }
 #    end
-    
 
-    # "sort results by" select (pulldown)
-    # label in pulldown is followed by the name of the SOLR field to sort by and
-    # whether the sort is ascending or descending (it must be asc or desc
-    # except in the relevancy case).
+
+# "sort results by" select (pulldown)
+# label in pulldown is followed by the name of the SOLR field to sort by and
+# whether the sort is ascending or descending (it must be asc or desc
+# except in the relevancy case).
 #    config.add_sort_field 'score desc, pub_date_dtsi desc, title_tesi asc', :label => 'relevance'
 #    config.add_sort_field 'http://purl.org/dc/terms/isPartOf_sim', :label => 'Corpus' 
 #    config.add_sort_field 'http://purl.org/dc/terms/title_tesim', :label => 'Title'
 #    config.add_sort_field 'http://purl.org/dc/terms/contributor', :label => 'Contributor'
 
-    # If there are more than this many search results, no spelling ("did you 
-    # mean") suggestion is offered.
+# If there are more than this many search results, no spelling ("did you
+# mean") suggestion is offered.
     config.spell_max = 5
   end
 
   # override default show method to allow for json response
   def show
-    @response, @document = get_solr_response_for_doc_id    
+    @response, @document = get_solr_response_for_doc_id
     respond_to do |format|
-      format.html {setup_next_and_previous_documents}
+      format.html { setup_next_and_previous_documents }
       format.json {}
       # Add all dynamically added (such as by document extensions)
       # export formats.
-      @document.export_formats.each_key do | format_name |
+      @document.export_formats.each_key do |format_name|
         # It's important that the argument to send be a symbol;
         # if it's a string, it makes Rails unhappy for unclear reasons. 
         format.send(format_name.to_sym) { render :text => @document.export_as(format_name), :layout => false }
       end
-      
+
     end
+  end
+
+  def primary_text
+    @response, @document = get_solr_response_for_doc_id
+    item = Item.find(@document.id)
+    send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
+  end
+  
+  include Blacklight::BlacklightHelperBehavior
+
+  def document
+    @response, @document = get_solr_response_for_doc_id
+    uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
+    # TODO: Change this to use ActiveFedora has_many once jetty is updated
+    documents = item_documents(@document, uris)
+    if documents.present?
+      is_cooee = @document[MetadataHelper::short_form(MetadataHelper::IS_PART_OF)][0] == "cooee"
+      type_format = get_type_format(@document, is_cooee)
+      documents.each do |values|
+        next unless values[MetadataHelper::IDENTIFIER].to_s.eql?(params[:filename])
+        send_file values[MetadataHelper::SOURCE]
+
+      end
+    end
+
   end
 
 end 

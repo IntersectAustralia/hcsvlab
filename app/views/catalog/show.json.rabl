@@ -38,8 +38,12 @@ node(:metadata) do
   hash
 end
 
-node(:primary_text) do
-  uri = buildURI(@document.id, 'primary_text')
+node(:primary_text_url) do
+  if Item.find(@document.id).primary_text.content.nil?
+    "No primary text found"
+  else
+    catalog_primary_text_url(@document.id)
+  end
 end
 
 node(:documents) do
@@ -53,9 +57,8 @@ node(:documents) do
     type_format = get_type_format(@document, is_cooee)
     hash = {}
     documents.each do |values|
-       #URL/Filename
       if values.has_key?(MetadataHelper::SOURCE)
-        hash[:url] = values[MetadataHelper::SOURCE].to_s
+        hash[:url] = catalog_document_url(@document.id, values[MetadataHelper::IDENTIFIER])
       else
         hash[:url] = values[MetadataHelper::IDENTIFIER]
       end
@@ -69,6 +72,7 @@ node(:documents) do
       else
         field = "unlabelled"
       end
+
       hash[:type] = sprintf(type_format, field)
 
       #Size
