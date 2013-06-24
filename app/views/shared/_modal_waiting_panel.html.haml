@@ -1,13 +1,15 @@
 .loading-div-background
-  .loading-div.ui-corner-all
-    =image_tag "loading.gif", :style=>'height:80px;margin:30px;', :alt=>'Loading..'
-    %h2{:style=>'color:gray;font-weight:normal;'}
-      Please wait....
+.loading-div.ui-corner-all
+  =image_tag "loading.gif", :style=>'margin:30px; width:30px; height:30px;', :alt=>'Loading..'
+  %h2{:style=>'color:gray;font-weight:normal;'}
+    Please wait....
 :javascript
   function showProgressAnimation() {
     $('.loading-div-background').show();
+    $('.loading-div').show();
   }
 
   function hideProgressAnimation() {
     $('.loading-div-background').hide();
+    $('.loading-div').hide();
   }
