@@ -6,8 +6,8 @@ Feature: Create and manage authentication tokens
   Background:
     Given I have the usual roles and permissions
     Given I have users
-      | email                     | first_name | last_name |
-      | diego@intersect.org.au    | Diego       | Alonso   |
+      | email                  | first_name | last_name |
+      | diego@intersect.org.au | Diego      | Alonso    |
     And "diego@intersect.org.au" has role "researcher"
     And I am logged in as "diego@intersect.org.au"
 
@@ -37,8 +37,9 @@ Feature: Create and manage authentication tokens
   Scenario: Tokens can't be used on non-API actions
     And I follow "Generate Token"
     Then I should see the api token displayed for user "diego@intersect.org.au"
-    When I make a request for the item lists page with the API token for "diego@intersect.org.au"
-    Then I should get a 401 response code
+    And I follow "Logout"
+    When I make a JSON request for the catalog page with the API token for "diego@intersect.org.au"
+    Then I should get a 406 response code
 
   Scenario: Download a token
     Given "diego@intersect.org.au" has an api token

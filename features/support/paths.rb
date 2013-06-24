@@ -36,7 +36,6 @@ module NavigationHelpers
     when /^the reset password page$/
       edit_user_password_path(options)
 
-    # Users paths
     when /the access requests page/
       access_requests_users_path(options)
 
@@ -45,6 +44,14 @@ module NavigationHelpers
 
     when /the item lists page/
       item_lists_path(options)
+
+    when /the item list page for (.*)/
+      item_list_path(ItemList.find_by_name($1),options)
+
+    when /the catalog page/
+      catalog_index_path(options)
+
+
 
 # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
