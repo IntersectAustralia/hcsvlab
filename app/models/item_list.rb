@@ -154,6 +154,8 @@ class ItemList < ActiveRecord::Base
   # Return a Set of the ids of the Items which were added.
   #
   def add_items(item_ids)
+    bench_start = Time.now
+
     adding = Set.new(item_ids.map{ |item_id| item_id.to_s })
     adding.subtract(get_item_ids)
 
@@ -179,6 +181,8 @@ class ItemList < ActiveRecord::Base
             #patch_after_update(item_id)
         end
     }
+
+    Rails.logger.debug("Time for adding #{adding.size} docs to an item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
 
     return adding
   end
