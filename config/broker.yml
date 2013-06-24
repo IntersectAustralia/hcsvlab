@@ -157,8 +157,10 @@ staging2:
     port: 61613
 
 production:
-    adapter: prod
+    adapter: stomp
     reliable: true
+    host: 127.0.0.1
+    port: 61613
     # properties below are all defaults for this adapter
     # login: ""
     # passcode: ""

@@ -131,13 +131,14 @@ class ItemList < ActiveRecord::Base
   # Items of this ItemList.
   # Return the response we get from Solr.
   #
-  def get_items(start, rows = 20)
+  def get_items(start, rows)
     get_solr_connection
 
+    rows = 20 if rows.nil?
     if start.nil?
       startValue = 0
     else
-      startValue = (start.to_i-1)*20
+      startValue = (start.to_i-1)*rows.to_i
     end
     params = {:start => startValue, :rows => rows, :q=>"item_lists:#{RSolr.escape(id.to_s)}"}
 
