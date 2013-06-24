@@ -11,6 +11,7 @@ class ItemListsController < ApplicationController
   set_tab :itemList
 
   include Blacklight::Catalog
+  include Blacklight::BlacklightHelperBehavior
 
   def index
   end
@@ -81,7 +82,7 @@ class ItemListsController < ApplicationController
   private
 
   def processAndHighlightManually(preAndPostChunkSize)
-    searchPattern = /[^\w]*#{params[:search_for]}[^\w]*/i
+    searchPattern = /(\s[^\w]*)#{params[:search_for]}([^\w]*\s)/i
 
     # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
     self.solr_search_params_logic += [:add_solr_extra_filters]
@@ -92,7 +93,10 @@ class ItemListsController < ApplicationController
     highlighting = {}
     @document_list.each do |doc|
       full_text = doc[:full_text]
-      highlighting[doc[:id]] = {:full_text => []}
+
+      highlighting[doc[:id]] = {}
+      highlighting[doc[:id]][:title] = main_link_label(doc)
+      highlighting[doc[:id]][:matches] = []
 
       # Iterate over everything that matches with the search in case-insensitive mode
       matchingData = full_text.to_enum(:scan, searchPattern).map { Regexp.last_match }
@@ -106,8 +110,13 @@ class ItemListsController < ApplicationController
         # Add come color to the martching word
         text = m.to_s.gsub(/#{params[:search_for]}/i, "<span class='highlighting'>#{params[:search_for]}</span>")
 
-        # join the processed text
-        highlighting[doc[:id]][:full_text] << "<td class='leftColumn'>" + pre + "</td><td class='centerColumn'>" + text  + "</td><td class='rightColumn'>" +  post + "</td>"
+        formattedMatch = {}
+        formattedMatch[:textBefore] = pre
+        formattedMatch[:textAfter] = post
+        formattedMatch[:textHighlighted] = text
+
+        highlighting[doc[:id]][:matches] << formattedMatch
+
       }
     end
 

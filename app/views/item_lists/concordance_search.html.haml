@@ -9,12 +9,17 @@
       - @highlighting.each do |key, value|
         %div
           %div{:class=>"documentTitle"}
-            =link_to key, solr_document_path(key)
+            =link_to value[:title], solr_document_path(key)
+            = "(Found " + pluralize(value[:matches].size, 'match') + ")"
           %table{:class=> 'concordanceTable'}
-            - value.each do |key2, value2|
-              - value2.each do |hl|
-                %tr
-                  = hl.html_safe
+            - value[:matches].each do |m|
+              %tr
+                %td{:class=>'leftColumn'}
+                  = m[:textBefore].html_safe
+                %td{:class=>'centerColumn'}
+                  = m[:textHighlighted].html_safe
+                %td{:class=>'rightColumn'}
+                  = m[:textAfter].html_safe
   - else
     .alert.alert-info No documents matches with your search
 = render 'shared/nectar_attribution'
