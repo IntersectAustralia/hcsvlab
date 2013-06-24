@@ -4,7 +4,7 @@ module Devise
   module Strategies
     class TokenAuthenticatable
       def valid?
-        super && params[:controller] == 'item_lists' && (params[:action] == 'download' || params[:action] == 'api_create' || params[:action] == 'api_search')
+        super && params[:format] == "json" &&((params[:controller] == 'item_lists' and (params[:action] == 'index' or params[:action] == 'show')) or (params[:controller] == 'catalog' and params[:action] == 'show'))
       end
     end
   end

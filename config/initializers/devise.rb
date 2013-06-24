@@ -5,20 +5,23 @@ Devise.setup do |config|
   # verifies password before checking if account is active
   Devise::Models::Authenticatable.module_eval do
     def valid_for_authentication?
-      if block_given? && yield
-        active_for_authentication? ? true : inactive_message
+      if block_given?
+        if yield
+          active_for_authentication? ? true : inactive_message
+        else
+          false
+        end
       else
-        false
+        active_for_authentication? ? true : inactive_message
       end
     end
-
   end
 
 
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class with default "from" parameter.
-  config.mailer_sender = "please-change-me-at-config-initializers-devise@example.com"
+  config.mailer_sender = APP_CONFIG['notification_email_sender']
 
   # Configure the class responsible to send e-mails.
   # config.mailer = "Devise::Mailer"
@@ -84,7 +87,7 @@ Devise.setup do |config|
   # Notice that if you are skipping storage for all authentication paths, you
   # may want to disable generating routes to Devise's sessions controller by
   # passing :skip => :sessions to `devise_for` in your config/routes.rb
-  config.skip_session_storage = [:http_auth]
+  config.skip_session_storage = [:http_auth, :token_auth]
 
   # ==> Configuration for :database_authenticatable
   # For bcrypt, this is the cost for hashing the password and defaults to 10. If
@@ -148,7 +151,7 @@ Devise.setup do |config|
   # ==> Configuration for :timeoutable
   # The time you want to timeout the user session without activity. After this
   # time the user will be asked for credentials again. Default is 30 minutes.
-  # config.timeout_in = 30.minutes
+  config.timeout_in = Rails.env.development? ? 12.hours : 30.minutes
 
   # If true, expires auth token on session timeout.
   # config.expire_auth_token_on_timeout = false
@@ -158,7 +161,7 @@ Devise.setup do |config|
   config.lock_strategy = :failed_attempts
   config.unlock_strategy = :time
   config.maximum_attempts = 3
-  config.unlock_in = 1.hour
+  config.unlock_in = Rails.env.development? ? 1.second : 1.hour
 
   # Defines which strategy will be used to lock an account.
   # :failed_attempts = Locks an account after a number of failed attempts to sign in.

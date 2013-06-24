@@ -2,6 +2,9 @@
 require 'blacklight/catalog'
 
 class ItemListsController < ApplicationController
+  include Blacklight::Catalog
+  include Blacklight::BlacklightHelperBehavior
+  
   FIXNUM_MAX = 2147483647
 
   before_filter :authenticate_user!
@@ -9,9 +12,6 @@ class ItemListsController < ApplicationController
 
   # Set itemList tab as current selected
   set_tab :itemList
-
-  include Blacklight::Catalog
-  include Blacklight::BlacklightHelperBehavior
 
   def index
   end

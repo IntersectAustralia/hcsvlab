@@ -106,5 +106,5 @@ gem "tabs_on_rails"
 gem 'colorize'
 
 # ruby json builder
-gem 'rabl-rails'
+gem 'rabl'
 
