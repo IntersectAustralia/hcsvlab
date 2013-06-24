@@ -526,6 +526,7 @@ background-color: #FFD875;
   padding:5px;
 }
 
+// Modal waiting panel
 .loading-div-background {
   display:none;
   opacity: 0.25;
@@ -535,6 +536,7 @@ background-color: #FFD875;
   background:black;
   width:100%;
   height:100%;
+  z-index:1000;
 }
 
 .loading-div {

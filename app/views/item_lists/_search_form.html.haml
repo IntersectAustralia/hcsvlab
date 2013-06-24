@@ -11,12 +11,4 @@
         = search_field_tag :search_for, value = params[:search_for]
       %div{:style=>'display:inline-block'}
         = submit_tag 'search'
-.loading-div-background
-  .loading-div.ui-corner-all
-    =image_tag "loading.gif", :style=>'height:80px;margin:30px;', :alt=>'Loading..'
-    %h2{:style=>'color:gray;font-weight:normal;'}
-      Please wait....
-:javascript
-  function showProgressAnimation() {
-    $('.loading-div-background').show();
-  }
+= render "shared/modal_waiting_panel"
