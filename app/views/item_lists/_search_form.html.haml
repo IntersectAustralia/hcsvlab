@@ -2,11 +2,11 @@
   = form_tag({:action => 'concordance_search', :id => params[:id]}, :onSubmit => "showProgressAnimation();") do
     = field_set_tag do
       = hidden_field_tag :itemListId, :value => params[:id]
-      %div{:style=>'display:inline-block'}
+      %div{:style=>'display:none'}
         =# label_tag 'Search type'
         =# select_tag :search_type, :options => ["simple", "concordance"]
         =# select(:search_type, :aa, {"simple"=>"simple", "concordance"=>"concordance"})
-      %div{:style=>'display:inline-block'}
+      .input-append
         = label_tag 'Concordance search term'
         = search_field_tag :search_for, value = params[:search_for]
       %div{:style=>'display:inline-block'}
