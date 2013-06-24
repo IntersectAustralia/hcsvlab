@@ -16,7 +16,7 @@ class ItemListsController < ApplicationController
   end
 
   def show
-    @response = @item_list.get_items(params[:page])
+    @response = @item_list.get_items(params[:page], params[:per_page])
     @document_list = @response["response"]["docs"]
     respond_to do |format|
       format.json
