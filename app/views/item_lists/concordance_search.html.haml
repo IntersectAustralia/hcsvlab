@@ -1,25 +1,26 @@
 = render 'display_item_lists'
 .span9
-  - if (!params[:id].nil?)
-    = render 'search_form'
   - if (!@highlighting.nil? and !@highlighting.empty?)
-    .itemsFound
+    %h2
       ="Found #{@document_list.size} matching documents"
-    .highlightings
+  - if (!params[:id].nil?)
+    .well= render 'search_form'
+  - if (!@highlighting.nil? and !@highlighting.empty?)
+    .document
       - @highlighting.each do |key, value|
-        %div
-          %div{:class=>"documentTitle"}
+        %h3
+          %span
             =link_to value[:title], solr_document_path(key)
             = "(Found " + pluralize(value[:matches].size, 'match') + ")"
-          %table{:class=> 'concordanceTable'}
-            - value[:matches].each do |m|
-              %tr
-                %td{:class=>'leftColumn'}
-                  = m[:textBefore].html_safe
-                %td{:class=>'centerColumn'}
-                  = m[:textHighlighted].html_safe
-                %td{:class=>'rightColumn'}
-                  = m[:textAfter].html_safe
+        %table.table.table-condensed.concordanceTable
+          - value[:matches].each do |m|
+            %tr
+              %td{:class=>'leftColumn'}
+                = m[:textBefore].html_safe
+              %td{:class=>'centerColumn'}
+                = m[:textHighlighted].html_safe
+              %td{:class=>'rightColumn'}
+                = m[:textAfter].html_safe
   - else
     .alert.alert-info No documents matches with your search
 = render 'shared/nectar_attribution'

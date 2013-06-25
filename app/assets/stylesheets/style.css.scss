@@ -1,6 +1,7 @@
 
 a { color: rgb(0, 171, 255); }
 a:hover { color: #0D6B9F; }
+a:hover i { text-decoration: none; }
 
 
 h1 { font-weight: 200; font-size: 38.5px; margin-bottom: 20px; }
@@ -44,7 +45,15 @@ h3 { font-weight: 200; font-size: 24.5px; }
 border-width: 0 0 0px;
 }
 
+.search-form { margin: 0 0 20px 0; }
+.well .search-form { margin: 0; }
+#item-list-search { width: 74px; }
+
 #sortAndPerPage form.pull-right { position: relative; margin: -5px 10px 0 0; }
+
+.input-append input, .input-append select, .input-append .uneditable-input {
+-webkit-border-radius: 3px 0 0 3px; -moz-border-radius: 3px 0 0 3px; border-radius: 3px 0 0 3px;
+}
 
 .navbar .brand {
   width: 150px;
@@ -448,6 +457,14 @@ background-color: #FFF;
 color: #333;
 }
 
+.table th, .table td {
+  padding: 8px;
+  line-height: 20px;
+  text-align: left;
+  vertical-align: top;
+  border-top: 1px dotted #DDD;
+}
+
 #url { display: inline-block; }
 
 
@@ -506,24 +523,23 @@ background-color: #FFD875;
   background-color: lightsteelblue;
   margin-top:10px;
 }
-.highlightings .concordanceTable {
-  margin-left: auto;
-  margin-right: auto;
+.concordanceTable {
+  margin: 0 0 40px 0;
 }
 
-.highlightings .concordanceTable .highlighting {
-  color: red;
+.concordanceTable .highlighting {
+  color: #f6b717;
 }
 
-.highlightings .concordanceTable .leftColumn {
+.concordanceTable .leftColumn {
   text-align:right;
 }
 
-.highlightings .concordanceTable .rightColumn {
+.concordanceTable .rightColumn {
 }
 
-.highlightings .concordanceTable .centerColumn {
-  padding:5px;
+.concordanceTable .centerColumn {
+  padding:8px;
 }
 
 // Modal waiting panel
@@ -700,6 +716,7 @@ text-shadow: 0 -1px rgba(0,0,0,0.36);
 
 @media only screen and (max-width : 1200px) {
 #searchbar input { width: 140px; }
+#item-list-search { width: 60px; }
 }
 
 
