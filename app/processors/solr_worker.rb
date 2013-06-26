@@ -289,14 +289,14 @@ private
     #end
 
     xml_update = "";
-    xml_update << "<add><doc>"
-  
+    xml_update << "<add commitWithin='10000' overwrite='false'> <doc>"
+      
     document.keys.each do | key |
     
       value = document[key]
     
       if (key.to_s == "id")
-        xml_update << "<field name='#{key.to_s}'>#{CGI.escapeHTML(value.to_s.force_encoding('UTF-8'))}</field>"
+        xml_update << "<field name='#{key.to_s}'>#{value.to_s}</field>"
       else
         if value.kind_of?(Array)
           value.each do |val| 
@@ -308,7 +308,7 @@ private
       end
     end
     
-    xml_update << "</doc></add>"
+    xml_update << "</doc> </add>"
 
     logger.debug "XML= " + xml_update
     
@@ -333,12 +333,13 @@ private
     if (object_exists_in_solr?(object))
       logger.debug "Updating " + object.to_s
       xml_update = make_solr_update(document)
-      @@solr.update :data => xml_update
+      response = @@solr.update :data => xml_update
+      logger.debug("Update response= #{response.to_s}")
     else
       logger.debug "Inserting " + object.to_s 
-      @@solr.add(document)
-    end
-    @@solr.commit
+      response = @@solr.add(document)
+      response = @@solr.commit
+    end 
   end
 
   #
