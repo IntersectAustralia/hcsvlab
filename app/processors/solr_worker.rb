@@ -296,14 +296,14 @@ private
       value = document[key]
     
       if (key.to_s == "id")
-        xml_update << "<field name='#{key.to_s}'>#{value.to_s.force_encoding('UTF-8')}</field>"
+        xml_update << "<field name='#{key.to_s}'>#{CGI.escapeHTML(value.to_s.force_encoding('UTF-8'))}</field>"
       else
         if value.kind_of?(Array)
           value.each do |val| 
-            xml_update << "<field name='#{key.to_s}' update='set'>#{val.to_s.force_encoding('UTF-8')}</field>"
+            xml_update << "<field name='#{key.to_s}' update='set'>#{CGI.escapeHTML(val.to_s.force_encoding('UTF-8'))}</field>"
           end
         else
-          xml_update << "<field name='#{key.to_s}' update='set'>#{value.to_s.force_encoding('UTF-8')}</field>"
+          xml_update << "<field name='#{key.to_s}' update='set'>#{CGI.escapeHTML(value.to_s.force_encoding('UTF-8'))}</field>"
         end
       end
     end
