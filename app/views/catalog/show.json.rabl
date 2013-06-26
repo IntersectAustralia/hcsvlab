@@ -42,7 +42,7 @@ node(:primary_text_url) do
   if Item.find(@document.id).primary_text.content.nil?
     "No primary text found"
   else
-    catalog_primary_text_url(@document.id)
+    catalog_primary_text_url(@document.id, format: :json)
   end
 end
 
