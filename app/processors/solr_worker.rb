@@ -274,12 +274,70 @@ private
   end
 
   #
+  # Make a Solr update document from information extracted from the Item
+  #
+  def make_solr_update(document)
+
+    #add_attributes = {:allowDups => false, :commitWithin => 10}
+    #
+    #xml_update = @@solr.xml.add(document, add_attributes) do | doc |
+    #  document.keys.each do | key |
+    #    if (key.to_s != 'id')
+    #      doc.field_by_name(key).attrs[:update] = 'set'
+    #    end
+    #  end
+    #end
+
+    xml_update = "";
+    xml_update << "<add><doc>"
+  
+    document.keys.each do | key |
+    
+      value = document[key]
+    
+      if (key.to_s == "id")
+        xml_update << "<field name='#{key.to_s}'>#{value.to_s.force_encoding('UTF-8')}</field>"
+      else
+        if value.kind_of?(Array)
+          value.each do |val| 
+            xml_update << "<field name='#{key.to_s}' update='set'>#{val.to_s.force_encoding('UTF-8')}</field>"
+          end
+        else
+          xml_update << "<field name='#{key.to_s}' update='set'>#{value.to_s.force_encoding('UTF-8')}</field>"
+        end
+      end
+    end
+    
+    xml_update << "</doc></add>"
+
+    logger.debug "XML= " + xml_update
+    
+    return xml_update
+
+  end
+
+  #
+  # Search for an object in Solr to see if we need to add or update
+  #
+  def object_exists_in_solr?(object)
+    response = @@solr.get 'select', :params => { :q => object }
+    (response['response']['docs'].count > 0) ? true : false
+  end
+
+  #
   # Update Solr with the information we've found
   #
   def store_results(object, results, full_text, extras = nil)
     get_solr_connection()
     document = make_solr_document(object, results, full_text, extras)
-    @@solr.add(document)
+    if (object_exists_in_solr?(object))
+      logger.debug "Updating " + object.to_s
+      xml_update = make_solr_update(document)
+      @@solr.update :data => xml_update
+    else
+      logger.debug "Inserting " + object.to_s 
+      @@solr.add(document)
+    end
     @@solr.commit
   end
 
