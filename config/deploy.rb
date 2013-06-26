@@ -349,7 +349,11 @@ namespace :deploy do
     require 'socket'
 
     url = URI.parse('http://deployment-tracker.intersect.org.au/deployments/api_create')
-    post_args = {'app_name'=>application, 'deployer_machine'=>"#{ENV['USER']}@#{Socket.gethostname}", 'environment'=>rails_env, 'server_url'=>find_servers[0].to_s, 'tag'=> branch || "HEAD"}
+    post_args = {'app_name'=>application, 
+      'deployer_machine'=>"#{ENV['USER']}@#{Socket.gethostname}", 
+      'environment'=>rails_env, 
+      'server_url'=>find_servers[0].to_s,
+      'tag'=> branch || "HEAD"}
     begin
       print "Sending Post request with args: #{post_args}\n"
       resp, data = Net::HTTP.post_form(url, post_args)
