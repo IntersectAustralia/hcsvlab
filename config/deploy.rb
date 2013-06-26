@@ -305,7 +305,11 @@ namespace :deploy do
 
   desc "Create the HCS vLab Solr core"
   task :create_solr_core, :roles => :app do
+    # Copy the jar files etc that Tomcat will need for Solr 4.3 logging
+    run "cp -rp #{current_path}/solr_conf/lib/ext/* $CATALINA_HOME/lib/", :env => {'RAILS_ENV' => stage}
+    # Copy the solr core diir
     run "cp -rp #{current_path}/solr_conf/hcsvlab $SOLR_HOME/", :env => {'RAILS_ENV' => stage}
+    # Configure solr
     run "cp -p #{current_path}/solr_conf/conf/schema.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
     run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
   end
