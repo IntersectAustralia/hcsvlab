@@ -45,27 +45,35 @@
         = link_to t('blacklight.header_links.login'), new_user_session_path
 :javascript
   $(document).ready(function () {
-    var clip = new ZeroClipboard($('#zc_copy_token'));
-    clip.on('complete', function (client, args) {
-      alert("Token copied to clipboard!");
-    });
-    clip.on('mouseout', function (client, args) {
-      $(this).removeClass("hovered");
-      $(this).closest('.dropdown-submenu').children('a').removeClass('hovered');
-    });
+    if (!$('#zc_copy_token').closest('li').hasClass('disabled')) {
+      var clip = new ZeroClipboard($('#zc_copy_token'));
+      clip.on('complete', function (client, args) {
+        alert("Token copied to clipboard!");
+      });
+      clip.on('mouseout', function (client, args) {
+        $(this).removeClass("hovered");
+        $(this).closest('.dropdown-submenu').children('a').removeClass('hovered');
+      });
+    }
   });
 
   $('#zc_copy_token').mouseover(function (e) {
-    if (!$(this).attr('disabled')) {
+
+    if (!$(this).closest('li').hasClass('disabled')) {
       $(this).addClass("hovered");
       $(this).closest('.dropdown-submenu').children('a').addClass('hovered');
       $(this).closest('.dropdown-submenu').addClass('open');
     }
+
   });
+
   $('#zc_copy_token').mouseout(function (e) {
-    $(this).addClass("hovered");
-    $(this).closest('.dropdown-submenu').children('a').addClass('hovered');
-    $(this).closest('.dropdown-submenu').addClass('open');
+    if (!$(this).closest('li').hasClass('disabled')) {
+      $(this).addClass("hovered");
+      $(this).closest('.dropdown-submenu').children('a').addClass('hovered');
+      $(this).closest('.dropdown-submenu').addClass('open');
+    }
+
   });
 
   $('.dropdown-menu li a').mouseover(function (e) {
