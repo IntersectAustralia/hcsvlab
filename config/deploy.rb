@@ -41,7 +41,7 @@ set :branch do
 
   tag = Capistrano::CLI.ui.ask "Tag to deploy (make sure to push the branch/tag first) or HEAD?: [#{default_tag}] ".colorize(:yellow)
   tag = default_tag if tag.empty?
-  tag = nil if "HEAD".eql?(tag)
+  tag = nil if tag.eql?("HEAD")
 
   tag
 end
@@ -111,6 +111,7 @@ end
 after 'deploy:update' do
   server_setup.logging.rotation
   server_setup.config.apache
+  deploy.create_deployment_record
   deploy.restart
   deploy.additional_symlinks
 
@@ -339,6 +340,27 @@ namespace :deploy do
     run "cd $ACTIVEMQ_HOME && bin/activemq stop", :env => {'RAILS_ENV' => stage}
   end
 
+  task :create_deployment_record do
+    require 'net/http'
+    require 'socket'
+
+    url = URI.parse('http://deployment-tracker.intersect.org.au/deployments/api_create')
+    post_args = {'app_name'=>application, 'deployer_machine'=>"#{ENV['USER']}@#{Socket.gethostname}", 'environment'=>rails_env, 'server_url'=>find_servers[0].to_s, 'time_deployed'=>Time.now.to_s, 'tag'=> branch || "HEAD"}
+    begin
+      print "Sending Post request with args: #{post_args}\n"
+      resp, data = Net::HTTP.post_form(url, post_args)
+
+      case resp
+      when Net::HTTPSuccess
+        puts "Deployment record saved"
+      else
+        puts data
+      end
+
+    rescue StandardError => e
+      puts e.message
+    end
+  end
 end
 
 namespace :backup do
