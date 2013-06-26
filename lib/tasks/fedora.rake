@@ -150,7 +150,7 @@ namespace :fedora do
 						if STORE_DOCUMENT_TYPES.include? result.type.to_s
 							case result.type.to_s
 							when 'Text'
-								item.primary_text.content = File.open(path)
+								item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
 							else
 								puts "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item"
 							end

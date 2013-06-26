@@ -52,15 +52,25 @@ class ItemListsController < ApplicationController
   end
 
   def clear
+    bench_start = Time.now
+
     removed_set = @item_list.clear
+
+    Rails.logger.debug("Time for clear item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+
     flash[:notice] = "#{view_context.pluralize(removed_set.size, "")} cleared from item list #{@item_list.name}"
     redirect_to @item_list
   end
 
   def destroy
+    bench_start = Time.now
+
     name = @item_list.name
     @item_list.clear
     @item_list.delete
+
+    Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+
     flash[:notice] = "Item list #{name} deleted successfully"
     redirect_to item_lists_path
   end

@@ -392,5 +392,5 @@ task :generate_database_yml, :roles => :app do
 end
 
 after 'multistage:ensure' do
-  set (:rails_env) {"#{defined?(rails_env) ? rails_env : stage.to_s}" }
+  set(:rails_env) { "#{defined?(rails_env) ? rails_env : stage.to_s}" }
 end

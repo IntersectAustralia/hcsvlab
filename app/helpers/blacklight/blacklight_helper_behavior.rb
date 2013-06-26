@@ -39,10 +39,10 @@ module Blacklight::BlacklightHelperBehavior
 
     html = ""
     document.export_formats.each_pair do |format, spec|
-      unless( options[:exclude].include?(format) ||
-             (options[:unique] && seen.include?(spec[:content_type]))
-             )
-        html << tag(:link, {:rel=>"alternate", :title=>format, :type => spec[:content_type], :href=> polymorphic_url(document, :format => format)}) << "\n"
+      unless (options[:exclude].include?(format) ||
+          (options[:unique] && seen.include?(spec[:content_type]))
+      )
+        html << tag(:link, {:rel => "alternate", :title => format, :type => spec[:content_type], :href => polymorphic_url(document, :format => format)}) << "\n"
 
         seen.add(spec[:content_type]) if options[:unique]
       end
@@ -69,7 +69,7 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   def render_search_bar
-    render :partial=>'catalog/search_form'
+    render :partial => 'catalog/search_form'
   end
 
   def search_action_url
@@ -81,7 +81,7 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   def render_document_list_partial options={}
-    render :partial=>'catalog/document_list'
+    render :partial => 'catalog/document_list'
   end
 
   # Save function area for search results 'index' view, normally
@@ -90,9 +90,9 @@ module Blacklight::BlacklightHelperBehavior
     wrapping_class = options.delete(:wrapping_class) || "documentFunctions"
 
     content = []
-    content << render(:partial => 'catalog/bookmark_control', :locals => {:document=> document}.merge(options)) if has_user_authentication_provider? and current_or_guest_user
+    content << render(:partial => 'catalog/bookmark_control', :locals => {:document => document}.merge(options)) if has_user_authentication_provider? and current_or_guest_user
 
-    content_tag("div", content.join("\n").html_safe, :class=> wrapping_class)
+    content_tag("div", content.join("\n").html_safe, :class => wrapping_class)
   end
 
   # Save function area for item detail 'show' view, normally
@@ -100,9 +100,9 @@ module Blacklight::BlacklightHelperBehavior
   def render_show_doc_actions(document=@document, options={})
     wrapping_class = options.delete(:documentFunctions) || "documentFunctions"
     content = []
-    content << render(:partial => 'catalog/bookmark_control', :locals => {:document=> document}.merge(options)) if has_user_authentication_provider? and current_or_guest_user
+    content << render(:partial => 'catalog/bookmark_control', :locals => {:document => document}.merge(options)) if has_user_authentication_provider? and current_or_guest_user
 
-    content_tag("div", content.join("\n").html_safe, :class=>"documentFunctions")
+    content_tag("div", content.join("\n").html_safe, :class => "documentFunctions")
   end
 
   ##
@@ -113,7 +113,7 @@ module Blacklight::BlacklightHelperBehavior
 
   def should_render_index_field? document, solr_field
     document.has?(solr_field.field) ||
-      (document.has_highlight_field? solr_field.field if solr_field.highlight)
+        (document.has_highlight_field? solr_field.field if solr_field.highlight)
   end
 
   ##
@@ -189,16 +189,16 @@ module Blacklight::BlacklightHelperBehavior
 
     field_config = index_fields(document)[field]
 
-    value ||= case 
-      when value
-        value
-      when (field_config and field_config.helper_method)
-        send(field_config.helper_method, options.merge(:document => document, :field => field))
-      when (field_config and field_config.highlight)
-        document.highlight_field(field_config.field).map { |x| x.html_safe }
-      else
-        document.get(field, :sep => nil) if field
-    end
+    value ||= case
+                when value
+                  value
+                when (field_config and field_config.helper_method)
+                  send(field_config.helper_method, options.merge(:document => document, :field => field))
+                when (field_config and field_config.highlight)
+                  document.highlight_field(field_config.field).map { |x| x.html_safe }
+                else
+                  document.get(field, :sep => nil) if field
+              end
 
     render_field_value value
   end
@@ -221,7 +221,7 @@ module Blacklight::BlacklightHelperBehavior
       end
       l1 + ":" + l2
     rescue
-     document[blacklight_config.show.heading] || document.id
+      document[blacklight_config.show.heading] || document.id
     end
   end
 
@@ -357,28 +357,28 @@ module Blacklight::BlacklightHelperBehavior
 
     field_config = document_show_fields(document)[field]
 
-    value ||= case 
-      when value
-        value
-      when (field_config and field_config.helper_method)
-        send(field_config.helper_method, options.merge(:document => document, :field => field))
-      when (field_config and field_config.highlight)
-        document.highlight_field(field_config.field).map { |x| x.html_safe }
-      else
-        document.get(field, :sep => nil) if field
-    end
+    value ||= case
+                when value
+                  value
+                when (field_config and field_config.helper_method)
+                  send(field_config.helper_method, options.merge(:document => document, :field => field))
+                when (field_config and field_config.highlight)
+                  document.highlight_field(field_config.field).map { |x| x.html_safe }
+                else
+                  document.get(field, :sep => nil) if field
+              end
 
     render_field_value value
   end
 
   def should_render_show_field? document, solr_field
     document.has?(solr_field.field) ||
-      (document.has_highlight_field? solr_field.field if solr_field.highlight)
+        (document.has_highlight_field? solr_field.field if solr_field.highlight)
   end
 
   def render_field_value value=nil
     value = [value] unless value.is_a? Array
-    value = value.collect { |x| x.respond_to?(:force_encoding) ? x.force_encoding("UTF-8") : x}
+    value = value.collect { |x| x.respond_to?(:force_encoding) ? x.force_encoding("UTF-8") : x }
     return value.map { |v| html_escape v }.join(field_value_separator).html_safe
   end
 
@@ -396,7 +396,7 @@ module Blacklight::BlacklightHelperBehavior
 
   def get_galaxy_bookmark_list documents = nil, locals = {}
     documents = current_user.bookmarks.collect { |b| b.document }
-    
+
     galaxy_list = ""
     documents.each_with_index do |doc, index|
       uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE]
@@ -410,7 +410,7 @@ module Blacklight::BlacklightHelperBehavior
         end
       end
     end
-    
+
     return galaxy_list
   end
 
@@ -421,7 +421,7 @@ module Blacklight::BlacklightHelperBehavior
       # XXX rather than handling this logic through exceptions, maybe there's a Rails internals method
       # for determining if a partial template exists..
       begin
-        return render(:partial => (str % { :index_view_type => document_index_view_type }), :locals => { :documents => documents, :extraRenderParams => extraRenderParams })
+        return render(:partial => (str % {:index_view_type => document_index_view_type}), :locals => {:documents => documents, :extraRenderParams => extraRenderParams})
       rescue ActionView::MissingTemplate
         nil
       end
@@ -448,7 +448,7 @@ module Blacklight::BlacklightHelperBehavior
     return 'default' unless display_type
     display_type = display_type.join(" ") if display_type.respond_to?(:join)
 
-    "#{display_type.gsub("-"," ")}".parameterize("_").to_s
+    "#{display_type.gsub("-", " ")}".parameterize("_").to_s
   end
 
   # given a doc and action_name, this method attempts to render a partial template
@@ -462,7 +462,7 @@ module Blacklight::BlacklightHelperBehavior
       # XXX rather than handling this logic through exceptions, maybe there's a Rails internals method
       # for determining if a partial template exists..
       begin
-        return render :partial => (str % { :action_name => action_name, :format => format, :index_view_type => document_index_view_type }), :locals=>locals.merge({:document=>doc})
+        return render :partial => (str % {:action_name => action_name, :format => format, :index_view_type => document_index_view_type}), :locals => locals.merge({:document => doc})
       rescue ActionView::MissingTemplate
         nil
       end
@@ -517,10 +517,10 @@ module Blacklight::BlacklightHelperBehavior
   # Use the catalog_path RESTful route to create a link to the show page for a specific item.
   # catalog_path accepts a HashWithIndifferentAccess object. The solr query params are stored in the session,
   # so we only need the +counter+ param here. We also need to know if we are viewing to document as part of search results.
-  def link_to_document(doc, opts={:label=>nil, :counter => nil, :results_view => true})
+  def link_to_document(doc, opts={:label => nil, :counter => nil, :results_view => true})
     opts[:label] ||= blacklight_config.index.show_link.to_sym
     label = render_document_index_label doc, opts
-    link_to label, doc, { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
+    link_to label, doc, {:'data-counter' => opts[:counter]}.merge(opts.reject { |k, v| [:label, :counter, :results_view].include? k })
   end
 
   # link_literal_to_document(doc, :label=>'VIEW', :counter => 3)
@@ -528,16 +528,16 @@ module Blacklight::BlacklightHelperBehavior
   # catalog_path accepts a HashWithIndifferentAccess object. The solr query params are stored in the session,
   # so we only need the +counter+ param here. We also need to know if we are viewing to document as part of search results.
   def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true})
-      if !opts[:itemViewList].nil?
-        link_to label, solr_document_path(doc[:id], :il =>opts[:itemViewList])
-      else
-        link_to label, doc, { :'data-counter' => opts[:counter] }.merge(opts.reject { |k,v| [:label, :counter, :results_view].include? k  })
-      end
+    if !opts[:itemViewList].nil?
+      link_to label, solr_document_path(doc[:id], :il => opts[:itemViewList])
+    else
+      link_to label, doc, {:'data-counter' => opts[:counter]}.merge(opts.reject { |k, v| [:label, :counter, :results_view].include? k })
+    end
   end
-  
+
   # link_back_to_catalog(:label=>'Back to Search')
   # Create a link back to the index screen, keeping the user's facet, query and paging choices intact by using session.
-  def link_back_to_catalog(opts={:label=>nil})
+  def link_back_to_catalog(opts={:label => nil})
     query_params = session[:search] ? session[:search].dup : {}
     query_params.delete :counter
     query_params.delete :total
@@ -555,7 +555,7 @@ module Blacklight::BlacklightHelperBehavior
     type = nil
     if is_cooee
       if document.has_key?(MetadataHelper::TYPE.to_s + "_tesim")
-        document[MetadataHelper::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" } 
+        document[MetadataHelper::TYPE.to_s + "_tesim"].each { |t| type = t unless t == "Original" or t == "Raw" }
       end
       if type.nil?
         type_format = '%s'
@@ -603,11 +603,11 @@ module Blacklight::BlacklightHelperBehavior
       end
     end
 
-    if my_params[:page] and (my_params[:per_page] != source_params[:per_page] or my_params[:sort] != source_params[:sort] )
+    if my_params[:page] and (my_params[:per_page] != source_params[:per_page] or my_params[:sort] != source_params[:sort])
       my_params[:page] = 1
     end
 
-    my_params.reject! { |k,v| v.nil? }
+    my_params.reject! { |k, v| v.nil? }
 
     # removing action and controller from duplicate params so that we don't get hidden fields for them.
     my_params.delete(:action)
@@ -630,7 +630,6 @@ module Blacklight::BlacklightHelperBehavior
     # hash_as_hidden_fields in hash_as_hidden_fields.rb
     return hash_as_hidden_fields(my_params)
   end
-
 
 
   def link_to_previous_document(previous_document)
@@ -686,7 +685,7 @@ module Blacklight::BlacklightHelperBehavior
     config = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env]
     return config["url"].to_s + "/objects/#{object_id}/datastreams/#{datastream}/content"
   end
-  
+
   def has_only_text_documents?(document)
     uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::SOURCE]
     documents = item_documents(document, uris)
@@ -696,7 +695,7 @@ module Blacklight::BlacklightHelperBehavior
     end
     return true
   end
-  
+
   def has_one_document?(document)
     uris = [MetadataHelper::IDENTIFIER]
     documents = item_documents(document, uris)
@@ -706,7 +705,7 @@ module Blacklight::BlacklightHelperBehavior
       return false
     end
   end
-  
+
   def render_primary_text(document)
     uri = buildURI(document.id, 'primary_text')
     begin
@@ -716,7 +715,7 @@ module Blacklight::BlacklightHelperBehavior
       return render_no_primary_document
     end
   end
-  
+
   def render_no_primary_document
     return "<em>This Item has no primary document</em>"
   end
@@ -733,10 +732,10 @@ module Blacklight::BlacklightHelperBehavior
 
     unless item_results.size == 0
       item = item_results[0][:item]
- 
+
       # Look for references to Documents within the metadata and
       # find their fields as specified in uris.
-      query = RDF::Query.new({:item => {MetadataHelper::DOCUMENT => :document}})
+      query = RDF::Query.new({item => {MetadataHelper::DOCUMENT => :document}})
       document_results = query.execute(graph)
 
       document_results.each { |result|
@@ -758,7 +757,7 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   # NOTE: this method duplicates that above with the exception of passing an id in rather than the
-  # document. Since the above only uses the document for it's id, this method could replace all 
+  # document. Since the above only uses the document for its id, this method could replace all
   # references of the above
   def item_documents_from_id(document_id, uris)
     document_descriptors = []
@@ -772,7 +771,7 @@ module Blacklight::BlacklightHelperBehavior
 
     unless item_results.size == 0
       item = item_results[0][:item]
- 
+
       # Look for references to Documents within the metadata and
       # find their fields as specified in uris.
       query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
@@ -809,7 +808,7 @@ module Blacklight::BlacklightHelperBehavior
     prefix = ['E', 'P', 'T', 'G', 'M', 'k', '', 'm', 'u', 'n', 'p', 'f', 'a']
     p_idx = prefix.find_index('')
 
-     while value.abs > multiple
+    while value.abs > multiple
       value = 1.0 * value # force it to floating point
       value /= multiple
       p_idx -= 1
@@ -843,7 +842,7 @@ module Blacklight::BlacklightHelperBehavior
   # Extract the last part of a path/URI/slash-separated-list-of-things
   #
   def last_bit(uri)
-    str = uri.to_s   # just in case it is not a String object
+    str = uri.to_s # just in case it is not a String object
     return str.split('/')[-1]
   end
 
@@ -924,7 +923,7 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   def render_language_codes(list)
-    return (list.map {|c| render_language_code(c)}).join(', ')
+    return (list.map { |c| render_language_code(c) }).join(', ')
   end
   #
   # End of Language Code methods
