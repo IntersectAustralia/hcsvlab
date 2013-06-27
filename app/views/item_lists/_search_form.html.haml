@@ -3,18 +3,18 @@
     if ("concordance" == value) {
       jQuery("#concordance_search_form").show();
       jQuery("#frequency_search_form").hide();
-      //alert($('#search_type').val());
       $('#search_type2').val("concordance");
+      $('#concordance_search_for').val($('#frequency_search_for').val())
     } else {
       jQuery("#concordance_search_form").hide();
       jQuery("#frequency_search_form").show();
-      //alert($('#search_type2').val());
       $('#search_type').val("frequency");
+      $('#frequency_search_for').val($('#concordance_search_for').val())
     }
   }
 
 %div
-  = form_tag({:action => 'frequency_search', :id => params[:id]}, :id=>"frequency_search_form" , :onSubmit => "showProgressAnimation();") do
+  = form_tag({:action => 'frequency_search', :id => params[:id]}, :method=>"GET", :id=>"frequency_search_form" , :onSubmit => "showProgressAnimation();") do
     = field_set_tag do
       = hidden_field_tag :itemListId, :value => params[:id]
       .input-append.search-form.row-fluid
@@ -24,22 +24,22 @@
         -facetsConfig = YAML.load_file(Rails.root.join("config", "facets.yml"))
         = select_tag :facet, options_for_select(facetsConfig[:facets].collect{ |aFacetConfig| [aFacetConfig[:label], aFacetConfig[:name]] }, params[:facet])
         .hidden= label_tag 'Search for'
-        = search_field_tag :search_for, value = params[:search_for], :class => "span5", :placeholder => "Search list..."
+        = search_field_tag :search_for, value = params[:search_for], :id=>"frequency_search_for", :class => "span5", :placeholder => "Search list..."
         %button#item-list-search.btn.search-btn{:name => "commit", :type => "submit", :value => ""}
           %span.icon-search
 
-  = form_tag({:action => 'concordance_search', :id => params[:id]}, :id=>"concordance_search_form" , :onSubmit => "showProgressAnimation();") do
+  = form_tag({:action => 'concordance_search', :id => params[:id]}, :method=>"GET", :id=>"concordance_search_form" , :onSubmit => "showProgressAnimation();") do
     = field_set_tag do
       = hidden_field_tag :itemListId, :value => params[:id]
       .input-append.search-form.row-fluid
         .hidden= label_tag 'Search type'
         = select_tag :search_type2, options_for_select([["Concordance", "concordance"], ["Frequency", "frequency"]], 0), :onChange=>"changeFormAction(this.value)"
         .hidden= label_tag 'Concordance search term'
-        = search_field_tag :search_for, value = params[:search_for], :class => "span8", :placeholder => "Search term..."
+        = search_field_tag :search_for, value = params[:search_for], :id=>"concordance_search_for", :class => "span8", :placeholder => "Search term..."
         %button#item-list-search.btn.search-btn{:name => "commit", :type => "submit", :value => ""}
           %span.icon-search
 
 :javascript
-  changeFormAction("#{params[:search_type]}");
+  changeFormAction("#{(params[:search_type].nil?)?params[:search_type2]:params[:search_type]}");
 
 = render "shared/modal_waiting_panel"
