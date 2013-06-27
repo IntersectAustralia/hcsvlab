@@ -9,8 +9,6 @@
     - if has_user_authentication_provider? and current_user
       %li= link_to t('blacklight.header_links.saved_searches'), saved_searches_path
       %li= link_to t('blacklight.header_links.search_history'), search_history_path
-    - if current_or_guest_user
-      %li= link_to t('blacklight.header_links.bookmarks'), bookmarks_path
     %li.divider
     - if current_or_guest_user
       %li= link_to "Edit My Details", edit_user_registration_path

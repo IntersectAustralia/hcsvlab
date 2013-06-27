@@ -394,26 +394,6 @@ module Blacklight::BlacklightHelperBehavior
     end
   end
 
-  def get_galaxy_bookmark_list documents = nil, locals = {}
-    documents = current_user.bookmarks.collect { |b| b.document }
-
-    galaxy_list = ""
-    documents.each_with_index do |doc, index|
-      uris = [PURL::IDENTIFIER, PURL::TYPE, PURL::EXTENT, PURL::SOURCE]
-      item_documents(doc, uris).each do |values|
-        if values[PURL::TYPE] == "Text"
-          if index != (documents.size-1)
-            galaxy_list += (values[PURL::SOURCE] + ",")
-          else
-            galaxy_list += values[PURL::SOURCE]
-          end
-        end
-      end
-    end
-
-    return galaxy_list
-  end
-
   def render_document_index documents = nil, locals = {}, extraRenderParams = {}
     documents ||= @document_list
 
