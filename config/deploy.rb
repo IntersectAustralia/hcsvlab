@@ -41,7 +41,7 @@ set :branch do
 
   tag = Capistrano::CLI.ui.ask "Tag to deploy (make sure to push the branch/tag first) or HEAD?: [#{default_tag}] ".colorize(:yellow)
   tag = default_tag if tag.empty?
-  tag = nil if "HEAD".eql?(tag)
+  tag = nil if tag.eql?("HEAD")
 
   tag
 end
@@ -111,6 +111,7 @@ end
 after 'deploy:update' do
   server_setup.logging.rotation
   server_setup.config.apache
+  deploy.create_deployment_record
   deploy.restart
   deploy.additional_symlinks
 
@@ -302,9 +303,20 @@ namespace :deploy do
     run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
   end
 
+  desc "Update the HCS vLab Solr core"
+  task :update_solr_core, :roles => :app do
+    # Remove the exisiting core
+    run "rm -rf $SOLR_HOME/hcsvlab", :env => {'RAILS_ENV' => stage}
+    create_solr_core
+  end
+
   desc "Create the HCS vLab Solr core"
   task :create_solr_core, :roles => :app do
+    # Copy the jar files etc that Tomcat will need for Solr 4.3 logging
+    run "cp -rp #{current_path}/solr_conf/lib/ext/* $CATALINA_HOME/lib/", :env => {'RAILS_ENV' => stage}
+    # Copy the solr core diir
     run "cp -rp #{current_path}/solr_conf/hcsvlab $SOLR_HOME/", :env => {'RAILS_ENV' => stage}
+    # Configure solr
     run "cp -p #{current_path}/solr_conf/conf/schema.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
     run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
   end
@@ -339,6 +351,31 @@ namespace :deploy do
     run "cd $ACTIVEMQ_HOME && bin/activemq stop", :env => {'RAILS_ENV' => stage}
   end
 
+  task :create_deployment_record do
+    require 'net/http'
+    require 'socket'
+
+    url = URI.parse('http://deployment-tracker.intersect.org.au/deployments/api_create')
+    post_args = {'app_name'=>application, 
+      'deployer_machine'=>"#{ENV['USER']}@#{Socket.gethostname}", 
+      'environment'=>rails_env, 
+      'server_url'=>find_servers[0].to_s,
+      'tag'=> branch || "HEAD"}
+    begin
+      print "Sending Post request with args: #{post_args}\n"
+      resp, data = Net::HTTP.post_form(url, post_args)
+
+      case resp
+      when Net::HTTPSuccess
+        puts "Deployment record saved"
+      else
+        puts data
+      end
+
+    rescue StandardError => e
+      puts e.message
+    end
+  end
 end
 
 namespace :backup do

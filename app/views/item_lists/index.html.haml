@@ -2,6 +2,7 @@
 .span9
   - if (!params[:id].nil?)
     = render 'search_form'
+  - else
+    %h2 Select a list from which to search
   = render 'display_items_table'
 = render 'shared/nectar_attribution'
-

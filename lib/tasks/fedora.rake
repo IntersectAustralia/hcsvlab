@@ -1,7 +1,7 @@
 
 require 'find'
 
-ENABLE_SOLR_UPDATES = false
+#ENABLE_SOLR_UPDATES = false
 ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 STORE_DOCUMENT_TYPES = ['Text']
 

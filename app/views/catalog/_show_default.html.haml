@@ -24,77 +24,78 @@
     = raw render_primary_text(document)
   - else
     = raw render_no_primary_document
-  %h3
-    %span Item Details
-  %dl.dl-horizontal.dl-invert
-    - document_show_fields(document).each do |solr_fname, field|
-      - if should_render_show_field? document, field
-        %dt{:class => "blacklight-#{solr_fname.parameterize}"}
-          = render_document_show_field_label document, :field => solr_fname
-        - if solr_fname == 'OLAC_language_tesim'
-          %dd{:class => "blacklight-#{solr_fname.parameterize}"}
-            = raw render_language_codes document[solr_fname]
-        - elsif solr_fname == 'DC_type'
-          %dd{:class => "blacklight-#{solr_fname.parameterize}"}
-            = format_duplicates(document[solr_fname])
-        - else
-          %dd{:class => "blacklight-#{solr_fname.parameterize}"}
-            = render_document_show_field_value document, :field => solr_fname
-    - do_not_display = {'id' => nil,
-                 'timestamp' => nil,
-       MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
-                   'date_group_tesim' => nil,
-                   'all_metadata' => nil,
-                   '_version_' => nil,
-                   'item_lists' => nil}
-    - do_not_display = {} if Rails.env.development? # In development, display everything
-    - do_not_display.merge!(document_show_fields(document))
-    - document.keys.each do |k|
-      - v = document[k]
-      - unless do_not_display.has_key?(k)
-        %dt.blacklight= format_key(k)
-        - if k == 'DC_type'
-          %dd.blacklight= format_duplicates(v)
-        - else
-          %dd.blacklight= format_value(v)
-  %h3
-    %span Documents
-  - uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
-  - documents = item_documents(document, uris)
-  - if documents.empty?
-    %em This Item has no documents
-  - else
-    - is_cooee = document[MetadataHelper::short_form(MetadataHelper::IS_PART_OF)][0] == "cooee"
-    - type_format = get_type_format(document, is_cooee)
-    %table.document-table.table.table-striped{:border => "0"}
-      %thead
+%h3
+  %span Item Details
+%dl.dl-horizontal.dl-invert
+  - document_show_fields(document).each do |solr_fname, field|
+    - if should_render_show_field? document, field
+      %dt{:class => "blacklight-#{solr_fname.parameterize}"}
+        = render_document_show_field_label document, :field => solr_fname
+      - if solr_fname == 'OLAC_language_tesim'
+        %dd{:class => "blacklight-#{solr_fname.parameterize}"}
+          = raw render_language_codes document[solr_fname]
+      - elsif solr_fname == 'DC_type'
+        %dd{:class => "blacklight-#{solr_fname.parameterize}"}
+          = format_duplicates(document[solr_fname])
+      - else
+        %dd{:class => "blacklight-#{solr_fname.parameterize}"}
+          = render_document_show_field_value document, :field => solr_fname
+  - do_not_display = {'id' => nil,
+               'timestamp' => nil,
+               'full_text' => nil,
+     MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
+                 'date_group_tesim' => nil,
+                 'all_metadata' => nil,
+                 '_version_' => nil,
+                 'item_lists' => nil}
+  - do_not_display = {} if Rails.env.development? # In development, display everything
+  - do_not_display.merge!(document_show_fields(document))
+  - document.keys.each do |k|
+    - v = document[k]
+    - unless do_not_display.has_key?(k)
+      %dt.blacklight= format_key(k)
+      - if k == 'DC_type'
+        %dd.blacklight= format_duplicates(v)
+      - else
+        %dd.blacklight= format_value(v)
+%h3
+  %span Documents
+- uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
+- documents = item_documents(document, uris)
+- if documents.empty?
+  %em This Item has no documents
+- else
+  - is_cooee = document[MetadataHelper::short_form(MetadataHelper::IS_PART_OF)][0] == "cooee"
+  - type_format = get_type_format(document, is_cooee)
+  %table.document-table.table.table-striped{:border => "0"}
+    %thead
+      %tr
+        %th Filename
+        %th Type
+        %th Size
+    %tbody
+      - documents.each do |values|
         %tr
-          %th Filename
-          %th Type
-          %th Size
-      %tbody
-        - documents.each do |values|
-          %tr
-            - if values.has_key?(MetadataHelper::SOURCE)
-              %td
-                %a{:href => values[MetadataHelper::SOURCE]}= values[MetadataHelper::IDENTIFIER]
-            - else
-              %td= values[MetadataHelper::IDENTIFIER]
-            - if values.has_key?(MetadataHelper::TYPE)
-              - field = values[MetadataHelper::TYPE]
-              - field = "unlabelled" if field == ""
-              - field = "Plain" if is_cooee && field == type
-            - else
-              - field = "unlabelled"
-            %td= sprintf(type_format, field)
-            - if values.has_key?(MetadataHelper::EXTENT)
-              - field = values[MetadataHelper::EXTENT]
-              - if field.nil? || field == ""
-                - field = "unknown"
-              - else
-                - field = format_extent(field.to_i, 'B')
-            - else
+          - if values.has_key?(MetadataHelper::SOURCE)
+            %td
+              %a{:href => values[MetadataHelper::SOURCE]}= values[MetadataHelper::IDENTIFIER]
+          - else
+            %td= values[MetadataHelper::IDENTIFIER]
+          - if values.has_key?(MetadataHelper::TYPE)
+            - field = values[MetadataHelper::TYPE]
+            - field = "unlabelled" if field == ""
+            - field = "Plain" if is_cooee && field == type
+          - else
+            - field = "unlabelled"
+          %td= sprintf(type_format, field)
+          - if values.has_key?(MetadataHelper::EXTENT)
+            - field = values[MetadataHelper::EXTENT]
+            - if field.nil? || field == ""
               - field = "unknown"
-            %td= field
-    - if eopas_viewable? documents
-      = link_to('View in EOPAS', eopas_path, class: 'btn')
+            - else
+              - field = format_extent(field.to_i, 'B')
+          - else
+            - field = "unknown"
+          %td= field
+  - if eopas_viewable? documents
+    = link_to('View in EOPAS', eopas_path, class: 'btn')

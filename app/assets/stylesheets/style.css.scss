@@ -1,6 +1,7 @@
 
 a { color: rgb(0, 171, 255); }
 a:hover { color: #0D6B9F; }
+a:hover i { text-decoration: none; }
 
 
 h1 { font-weight: 200; font-size: 38.5px; margin-bottom: 20px; }
@@ -44,7 +45,15 @@ h3 { font-weight: 200; font-size: 24.5px; }
 border-width: 0 0 0px;
 }
 
+.search-form { margin: 0 0 20px 0; }
+.well .search-form { margin: 0; }
+#item-list-search { width: 74px; }
+
 #sortAndPerPage form.pull-right { position: relative; margin: -5px 10px 0 0; }
+
+.input-append input, .input-append select, .input-append .uneditable-input {
+-webkit-border-radius: 3px 0 0 3px; -moz-border-radius: 3px 0 0 3px; border-radius: 3px 0 0 3px;
+}
 
 .navbar .brand {
   width: 150px;
@@ -202,7 +211,7 @@ padding-right: 14px;
 
 #sortAndPerPage {
   min-height: 20px;
-  padding: 19px;
+  padding: 10px 20px;
   z-index: 0;
   position: relative;
   margin-bottom: 20px;
@@ -448,6 +457,14 @@ background-color: #FFF;
 color: #333;
 }
 
+.table th, .table td {
+  padding: 8px;
+  line-height: 20px;
+  text-align: left;
+  vertical-align: top;
+  border-top: 1px dotted #DDD;
+}
+
 #url { display: inline-block; }
 
 
@@ -506,24 +523,23 @@ background-color: #FFD875;
   background-color: lightsteelblue;
   margin-top:10px;
 }
-.highlightings .concordanceTable {
-  margin-left: auto;
-  margin-right: auto;
+.concordanceTable {
+  margin: 0 0 40px 0;
 }
 
-.highlightings .concordanceTable .highlighting {
-  color: red;
+.concordanceTable .highlighting {
+  color: #f6b717;
 }
 
-.highlightings .concordanceTable .leftColumn {
+.concordanceTable .leftColumn {
   text-align:right;
 }
 
-.highlightings .concordanceTable .rightColumn {
+.concordanceTable .rightColumn {
 }
 
-.highlightings .concordanceTable .centerColumn {
-  padding:5px;
+.concordanceTable .centerColumn {
+  padding:8px;
 }
 
 // Modal waiting panel
@@ -566,21 +582,18 @@ background-color: #FFD875;
 
 .btn-group > .btn:first-child {
 margin-left: 0;
--webkit-border-bottom-left-radius: 4px;
-border-bottom-left-radius: 4px;
--webkit-border-top-left-radius: 4px;
-border-top-left-radius: 4px;
--moz-border-radius-bottomleft: 4px;
--moz-border-radius-topleft: 4px;
+-webkit-border-bottom-left-radius: 3px; border-bottom-left-radius: 3px;
+-webkit-border-top-left-radius: 3px; border-top-left-radius: 3px;
+-moz-border-radius-bottomleft: 3px; -moz-border-radius-topleft: 3px;
 }
 
 .btn-group > .btn:last-child, .btn-group > .dropdown-toggle {
--webkit-border-top-right-radius: 4px;
-border-top-right-radius: 4px;
--webkit-border-bottom-right-radius: 4px;
-border-bottom-right-radius: 4px;
--moz-border-radius-topright: 4px;
--moz-border-radius-bottomright: 4px;
+-webkit-border-top-right-radius: 3px;
+border-top-right-radius: 3px;
+-webkit-border-bottom-right-radius: 3px;
+border-bottom-right-radius: 3px;
+-moz-border-radius-topright: 3px;
+-moz-border-radius-bottomright: 3px;
 }
 
 
@@ -598,6 +611,13 @@ margin-left: -1px;
 }
 
 button a:hover { text-decoration: none; }
+
+.css-dropdown {
+  list-style: none;
+  position: relative;
+  margin: 0;
+  display: inline-block;
+}
 
 .css-dropdown ul.dropdown-menu {
 list-style: none;
@@ -645,9 +665,7 @@ border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 border: 1px solid #bbbbbb;
 border-bottom-color: #a2a2a2;
--webkit-border-radius: 4px;
--moz-border-radius: 4px;
-border-radius: 4px;
+-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
 box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -690,10 +708,15 @@ text-shadow: 0 -1px rgba(0,0,0,0.36);
   box-shadow: inset 0 8px 8px -8px #CCC, inset 0 -8px 8px -8px #CCC;
 }
 
+.input-append .add-on:last-child, .input-append .btn:last-child, .input-append .btn-group:last-child > .dropdown-toggle {
+-webkit-border-radius: 0 3px 3px 0; -moz-border-radius: 0 3px 3px 0; border-radius: 0 3px 3px 0;
+}
+
 .btn-primary:hover { background-color: #00abff; }
 
 @media only screen and (max-width : 1200px) {
 #searchbar input { width: 140px; }
+#item-list-search { width: 60px; }
 }
 
 

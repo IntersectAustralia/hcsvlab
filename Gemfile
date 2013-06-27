@@ -108,3 +108,5 @@ gem 'colorize'
 # ruby json builder
 gem 'rabl'
 
+# exception tracker
+gem 'whoops_rails_logger', git: 'https://github.com/IntersectAustralia/whoops_rails_logger.git'
