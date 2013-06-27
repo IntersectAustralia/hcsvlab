@@ -1,14 +1,44 @@
+:javascript
+  function changeFormAction(value) {
+    if ("concordance" == value) {
+      jQuery("#concordance_search_form").show();
+      jQuery("#frequency_search_form").hide();
+    } else {
+      jQuery("#concordance_search_form").hide();
+      jQuery("#frequency_search_form").show();
+    }
+  }
+
 %div
-  = form_tag({:action => 'concordance_search', :id => params[:id]}, :onSubmit => "showProgressAnimation();") do
+  = form_tag({:action => 'frequency_search', :id => params[:id]}, :id=>"frequency_search_form" , :onSubmit => "showProgressAnimation();") do
     = field_set_tag do
       = hidden_field_tag :itemListId, :value => params[:id]
       %div{:style=>'display:inline-block'}
-        =# label_tag 'Search type'
-        =# select_tag :search_type, :options => ["simple", "concordance"]
-        =# select(:search_type, :aa, {"simple"=>"simple", "concordance"=>"concordance"})
+        = label_tag 'Search type'
+        = select_tag :search_type, "<option value='concordance'>Concordance</option><option value='frequency' selected>Frequency</option>".html_safe, :onChange=>"changeFormAction(this.value)"
+      %div{:style=>'display:inline-block'}
+        = label_tag 'Search for'
+        = search_field_tag :search_for, value = params[:search_for]
+      %div{:style=>'display:inline-block'}
+        = label_tag 'Facet'
+        -facetsConfig = YAML.load_file(Rails.root.join("config", "facets.yml"))
+        = select_tag :facet, options_for_select(facetsConfig[:facets].collect{ |aFacetConfig| [aFacetConfig[:label], aFacetConfig[:name]] }, params[:facet])
+      %div{:style=>'display:inline-block'}
+        = submit_tag 'search'
+
+  = form_tag({:action => 'concordance_search', :id => params[:id]}, :id=>"concordance_search_form" , :onSubmit => "showProgressAnimation();") do
+    = field_set_tag do
+      = hidden_field_tag :itemListId, :value => params[:id]
+      %div{:style=>'display:inline-block'}
+        = label_tag 'Search type'
+        = select_tag :search_type, "<option value='concordance' selected>Concordance</option><option value='frequency'>Frequency</option>".html_safe, :onChange=>"changeFormAction(this.value)"
       %div{:style=>'display:inline-block'}
         = label_tag 'Concordance search term'
         = search_field_tag :search_for, value = params[:search_for]
       %div{:style=>'display:inline-block'}
         = submit_tag 'search'
+
+:javascript
+  changeFormAction("#{params[:search_type]}");
+
 = render "shared/modal_waiting_panel"

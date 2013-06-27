@@ -1,0 +1,51 @@
+:facets:
+  -
+    :name: DC_is_part_of
+    :label: Corpus
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: date_group
+    :label: Created
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: AUSNC_mode
+    :label: Mode
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: AUSNC_speech_style
+    :label: Speech Style
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: AUSNC_interactivity
+    :label: Interactivity
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: AUSNC_communication_context
+    :label: Communication Context
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: AUSNC_audience
+    :label: Audience
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: OLAC_discourse_type
+    :label: Discourse Type
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: OLAC_language
+    :label: Language (ISO 639-3 Code)
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: DC_type
+    :label: Type
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'

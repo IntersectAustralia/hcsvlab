@@ -46,6 +46,7 @@ HcsvlabWeb::Application.routes.draw do
       member do
         post 'clear'
         post 'concordance_search'
+        post 'frequency_search'
       end
   end
 
