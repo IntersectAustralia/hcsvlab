@@ -306,7 +306,7 @@ namespace :deploy do
   desc "Update the HCS vLab Solr core"
   task :update_solr_core, :roles => :app do
     # Remove the exisiting core
-    run "rm -rf #{current_path}/solr_conf/hcsvlab", :env => {'RAILS_ENV' => stage}
+    run "rm -rf $SOLR_HOME/hcsvlab", :env => {'RAILS_ENV' => stage}
     create_solr_core
   end
 
