@@ -168,13 +168,13 @@ class ItemList < ActiveRecord::Base
 
         # Check that we got something useful...
         if response == nil 
-            logger.warning "No response from Solr when searching for Item #{item_id}"
+            logger.warn "No response from Solr when searching for Item #{item_id}"
         elsif response["response"] == nil
-            logger.warning "Badly formed response from Solr when searching for Item #{item_id}"
+            logger.warn "Badly formed response from Solr when searching for Item #{item_id}"
         elsif response["response"]["numFound"] == 0
-            logger.warning "Cannot find Item #{item_id} in Solr"
+            logger.warn "Cannot find Item #{item_id} in Solr"
         elsif response["response"]["numFound"] > 1
-            logger.warning "Multiple documents for Item #{item_id} in Solr"
+            logger.warn "Multiple documents for Item #{item_id} in Solr"
         else
             #... and if we did, update it
             update_solr_field(item_id, :item_lists, id)

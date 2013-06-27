@@ -14,24 +14,24 @@
       %li= link_to "Edit My Details", edit_user_registration_path
       %li= link_to "Change My Password", users_edit_password_path
       %li#api_token_submenu.dropdown-submenu
-        %a{:href => "#"} Authorisation Token
+        %a{:href => "#"} API Key
         %ul.dropdown-menu
           - li_class = current_user.authentication_token.blank? ? "disabled" : ""
           - if li_class.present?
             %li.disabled
-              %a#api_token_display{:href => "#"} No token generated
-            %li= link_to 'Generate Token', users_generate_token_path, :method => :put
+              %a#api_token_display{:href => "#"} No API Key generated
+            %li= link_to 'Generate API Key', users_generate_token_path, :method => :put
           - else
             %li.disabled
               %a{:href => "#"}= current_user.authentication_token
-            %li= link_to 'Regenerate Token', users_generate_token_path, :method => :put, :confirm => 'Are you sure you want to regenerate your token? You will need to update any scripts that used the previous token.'
-            %li= link_to 'Delete Token', users_delete_token_path, :method => :delete, :confirm => 'Are you sure you want to delete your token? You will no longer be able to perform API actions.'
+            %li= link_to 'Regenerate API Key', users_generate_token_path, :method => :put, :confirm => 'Are you sure you want to regenerate your token? You will need to update any scripts that used the previous token.'
+            %li= link_to 'Delete API Key', users_delete_token_path, :method => :delete, :confirm => 'Are you sure you want to delete your token? You will no longer be able to perform API actions.'
           %li.divider
           %li{:class => li_class}
             %a#zc_copy_token{"data-clipboard-text" => current_user.authentication_token, :href => "#"}
               Copy to Clipboard
           %li{:class => li_class}
-            = link_to 'Download Token', users_download_token_path
+            = link_to 'Download API Key', users_download_token_path
       - if current_user.is_superuser?
         %li.divider
         %li= link_to "Admin", admin_users_path
@@ -46,7 +46,7 @@
     if (!$('#zc_copy_token').closest('li').hasClass('disabled')) {
       var clip = new ZeroClipboard($('#zc_copy_token'));
       clip.on('complete', function (client, args) {
-        alert("Token copied to clipboard!");
+        alert("API Key copied to clipboard!");
       });
       clip.on('mouseout', function (client, args) {
         $(this).removeClass("hovered");
