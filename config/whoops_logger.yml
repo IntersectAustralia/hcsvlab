@@ -1,5 +1,5 @@
 common: &common
-  host: http://deployment-tracker.intersect.org.au
+  host: deployment-tracker.intersect.org.au
 
 # development:
 #   host: localhost
