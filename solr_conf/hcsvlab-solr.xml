@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Context docBase="${SOLR_HOME}/hcsvlab/solr/apache-solr-4.3.0.war" 
+<Context docBase="${SOLR_HOME}/hcsvlab/solr/solr-4.3.0.war" 
          debug="0" 
          crossContext="true">
     <Environment name="solr/home" 
