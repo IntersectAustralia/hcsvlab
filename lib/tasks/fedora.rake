@@ -93,7 +93,7 @@ namespace :fedora do
 			exit 1
 		end
 
-		objects = ActiveFedora::Base.find_with_conditions( {'http\:\/\/purl.org\/dc\/terms\/isPartOf_tesim' => corpus }, :rows => 1000000 )
+		objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
 
 		puts "Removing " + objects.count.to_s + " objects"
 
