@@ -168,13 +168,13 @@ class ItemList < ActiveRecord::Base
 
         # Check that we got something useful...
         if response == nil 
-            logger.warn "No response from Solr when searching for Item #{item_id}"
+            Rails.logger.warn "No response from Solr when searching for Item #{item_id}"
         elsif response["response"] == nil
-            logger.warn "Badly formed response from Solr when searching for Item #{item_id}"
+            Rails.logger.warn "Badly formed response from Solr when searching for Item #{item_id}"
         elsif response["response"]["numFound"] == 0
-            logger.warn "Cannot find Item #{item_id} in Solr"
+            Rails.logger.warn "Cannot find Item #{item_id} in Solr"
         elsif response["response"]["numFound"] > 1
-            logger.warn "Multiple documents for Item #{item_id} in Solr"
+            Rails.logger.warn "Multiple documents for Item #{item_id} in Solr"
         else
             #... and if we did, update it
             update_solr_field(item_id, :item_lists, id)
@@ -209,13 +209,13 @@ class ItemList < ActiveRecord::Base
 
         # Check that we got something useful...
         if response == nil 
-            logger.warning "No response from Solr when searching for Item #{item_id}"
+            Rails.logger.warn "No response from Solr when searching for Item #{item_id}"
         elsif response["response"] == nil
-            logger.warning "Badly formed response from Solr when searching for Item #{item_id}"
+            Rails.logger.warn "Badly formed response from Solr when searching for Item #{item_id}"
         elsif response["response"]["numFound"] == 0
-            logger.warning "Cannot find Item #{item_id} in Solr"
+            Rails.logger.warn "Cannot find Item #{item_id} in Solr"
         elsif response["response"]["numFound"] > 1
-            logger.warning "Multiple documents for Item #{item_id} in Solr"
+            Rails.logger.warn "Multiple documents for Item #{item_id} in Solr"
         else
             #... and if we did, remove our id from the Item's Solr
             # Document's item_lists field. Solr doesn't give us an
