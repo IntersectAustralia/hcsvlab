@@ -1,4 +1,20 @@
 class ApplicationController < ActionController::Base
+
+  prepend_before_filter :get_api_key
+
+  include ErrorResponseActions
+  
+  rescue_from CanCan::AccessDenied, :with => :authorization_error
+  rescue_from ActiveRecord::RecordNotFound, :with => :resource_not_found
+
+  private
+  def get_api_key
+    params.delete(:api_key)
+    if request.headers["X-API-KEY"]
+      params[:api_key] = request.headers["X-API-KEY"]
+    end
+  end
+
   # Adds a few additional behaviors into the application controller 
    include Blacklight::Controller
   # Please be sure to impelement current_user and user_session. Blacklight depends on 
@@ -7,11 +23,6 @@ class ApplicationController < ActionController::Base
   layout 'blacklight'
 
   protect_from_forgery
-  # catch access denied and redirect to the home page
-  rescue_from CanCan::AccessDenied do |exception|
-    flash[:alert] = exception.message
-    redirect_to root_url
-  end
 
 
 end

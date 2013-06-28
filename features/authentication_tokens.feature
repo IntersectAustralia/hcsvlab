@@ -15,27 +15,27 @@ Feature: Create and manage authentication tokens
     Then I should see no api token
 
   Scenario: Generate a token
-    When I follow "Generate Token"
+    When I follow "Generate API Key"
     Then I should see the api token displayed for user "diego@intersect.org.au"
-    And I should not see link "Generate Token"
-    And I should see link "Regenerate Token"
+    And I should not see link "Generate API Key"
+    And I should see link "Regenerate API Key"
 
   Scenario: Regenerate a token
     Given "diego@intersect.org.au" has an api token
     And I am on the home page
     Then I should see the api token displayed for user "diego@intersect.org.au"
-    And I follow "Regenerate Token"
+    And I follow "Regenerate API Key"
     Then I should see the api token displayed for user "diego@intersect.org.au"
 
   Scenario: Delete a token
     Given "diego@intersect.org.au" has an api token
     And I am on the home page
     Then I should see the api token displayed for user "diego@intersect.org.au"
-    And I follow "Delete Token"
+    And I follow "Delete API Key"
     Then I should see no api token
 
   Scenario: Tokens can't be used on non-API actions
-    And I follow "Generate Token"
+    And I follow "Generate API Key"
     Then I should see the api token displayed for user "diego@intersect.org.au"
     And I follow "Logout"
     When I make a JSON request for the catalog page with the API token for "diego@intersect.org.au"
@@ -45,6 +45,6 @@ Feature: Create and manage authentication tokens
     Given "diego@intersect.org.au" has an api token
     And I am on the home page
     Then I should see the api token displayed for user "diego@intersect.org.au"
-    And I follow "Download Token"
+    And I follow "Download API Key"
     Then I should get the authentication token json file for "diego@intersect.org.au"
 
