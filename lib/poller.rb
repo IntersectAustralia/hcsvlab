@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Make sure stdout and stderr write out without delay for using with daemon like scripts
-STDOUT.sync = true; STDOUT.flush
-STDERR.sync = true; STDERR.flush
+STDOUT.sync = true; STDOUT.flush if STDOUT.respond_to? :flush
+STDERR.sync = true; STDERR.flush if STDERR.respond_to? :flush
 
 app_root = ENV['APP_ROOT'] || File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
 application_file = File.join(app_root, 'config', 'environment.rb')

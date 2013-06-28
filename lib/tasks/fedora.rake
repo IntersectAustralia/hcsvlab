@@ -1,7 +1,9 @@
 
+
+
 require 'find'
 
-#ENABLE_SOLR_UPDATES = false
+ENABLE_SOLR_UPDATES = false
 ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 STORE_DOCUMENT_TYPES = ['Text']
 
@@ -112,6 +114,16 @@ namespace :fedora do
 		look_for_documents(item, corpus_dir, rdf_file)
 
 		item.save!
+
+		# Msg to fedora.apim.update
+		#publish :fedora_worker, "<xml><title>finishedWork</title><content>Fedora worker has finished with #{item.pid}</content><summary>#{item.pid}</summary> </xml>"
+
+		#ms = MessageSender.new
+		#ms.send_message(item.pid)
+
+		client = Stomp::Client.open "stomp://localhost:61613"
+		client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
+
 	end
 
     def create_item_from_file(rdf_file)

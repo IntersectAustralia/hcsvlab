@@ -150,9 +150,14 @@ private
 
       # Get the full text, if there is any
       fed_item = Item.find(object)
-      unless fed_item.nil? || fed_item.primary_text.nil?
-        full_text = fed_item.primary_text.content
-      end 
+      begin
+        unless fed_item.nil? || fed_item.primary_text.nil?
+          full_text = fed_item.primary_text.content
+        end 
+      rescue
+        logger.warning("Solr_Worker caught exception fetching full_text for: " + object.to_s)
+        full_text = ""
+      end
 
       # Finally look for references to Documents within the metadata and
       # find their types and extents.
@@ -289,7 +294,7 @@ private
     #end
 
     xml_update = "";
-    xml_update << "<add commitWithin='10000' overwrite='false'> <doc>"
+    xml_update << "<add overwrite='true' allowDups='false'> <doc>"
       
     document.keys.each do | key |
     
@@ -335,6 +340,8 @@ private
       xml_update = make_solr_update(document)
       response = @@solr.update :data => xml_update
       logger.debug("Update response= #{response.to_s}")
+      response = @@solr.commit
+      logger.debug("Commit response= #{response.to_s}")
     else
       logger.debug "Inserting " + object.to_s 
       response = @@solr.add(document)
