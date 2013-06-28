@@ -106,6 +106,47 @@ namespace :fedora do
 
 	end
 
+
+	task :reindex_one => :environment do
+		item_id  = ENV['item']
+
+		if item_id.nil?
+			puts "Usage: rake fedora:reindex_one item=<item id>"
+			exit 1
+		end
+
+		unless item_id =~ /hcsvlab:[0-9]+/
+			puts "Error: invalid item id, expecting 'hcsvlab:<digits>'"
+			exit 1
+		end
+
+		stomp_client = Stomp::Client.open "stomp://localhost:61613"
+		reindex_item(item_id, stomp_client)
+	end
+
+
+	task :reindex_corpus do
+
+        corpus = ENV['corpus']
+
+		if (corpus.nil?)
+			puts "Usage: rake fedora:reindex_corpus corpus=<corpus name>"
+			exit 1
+		end
+
+		objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
+
+		puts "Reindexing " + objects.count.to_s + " objects"
+
+		stomp_client = Stomp::Client.open "stomp://localhost:61613"
+		objects.each do |obj|
+  			id = obj["id"].to_s
+  			reindex_item(id, stomp_client)
+		end
+
+	end
+
+
 	def ingest_rdf_file(corpus_dir, rdf_file)
 		puts "Ingesting item: " + rdf_file.to_s
 
@@ -193,5 +234,11 @@ namespace :fedora do
 			puts "Annotation Document = #{doc.pid.to_s}"
 		end
 	end
+
+	def reindex_item(item_id, stomp_client)
+		puts "Reindexing item: " + item_id
+		stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
+	end
+
 
 end

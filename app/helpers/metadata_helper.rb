@@ -6,8 +6,8 @@ private
   AUSNC_ROOT_URI = 'http://ns.ausnc.org.au/schemas/'
     ACE_BASE_URI     = AUSNC_ROOT_URI + 'ace/' unless const_defined?(:ACE_BASE_URI)
     AUSNC_BASE_URI   = AUSNC_ROOT_URI + 'ausnc_md_model/' unless const_defined?(:AUSNC_BASE_URI)
-    AUSTLIT_BASE_URI = AUSNC_ROOT_URI + 'cooee/'
-    COOEE_BASE_URI   = AUSNC_ROOT_URI + 'austlit/'
+    AUSTLIT_BASE_URI = AUSNC_ROOT_URI + 'austlit/'
+    COOEE_BASE_URI   = AUSNC_ROOT_URI + 'cooee/'
     GCSAUSE_BASE_URI = AUSNC_ROOT_URI + 'gcsause/'
     ICE_BASE_URI     = AUSNC_ROOT_URI + 'ice/'
 
