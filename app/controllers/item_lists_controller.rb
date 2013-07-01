@@ -83,15 +83,20 @@ class ItemListsController < ApplicationController
 
     # do matching only in the text. search for "dog," results in "dog", but search for "dog-fighter" results in "dog-fighter"
     search_for = params[:search_for].match(/(\w+([-]?\w+)?)/i).to_s
-
     params[:q] = 'full_text:"' + search_for + '"'
 
     bench_start = Time.now
-    @highlighting = processAndHighlightManually(search_for, 7)
+
+    # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
+    self.solr_search_params_logic += [:add_concordance_solr_extra_filters]
+
+    # get search result from solr
+    (@response, @document_list) = get_search_results
+
+    #process the information
+    @highlighting = processAndHighlightManually(@document_list, search_for, 7)
+
     Rails.logger.debug("Time for searching for '#{search_for}' in concordance view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
-
-    #doFrecuencySearch(params[:search_for])
-
 
   end
 
@@ -102,49 +107,59 @@ class ItemListsController < ApplicationController
     params[:q] = 'full_text:"' + search_for + '"'
 
     bench_start = Time.now
+    # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
+    self.solr_search_params_logic += [:add_frequency_solr_extra_filters]
 
-    doFrequencySearch(search_for)
+    # get search result from solr
+    (@response, @document_list) = get_search_results
+    facet_fields = @response[:facet_counts][:facet_fields]
+
+    #process the information
+    @result = doFrequencySearch(facet_fields, @document_list, search_for, @facet_field)
 
     Rails.logger.debug("Time for processing the frequency view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
   end
 
-
   private
 
-
-  def doFrequencySearch(search_for)
+  def doFrequencySearch(facet_fields, document_list, search_for, facet_field_restriction)
 
     searchPattern = /(^|\W)(#{search_for})(\W|$)/i
 
-    self.solr_search_params_logic += [:add_frequency_solr_extra_filters]
+    facetsWithResults = facet_fields[facet_field_restriction]
 
-    (@response, @document_list) = get_search_results
-
-    facetsWithResults = @response[:facet_counts][:facet_fields][@facet_field]
-
-    @result = {}
+    # First I will obtain the facets and the number of documents matching with each one
+    result = {}
     i = 0
     while (i < facetsWithResults.size) do
+      # Blacklight returns the facets setting the name of the facet in the even numbers, and the
+      # number of document for that facet in the next index.
       facetValue = facetsWithResults[i]
       facetNumDocs = facetsWithResults[i+1]
 
-      @result[facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
+      result[facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
 
       i = i + 2
     end
-    @document_list.each do |doc|
+
+    # Second I will count the number of matches in each document.
+    document_list.each do |doc|
       full_text = doc[:full_text]
       matchingData = full_text.to_enum(:scan, searchPattern).map { Regexp.last_match }
-      facetValue = doc[@facet_field]
+      facetValue = doc[facet_field_restriction]
       if (!facetValue.nil?)
         facetValue.each do |facet|
-          if (@result[facet].nil?)
-            @result[facet] = {:num_docs => "###", :num_occurrences => 0}
+          # If for some reason the facet is not in the Hash, I won't make the process fail, but
+          # I will show the text "###" in the number of documents. This should not happen.
+          if (result[facet].nil?)
+            result[facet] = {:num_docs => "###", :num_occurrences => 0}
           end
-          @result[facet][:num_occurrences] = @result[facet][:num_occurrences] + matchingData.size
+          result[facet][:num_occurrences] = result[facet][:num_occurrences] + matchingData.size
         end
       end
     end
+
+    result
   end
 
   def add_frequency_solr_extra_filters(solr_parameters, user_params)
@@ -155,18 +170,13 @@ class ItemListsController < ApplicationController
     solr_parameters[:'facet.limit'] = -1
   end
 
-  def processAndHighlightManually(search_for, preAndPostChunkSize)
+  def processAndHighlightManually(document_list, search_for, preAndPostChunkSize)
     charactersChunkSize = 200
     searchPattern = /(^|\W)(#{search_for})(\W|$)/i
 
-    # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
-    self.solr_search_params_logic += [:add_solr_extra_filters]
-
-    (@response, @document_list) = get_search_results
-
     # Get document full text
     highlighting = {}
-    @document_list.each do |doc|
+    document_list.each do |doc|
       full_text = doc[:full_text]
 
       highlighting[doc[:id]] = {}
@@ -190,12 +200,12 @@ class ItemListsController < ApplicationController
         subMatchPost = m[3]
 
         # Add come color to the martching word
-        text = "<span class='highlighting'>#{subMatch.to_s}</span>"
+        highlightedText = "<span class='highlighting'>#{subMatch.to_s}</span>"
 
         formattedMatch = {}
         formattedMatch[:textBefore] = pre +  subMatchPre
         formattedMatch[:textAfter] = subMatchPost + post
-        formattedMatch[:textHighlighted] = text
+        formattedMatch[:textHighlighted] = highlightedText
 
         highlighting[doc[:id]][:matches] << formattedMatch
 
@@ -208,7 +218,7 @@ class ItemListsController < ApplicationController
     highlighting
   end
 
-  def add_solr_extra_filters(solr_parameters, user_params)
+  def add_concordance_solr_extra_filters(solr_parameters, user_params)
     solr_parameters[:fq] = 'item_lists:' + params[:id]
     solr_parameters[:rows] = FIXNUM_MAX
   end

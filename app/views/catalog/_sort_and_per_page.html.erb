@@ -42,7 +42,7 @@
         <br/>
 
         <%= f.label :name %>
-        <%= f.text_field :name %>
+        <%= f.text_field :name%>
 
         <%= hidden_field_tag :sel_document_ids %>
         <%= hidden_field_tag :all_items %>
@@ -88,25 +88,25 @@
       showProgressAnimation();
       });
 
-function generateDocumentIds(field) {
-  checks = document.getElementsByClassName('toggle_item_list');
-  for (var i=0, n=checks.length; i<n; i++) {
-    if (checks[i].checked) {
-      var existing = jQuery(field).val();
-      if (existing == "") {
-        jQuery(field).val(checks[i].name);
-      }
-      else {
-        jQuery(field).val(existing + "," + checks[i].name);
+  function generateDocumentIds(field) {
+    checks = document.getElementsByClassName('toggle_item_list');
+    for (var i=0, n=checks.length; i<n; i++) {
+      if (checks[i].checked) {
+        var existing = jQuery(field).val();
+        if (existing == "") {
+          jQuery(field).val(checks[i].name);
+        }
+        else {
+          jQuery(field).val(existing + "," + checks[i].name);
+        }
       }
     }
-  }
-};
+  };
 
-function clearData() {
-  jQuery("#item_list_error").text("");
-  jQuery("#item_list_name").val("");
-};
+  function clearData() {
+    jQuery("#item_list_error").text("");
+    jQuery("#item_list_name").val("");
+  };
 
 
   jQuery("#create_item_list").click( function() {
@@ -120,19 +120,23 @@ function clearData() {
     jQuery("#all_items").val("true");
   });
 
-jQuery("A[href='#add_to_existing_item_list']").click( function() {
-    generateDocumentIds("#document_ids");
-    itemListId=$(this).attr('id');
-    jQuery("#item_list_id").val(itemListId);
-    jQuery("#add_all_items").val("false");
-    jQuery("#add_to_item_list").submit();
-    });
+  jQuery("A[href='#add_to_existing_item_list']").click( function() {
+      generateDocumentIds("#document_ids");
+      itemListId=$(this).attr('id');
+      jQuery("#item_list_id").val(itemListId);
+      jQuery("#add_all_items").val("false");
+      jQuery("#add_to_item_list").submit();
+      });
 
-jQuery("A[href='#add_all_to_existing_item_list']").click( function() {
-    itemListId=$(this).attr('id');
-    jQuery("#item_list_id").val(itemListId);
-    jQuery("#add_all_items").val("true");
-    jQuery("#add_to_item_list").submit();
-    });
+  jQuery("A[href='#add_all_to_existing_item_list']").click( function() {
+      itemListId=$(this).attr('id');
+      jQuery("#item_list_id").val(itemListId);
+      jQuery("#add_all_items").val("true");
+      jQuery("#add_to_item_list").submit();
+      });
+  //Set focus to the first element in the form of the modal panel
+  jQuery('#new-item-list').on('shown', function () {
+    jQuery('input:text:visible:first', this).focus();
+  })
 
 </script>
