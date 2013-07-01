@@ -156,6 +156,7 @@ class ItemListsController < ApplicationController
   end
 
   def processAndHighlightManually(search_for, preAndPostChunkSize)
+    charactersChunkSize = 200
     searchPattern = /(^|\W)(#{search_for})(\W|$)/i
 
     # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
@@ -175,11 +176,12 @@ class ItemListsController < ApplicationController
       # Iterate over everything that matches with the search in case-insensitive mode
       matchingData = full_text.to_enum(:scan, searchPattern).map { Regexp.last_match }
       matchingData.each { |m|
-      #full_text.match(searchPattern) {|m|
         # get the text preceding the match and extract the last 7 words
-        pre = m.pre_match().split(" ").last(preAndPostChunkSize).join(" ")
+        pre = m.pre_match()
+        pre = pre[-[pre.size, charactersChunkSize].min,charactersChunkSize].split(" ").last(preAndPostChunkSize).join(" ")
+
         # get the text after the match and extract the first 7 words
-        post = m.post_match().split(" ").first(preAndPostChunkSize).join(" ")
+        post = m.post_match()[0,charactersChunkSize].split(" ").first(preAndPostChunkSize).join(" ")
 
         # since some special character might slip in the match, we do a second match to
         # add color only to the proper text.
