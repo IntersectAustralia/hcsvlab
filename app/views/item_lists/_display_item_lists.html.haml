@@ -18,7 +18,6 @@
               %div{:style=>"display:inline-block;"}
                 =link_to(itemList, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Item List "'+ itemList.name + '"?\', event));') do
                   %i{:class=>"icon-trash"}
-= render 'shared/modal_waiting_panel'
 
 :javascript
   function confirmDelete(text, event) {

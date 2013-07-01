@@ -157,13 +157,10 @@ namespace :fedora do
 		item.save!
 
 		# Msg to fedora.apim.update
-		#publish :fedora_worker, "<xml><title>finishedWork</title><content>Fedora worker has finished with #{item.pid}</content><summary>#{item.pid}</summary> </xml>"
-
-		#ms = MessageSender.new
-		#ms.send_message(item.pid)
 
 		client = Stomp::Client.open "stomp://localhost:61613"
 		client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
+		client.close
 
 	end
 
