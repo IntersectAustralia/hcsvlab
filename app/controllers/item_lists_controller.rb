@@ -81,12 +81,14 @@ class ItemListsController < ApplicationController
       return
     end
 
-    params[:q] = 'full_text:' + params[:search_for]
+    # do matching only in the text. search for "dog," results in "dog", but search for "dog-fighter" results in "dog-fighter"
+    search_for = params[:search_for].match(/(\w+([-]?\w+)?)/i).to_s
+
+    params[:q] = 'full_text:"' + search_for + '"'
 
     bench_start = Time.now
-    @highlighting = processAndHighlightManually(7)
-    #@highlighting = processAndHighlightWithSolr()
-    Rails.logger.debug("Time for processing the concordance view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+    @highlighting = processAndHighlightManually(search_for, 7)
+    Rails.logger.debug("Time for searching for '#{search_for}' in concordance view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
 
     #doFrecuencySearch(params[:search_for])
 
@@ -95,11 +97,13 @@ class ItemListsController < ApplicationController
 
   def frequency_search
     @facet_field = params[:facet]
-    params[:q] = 'full_text:' + params[:search_for]
+    search_for = params[:search_for].match(/(\w+([-]?\w+)?)/i).to_s
+
+    params[:q] = 'full_text:"' + search_for + '"'
 
     bench_start = Time.now
 
-    doFrequencySearch(params[:search_for])
+    doFrequencySearch(search_for)
 
     Rails.logger.debug("Time for processing the frequency view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
   end
@@ -110,9 +114,7 @@ class ItemListsController < ApplicationController
 
   def doFrequencySearch(search_for)
 
-    #searchPattern = /(\s[^\w]*)#{search_for}([^\w]*\s)/i
-    searchPattern = /(^|\s)*([^\w]+)(\w+-)*(#{params[:search_for]})(-\w+)*([^\w]+)(\s|$)*/i
-
+    searchPattern = /(^|\W)(#{search_for})(\W|$)/i
 
     self.solr_search_params_logic += [:add_frequency_solr_extra_filters]
 
@@ -153,9 +155,8 @@ class ItemListsController < ApplicationController
     solr_parameters[:'facet.limit'] = -1
   end
 
-  def processAndHighlightManually(preAndPostChunkSize)
-    #searchPattern = /(\s[^\w]*)#{params[:search_for]}([^\w]*\s)/i
-    searchPattern = /(^|\s)*([^\w]+)(\w+-)*(#{params[:search_for]})(-\w+)*([^\w]+)(\s|$)*/i
+  def processAndHighlightManually(search_for, preAndPostChunkSize)
+    searchPattern = /(^|\W)(#{search_for})(\W|$)/i
 
     # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
     self.solr_search_params_logic += [:add_solr_extra_filters]
@@ -182,9 +183,9 @@ class ItemListsController < ApplicationController
 
         # since some special character might slip in the match, we do a second match to
         # add color only to the proper text.
-        subMatch = m.to_s.match(/#{params[:search_for]}/i)
-        subMatchPre = subMatch.pre_match()
-        subMatchPost = subMatch.post_match()
+        subMatch = m[2]
+        subMatchPre = m[1]
+        subMatchPost = m[3]
 
         # Add come color to the martching word
         text = "<span class='highlighting'>#{subMatch.to_s}</span>"
