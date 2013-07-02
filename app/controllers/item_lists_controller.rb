@@ -115,7 +115,7 @@ class ItemListsController < ApplicationController
     all_facet_fields = @response[:facet_counts][:facet_fields]
 
     # get search result from solr
-    params[:q] = "full_text:'#{search_for}'"
+    params[:q] = "{!qf=full_text pf=''}#{search_for}"
     (@response, @document_list) = get_search_results
 
     facet_fields = @response[:facet_counts][:facet_fields]
@@ -180,9 +180,13 @@ class ItemListsController < ApplicationController
           if (result[facet].nil?)
             result[facet] = {:num_docs => "###", :num_occurrences => 0}
           end
-          value[:full_text].each do |aMatch|
-            matchingData = aMatch.to_enum(:scan, pattern).map { Regexp.last_match }
-            result[facet][:num_occurrences] = result[facet][:num_occurrences] + matchingData.size
+          if (!value[:full_text].nil?)
+            value[:full_text].each do |aMatch|
+              matchingData = aMatch.to_enum(:scan, pattern).map { Regexp.last_match }
+              result[facet][:num_occurrences] = result[facet][:num_occurrences] + matchingData.size
+            end
+          else
+            Rails.logger.error("Solr has returned results for document id: #{docId} but it didn't highlighted any match")
           end
         end
       end
@@ -210,8 +214,10 @@ class ItemListsController < ApplicationController
     solr_parameters[:hl] = "on"
     solr_parameters[:'hl.fl'] = "full_text"
     solr_parameters[:'hl.snippets'] = 1000
-    solr_parameters[:'hl.simple.pre'] = "###***###"
-    solr_parameters[:'hl.simple.post'] = "###***###"
+    solr_parameters[:'hl.simple.pre'] = "###***###" # indicate SOLR to surround the matching text with this chars
+    solr_parameters[:'hl.simple.post'] = "###***###" # indicate SOLR to surround the matching text with this chars
+    solr_parameters[:'hl.fragsize'] = 0
+    solr_parameters[:'hl.maxAnalyzedChars'] = -1 # indicate SOLR to process the whole text
 
   end
 
