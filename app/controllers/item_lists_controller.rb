@@ -82,23 +82,9 @@ class ItemListsController < ApplicationController
       return
     end
 
-    # do matching only in the text. search for "dog," results in "dog", but search for "dog-fighter" results in "dog-fighter"
-    search_for = params[:search_for].match(/(\w+([-]?\w+)?)/i).to_s
-    params[:q] = 'full_text:"' + search_for + '"'
-
-    bench_start = Time.now
-
-    # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
-    self.solr_search_params_logic += [:add_concordance_solr_extra_filters]
-
-    # get search result from solr
-    (@response, @document_list) = get_search_results
-
-    #process the information
-    @highlighting = processAndHighlightManually(@document_list, search_for)
-
-    Rails.logger.debug("Time for searching for '#{search_for}' in concordance view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
-
+    result = @item_list.doConcordanceSearch(params[:search_for])
+    @highlighting = result[:highlighting]
+    @matchingDocs = result[:matching_docs]
   end
 
   def frequency_search
@@ -219,59 +205,6 @@ class ItemListsController < ApplicationController
     solr_parameters[:'hl.fragsize'] = 0
     solr_parameters[:'hl.maxAnalyzedChars'] = -1 # indicate SOLR to process the whole text
 
-  end
-
-  def processAndHighlightManually(document_list, search_for)
-    charactersChunkSize = 200
-    searchPattern = /(^|\W)(#{search_for})(\W|$)/i
-
-    # Get document full text
-    highlighting = {}
-    document_list.each do |doc|
-      full_text = doc[:full_text]
-
-      highlighting[doc[:id]] = {}
-      highlighting[doc[:id]][:title] = main_link_label(doc)
-      highlighting[doc[:id]][:matches] = []
-
-      # Iterate over everything that matches with the search in case-insensitive mode
-      matchingData = full_text.to_enum(:scan, searchPattern).map { Regexp.last_match }
-      matchingData.each { |m|
-        # get the text preceding the match and extract the last 7 words
-        pre = m.pre_match()
-        pre = pre[-[pre.size, charactersChunkSize].min,charactersChunkSize].split(" ").last(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
-
-        # get the text after the match and extract the first 7 words
-        post = m.post_match()[0,charactersChunkSize].split(" ").first(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
-
-        # since some special character might slip in the match, we do a second match to
-        # add color only to the proper text.
-        subMatch = m[2]
-        subMatchPre = m[1]
-        subMatchPost = m[3]
-
-        # Add come color to the martching word
-        highlightedText = "<span class='highlighting'>#{subMatch.to_s}</span>"
-
-        formattedMatch = {}
-        formattedMatch[:textBefore] = pre +  subMatchPre
-        formattedMatch[:textAfter] = subMatchPost + post
-        formattedMatch[:textHighlighted] = highlightedText
-
-        highlighting[doc[:id]][:matches] << formattedMatch
-
-      }
-
-      Rails.logger.error("Solr has returned results for document id: #{doc[:id]} with title:'#{highlighting[doc[:id]][:title]}' but the highlighting procedure didn't find those results") if (highlighting[doc[:id]][:matches].empty?)
-
-    end
-
-    highlighting
-  end
-
-  def add_concordance_solr_extra_filters(solr_parameters, user_params)
-    solr_parameters[:fq] = 'item_lists:' + params[:id]
-    solr_parameters[:rows] = FIXNUM_MAX
   end
 
 # I COMMENTED THIS CODE BECAUSE WE ARE STILL NOT SURE IF WE ARE GOING TO USE SOLR
