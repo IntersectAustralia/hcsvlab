@@ -197,7 +197,7 @@ class ItemList < ActiveRecord::Base
   # Add the contents of item_list to this ItemList.
   #
   def add_item_list(item_list)
-    return add_items(get_item_ids)
+    return add_items(item_list.get_item_ids)
   end
   
   #

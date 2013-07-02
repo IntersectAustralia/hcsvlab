@@ -4,6 +4,7 @@ require 'capistrano/ext/multistage'
 require 'capistrano_colors'
 require 'rvm/capistrano'
 
+set :keep_releases, 5
 set :application, 'hcsvlab-web'
 set :stages, %w(qa qa2 staging staging2 production)
 set :default_stage, "qa"
@@ -114,8 +115,8 @@ after 'deploy:update' do
   deploy.create_deployment_record
   deploy.restart
   deploy.additional_symlinks
-
   deploy.write_tag
+  deploy.cleanup
 end
 
 after 'deploy:finalize_update' do
@@ -356,12 +357,25 @@ namespace :deploy do
     require 'net/http'
     require 'socket'
 
-    url = URI.parse('http://deployment-tracker.intersect.org.au/deployments/api_create')
+    branchName = branch.nil? ? "HEAD" : branch
+
+    availableTags = `git tag`.split( /\r?\n/ )
+    haveToShowHash = !availableTags.any? { |s| s.include?(branchName) }
+
+    current_deployed_version = branchName
+    if (haveToShowHash)
+      availableBranches = `git branch -a`.split( /\r?\n/ )
+      fullBranchName = (branchName.eql?("HEAD")) ? branchName : availableBranches.select { |s| s.include?(branchName) }.first.to_s.strip
+      fullBranchName.gsub!('*','').strip! if fullBranchName.include?('*')
+      current_deployed_version += " (sha1:" + `git rev-parse --short #{fullBranchName}`.strip + ")"
+    end
+
+    url = URI.parse('http://http://deployment-tracker.intersect.org.au/deployments/api_create/deployments/api_create')
     post_args = {'app_name'=>application, 
       'deployer_machine'=>"#{ENV['USER']}@#{Socket.gethostname}", 
       'environment'=>rails_env, 
       'server_url'=>find_servers[0].to_s,
-      'tag'=> branch || "HEAD"}
+      'tag'=> current_deployed_version}
     begin
       print "Sending Post request with args: #{post_args}\n"
       resp, data = Net::HTTP.post_form(url, post_args)

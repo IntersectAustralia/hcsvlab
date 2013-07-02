@@ -48,30 +48,25 @@
       clip.on('complete', function (client, args) {
         alert("API Key copied to clipboard!");
       });
-      clip.on('mouseout', function (client, args) {
-        $(this).removeClass("hovered");
-        $(this).closest('.dropdown-submenu').children('a').removeClass('hovered');
+      clip.on('mouseover', function(){
+        $('#zc_copy_token').addClass("hovered");
+        $('#zc_copy_token').closest('.dropdown-submenu').addClass('open');
+      });
+      clip.on('mouseout', function(){
+        $('#zc_copy_token').removeClass("hovered");
       });
     }
   });
 
-  $('#zc_copy_token').mouseover(function (e) {
-
-    if (!$(this).closest('li').hasClass('disabled')) {
-      $(this).addClass("hovered");
-      $(this).closest('.dropdown-submenu').children('a').addClass('hovered');
-      $(this).closest('.dropdown-submenu').addClass('open');
+  $('#api_token_submenu a, #api_token_submenu').hover(function (e) {
+    if($('#global-zeroclipboard-html-bridge').is(':hover')){
+      $('#zc_copy_token').addClass("hovered");
+      $('#zc_copy_token').closest('.dropdown-submenu').children('a').addClass('hovered');
+      $('#zc_copy_token').closest('.dropdown-submenu').addClass('open');
+    } else {
+      $('#zc_copy_token').removeClass("hovered");
+      $('#zc_copy_token').closest('.dropdown-submenu').children('a').removeClass('hovered');
     }
-
-  });
-
-  $('#zc_copy_token').mouseout(function (e) {
-    if (!$(this).closest('li').hasClass('disabled')) {
-      $(this).addClass("hovered");
-      $(this).closest('.dropdown-submenu').children('a').addClass('hovered');
-      $(this).closest('.dropdown-submenu').addClass('open');
-    }
-
   });
 
   $('.dropdown-menu li a').mouseover(function (e) {

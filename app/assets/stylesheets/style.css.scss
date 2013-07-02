@@ -481,6 +481,10 @@ color: #333;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFD875', endColorstr='#FFD875', GradientType=0);
 }
 
+#zc_copy_token:hover {
+  background: none;
+}
+
 #searchbar #search_field { display: none; }
 
 #searchbar input { width: 190px; }
