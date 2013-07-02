@@ -4,7 +4,7 @@
     %h2
       ="Found #{@document_list.size} matching documents"
   - if (!params[:id].nil?)
-    .well= render 'search_form'
+    = render 'search_form'
   - if (!@highlighting.nil? and !@highlighting.empty?)
     .document
       - @highlighting.each do |key, value|

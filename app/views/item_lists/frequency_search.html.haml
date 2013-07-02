@@ -3,13 +3,13 @@
   - if (!params[:id].nil?)
     = render 'search_form'
   - if (!@result.nil? && !@result.empty?)
-    %table{:style=>"width:100%"}
-      %tr{:style=>"backgraound-color:gray"}
-        %th{:style=>"backgraound-color:gray"}
+    %table{:class=>"table table-striped"}
+      %tr
+        %th
           Facet value
-        %th{:style=>"backgraound-color:gray"}
+        %th
           Matching documents
-        %th{:style=>"backgraound-color:gray"}
+        %th
           Term Occurrences
       - @result.each_pair do |key, value|
         %tr
