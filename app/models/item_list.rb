@@ -1,5 +1,11 @@
 class ItemList < ActiveRecord::Base
   include Blacklight::BlacklightHelperBehavior
+  include Blacklight::Configurable
+  include Blacklight::SolrHelper
+
+  FIXNUM_MAX = 2147483647
+  CONCORDANCE_PRE_POST_CHUNK_SIZE = 7
+
 
   belongs_to :user
 
@@ -253,6 +259,66 @@ class ItemList < ActiveRecord::Base
     return remove_items(get_item_ids)
   end
 
+  #
+  # Perform a Concordance search for a given term
+  #
+  def doConcordanceSearch(term)
+    bench_start = Time.now
+
+    # do matching only in the text. search for "dog," results in "dog", but search for "dog-fighter" results in "dog-fighter"
+    search_for = term.match(/(\w+([-]?\w+)?)/i).to_s
+    params = {}
+    params[:q] = 'full_text:"' + search_for + '"'
+
+    # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
+    self.solr_search_params_logic += [:add_concordance_solr_extra_filters]
+
+    # get search result from solr
+    (response, document_list) = get_search_results params
+
+    #process the information
+    highlighting = processAndHighlightManually(document_list, search_for)
+    matchingDocs = document_list.size
+
+    result = {:highlighting => highlighting, :matching_docs => matchingDocs}
+
+    Rails.logger.debug("Time for searching for '#{search_for}' in concordance view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+
+    result
+  end
+
+  #
+  # Perform a Frequency search for a given query
+  #
+  def doFrequencySearch(query, facet)
+    bench_start = Time.now
+    # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
+    self.solr_search_params_logic += [:add_frequency_solr_extra_filters]
+
+    params = {}
+    params[:'facet.field'] = facet
+    # first I need to get all the facets and its values
+    params[:q] = '*:*'
+    (response, document_list) = get_search_results params
+    all_facet_fields = response[:facet_counts][:facet_fields]
+
+    # get search result from solr
+    params[:q] = "{!qf=full_text pf=''}#{query}"
+    params[:hl] = "on"
+    params[:'hl.maxAnalyzedChars'] = -1 # indicate SOLR to process the whole text
+    (response, document_list) = get_search_results params
+
+    facet_fields = response[:facet_counts][:facet_fields]
+    highlighting = response[:highlighting]
+
+    #process the information
+    result = executeFrequencySearch(all_facet_fields, facet_fields, document_list, highlighting, facet)
+
+    Rails.logger.debug("Time for searching for '#{query}' in frequency view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+
+    result
+  end
+
   private
 
   #
@@ -294,7 +360,6 @@ class ItemList < ActiveRecord::Base
     update_solr_field(item_id, field_id, '.', 'set')
   end
 
-
   def force_to_utf8(value)
     case value
       when Hash
@@ -307,4 +372,173 @@ class ItemList < ActiveRecord::Base
     value
   end
 
+  #
+  # Process the documents returned in the concordance search, it highlights the searched term and
+  # extract the surrounding words for each match
+  #
+  def processAndHighlightManually(document_list, search_for)
+    charactersChunkSize = 200
+    searchPattern = /(^|\W)(#{search_for})(\W|$)/i
+
+    # Get document full text
+    highlighting = {}
+    document_list.each do |doc|
+      full_text = doc[:full_text]
+
+      highlighting[doc[:id]] = {}
+      highlighting[doc[:id]][:title] = main_link_label(doc)
+      highlighting[doc[:id]][:matches] = []
+
+      # Iterate over everything that matches with the search in case-insensitive mode
+      matchingData = full_text.to_enum(:scan, searchPattern).map { Regexp.last_match }
+      matchingData.each { |m|
+        # get the text preceding the match and extract the last 7 words
+        pre = m.pre_match()
+        pre = pre[-[pre.size, charactersChunkSize].min,charactersChunkSize].split(" ").last(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
+
+        # get the text after the match and extract the first 7 words
+        post = m.post_match()[0,charactersChunkSize].split(" ").first(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
+
+        # since some special character might slip in the match, we do a second match to
+        # add color only to the proper text.
+        subMatch = m[2]
+        subMatchPre = m[1]
+        subMatchPost = m[3]
+
+        # Add come color to the martching word
+        highlightedText = "<span class='highlighting'>#{subMatch.to_s}</span>"
+
+        formattedMatch = {}
+        formattedMatch[:textBefore] = pre +  subMatchPre
+        formattedMatch[:textAfter] = subMatchPost + post
+        formattedMatch[:textHighlighted] = highlightedText
+
+        highlighting[doc[:id]][:matches] << formattedMatch
+
+      }
+      Rails.logger.error("Solr has returned results for document id: #{doc[:id]} with title:'#{highlighting[doc[:id]][:title]}' but the highlighting procedure didn't find those results") if (highlighting[doc[:id]][:matches].empty?)
+
+    end
+
+    highlighting
+  end
+
+  #
+  # Add extra parameters in SOLR filters for the Concordance search
+  #
+  def add_concordance_solr_extra_filters(solr_parameters, user_params)
+    solr_parameters[:q] = user_params[:q]
+    solr_parameters[:fq] = 'item_lists:' + id.to_s
+    solr_parameters[:rows] = FIXNUM_MAX
+  end
+
+  #
+  # Process all the information retrieved from SOLR.
+  #
+  def executeFrequencySearch(all_facet_fields, facet_fields, document_list, highlighting, facet_field_restriction)
+
+    facetsWithResults = facet_fields[facet_field_restriction]
+    allFacets = all_facet_fields[facet_field_restriction]
+
+    # First I will obtain the facets and the number of documents matching with each one
+    result = {}
+    i = 0
+    while (!allFacets.nil? and i < allFacets.size) do
+      # Blacklight returns the facets setting the name of the facet in the even numbers, and the
+      # number of document for that facet in the next index.
+      facetValue = allFacets[i]
+
+      result[facetValue] = {:num_docs => 0, :num_occurrences => 0}
+
+      i = i + 2
+    end
+
+    i = 0
+    while (i < facetsWithResults.size) do
+      # Blacklight returns the facets setting the name of the facet in the even numbers, and the
+      # number of document for that facet in the next index.
+      facetValue = facetsWithResults[i]
+      facetNumDocs = facetsWithResults[i+1]
+
+      result[facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
+
+      i = i + 2
+    end
+
+    # In order to get better performance, I will create a hash containing the facets for each document
+    facetsByDocuments = extractFacetsFromDocuments(document_list, facet_field_restriction)
+
+    # Count the occurrences of the search in the highlighted fragments returned by SOLR
+    countOccurrences(highlighting, facetsByDocuments, facetValue, result)
+
+    result
+  end
+
+  #
+  # This method count the occurrences of the search in the returned highlighted results
+  #
+  def countOccurrences(highlighting, facetsByDocuments, facetValue, result)
+    pattern = /(###\*\*\*###)(\w+)(###\*\*\*###)/i
+    highlighting.each do |docId, value|
+      facetValue = facetsByDocuments[docId]
+      if (!facetValue.nil?)
+        facetValue.each do |facet|
+          # If for some reason the facet is not in the Hash, I won't make the process fail, but
+          # I will show the text "###" in the number of documents. This should not happen.
+          if (result[facet].nil?)
+            result[facet] = {:num_docs => "###", :num_occurrences => 0}
+          end
+          if (!value[:full_text].nil?)
+            value[:full_text].each do |aMatch|
+              matchingData = aMatch.to_enum(:scan, pattern).map { Regexp.last_match }
+              result[facet][:num_occurrences] = result[facet][:num_occurrences] + matchingData.size
+            end
+          else
+            Rails.logger.error("Solr has returned results for document id: #{docId} but it didn't highlighted any match")
+          end
+        end
+      end
+    end
+  end
+
+  #
+  # This method creates a Hash containing the values of an specified facet in a document
+  #
+  def extractFacetsFromDocuments(document_list, facet_field_restriction)
+    result = {}
+    document_list.each do |aDoc|
+      result[aDoc[:id]] = aDoc[facet_field_restriction]
+    end
+    result
+  end
+
+  #
+  # This method adds extra parameters to the SOLR search.
+  #
+  def add_frequency_solr_extra_filters(solr_parameters, user_params)
+    solr_parameters[:fq] = 'item_lists:' + id.to_s
+    solr_parameters[:rows] = FIXNUM_MAX
+    solr_parameters[:facet] = "on"
+    solr_parameters[:'facet.field'] = user_params[:'facet.field']
+    solr_parameters[:'facet.limit'] = -1
+
+    #highlighting parameters
+    solr_parameters[:hl] = user_params[:hl]
+    solr_parameters[:'hl.fl'] = "full_text"
+    solr_parameters[:'hl.snippets'] = 1000
+    solr_parameters[:'hl.simple.pre'] = "###***###" # indicate SOLR to surround the matching text with this chars
+    solr_parameters[:'hl.simple.post'] = "###***###" # indicate SOLR to surround the matching text with this chars
+    solr_parameters[:'hl.fragsize'] = 0
+    if (!user_params[:'hl.maxAnalyzedChars'].nil?)
+      solr_parameters[:'hl.maxAnalyzedChars'] = user_params[:'hl.maxAnalyzedChars']
+    end
+  end
+
+  #
+  # blacklight uses this method to get the SOLR connection.
+  #
+  def blacklight_solr
+    get_solr_connection
+    @@solr
+  end
 end
