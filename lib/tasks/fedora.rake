@@ -122,6 +122,7 @@ namespace :fedora do
 
 		stomp_client = Stomp::Client.open "stomp://localhost:61613"
 		reindex_item(item_id, stomp_client)
+		stomp_client.close
 	end
 
 
@@ -143,6 +144,7 @@ namespace :fedora do
   			id = obj["id"].to_s
   			reindex_item(id, stomp_client)
 		end
+		stomp_client.close
 
 	end
 

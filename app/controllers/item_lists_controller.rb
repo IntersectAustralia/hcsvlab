@@ -6,6 +6,7 @@ class ItemListsController < ApplicationController
   include Blacklight::BlacklightHelperBehavior
   
   FIXNUM_MAX = 2147483647
+  CONCORDANCE_PRE_POST_CHUNK_SIZE = 7
 
   before_filter :authenticate_user!
   load_and_authorize_resource
@@ -94,7 +95,7 @@ class ItemListsController < ApplicationController
     (@response, @document_list) = get_search_results
 
     #process the information
-    @highlighting = processAndHighlightManually(@document_list, search_for, 7)
+    @highlighting = processAndHighlightManually(@document_list, search_for)
 
     Rails.logger.debug("Time for searching for '#{search_for}' in concordance view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
 
@@ -102,34 +103,50 @@ class ItemListsController < ApplicationController
 
   def frequency_search
     @facet_field = params[:facet]
-    search_for = params[:search_for].match(/(\w+([-]?\w+)?)/i).to_s
-
-    params[:q] = 'full_text:"' + search_for + '"'
+    search_for = params[:search_for]
 
     bench_start = Time.now
     # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
     self.solr_search_params_logic += [:add_frequency_solr_extra_filters]
 
-    # get search result from solr
+    # first I need to get all the facets and its values
+    params[:q] = '*:*'
     (@response, @document_list) = get_search_results
+    all_facet_fields = @response[:facet_counts][:facet_fields]
+
+    # get search result from solr
+    params[:q] = "full_text:'#{search_for}'"
+    (@response, @document_list) = get_search_results
+
     facet_fields = @response[:facet_counts][:facet_fields]
+    highlighting = @response[:highlighting]
 
     #process the information
-    @result = doFrequencySearch(facet_fields, @document_list, search_for, @facet_field)
+    @result = doFrequencySearch(all_facet_fields, facet_fields, @document_list, highlighting, @facet_field)
 
-    Rails.logger.debug("Time for processing the frequency view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+    Rails.logger.debug("Time for searching for '#{search_for}' in frequency view: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
   end
 
   private
 
-  def doFrequencySearch(facet_fields, document_list, search_for, facet_field_restriction)
-
-    searchPattern = /(^|\W)(#{search_for})(\W|$)/i
+  def doFrequencySearch(all_facet_fields, facet_fields, document_list, highlighting, facet_field_restriction)
 
     facetsWithResults = facet_fields[facet_field_restriction]
+    allFacets = all_facet_fields[facet_field_restriction]
 
     # First I will obtain the facets and the number of documents matching with each one
     result = {}
+    i = 0
+    while (i < allFacets.size) do
+      # Blacklight returns the facets setting the name of the facet in the even numbers, and the
+      # number of document for that facet in the next index.
+      facetValue = allFacets[i]
+
+      result[facetValue] = {:num_docs => 0, :num_occurrences => 0}
+
+      i = i + 2
+    end
+
     i = 0
     while (i < facetsWithResults.size) do
       # Blacklight returns the facets setting the name of the facet in the even numbers, and the
@@ -142,11 +159,20 @@ class ItemListsController < ApplicationController
       i = i + 2
     end
 
-    # Second I will count the number of matches in each document.
-    document_list.each do |doc|
-      full_text = doc[:full_text]
-      matchingData = full_text.to_enum(:scan, searchPattern).map { Regexp.last_match }
-      facetValue = doc[facet_field_restriction]
+    # In order to get better performance, I will create a hash containing the facets for each document
+    facetsByDocuments = extractFacetsFromDocuments(document_list, facet_field_restriction)
+
+    # Count the occurrences of the search in the highlighted fragments returned by SOLR
+    countOccurrences(highlighting, facetsByDocuments, facetValue, result)
+
+    result
+  end
+
+  # This method count the occurrences of the search in the returned highlighted results
+  def countOccurrences(highlighting, facetsByDocuments, facetValue, result)
+    pattern = /(###\*\*\*###)(\w+)(###\*\*\*###)/i
+    highlighting.each do |docId, value|
+      facetValue = facetsByDocuments[docId]
       if (!facetValue.nil?)
         facetValue.each do |facet|
           # If for some reason the facet is not in the Hash, I won't make the process fail, but
@@ -154,23 +180,42 @@ class ItemListsController < ApplicationController
           if (result[facet].nil?)
             result[facet] = {:num_docs => "###", :num_occurrences => 0}
           end
-          result[facet][:num_occurrences] = result[facet][:num_occurrences] + matchingData.size
+          value[:full_text].each do |aMatch|
+            matchingData = aMatch.to_enum(:scan, pattern).map { Regexp.last_match }
+            result[facet][:num_occurrences] = result[facet][:num_occurrences] + matchingData.size
+          end
         end
       end
     end
+  end
 
+  # This method creates a Hash containing the values of an specified facet in a document
+  def extractFacetsFromDocuments(document_list, facet_field_restriction)
+    result = {}
+    document_list.each do |aDoc|
+      result[aDoc[:id]] = aDoc[facet_field_restriction]
+    end
     result
   end
 
+  # This method adds extra parameters to the SOLR search.
   def add_frequency_solr_extra_filters(solr_parameters, user_params)
     solr_parameters[:fq] = 'item_lists:' + params[:id]
     solr_parameters[:rows] = FIXNUM_MAX
     solr_parameters[:facet] = "on"
     solr_parameters[:'facet.field'] = @facet_field
     solr_parameters[:'facet.limit'] = -1
+
+    #highlighting parameters
+    solr_parameters[:hl] = "on"
+    solr_parameters[:'hl.fl'] = "full_text"
+    solr_parameters[:'hl.snippets'] = 1000
+    solr_parameters[:'hl.simple.pre'] = "###***###"
+    solr_parameters[:'hl.simple.post'] = "###***###"
+
   end
 
-  def processAndHighlightManually(document_list, search_for, preAndPostChunkSize)
+  def processAndHighlightManually(document_list, search_for)
     charactersChunkSize = 200
     searchPattern = /(^|\W)(#{search_for})(\W|$)/i
 
@@ -188,10 +233,10 @@ class ItemListsController < ApplicationController
       matchingData.each { |m|
         # get the text preceding the match and extract the last 7 words
         pre = m.pre_match()
-        pre = pre[-[pre.size, charactersChunkSize].min,charactersChunkSize].split(" ").last(preAndPostChunkSize).join(" ")
+        pre = pre[-[pre.size, charactersChunkSize].min,charactersChunkSize].split(" ").last(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
 
         # get the text after the match and extract the first 7 words
-        post = m.post_match()[0,charactersChunkSize].split(" ").first(preAndPostChunkSize).join(" ")
+        post = m.post_match()[0,charactersChunkSize].split(" ").first(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
 
         # since some special character might slip in the match, we do a second match to
         # add color only to the proper text.
