@@ -21,7 +21,7 @@ namespace :fedora do
 			exit 1
 		end
 
-		ingest_rdf_file(File.dirname(corpus_rdf), corpus_rdf)
+		ingest_rdf_file(File.dirname(corpus_rdf), corpus_rdf, true)
 
 	end
 
