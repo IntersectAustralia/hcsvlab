@@ -514,7 +514,8 @@ private
   # Extract the last part of a path/URI/slash-separated-list-of-things
   #
   def last_bit(uri)
-    str = uri.to_s   # just in case it is not a String object
+    str = uri.to_s                # just in case it is not a String object
+    return str if str.match(/\s/) # If there are spaces, then it's not a path(?)
     return str.split('/')[-1]
   end
 
