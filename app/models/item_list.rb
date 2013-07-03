@@ -263,6 +263,15 @@ class ItemList < ActiveRecord::Base
   # Perform a Concordance search for a given term
   #
   def doConcordanceSearch(term)
+    pattern = /([^\w-])/i
+    matchingWords = term.to_enum(:scan, pattern).map { Regexp.last_match }
+
+    #if params[:search_for].split.size > 1
+    if matchingWords.length > 0
+      result = {:error => "Concordance search allows only one word for searching. E.g. dog, dog-fighter"}
+      return result
+    end
+
     bench_start = Time.now
 
     # do matching only in the text. search for "dog," results in "dog", but search for "dog-fighter" results in "dog-fighter"
