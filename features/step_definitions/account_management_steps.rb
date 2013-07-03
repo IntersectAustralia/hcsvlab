@@ -21,7 +21,7 @@ And /^I have role "([^"]*)"$/ do |name|
 end
 
 Given /^"([^"]*)" has role "([^"]*)"$/ do |email, role|
-  user = User.where(:email => email).first 
+  user = User.where(:email => email).first
   role = Role.where(:name => role).first
   user.role = role
   user.save!(:validate => false)

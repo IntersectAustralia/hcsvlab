@@ -8,36 +8,36 @@ module HtmlSelectorsHelpers
   def selector_for(locator)
     case locator
 
-    when "the page"
-      "html > body"
+      when "the page"
+        "html > body"
 
-    when "the api token display"
-      "#api_token_display"
-      
-    when "the api token dropdown"
-      "#api_token_submenu"
+      when "the api token display"
+        "#api_token_display"
 
-    # Add more mappings here.
-    # Here is an example that pulls values out of the Regexp:
-    #
-    #  when /^the (notice|error|info) flash$/
-    #    ".flash.#{$1}"
+      when "the api token dropdown"
+        "#api_token_submenu"
 
-    # You can also return an array to use a different selector
-    # type, like:
-    #
-    #  when /the header/
-    #    [:xpath, "//header"]
+      # Add more mappings here.
+      # Here is an example that pulls values out of the Regexp:
+      #
+      #  when /^the (notice|error|info) flash$/
+      #    ".flash.#{$1}"
 
-    # This allows you to provide a quoted selector as the scope
-    # for "within" steps as was previously the default for the
-    # web steps:
-    when /^"(.+)"$/
-      $1
+      # You can also return an array to use a different selector
+      # type, like:
+      #
+      #  when /the header/
+      #    [:xpath, "//header"]
 
-    else
-      raise "Can't find mapping from \"#{locator}\" to a selector.\n" +
-        "Now, go and add a mapping in #{__FILE__}"
+      # This allows you to provide a quoted selector as the scope
+      # for "within" steps as was previously the default for the
+      # web steps:
+      when /^"(.+)"$/
+        $1
+
+      else
+        raise "Can't find mapping from \"#{locator}\" to a selector.\n" +
+                  "Now, go and add a mapping in #{__FILE__}"
     end
   end
 end

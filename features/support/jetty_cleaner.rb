@@ -1,4 +1,3 @@
-
 def clear_jetty
   # clear Solr
   uri = URI.parse(ActiveFedora.solr_config[:url] + '/update?commit=true')
@@ -52,7 +51,7 @@ at_exit do
   clear_jetty
 end
 
-Before do  
+Before do
   clear_jetty
 end
 

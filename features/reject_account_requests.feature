@@ -2,7 +2,7 @@ Feature: Reject access requests
   In order to manage the system
   As an administrator
   I want to reject access requests
-  
+
   Background:
     Given I have the usual roles and permissions
     And I have a user "georgina@intersect.org.au"
@@ -86,11 +86,11 @@ Feature: Reject access requests
     And I follow "Logout"
     And I am on the request account page
     And I fill in the following:
-      | Email Address         | diego@intersect.org.au |
-      | Password              | Pas$w0rd               |
-      | Confirm Password      | Pas$w0rd               |
-      | First Name            | Fred                   |
-      | Last Name             | Bloggs                 |
+      | Email Address    | diego@intersect.org.au |
+      | Password         | Pas$w0rd               |
+      | Confirm Password | Pas$w0rd               |
+      | First Name       | Fred                   |
+      | Last Name        | Bloggs                 |
     And I press "Submit Request"
     Then I should see "Thanks for requesting an account. You will receive an email when your request has been approved."
 
@@ -101,11 +101,11 @@ Feature: Reject access requests
     And I follow "Logout"
     And I am on the request account page
     And I fill in the following:
-      | Email Address         | diego@intersect.org.au |
-      | Password              | Pas$w0rd               |
-      | Confirm Password      | Pas$w0rd               |
-      | First Name            | Fred                   |
-      | Last Name             | Bloggs                 |
+      | Email Address    | diego@intersect.org.au |
+      | Password         | Pas$w0rd               |
+      | Confirm Password | Pas$w0rd               |
+      | First Name       | Fred                   |
+      | Last Name        | Bloggs                 |
     And I press "Submit Request"
     Then I should see "has already been taken"
 

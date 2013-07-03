@@ -7,7 +7,7 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   # look_for_documents(item, corpus_dir, rdf_file)
 
   item = Item.new(pid: pid)
-  item.descMetadata.graph.load("#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf", :format => :ttl, :validate => true )
+  item.descMetadata.graph.load("#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf", :format => :ttl, :validate => true)
   item.label = item.descMetadata.graph.statements.first.subject
   item.save!
   xml = File.read("#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-solr.xml")
