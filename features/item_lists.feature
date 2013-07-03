@@ -32,6 +32,7 @@ Feature: Managing Item Lists
       | hcsvlab:1 |
       | hcsvlab:2 |
       | hcsvlab:3 |
+    And I am on the item list page for "Add All Test"
     And I should see "1 - 3 of 3"
 
   @javascript
@@ -57,6 +58,7 @@ Feature: Managing Item Lists
       | hcsvlab:1 |
       | hcsvlab:2 |
       | hcsvlab:3 |
+    And I am on the item list page for "Add All Test"
     And I should see "1 - 3 of 3"
 
   Scenario: Accessing other user's Item Lists
