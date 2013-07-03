@@ -58,7 +58,7 @@ Feature: Managing Item Lists
       | hcsvlab:1 |
       | hcsvlab:2 |
       | hcsvlab:3 |
-    And I am on the item list page for "Add All Test"
+    And I am on the item list page for "Add Selected Test"
     And I should see "1 - 3 of 3"
 
   Scenario: Accessing other user's Item Lists
@@ -81,7 +81,6 @@ Feature: Managing Item Lists
     And the item list "Clear Test" should have 3 items
     And I follow "Clear Item List"
     And I should see "3 cleared from item list Clear Test"
-    And I should see "Item List is empty"
 
   Scenario: Deleting an Item List
     And "researcher@intersect.org.au" has item lists
