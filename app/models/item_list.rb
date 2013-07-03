@@ -263,7 +263,8 @@ class ItemList < ActiveRecord::Base
   # Perform a Concordance search for a given term
   #
   def doConcordanceSearch(term)
-    pattern = /(([^\w-])|(^-\w+)|(\w+-$)|(-{2,}))/i
+    #pattern = /(([^\w-])|(^-\w+)|(\w+-$)|(-{2,}))/i
+    pattern = /(([^\w])|(^-\w+)|(\w+-$))/i
     matchingWords = term.to_enum(:scan, pattern).map { Regexp.last_match }
 
     if matchingWords.length > 0
@@ -276,7 +277,9 @@ class ItemList < ActiveRecord::Base
     # do matching only in the text. search for "dog," results in "dog", but search for "dog-fighter" results in "dog-fighter"
     search_for = term.match(/(\w+([-]?\w+)?)/i).to_s
     params = {}
-    params[:q] = 'full_text:"' + search_for + '"'
+    #params[:q] = 'full_text:"' + search_for + '"'
+    params[:q] = "{!qf=full_text pf=''}#{search_for}"
+
 
     # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
     self.solr_search_params_logic += [:add_concordance_solr_extra_filters]
