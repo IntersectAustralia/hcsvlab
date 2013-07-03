@@ -5,9 +5,9 @@ Feature: Approve access requests
 
   Background:
     Given I have roles
-      | name       |
-      | hcsvlab-admin  |
-      | Researcher |
+      | name          |
+      | hcsvlab-admin |
+      | Researcher    |
     And I have a user "georgina@intersect.org.au" with role "hcsvlab-admin"
     And I have access requests
       | email                  | first_name | last_name        |

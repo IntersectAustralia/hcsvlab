@@ -6,7 +6,7 @@ When /^I make a (JSON )?request for (.*) with the API token for "(.*)"$/ do |jso
   user = User.find_by_email!(email)
   if json.present?
     get path_to(page_name), {:format => :json}, {'X-API-KEY' => user.authentication_token}
-  else  
+  else
     get path_to(page_name)
   end
 end
@@ -15,7 +15,7 @@ When /^I make a (JSON )?request for (.*) with the API token for "(.*)" outside t
   user = User.find_by_email!(email)
   if json.present?
     get path_to(page_name), {:format => :json, :api_key => user.authentication_token}
-  else  
+  else
     get path_to(page_name), {:api_key => user.authentication_token}
   end
 end
@@ -23,7 +23,7 @@ end
 When /^I make a (JSON )?request for (.*) without an API token$/ do |json, page_name|
   if json.present?
     get path_to(page_name), {:format => :json}
-  else  
+  else
     get path_to(page_name)
   end
 end
@@ -31,7 +31,7 @@ end
 When /^I make a (JSON )?request for (.*) with an invalid API token$/ do |json, page_name|
   if json.present?
     get path_to(page_name), {:format => :json}, {'X-API-KEY' => 'blah'}
-  else  
+  else
     get path_to(page_name)
   end
 end

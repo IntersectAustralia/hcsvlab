@@ -69,14 +69,15 @@ class ItemListsController < ApplicationController
   end
 
   def concordance_search
-    if params[:search_for].split.size > 1
-      flash[:notice] = "Concordance search allows only one word for searching"
-      return
-    end
-
     result = @item_list.doConcordanceSearch(params[:search_for])
-    @highlighting = result[:highlighting]
-    @matchingDocs = result[:matching_docs]
+
+    if (result[:error].nil? or result[:error].empty?)
+      @highlighting = result[:highlighting]
+      @matchingDocs = result[:matching_docs]
+      flash[:error] = nil
+    else
+      flash[:error] = result[:error]
+    end
   end
 
   def frequency_search

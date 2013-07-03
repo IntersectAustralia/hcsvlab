@@ -16,7 +16,7 @@
                   %div{:style=>"display:inline-block;width:90%;"}
                     =itemList.name
               %div{:style=>"display:inline-block;"}
-                =link_to(itemList, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Item List "'+ itemList.name + '"?\', event));') do
+                =link_to(itemList, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Item List "'+ itemList.name + '"?\', event));', :id => "delete_item_list_#{itemList.id}") do
                   %i{:class=>"icon-trash"}
 
 :javascript
