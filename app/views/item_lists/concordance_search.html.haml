@@ -2,7 +2,7 @@
 .span9
   - if (!@highlighting.nil? and !@highlighting.empty?)
     %h2
-      ="Found #{@matchingDocs} matching documents"
+      ="Found #{pluralize(@matchingDocs, 'matching document')}"
   - if (!params[:id].nil?)
     = render 'search_form'
   - if (!@highlighting.nil? and !@highlighting.empty?)

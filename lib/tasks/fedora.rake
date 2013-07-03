@@ -1,6 +1,3 @@
-
-
-
 require 'find'
 
 ENABLE_SOLR_UPDATES = false

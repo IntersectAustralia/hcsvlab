@@ -98,4 +98,5 @@ Feature: Browsing via API
       | Test 1 | 0         |
       | Test 2 | 0         |
 
+  Scenario: Download item from item list
 
