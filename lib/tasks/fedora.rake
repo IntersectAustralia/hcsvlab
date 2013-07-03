@@ -9,6 +9,9 @@ STORE_DOCUMENT_TYPES = ['Text']
 
 namespace :fedora do
 	
+	#
+	# Ingest one metadata file, given as an argument
+	#
 	task :ingest_one => :environment do
 
 		corpus_rdf  = ARGV[1] unless ARGV[1].nil?
@@ -22,52 +25,35 @@ namespace :fedora do
 
 	end
 
+	
+	#
+	# Ingest one corpus directory, given as an argument
+	#
 	task :ingest => :environment do
 
-		corpus_dir  = ARGV[1] unless ARGV[1].nil?
+		# defaults
+		num_spec = :all
+
+		corpus_dir  = ENV['corpus'] unless ENV['corpus'].nil?
+		num_spec    = ENV['amount'] unless ENV['amount'].nil?
+		random      = parse_boolean(ENV['random'], false)
+		annotations = parse_boolean(ENV['annotations'], true)
 
 		if (corpus_dir.nil?) || (! Dir.exists?(corpus_dir))
-			puts "Usage: rake fedora:ingest <corpus folder>"
+			puts "Usage: rake fedora:ingest corpus=<corpus folder> [amount=<amount>] [random=<boolean>] [annotations=<boolean>]"
+			puts "       <amount> can be an absolute number or a percentage: eg. 10 or 10%"
+			puts "       <random> defaults to false"
+			puts "       <annotations> defaults to true"
 			exit 1
 		end
 
-		puts "Ingesting corpus from " + corpus_dir.to_s
-		errors = {}
-		success_count = 0
-
-		Dir.glob( corpus_dir + '/*-metadata.rdf') do |rdf_file|
-			begin
-				ingest_rdf_file(corpus_dir, rdf_file)
-				success_count += 1
-			rescue => e
-				puts "Error! #{e.message}"
-				errors[rdf_file] = e.message
-			end
-		end
-
-		logfile   = "log/ingest_#{File.basename(corpus_dir)}.log"
-		logstream = File.open(logfile, "w")
-
-        message = "Successfully ingested #{success_count} Item#{success_count==1? '': 's'}"
-		message += ", and rejected #{errors.size} Item#{errors.size==1? '': 's'}" unless errors.empty?
-        puts message
-		puts "Summary written to #{logfile}"
-
-		if errors.empty?
-        	logstream << message << "\n"
-		else
-        	logstream << "Ingest of #{corpus_dir}" << "\n\n"
-        	logstream << message << "\n\n"
-			logstream << "Error Summary" << "\n"
-			logstream << "=============" << "\n"
-        	errors.each { |item, message|
-        		logstream << "\nItem #{item}:" << "\n\n"
-        		logstream << "#{message}" << "\n"
-        	}
-    	end
-		logstream.close
+		ingest_corpus(corpus_dir, num_spec, random, annotations)
 	end
 
+	
+	#
+	# Clear everything out of the system
+	#
 	task :clear => :environment do
 
 		puts "Emptying Fedora"
@@ -84,6 +70,10 @@ namespace :fedora do
 
 	end
 
+	
+	#
+	# Clear one corpus (given as corpus=<corpus-name>) out of the system
+	#
 	task :clear_corpus do
 
         corpus = ENV['corpus']
@@ -106,7 +96,10 @@ namespace :fedora do
 
 	end
 
-
+	
+	#
+	# Reindex one item (given as item=<item-id>)
+	#
 	task :reindex_one => :environment do
 		item_id  = ENV['item']
 
@@ -125,7 +118,10 @@ namespace :fedora do
 		stomp_client.close
 	end
 
-
+	
+	#
+	# Reindex one corpus (given as corpus=<corpus-name>)
+	#
 	task :reindex_corpus do
 
         corpus = ENV['corpus']
@@ -149,11 +145,66 @@ namespace :fedora do
 	end
 
 
-	def ingest_rdf_file(corpus_dir, rdf_file)
+	def ingest_corpus(corpus_dir, num_spec=:all, shuffle=false, annotations=true)
+
+		label = "Ingesting...\n"
+		label += "   corpus:      #{corpus_dir}\n"
+		label += "   amount:      #{num_spec}\n"
+		label += "   random:      #{shuffle}\n"
+		label += "   annotations: #{annotations}"
+		puts label
+
+		rdf_files = Dir.glob( corpus_dir + '/*-metadata.rdf')
+
+		if num_spec == :all
+			num = rdf_files.size
+		elsif num_spec.is_a? String
+			if num_spec.end_with?('%')
+				# The argument is a percentage
+				num_spec = num_spec.slice(0, num_spec.size-1) # drop the % sign
+				percentage = num_spec.to_f
+				if percentage == 0 || percentage > 100
+					puts "   Percentage should be a number between 0 and 100"
+					exit 1
+				end
+				num = ((rdf_files.size * percentage)/100).to_i
+				num = 1 if num < 1
+			else
+				# The argument is just a number. Well, it should be.
+				num = num_spec.to_i
+				if num == 0 || num > rdf_files.size
+					puts "   Amount should be a number between 0 and the number of RDF files in the corpus (#{rdf_files.size})"
+					exit 1
+				end
+			end
+		end
+
+		puts "Ingesting #{num} file#{(num==1)? '': 's'} of #{rdf_files.size}"
+		errors    = {}
+		successes = {}
+
+		rdf_files.shuffle! if shuffle
+		rdf_files = rdf_files.slice(0, num)
+
+		rdf_files.each do |rdf_file|
+			begin
+				pid = ingest_rdf_file(corpus_dir, rdf_file, annotations)
+				successes[rdf_file] = pid
+			rescue => e
+				puts "Error! #{e.message}"
+				errors[rdf_file] = e.message
+			end
+		end
+
+		report_results(label, corpus_dir, successes, errors)
+	end
+
+
+	def ingest_rdf_file(corpus_dir, rdf_file, annotations)
 		puts "Ingesting item: " + rdf_file.to_s
 
 		item = create_item_from_file(rdf_file)
-		look_for_annotations(item, rdf_file)
+		look_for_annotations(item, rdf_file) if annotations
 		look_for_documents(item, corpus_dir, rdf_file)
 
 		item.save!
@@ -164,7 +215,9 @@ namespace :fedora do
 		client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
 		client.close
 
+		return item.pid
 	end
+
 
     def create_item_from_file(rdf_file)
 		item = Item.new
@@ -176,6 +229,7 @@ namespace :fedora do
 		puts "Item = " + item.pid.to_s
 		return item
     end
+
 
 	def look_for_documents(item, corpus_dir, rdf_file)
 		#Text
@@ -216,6 +270,7 @@ namespace :fedora do
 		end
 	end
 
+
 	def look_for_annotations(item, metadata_filename)
 		annotation_filename = metadata_filename.sub("metadata", "ann")
 		if File.exists?(annotation_filename)
@@ -234,10 +289,52 @@ namespace :fedora do
 		end
 	end
 
+
 	def reindex_item(item_id, stomp_client)
 		puts "Reindexing item: " + item_id
 		stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
 	end
 
+
+	def report_results(label, corpus_dir, successes, errors)
+		logfile   = "log/ingest_#{File.basename(corpus_dir)}.log"
+		logstream = File.open(logfile, "w")
+
+        message = "Successfully ingested #{successes.size} Item#{successes.size==1? '': 's'}"
+		message += ", and rejected #{errors.size} Item#{errors.size==1? '': 's'}" unless errors.empty?
+        puts message
+		puts "Writing summary to #{logfile}"
+
+        logstream << "#{label}" << "\n\n"
+        logstream << message << "\n"
+
+		unless successes.empty?
+        	logstream << "\n"
+			logstream << "Successfully Ingested" << "\n"
+			logstream << "=====================" << "\n"
+        	successes.each { |item, message|
+        		logstream << "Item #{item} as #{message}" << "\n"
+        	}
+    	end
+
+		unless errors.empty?
+        	logstream << "\n"
+			logstream << "Error Summary" << "\n"
+			logstream << "=============" << "\n"
+        	errors.each { |item, message|
+        		logstream << "\nItem #{item}:" << "\n\n"
+        		logstream << "#{message}" << "\n"
+        	}
+    	end
+		logstream.close
+	end
+
+
+	def parse_boolean(string, default=false)
+		return default if string.blank? # nil.blank? returns true, so this is also a nil guard.
+		return false if string =~ (/(false|f|no|n|0)$/i)
+		return true  if string =~ (/(true|t|yes|y|1)$/i)
+		raise ArgumentError.new("invalid value for Boolean: \"#{string}\", should be \"true\" or \"false\"")
+	end
 
 end
