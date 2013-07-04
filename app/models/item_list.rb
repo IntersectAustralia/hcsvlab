@@ -267,7 +267,7 @@ class ItemList < ActiveRecord::Base
     pattern = /(([^\w])|(^-\w+)|(\w+-$))/i
     matchingWords = term.to_enum(:scan, pattern).map { Regexp.last_match }
 
-    if matchingWords.length > 0
+    if (matchingWords.length > 0 or term.empty?)
       result = {:error => "Concordance search allows only one word for searching. E.g. dog, dog-fighter"}
       return result
     end
