@@ -11,15 +11,15 @@
         %h3
           %span
             =link_to value[:title], solr_document_path(key)
-            = "(Found " + pluralize(value[:matches].size, 'match') + ")"
+            %small= "Found " + pluralize(value[:matches].size, 'match')
         %table.table.table-condensed.concordanceTable
           - value[:matches].each do |m|
             %tr
-              %td{:class=>'leftColumn'}
+              %td.leftColumn.span6
                 = m[:textBefore].html_safe
-              %td{:class=>'centerColumn'}
+              %td.centerColumn
                 = m[:textHighlighted].html_safe
-              %td{:class=>'rightColumn'}
+              %td.rightColumn.span5
                 = m[:textAfter].html_safe
   - else
     .alert.alert-info No document matches with your search

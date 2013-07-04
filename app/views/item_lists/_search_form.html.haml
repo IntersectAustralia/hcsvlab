@@ -17,9 +17,9 @@
   = form_tag({:action => 'frequency_search', :id => params[:id]}, :method=>"GET", :id=>"frequency_search_form" , :onSubmit => "showProgressAnimation();") do
     = field_set_tag do
       = hidden_field_tag :itemListId, :value => params[:id]
-      .input-append.search-form.row-fluid
+      .input-prepend.input-append.search-form
         .hidden= label_tag 'Search type'
-        = select_tag :search_type, options_for_select([["Concordance", "concordance"], ["Frequency", "frequency"]], 1), :onChange=>"changeFormAction(this.value)"
+        = select_tag :search_type, options_for_select([["Concordance", "concordance"], ["Frequency", "frequency"]], 1), :onChange=>"changeFormAction(this.value)", :class => "span3"
         .hidden= label_tag 'Facet'
         -facetsConfig = YAML.load_file(Rails.root.join("config", "facets.yml"))
         = select_tag :facet, options_for_select(facetsConfig[:facets].collect{ |aFacetConfig| [aFacetConfig[:label], aFacetConfig[:name]] }, params[:facet])
@@ -33,7 +33,7 @@
       = hidden_field_tag :itemListId, :value => params[:id]
       .input-append.search-form.row-fluid
         .hidden= label_tag 'Search type'
-        = select_tag :search_type2, options_for_select([["Concordance", "concordance"], ["Frequency", "frequency"]], 0), :onChange=>"changeFormAction(this.value)"
+        = select_tag :search_type2, options_for_select([["Concordance", "concordance"], ["Frequency", "frequency"]], 0), :onChange=>"changeFormAction(this.value)", :class => "span3"
         .hidden= label_tag 'Concordance search term'
         = search_field_tag :search_for, value = params[:search_for], :id=>"concordance_search_for", :class => "span8", :placeholder => "Search term..."
         %button#item-list-search.btn.search-btn{:name => "commit", :type => "submit", :value => ""}
