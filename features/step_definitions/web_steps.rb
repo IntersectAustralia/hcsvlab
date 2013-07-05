@@ -64,7 +64,7 @@ def get_link(link)
 end
 
 def get_field(field)
-  labels = page.all('label', text: field)
+  labels = page.all('label', text: field, :visible => false)
   return page.find_by_id(labels.first[:for])
 end
 

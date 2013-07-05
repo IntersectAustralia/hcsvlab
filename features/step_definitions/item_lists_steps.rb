@@ -28,3 +28,45 @@ And /^I follow the delete icon for item list "(.*)"$/ do |list_name|
   find("#delete_item_list_#{list.id}").click
 end
 
+When /^searching for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
+  list = ItemList.find_by_name(list_name)
+  result = list.doConcordanceSearch(term)
+  highlightings = result[:highlighting]
+  totalMatches = table.hashes.length
+  countMatches = 0
+  table.hashes.each do |attributes|
+    requestedMatch = attributes[:textBefore].strip()
+    requestedMatch = requestedMatch + "<span class='highlighting'>#{attributes[:textHighlighted]}</span>"
+    requestedMatch = requestedMatch + attributes[:textAfter].strip()
+
+    highlightings.each do |docId, matches|
+      if (!matches[:title].eql?(attributes[:documentTitle]))
+        next
+      end
+      matches[:matches].each do |aMatch|
+        retrievedMatch = aMatch[:textBefore].strip()
+        retrievedMatch = retrievedMatch + aMatch[:textHighlighted].strip()
+        retrievedMatch = retrievedMatch + aMatch[:textAfter].strip()
+
+        countMatches = countMatches + 1 if requestedMatch.eql?(retrievedMatch)
+      end
+
+    end
+  end
+  countMatches.should eq(totalMatches)
+end
+
+When /^searching for "(.*)" in item list "(.*)" should show not matches found message/ do |term, list_name|
+  list = ItemList.find_by_name(list_name)
+  result = list.doConcordanceSearch(term)
+  result[:matching_docs].should eq(0)
+end
+
+When /^searching for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
+  list = ItemList.find_by_name(list_name)
+  result = list.doConcordanceSearch(term)
+  result[:error].empty?.should eq(false)
+end
+
+
+

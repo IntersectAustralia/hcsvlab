@@ -7,6 +7,7 @@ Feature: Managing Item Lists
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "cooee:1-001" with id "hcsvlab:2"
     Given I ingest "cooee:1-001" with id "hcsvlab:3"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:4"
     Given I have the usual roles and permissions
     Given I have users
       | email                       | first_name | last_name |
@@ -91,6 +92,78 @@ Feature: Managing Item Lists
     And the item list "Delete Test" should have 3 items
     And I follow the delete icon for item list "Delete Test"
     And I should see "Item list Delete Test deleted successfully"
+
+  @javascript
+  Scenario: Doing a concordance search for "family"
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Concordance search |
+    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+    And I am on the item list page for "Concordance search"
+    And the item list "Concordance search" should have 2 items
+    When I select "Concordance" from "search_type"
+    When I fill in "Concordance search for" with "family"
+    And I press "execute_concordance_search"
+    And searching for "family" in item list "Concordance search" should show this results
+      | documentTitle | textBefore                         | textHighlighted | textAfter                       |
+      | cooee:1-001   | Banks & to the Ladys of your       | family          | .The hurry in which I write you |
+
+  @javascript
+  Scenario: Doing a concordance search for "make"
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Concordance search |
+    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+    And I am on the item list page for "Concordance search"
+    And the item list "Concordance search" should have 2 items
+    When I select "Concordance" from "search_type"
+    When I fill in "Concordance search for" with "make"
+    And I press "execute_concordance_search"
+    And searching for "make" in item list "Concordance search" should show this results
+      | documentTitle      | textBefore                                     | textHighlighted | textAfter                                 |
+      | cooee:1-001        | get the small fish, of which they              | make            |  no account in the Summer nor can          |
+      | cooee:1-001        | will, Sir, be so obliging as to                | make            |  my Compliments acceptable to Lady Banks & |
+      | auslit:adaessa.xml | of such a current; and, (I will                | make            |  a clean breast of it at once!),           |
+      | auslit:adaessa.xml | which distinguish the genial littérateur , and | make            |  his work, as one of my fellow             |
+
+  @javascript
+  Scenario: Doing a concordance search for "concordance"
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Concordance search |
+    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+    And I am on the item list page for "Concordance search"
+    And the item list "Concordance search" should have 2 items
+    When I select "Concordance" from "search_type"
+    When I fill in "Concordance search for" with "concordance"
+    And I press "execute_concordance_search"
+    Then searching for "concordance" in item list "Concordance search" should show not matches found message
+
+  @javascript
+  Scenario: Doing a failing concordance search for "dog-"
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Concordance search |
+    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+    And I am on the item list page for "Concordance search"
+    And the item list "Concordance search" should have 2 items
+    When I select "Concordance" from "search_type"
+    When I fill in "Concordance search for" with "dog-"
+    And I press "execute_concordance_search"
+    And searching for "dog-" in item list "Concordance search" should show error
+
+  @javascript
+  Scenario: Doing a failing concordance search for "dog like"
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Concordance search |
+    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+    And I am on the item list page for "Concordance search"
+    And the item list "Concordance search" should have 2 items
+    When I select "Concordance" from "search_type"
+    When I fill in "Concordance search for" with "dog-"
+    And I press "execute_concordance_search"
+    And searching for "dog like" in item list "Concordance search" should show error
 
 #TODO check output maybe?
 
