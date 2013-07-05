@@ -268,7 +268,7 @@ class ItemList < ActiveRecord::Base
     matchingWords = term.to_enum(:scan, pattern).map { Regexp.last_match }
 
     if (matchingWords.length > 0 or term.empty?)
-      result = {:error => "Concordance search allows only one word for searching. E.g. dog, dog-fighter"}
+      result = {:error => "Concordance search allows only one word for searching. E.g. dog, cat, etc."}
       return result
     end
 
