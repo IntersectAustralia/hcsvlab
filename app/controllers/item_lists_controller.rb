@@ -69,7 +69,7 @@ class ItemListsController < ApplicationController
   end
 
   def concordance_search
-    result = @item_list.doConcordanceSearch(params[:search_for])
+    result = @item_list.doConcordanceSearch(params[:concordance_search_for])
 
     if (result[:error].nil? or result[:error].empty?)
       @highlighting = result[:highlighting]
@@ -81,7 +81,13 @@ class ItemListsController < ApplicationController
   end
 
   def frequency_search
-    @result = @item_list.doFrequencySearch(params[:search_for], params[:facet])
+    result = @item_list.doFrequencySearch(params[:frequency_search_for], params[:facet])
+    if (result[:error].nil? or result[:error].empty?)
+      flash[:error] = nil
+      @result = result
+    else
+      flash[:error] = result[:error]
+    end
   end
 
   private

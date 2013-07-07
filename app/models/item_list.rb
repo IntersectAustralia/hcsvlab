@@ -302,6 +302,11 @@ class ItemList < ActiveRecord::Base
   # Perform a Frequency search for a given query
   #
   def doFrequencySearch(query, facet)
+    if (query.empty?)
+      result = {:error => "Frequency search does not allow empty searches"}
+      return result
+    end
+
     bench_start = Time.now
     # Tells blacklight to call this method when it ends processing all the parameters that will be sent to solr
     self.solr_search_params_logic += [:add_frequency_solr_extra_filters]
@@ -489,7 +494,7 @@ class ItemList < ActiveRecord::Base
   # This method count the occurrences of the search in the returned highlighted results
   #
   def countOccurrences(highlighting, facetsByDocuments, facetValue, result)
-    pattern = /(###\*\*\*###)(\w+)(###\*\*\*###)/i
+    pattern = /(###\*\*\*###)(\S+)(###\*\*\*###)/i
     highlighting.each do |docId, value|
       facetValue = facetsByDocuments[docId]
       if (!facetValue.nil?)

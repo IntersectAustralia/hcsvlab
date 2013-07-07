@@ -9,7 +9,9 @@
       jQuery("#concordance_search_form").hide();
       jQuery("#frequency_search_form").show();
       $('#search_type').val("frequency");
-      $('#frequency_search_for').val($('#concordance_search_for').val())
+      if (!$('#frequency_search_for').val()) {
+        $('#frequency_search_for').val($('#concordance_search_for').val())
+      }
     }
   }
 
@@ -24,7 +26,7 @@
         -facetsConfig = YAML.load_file(Rails.root.join("config", "facets.yml"))
         = select_tag :facet, options_for_select(facetsConfig[:facets].collect{ |aFacetConfig| [aFacetConfig[:label], aFacetConfig[:name]] }, params[:facet])
         .hidden= label_tag 'search for'
-        = search_field_tag :search_for, value = params[:search_for], :id=>"frequency_search_for", :class => "span5", :placeholder => "Search list..."
+        = search_field_tag :frequency_search_for, value = params[:frequency_search_for], :id=>"frequency_search_for", :class => "span5", :placeholder => "Search list..."
         %button#item-list-search.btn.search-btn{:name => "commit", :type => "submit", :value => ""}
           %span.icon-search
 
@@ -35,7 +37,7 @@
         .hidden= label_tag 'Search type'
         = select_tag :search_type2, options_for_select([["Concordance", "concordance"], ["Frequency", "frequency"]], 0), :onChange=>"changeFormAction(this.value)", :class => "span3"
         .hidden= label_tag 'Concordance search for'
-        = search_field_tag :search_for, value = params[:search_for], :id=>"Concordance_search_for", :class => "span8", :placeholder => "Search term..."
+        = search_field_tag :concordance_search_for, value = params[:concordance_search_for], :id=>"Concordance_search_for", :class => "span8", :placeholder => "Search term..."
         %button#execute_concordance_search.btn.search-btn{:name => "commit", :type => "submit", :value => ""}
           %span.icon-search
 
