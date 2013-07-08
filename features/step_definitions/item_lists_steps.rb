@@ -28,7 +28,7 @@ And /^I follow the delete icon for item list "(.*)"$/ do |list_name|
   find("#delete_item_list_#{list.id}").click
 end
 
-When /^searching for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
+When /^concordance search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
   list = ItemList.find_by_name(list_name)
   result = list.doConcordanceSearch(term)
   highlightings = result[:highlighting]
@@ -56,17 +56,33 @@ When /^searching for "(.*)" in item list "(.*)" should show this results$/ do |t
   countMatches.should eq(totalMatches)
 end
 
-When /^searching for "(.*)" in item list "(.*)" should show not matches found message/ do |term, list_name|
+When /^concordance search for "(.*)" in item list "(.*)" should show not matches found message$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
   result = list.doConcordanceSearch(term)
   result[:matching_docs].should eq(0)
 end
 
-When /^searching for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
+When /^concordance search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
   result = list.doConcordanceSearch(term)
   result[:error].empty?.should eq(false)
 end
 
+When /^frequency search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
+  list = ItemList.find_by_name(list_name)
+  field = get_field("Facet")
+  result = list.doFrequencySearch(term, field.value)
 
+  table.hashes.each do |attributes|
+    result[attributes[:facetValue]].should_not eq (nil)
+    result[attributes[:facetValue]][:num_docs].to_s.should eq(attributes[:matchingDocuments])
+    result[attributes[:facetValue]][:num_occurrences].to_s.should eq(attributes[:termOccurrences])
+  end
+end
 
+When /^frequency search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
+  list = ItemList.find_by_name(list_name)
+  field = get_field("Facet")
+  result = list.doFrequencySearch(term, field.value)
+  result[:error].empty?.should eq(false)
+end

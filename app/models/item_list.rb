@@ -302,7 +302,7 @@ class ItemList < ActiveRecord::Base
   # Perform a Frequency search for a given query
   #
   def doFrequencySearch(query, facet)
-    if (query.empty?)
+    if (query.strip.empty?)
       result = {:error => "Frequency search does not allow empty searches"}
       return result
     end

@@ -2,3 +2,7 @@ en:
 
   blacklight:
     application_name: 'HCS vLab'
+
+    search:
+      form:
+        q: 'Search Text Containing...'
