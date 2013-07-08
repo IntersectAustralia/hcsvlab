@@ -4,6 +4,12 @@
   %h2{:style=>'color:gray;font-weight:normal;'}
     Please wait....
 :javascript
+  $(document).ready(function(){
+    hideProgressAnimation();
+  });
+
+  window.onunload = function(){};
+
   function showProgressAnimation() {
     $('.loading-div-background').show();
     $('.loading-div').show();
