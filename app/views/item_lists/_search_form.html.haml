@@ -22,19 +22,19 @@
       .input-prepend.input-append.search-form
         .hidden= label_tag 'search type'
         = select_tag :search_type, options_for_select([["Concordance", "concordance"], ["Frequency", "frequency"]], 1), :onChange=>"changeFormAction(this.value)", :class => "span3"
-        .hidden= label_tag 'Facet'
+        .hidden= label_tag 'facet'
         -facetsConfig = YAML.load_file(Rails.root.join("config", "facets.yml"))
         = select_tag :facet, options_for_select(facetsConfig[:facets].collect{ |aFacetConfig| [aFacetConfig[:label], aFacetConfig[:name]] }, params[:facet])
-        .hidden= label_tag 'search for'
-        = search_field_tag :frequency_search_for, value = params[:frequency_search_for], :id=>"frequency_search_for", :class => "span5", :placeholder => "Search list..."
-        %button#item-list-search.btn.search-btn{:name => "commit", :type => "submit", :value => ""}
+        .hidden= label_tag 'Frequency search for'
+        = search_field_tag :frequency_search_for, value = params[:frequency_search_for], :id=>"Frequency_search_for", :class => "span5", :placeholder => "Search list..."
+        %button#execute_frequency_search.btn.search-btn{:name => "commit", :type => "submit", :value => ""}
           %span.icon-search
 
   = form_tag({:action => 'concordance_search', :id => params[:id]}, :method=>"GET", :id=>"concordance_search_form" , :onSubmit => "showProgressAnimation();") do
     = field_set_tag do
       = hidden_field_tag :itemListId, :value => params[:id]
       .input-append.search-form.row-fluid
-        .hidden= label_tag 'Search type'
+        .hidden= label_tag 'Search type2'
         = select_tag :search_type2, options_for_select([["Concordance", "concordance"], ["Frequency", "frequency"]], 0), :onChange=>"changeFormAction(this.value)", :class => "span3"
         .hidden= label_tag 'Concordance search for'
         = search_field_tag :concordance_search_for, value = params[:concordance_search_for], :id=>"Concordance_search_for", :class => "span8", :placeholder => "Search term..."

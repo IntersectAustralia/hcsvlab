@@ -8,6 +8,7 @@ Feature: Managing Item Lists
     Given I ingest "cooee:1-001" with id "hcsvlab:2"
     Given I ingest "cooee:1-001" with id "hcsvlab:3"
     Given I ingest "auslit:adaessa" with id "hcsvlab:4"
+    Given I ingest "auslit:bolroma" with id "hcsvlab:5"
     Given I have the usual roles and permissions
     Given I have users
       | email                       | first_name | last_name |
@@ -104,7 +105,7 @@ Feature: Managing Item Lists
     When I select "Concordance" from "search_type"
     When I fill in "Concordance search for" with "family"
     And I press "execute_concordance_search"
-    And searching for "family" in item list "Concordance search" should show this results
+    Then concordance search for "family" in item list "Concordance search" should show this results
       | documentTitle | textBefore                         | textHighlighted | textAfter                       |
       | cooee:1-001   | Banks & to the Ladys of your       | family          | .The hurry in which I write you |
 
@@ -119,7 +120,7 @@ Feature: Managing Item Lists
     When I select "Concordance" from "search_type"
     When I fill in "Concordance search for" with "make"
     And I press "execute_concordance_search"
-    And searching for "make" in item list "Concordance search" should show this results
+    Then concordance search for "make" in item list "Concordance search" should show this results
       | documentTitle      | textBefore                                     | textHighlighted | textAfter                                 |
       | cooee:1-001        | get the small fish, of which they              | make            |  no account in the Summer nor can          |
       | cooee:1-001        | will, Sir, be so obliging as to                | make            |  my Compliments acceptable to Lady Banks & |
@@ -137,7 +138,7 @@ Feature: Managing Item Lists
     When I select "Concordance" from "search_type"
     When I fill in "Concordance search for" with "concordance"
     And I press "execute_concordance_search"
-    Then searching for "concordance" in item list "Concordance search" should show not matches found message
+    Then concordance search for "concordance" in item list "Concordance search" should show not matches found message
 
   @javascript
   Scenario: Doing a failing concordance search for "dog-"
@@ -150,7 +151,7 @@ Feature: Managing Item Lists
     When I select "Concordance" from "search_type"
     When I fill in "Concordance search for" with "dog-"
     And I press "execute_concordance_search"
-    And searching for "dog-" in item list "Concordance search" should show error
+    Then concordance search for "dog-" in item list "Concordance search" should show error
 
   @javascript
   Scenario: Doing a failing concordance search for "dog like"
@@ -163,7 +164,69 @@ Feature: Managing Item Lists
     When I select "Concordance" from "search_type"
     When I fill in "Concordance search for" with "dog-"
     And I press "execute_concordance_search"
-    And searching for "dog like" in item list "Concordance search" should show error
+    Then concordance search for "dog like" in item list "Concordance search" should show error
+
+  @javascript
+  Scenario: Doing a frequency search for simple words (can)
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Frequency search |
+    And the item list "Frequency search" has items hcsvlab:5
+    And I am on the item list page for "Frequency search"
+    And the item list "Frequency search" should have 1 items
+    When I select "Frequency" from "search_type"
+    When I select "Corpus" from "Facet"
+    When I fill in "Frequency search for" with "can"
+    And I press "execute_frequency_search"
+    Then frequency search for "can" in item list "Frequency search" should show this results
+      | facetValue | matchingDocuments | termOccurrences |
+      | auslit     | 1                 | 131             |
+
+  @javascript
+  Scenario: Doing a frequency search for words word (what)
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Frequency search |
+    And the item list "Frequency search" has items hcsvlab:5
+    And I am on the item list page for "Frequency search"
+    And the item list "Frequency search" should have 1 items
+    When I select "Frequency" from "search_type"
+    When I select "Created" from "Facet"
+    When I fill in "Frequency search for" with "what"
+    And I press "execute_frequency_search"
+    Then frequency search for "what" in item list "Frequency search" should show this results
+      | facetValue      | matchingDocuments | termOccurrences   |
+      | 1890 - 1899     | 1                 | 219               |
+
+  @javascript
+  Scenario: Doing a frequency search for words with apostrophes (what's)
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Frequency search |
+    And the item list "Frequency search" has items hcsvlab:5
+    And I am on the item list page for "Frequency search"
+    And the item list "Frequency search" should have 1 items
+    When I select "Frequency" from "search_type"
+    When I select "Corpus" from "Facet"
+    When I fill in "Frequency search for" with "what's"
+    And I press "execute_frequency_search"
+    Then frequency search for "what's" in item list "Frequency search" should show this results
+      | facetValue | matchingDocuments | termOccurrences |
+      | auslit     | 1                 | 10              |
+
+  @javascript
+  Scenario: Doing an empty frequency search
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Frequency search |
+    And the item list "Frequency search" has items hcsvlab:5
+    And I am on the item list page for "Frequency search"
+    And the item list "Frequency search" should have 1 items
+    When I select "Frequency" from "search_type"
+    When I select "Corpus" from "Facet"
+    When I fill in "Frequency search for" with ""
+    And I press "execute_frequency_search"
+    Then frequency search for "" in item list "Frequency search" should show error
 
 #TODO check output maybe?
 
