@@ -13,12 +13,15 @@ Feature: Managing Item Lists
       | researcher@intersect.org.au | Researcher | One       |
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the home page
-    And I click "Corpus"
-    And I follow "cooee"
+    And I have done a search with corpus "cooee"
+    And I should see the applied facet "Corpus" with the value "cooee"
+    And I should get exactly 3 results
+    And I should see "1 - 3 of 3"
 
   @javascript
   Scenario: Creating an Item List with all items from search
+    And I should see "You searched for:"
+    And I should see "Add All to list"
     And I follow "Add All to list"
     And I follow "Create New List"
     And I should see "Create New Item List"
@@ -37,6 +40,8 @@ Feature: Managing Item Lists
 
   @javascript
   Scenario: Creating an Item List with no items and then adding to it later
+    And I should see "You searched for:"
+    And I should see "Add Selected to list"
     And I follow "Add Selected to list"
     And I follow "Create New List"
     And I should see "Create New Item List"
@@ -91,8 +96,6 @@ Feature: Managing Item Lists
     And the item list "Delete Test" should have 3 items
     And I follow the delete icon for item list "Delete Test"
     And I should see "Item list Delete Test deleted successfully"
-
-
 
 #TODO check output maybe?
 

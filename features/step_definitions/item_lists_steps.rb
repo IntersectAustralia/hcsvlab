@@ -70,7 +70,7 @@ end
 
 When /^frequency search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
   list = ItemList.find_by_name(list_name)
-  field = get_field("Facet")
+  field = find_field("Facet")
   result = list.doFrequencySearch(term, field.value)
 
   table.hashes.each do |attributes|
@@ -82,7 +82,7 @@ end
 
 When /^frequency search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
-  field = get_field("Facet")
+  field = find_field("Facet")
   result = list.doFrequencySearch(term, field.value)
   result[:error].empty?.should eq(false)
 end

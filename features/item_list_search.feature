@@ -16,9 +16,7 @@ Feature: Searching item lists
       | researcher@intersect.org.au | Researcher | One       |
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the home page
-    And I click "Corpus"
-      And I follow "cooee"
+    And I have done a search with corpus "cooee"
 
   Scenario: Doing a concordance search for "family"
     And "researcher@intersect.org.au" has item lists
