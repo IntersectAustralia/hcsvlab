@@ -1,6 +1,6 @@
 def clear_jetty
   # clear Solr
-  uri = URI.parse(ActiveFedora.solr_config[:url] + '/update?commit=true')
+  uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
 
   req = Net::HTTP::Post.new(uri)
   req.body = '<delete><query>*:*</query></delete>'
