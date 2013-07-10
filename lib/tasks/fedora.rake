@@ -1,10 +1,12 @@
 require 'find'
 
-ENABLE_SOLR_UPDATES = false
+#ENABLE_SOLR_UPDATES = false
 ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 STORE_DOCUMENT_TYPES = ['Text']
 
 namespace :fedora do
+
+	@solr = RSolr.connect(Blacklight.solr_config)
 	
 	#
 	# Ingest one metadata file, given as an argument
@@ -338,9 +340,8 @@ namespace :fedora do
 	end
 
 	def find_corpus_items(corpus)
-		solr = RSolr.connect(Blacklight.solr_config)
-		response = solr.get 'select', :params => {:q => 'DC_is_part_of:' + corpus, 
-			                          :rows => 2147483647 }
+		response = @solr.get 'select', :params => {:q => 'DC_is_part_of:' + corpus, 
+		                               :rows => 2147483647 }
 		response['response']['docs']
 	end
 
