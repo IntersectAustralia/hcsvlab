@@ -136,6 +136,7 @@ GEM
     equivalent-xml (0.3.0)
       nokogiri (>= 1.4.3)
     erubis (2.7.0)
+    eventmachine (1.0.3)
     execjs (1.4.0)
       multi_json (~> 1.0)
     factory_girl (4.2.0)
@@ -144,6 +145,8 @@ GEM
       factory_girl (~> 4.2.0)
       railties (>= 3.0.0)
     fastercsv (1.5.5)
+    faye-websocket (0.4.7)
+      eventmachine (>= 0.12.0)
     ffi (1.8.1)
     fileutils (0.7)
       rmagick (>= 2.13.1)
@@ -160,6 +163,7 @@ GEM
     hike (1.2.2)
     hooks (0.2.2)
     htmlentities (4.3.1)
+    http_parser.rb (0.5.3)
     hydra-access-controls (6.0.0)
       active-fedora (>= 6.0.0)
       activesupport
@@ -244,6 +248,10 @@ GEM
       solrizer (~> 3.1.0)
     orm_adapter (0.4.0)
     pg (0.15.1)
+    poltergeist (1.3.0)
+      capybara (~> 2.1.0)
+      faye-websocket (>= 0.4.4, < 0.5.0)
+      http_parser.rb (~> 0.5.3)
     polyglot (0.3.3)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
@@ -344,7 +352,6 @@ GEM
       mime-types
       nokogiri
       rest-client
-    rubyzip (0.9.9)
     rvm-capistrano (1.3.0)
       capistrano (>= 2.0.0)
     sass (3.2.9)
@@ -352,11 +359,6 @@ GEM
       railties (~> 3.2.0)
       sass (>= 3.1.10)
       tilt (~> 1.3)
-    selenium-webdriver (2.33.0)
-      childprocess (>= 0.2.5)
-      multi_json (~> 1.0)
-      rubyzip
-      websocket (~> 1.0.4)
     sexp_processor (4.2.1)
     shoulda (3.5.0)
       shoulda-context (~> 1.0, >= 1.0.1)
@@ -410,7 +412,6 @@ GEM
       multi_json (~> 1.0, >= 1.0.2)
     warden (1.2.1)
       rack (>= 1.0)
-    websocket (1.0.7)
     whoops_logger (0.1.4)
       json
     xml-simple (1.1.2)
@@ -458,6 +459,7 @@ DEPENDENCIES
   newrelic_rpm
   nokogiri
   pg
+  poltergeist
   pry
   pry-rails
   rabl
@@ -467,7 +469,6 @@ DEPENDENCIES
   rspec-rails
   rvm-capistrano
   sass-rails (~> 3.2.3)
-  selenium-webdriver
   shoulda
   simple_form
   simplecov (>= 0.3.8)

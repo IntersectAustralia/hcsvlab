@@ -29,7 +29,7 @@ def clear_jetty
 end
 
 #make sure jetty is started and clean
-puts 'Ensuring Fedora test instance is up...'.yellow
+puts 'Ensuring jetty test instance is up...'.yellow
 if Dir.glob("#{Rails.root}/tmp/pids/*jetty.pid").empty?
   puts "fedora.pid file not found. Make sure hydra-jetty is installed and the #{Rails.env} copy is installed and running".red
   exit 1
@@ -42,7 +42,7 @@ if output.present?
   puts output
   exit 1
 end
-puts 'Test Fedora ready'.green
+puts 'Test jetty ready'.green
 
 `echo '' > #{Rails.root}/log/test.log`
 clear_jetty
