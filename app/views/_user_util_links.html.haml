@@ -46,7 +46,7 @@
     if (!$('#zc_copy_token').closest('li').hasClass('disabled')) {
       var clip = new ZeroClipboard($('#zc_copy_token'));
       clip.on('complete', function (client, args) {
-        alert("API Key copied to clipboard!");
+        alert("API Key copied to clipboard");
       });
       clip.on('mouseover', function(){
         $('#zc_copy_token').addClass("hovered");
