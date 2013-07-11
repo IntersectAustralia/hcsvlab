@@ -1,3 +1,5 @@
+= render 'shared/modal_waiting_panel'
+
 %h3
   %span Primary Document
 - uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::SOURCE]
@@ -74,11 +76,11 @@
         %th Type
         %th Size
     %tbody
-      - documents.each do |values|
+      - documents.each_with_index do |values, index|
         %tr
           - if values.has_key?(MetadataHelper::SOURCE)
             %td
-              %a{:href => values[MetadataHelper::SOURCE]}= values[MetadataHelper::IDENTIFIER]
+              %a{:href => "/catalog/#{document[:id]}/document/#{values[MetadataHelper::IDENTIFIER]}", :onclick => "showProgressAnimation();"}= values[MetadataHelper::IDENTIFIER]
           - else
             %td= values[MetadataHelper::IDENTIFIER]
           - if values.has_key?(MetadataHelper::TYPE)
@@ -99,3 +101,6 @@
           %td= field
   - if eopas_viewable? documents
     = link_to('View in EOPAS', eopas_path, class: 'btn')
+
+:javascript
+

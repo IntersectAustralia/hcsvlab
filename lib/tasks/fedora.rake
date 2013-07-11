@@ -1,10 +1,12 @@
 require 'find'
 
-ENABLE_SOLR_UPDATES = false
+#ENABLE_SOLR_UPDATES = false
 ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 STORE_DOCUMENT_TYPES = ['Text']
 
 namespace :fedora do
+
+	@solr = RSolr.connect(Blacklight.solr_config)
 	
 	#
 	# Ingest one metadata file, given as an argument
@@ -71,7 +73,7 @@ namespace :fedora do
 	#
 	# Clear one corpus (given as corpus=<corpus-name>) out of the system
 	#
-	task :clear_corpus do
+	task :clear_corpus => :environment do
 
         corpus = ENV['corpus']
 
@@ -80,7 +82,8 @@ namespace :fedora do
 			exit 1
 		end
 
-		objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
+		#objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
+		objects = find_corpus_items corpus
 
 		puts "Removing " + objects.count.to_s + " objects"
 
@@ -119,7 +122,7 @@ namespace :fedora do
 	#
 	# Reindex one corpus (given as corpus=<corpus-name>)
 	#
-	task :reindex_corpus do
+	task :reindex_corpus => :environment do
 
         corpus = ENV['corpus']
 
@@ -128,7 +131,8 @@ namespace :fedora do
 			exit 1
 		end
 
-		objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
+		#objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
+		objects = find_corpus_items corpus
 
 		puts "Reindexing " + objects.count.to_s + " objects"
 
@@ -289,6 +293,7 @@ namespace :fedora do
 
 	def reindex_item(item_id, stomp_client)
 		puts "Reindexing item: " + item_id
+		Item.find(item_id).update_index
 		stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
 	end
 
@@ -332,6 +337,12 @@ namespace :fedora do
 		return false if string =~ (/(false|f|no|n|0)$/i)
 		return true  if string =~ (/(true|t|yes|y|1)$/i)
 		raise ArgumentError.new("invalid value for Boolean: \"#{string}\", should be \"true\" or \"false\"")
+	end
+
+	def find_corpus_items(corpus)
+		response = @solr.get 'select', :params => {:q => 'DC_is_part_of:' + corpus, 
+		                               :rows => 2147483647 }
+		response['response']['docs']
 	end
 
 end

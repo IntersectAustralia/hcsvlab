@@ -41,7 +41,6 @@ gem "jquery-rails", "2.3.0"
 group :development, :test do
   gem "rspec-rails"
   gem "factory_girl_rails"
-
   # cucumber gems
   gem "cucumber"
   gem "capybara"
@@ -64,7 +63,7 @@ group :test do
   gem "brakeman"
   gem "simplecov", ">=0.3.8", :require => false
   gem 'simplecov-rcov'
-  gem "selenium-webdriver"
+  gem "poltergeist"
 end
 gem 'zeroclipboard-rails'
 gem "haml"

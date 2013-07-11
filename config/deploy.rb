@@ -299,14 +299,16 @@ namespace :deploy do
 
   desc "Configure Solr"
   task :configure_solr, :roles => :app do
-    run "cp -p #{current_path}/solr_conf/hcsvlab-solr.xml $CATALINA_HOME/conf/Catalina/localhost/solr.xml", :env => {'RAILS_ENV' => stage}
-    run "cp -p #{current_path}/solr_conf/conf/schema.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
+    run "cp -p #{current_path}/solr_conf/hcsvlab-solr.xml    $CATALINA_HOME/conf/Catalina/localhost/solr.xml", :env => {'RAILS_ENV' => stage}
+    run "cp -p #{current_path}/solr_conf/conf/schema.xml     $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
     run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
+    run "cp -p #{current_path}/solr_conf/conf/schema.xml     $SOLR_HOME/hcsvlab/solr/hcsvlab-AF-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
+    run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-AF-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Update the HCS vLab Solr core"
   task :update_solr_core, :roles => :app do
-    # Remove the exisiting core and webapp
+    # Remove the existing core and webapp
     run "rm -rf $SOLR_HOME/hcsvlab", :env => {'RAILS_ENV' => stage}
     run "rm -rf $CATALINA_HOME/webapps/solr/", :env => {'RAILS_ENV' => stage}
     create_solr_core
@@ -319,8 +321,7 @@ namespace :deploy do
     # Copy the solr core diir
     run "cp -rp #{current_path}/solr_conf/hcsvlab $SOLR_HOME/", :env => {'RAILS_ENV' => stage}
     # Configure solr
-    run "cp -p #{current_path}/solr_conf/conf/schema.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
-    run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
+    configure_solr
   end
 
   desc "Stop the Tomcat 6 server"

@@ -1,0 +1,18 @@
+# This is a sample config file that does not have multiple solr instances. You will also need to be sure to
+# edit the fedora.yml file to match the solr URL for active-fedora. 
+development:
+  url: http://localhost:8983/solr/development-AF
+test: &TEST
+  url: <%= "http://127.0.0.1:#{ENV['TEST_JETTY_PORT'] || 8983}/solr/test-AF" %>
+cucumber:
+  <<: *TEST
+qa:
+  url: http://localhost:8080/solr/hcsvlab-AF
+qa2:
+  url: http://localhost:8080/solr/hcsvlab-AF
+staging:
+  url: http://localhost:8080/solr/hcsvlab-AF
+staging2:
+  url: http://localhost:8080/solr/hcsvlab-AF
+production:
+  url: http://localhost:8080/solr/hcsvlab-AF 
