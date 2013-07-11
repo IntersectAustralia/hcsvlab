@@ -15,7 +15,7 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   xml.gsub!("HCSVLAB_ID", pid)
   xml = "<add>" + xml + "</add>"
   # create in solr with xml
-  uri = URI.parse(ActiveFedora.solr_config[:url] + '/update?commit=true')
+  uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
 
   req = Net::HTTP::Post.new(uri)
   req.body = xml

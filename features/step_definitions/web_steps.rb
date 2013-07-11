@@ -56,26 +56,15 @@ When /^(?:|I )press "([^"]*)"$/ do |button|
 end
 
 When /^(?:|I )follow "([^"]*)"$/ do |link|
-  get_link(link).click
-end
-
-def get_link(link)
-  page.all('a', text: link).first
-end
-
-def get_field(field)
-  labels = page.all('label', text: field, :visible => false)
-  return page.find_by_id(labels.first[:for])
+  click_link(link)
 end
 
 When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
-  #fill_in(field, :with => value)
-  get_field(field).set(value)
+  fill_in(field, :with => value)
 end
 
 When /^(?:|I )fill in "([^"]*)" for "([^"]*)"$/ do |value, field|
-  #fill_in(field, :with => value)
-  get_field(field).set(value)
+  fill_in(field, :with => value)
 end
 
 # Use this to fill in an entire form with data from a table. Example:
@@ -153,7 +142,7 @@ end
 
 Then /^the "([^"]*)" field(?: within (.*))? should contain "([^"]*)"$/ do |field, parent, expected_value|
   with_scope(parent) do
-    field = get_field(field)
+    field = find_field(field)
     field_value = (field.tag_name == 'textarea') ? field.text : field.value
     if expected_value.blank?
       field_value.should be_blank
@@ -176,7 +165,7 @@ Then /^the "([^"]*)" field(?: within (.*))? should not contain "([^"]*)"$/ do |f
 end
 
 Then /^the "([^"]*)" field should have the error "([^"]*)"$/ do |field, error_message|
-  element = get_field(field)
+  element = find_field(field)
 
   form_for_input = element.find(:xpath, 'ancestor::form[1]')
   using_simple_form = form_for_input[:class].include?('simple_form')
