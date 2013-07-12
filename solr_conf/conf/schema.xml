@@ -21,7 +21,7 @@
 
     <field name="id" type="string" stored="true" indexed="true" multiValued="false" required="true"/>
     <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
-    <field name="full_text" type="text" indexed="true" stored="true" multiValued="false"/>
+    <field name="full_text" type="text" indexed="true" stored="true" multiValued="false" termVectors="true" termPositions="true" termOffsets="true"/>
     <field name="all_metadata" type="text_ws" indexed="true" stored="true" multiValued="true"/>   
     <field name="item_lists" type="string" indexed="true" stored="true" multiValued="true"/>   
 
