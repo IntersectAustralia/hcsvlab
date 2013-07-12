@@ -371,7 +371,7 @@ namespace :deploy do
       current_deployed_version += " (sha1:" + `git rev-parse --short #{fullBranchName}`.strip + ")"
     end
 
-    url = URI.parse('http://deployment-tracker.intersect.org.au/deployments/api_create/deployments/api_create')
+    url = URI.parse('http://deployment-tracker.intersect.org.au/deployments/api_create')
     post_args = {'app_name'=>application, 
       'deployer_machine'=>"#{ENV['USER']}@#{Socket.gethostname}", 
       'environment'=>rails_env, 
