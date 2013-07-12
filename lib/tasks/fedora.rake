@@ -202,6 +202,9 @@ namespace :fedora do
 
 
 	def ingest_rdf_file(corpus_dir, rdf_file, annotations)
+		unless rdf_file.to_s =~ /metadata/	# HCSVLAB-441
+			raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
+		end
 		puts "Ingesting item: " + rdf_file.to_s
 
 		item = create_item_from_file(rdf_file)
@@ -274,6 +277,8 @@ namespace :fedora do
 
 	def look_for_annotations(item, metadata_filename)
 		annotation_filename = metadata_filename.sub("metadata", "ann")
+		return if annotation_filename == metadata_filename # HCSVLAB-441
+
 		if File.exists?(annotation_filename)
 			doc = Document.new
 			doc.descMetadata.graph.load( annotation_filename, :format => :ttl )
