@@ -20,14 +20,20 @@ module FrequencySearchHelper
 
       params = {}
       params[:'facet.field'] = facet
+      params[:fq] = 'item_lists:' + itemListId.to_s
       # first I need to get all the facets and its values
       params[:q] = '*:*'
       (response, document_list) = get_search_results params
       all_facet_fields = response[:facet_counts][:facet_fields]
 
+      if (all_facet_fields[facet].nil? || all_facet_fields[facet].empty?)
+        result = {:status => "NO_FACET_VALUES_DEFINED"}
+        return result
+      end
+
+
       # get search result from solr
       params[:q] = "{!qf=full_text pf=''}#{query}"
-      params[:fq] = 'item_lists:' + itemListId.to_s
       params[:'hl.maxAnalyzedChars'] = -1 # indicate SOLR to process the whole text
       params[:fl] = "id, #{facet}, TF1:termfreq(full_text,'#{query}')"
 
@@ -57,13 +63,14 @@ module FrequencySearchHelper
 
       # First I will obtain the facets and the number of documents matching with each one
       result = {}
+      result[:data] = {}
       i = 0
       while (!allFacets.nil? and i < allFacets.size) do
         # Blacklight returns the facets setting the name of the facet in the even numbers, and the
         # number of document for that facet in the next index.
         facetValue = allFacets[i]
 
-        result[facetValue] = {:num_docs => 0, :num_occurrences => 0}
+        result[:data][facetValue] = {:num_docs => 0, :num_occurrences => 0}
 
         i = i + 2
       end
@@ -75,7 +82,7 @@ module FrequencySearchHelper
         facetValue = facetsWithResults[i]
         facetNumDocs = facetsWithResults[i+1]
 
-        result[facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
+        result[:data][facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
 
         i = i + 2
       end
@@ -92,10 +99,10 @@ module FrequencySearchHelper
           facetValue.each do |facet|
             # If for some reason the facet is not in the Hash, I won't make the process fail, but
             # I will show the text "###" in the number of documents. This should not happen.
-            if (result[facet].nil?)
-              result[facet] = {:num_docs => "###", :num_occurrences => 0}
+            if (result[:data][facet].nil?)
+              result[:data][facet] = {:num_docs => "###", :num_occurrences => 0}
             end
-            result[facet][:num_occurrences] = result[facet][:num_occurrences] + aDocument[:TF1]
+            result[:data][facet][:num_occurrences] = result[:data][facet][:num_occurrences] + aDocument[:TF1]
           end
         end
 
@@ -172,12 +179,17 @@ module FrequencySearchHelper
 
       params[:q] = '*:*'
       params[:fl] = "id"
+      params[:fq] = 'item_lists:' + itemListId.to_s
       (response, document_list) = get_search_results params
       all_facet_fields = response[:facet_counts][:facet_fields]
 
+      if (all_facet_fields[facet].nil? || all_facet_fields[facet].empty?)
+        result = {:status => "NO_FACET_VALUES_DEFINED"}
+        return result
+      end
+
       # get search result from solr
       params[:q] = "{!qf=full_text pf=''}#{query}"
-      params[:fq] = 'item_lists:' + itemListId.to_s
       params.delete(:fl)
       params[:hl] = "on"
       params[:tv] = "false"
@@ -213,13 +225,14 @@ module FrequencySearchHelper
 
       # First I will obtain the facets and the number of documents matching with each one
       result = {}
+      result[:data] = {}
       i = 0
       while (!allFacets.nil? and i < allFacets.size) do
         # Blacklight returns the facets setting the name of the facet in the even numbers, and the
         # number of document for that facet in the next index.
         facetValue = allFacets[i]
 
-        result[facetValue] = {:num_docs => 0, :num_occurrences => 0}
+        result[:data][facetValue] = {:num_docs => 0, :num_occurrences => 0}
 
         i = i + 2
       end
@@ -231,7 +244,7 @@ module FrequencySearchHelper
         facetValue = facetsWithResults[i]
         facetNumDocs = facetsWithResults[i+1]
 
-        result[facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
+        result[:data][facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
 
         i = i + 2
       end
@@ -256,13 +269,13 @@ module FrequencySearchHelper
           facetValue.each do |facet|
             # If for some reason the facet is not in the Hash, I won't make the process fail, but
             # I will show the text "###" in the number of documents. This should not happen.
-            if (result[facet].nil?)
-              result[facet] = {:num_docs => "###", :num_occurrences => 0}
+            if (result[:data][facet].nil?)
+              result[:data][facet] = {:num_docs => "###", :num_occurrences => 0}
             end
             if (!value[:full_text].nil?)
               value[:full_text].each do |aMatch|
                 matchingData = aMatch.to_enum(:scan, pattern).map { Regexp.last_match }
-                result[facet][:num_occurrences] = result[facet][:num_occurrences] + matchingData.size
+                result[:data][facet][:num_occurrences] = result[:data][facet][:num_occurrences] + matchingData.size
               end
             else
               Rails.logger.error("Solr has returned results for document id: #{docId} but it didn't highlighted any match")
