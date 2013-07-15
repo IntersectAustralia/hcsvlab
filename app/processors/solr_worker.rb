@@ -255,7 +255,19 @@ private
         field = binding[:predicate].to_s
         value = last_bit(binding[:object])
       end
-      add_field(result, field, value)
+
+
+      # When retrieving the information for a document, the RDF::Query library is forcing
+      # the text to be encoding to UTF-8, but that produces that some characters get misinterpreted,
+      # so we need to correct that by re mapping the wrong characters in the right ones.
+      # (maybe this is not the best solution :( )
+      value_encoded = value.inspect
+      replacements = []
+      replacements << ['â\u0080\u0098', '‘']
+      replacements << ['â\u0080\u0099', '’']
+      replacements.each{ |set| value_encoded.gsub!(set[0], set[1]) }
+
+      add_field(result, field, value_encoded)
     }
     unless extras.nil?
       extras.keys.each { |key|
