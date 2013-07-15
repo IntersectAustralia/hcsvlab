@@ -1,0 +1,29 @@
+mitcheldelbridge: 
+ corpus_prefix: http://ns.ausnc.org.au/schemas/mitcheldelbridge/
+
+monash:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/monash/
+
+cooee:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/cooee/
+
+gcsause:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/http://ns.ausnc.org.au/schemas/gcsause//
+
+ace:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/ace/
+
+ice:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/ice/
+
+braidedchannels:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/braidedchannels/
+
+paradisec:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/paradisec/
+
+austlit:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/austlit/
+
+avozes:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/avozes/

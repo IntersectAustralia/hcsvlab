@@ -74,9 +74,10 @@ When /^frequency search for "(.*)" in item list "(.*)" should show this results$
   result = list.doFrequencySearch(term, field.value)
 
   table.hashes.each do |attributes|
-    result[attributes[:facetValue]].should_not eq (nil)
-    result[attributes[:facetValue]][:num_docs].to_s.should eq(attributes[:matchingDocuments])
-    result[attributes[:facetValue]][:num_occurrences].to_s.should eq(attributes[:termOccurrences])
+    result[:status].should eq("OK")
+    result[:data][attributes[:facetValue]].should_not eq (nil)
+    result[:data][attributes[:facetValue]][:num_docs].to_s.should eq(attributes[:matchingDocuments])
+    result[:data][attributes[:facetValue]][:num_occurrences].to_s.should eq(attributes[:termOccurrences])
   end
 end
 
@@ -84,5 +85,5 @@ When /^frequency search for "(.*)" in item list "(.*)" should show error$/ do |t
   list = ItemList.find_by_name(list_name)
   field = find_field("Facet")
   result = list.doFrequencySearch(term, field.value)
-  result[:error].empty?.should eq(false)
+  result[:status].should eq("INPUT_ERROR")
 end

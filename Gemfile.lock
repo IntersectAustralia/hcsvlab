@@ -227,6 +227,7 @@ GEM
     mime-types (1.23)
     mimemagic (0.2.0)
     multi_json (1.7.4)
+    net-http-persistent (2.8)
     net-scp (1.1.1)
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
@@ -286,6 +287,8 @@ GEM
     rake (10.0.4)
     rdf (1.0.6)
       addressable (>= 2.2)
+    rdf-aggregate-repo (0.1.2)
+      rdf (>= 1.0)
     rdf-isomorphic (1.0.1)
       rdf (>= 1.0)
     rdf-json (1.0.0)
@@ -386,6 +389,19 @@ GEM
       nokogiri
       stomp
       xml-simple
+    sparql (1.0.8)
+      builder (>= 3.0)
+      ebnf (>= 0.3.0)
+      json (>= 1.7)
+      rdf (>= 1.0.6)
+      rdf-aggregate-repo
+      rdf-xsd (>= 1.0)
+      sparql-client (>= 1.0)
+      sxp (>= 0.1.0)
+    sparql-client (1.0.4.1)
+      json_pure (>= 1.4)
+      net-http-persistent (>= 1.4)
+      rdf (>= 1.0)
     sprockets (2.2.2)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -474,6 +490,7 @@ DEPENDENCIES
   simplecov (>= 0.3.8)
   simplecov-rcov
   solrizer
+  sparql
   stomp
   tabs_on_rails
   therubyracer

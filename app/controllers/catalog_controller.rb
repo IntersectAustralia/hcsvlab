@@ -262,6 +262,20 @@ class CatalogController < ApplicationController
     end
   end
 
+  def segments
+    @response, @document = get_solr_response_for_doc_id
+    begin
+      @item = Item.find(params[:id])
+    rescue Exception => e
+      #error handled in json
+    end 
+    @type = params[:type]
+    @label = params[:label]
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def primary_text
     @response, @document = get_solr_response_for_doc_id
     item = Item.find(@document.id)

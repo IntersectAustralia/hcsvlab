@@ -291,6 +291,7 @@ namespace :fedora do
 			doc.label = results[0][:part_of] unless results.size == 0
 			doc.item = item
 			doc.save
+			item.add_named_datastream('annotation_set', :dsLocation => "file://" + annotation_filename, :mimeType => 'text/plain')
 			puts "Annotation Document = #{doc.pid.to_s}"
 		end
 	end
