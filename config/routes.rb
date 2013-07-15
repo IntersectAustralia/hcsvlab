@@ -4,6 +4,7 @@ HcsvlabWeb::Application.routes.draw do
   Blacklight.add_routes(self)
   get "catalog/:id/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text'
   get "catalog/:id/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/
+  get "catalog/:id/segments", :to => 'catalog#segments', :as => 'catalog_segments'
 
   HydraHead.add_routes(self)
   
