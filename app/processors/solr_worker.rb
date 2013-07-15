@@ -2,64 +2,49 @@ require 'linkeddata'
 require 'xmlsimple'
 
 #
-# Helper class for interpreting the RELS-EXT we get from the Fedora message
-# queues. Currently a naive implementation based on regexp matching.
-#
-# Create a new RDFHelper from a String representation of the RELS-EXT RDF (as
-# obtained from Fedora) and the new object will put the hasModel resource into
-# its :type attribute. This should be "blah-blah-Item" or "blah-blah-Document"
-#
-class RDFHelper
-
-  attr_accessor :xml, :type
-
-  def initialize(xmlString)
-    @xml  = xmlString
-    @type = extract(generate_regexp('hasModel', 'resource'))
-  end
-
-private
-
-  def generate_regexp(tag, sub)
-    # We assume we're looking for either:
-    #   <ns0:#{tag} rdf:#{sub}="blah-blah-blah"></ns0:#{tag}>
-    # and we extract the "blah-blah-blah" part. We also allow any number in
-    # the namespace name, not just zero
-    return /<ns\d+:#{tag} rdf:#{sub}="([^"]*)"><\/ns\d+:#{tag}>/
-  end
-
-  def extract(regexp)
-    # Look for the regular expression in the RDF, and if we find it return the
-    # aforementioned "blah-blah-blah" part. If we don't find it, return nil.
-    match = regexp.match(xml)
-    return match[1] unless match == nil
-    return nil
-  end
-end
-
-
-#
 # Solr_Worker
 #
 class Solr_Worker < ApplicationProcessor
 
+  #
+  # =============================================================================
+  # Configuration
+  # =============================================================================
+  #
+
+  #
+  # Load up the facet fields from the supplied config
+  #
+  def self.load_config()
+    @@configured_fields = Set.new()
+    FACETS_CONFIG[:facets].each do |aFacetConfig|
+      @@configured_fields.add(aFacetConfig[:name])
+    end
+  end
+
+
   FEDORA_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env] unless const_defined?(:FEDORA_CONFIG)
+  FACETS_CONFIG = YAML.load_file(Rails.root.join("config", "facets.yml")) unless const_defined?(:FACETS_CONFIG)
 
-  @@configured_fields = Set.new([
-    'DC_is_part_of',
-    'date_group',
-    'AUSNC_mode',                 
-    'AUSNC_speech_style',         
-    'AUSNC_interactivity',        
-    'AUSNC_communication_context',
-    'AUSNC_audience',           
-    'OLAC_discourse_type',       
-    'OLAC_language',              
-    'DC_type'                    
-  ])
-
+  load_config()
   subscribes_to :solr_worker
 
+  #
+  # End of Configuration
+  # -----------------------------------------------------------------------------
+  #
+
+
+
+  #
+  # =============================================================================
+  # Processing
+  # =============================================================================
+  #
+
+  #
+  # Deal with an incoming message
+  #
   def on_message(message)
     # Expect message to be a command verb followed by the name of a Fedora object
     # and then do what the verb says to the object. Complain if the message is
@@ -227,11 +212,9 @@ private
 
   #
   # Add a field to the solr document we're building. Knows about the
-  # difference between dynamic and non-dynamic fields, and it maps the
-  # field name to the shortened form.
+  # difference between dynamic and non-dynamic fields.
   #
   def add_field(result, field, value)
-    field = MetadataHelper::short_form(field)
     if @@configured_fields.include?(field)
       logger.debug "\tAdding configured field #{field} with value #{value}"
       ::Solrizer::Extractor.insert_solr_field_value(result, field, value)
@@ -246,6 +229,7 @@ private
   #
   def make_solr_document(object, results, full_text, extras)
     result = {}
+    configured_fields_found = Set.new()
 
     results.each { |binding| 
       if binding[:predicate] == MetadataHelper::CREATED
@@ -261,19 +245,24 @@ private
       # the text to be encoding to UTF-8, but that produces that some characters get misinterpreted,
       # so we need to correct that by re mapping the wrong characters in the right ones.
       # (maybe this is not the best solution :( )
-      value_encoded = value.inspect
+      value_encoded = value.inspect[(1..-2)]
       replacements = []
       replacements << ['â\u0080\u0098', '‘']
       replacements << ['â\u0080\u0099', '’']
       replacements.each{ |set| value_encoded.gsub!(set[0], set[1]) }
 
+      # Map the field name to it's short form
+      field = MetadataHelper::short_form(field)
+      configured_fields_found.add(field) if @@configured_fields.include?(field)
       add_field(result, field, value_encoded)
     }
     unless extras.nil?
       extras.keys.each { |key|
+        field = MetadataHelper::short_form(key)
         values = extras[key]
+        configured_fields_found.add(field) if @@configured_fields.include?(field) && (values.size > 0)
         values.each { |value|
-          add_field(result, key, value)
+          add_field(result, field, value)
         }
       }
     end
@@ -287,6 +276,10 @@ private
     logger.debug "\tAdding configured field #{:id} with value #{object}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
 
+    # Add in defaults for the configured fields we haven't found so far
+    @@configured_fields.each { |field|
+      add_field(result, field, "unspecified") unless configured_fields_found.include?(field)
+    }
     return result
   end
 
@@ -557,5 +550,4 @@ private
   # End of Utility methods
   # -----------------------------------------------------------------------------
   #
-
 end
