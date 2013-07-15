@@ -23,7 +23,6 @@ else
     } "
   query = SPARQL.parse(q)
   item = query.execute(repo)
-  puts item.first[:item]
   node(:item) { File.basename(item.first[:item].to_s) }
 
   q = "
