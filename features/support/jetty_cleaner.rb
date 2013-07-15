@@ -10,7 +10,6 @@ def clear_jetty
   res = Net::HTTP.start(uri.hostname, uri.port) do |http|
     http.request(req)
   end
-
   # clear Fedora
   # TODO ActiveFedora is still not finding the objects to delete
 
@@ -34,8 +33,8 @@ if Dir.glob("#{Rails.root}/tmp/pids/*jetty.pid").empty?
   puts "fedora.pid file not found. Make sure hydra-jetty is installed and the #{Rails.env} copy is installed and running".red
   exit 1
 end
-#make sure jetty is set up properly
 
+#make sure jetty is set up properly
 output = `diff #{Rails.root}/fedora_conf/conf/test/fedora.fcfg #{Rails.root}/jetty/fedora/test/server/config/fedora.fcfg`
 if output.present?
   puts "Please run rake jetty:config to set up Fedora".red

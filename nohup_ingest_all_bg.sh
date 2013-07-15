@@ -2,5 +2,5 @@
 
 for CORPUS in $@
 do
-  rake fedora:ingest $CORPUS
+  rake fedora:ingest corpus=$CORPUS
 done

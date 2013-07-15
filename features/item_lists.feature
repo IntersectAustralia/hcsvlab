@@ -49,9 +49,9 @@ Feature: Managing Item Lists
     And I press "Create List"
     And I should be on the item list page for "Add Selected Test"
     And the item list "Add Selected Test" should have 0 items
-    And I am on the home page
-    And I click "Corpus"
-    And I follow "cooee"
+    And I have done a search with corpus "cooee"
+    And I should get exactly 3 results
+    And I should see "1 - 3 of 3"
     And I toggle the select all checkbox
     And I follow "Add Selected to list"
     And I follow "Add Selected Test"

@@ -15,7 +15,7 @@
     }
   }
 
-%div
+.search-form
   = form_tag({:action => 'frequency_search', :id => params[:id]}, :method=>"GET", :id=>"frequency_search_form" , :onSubmit => "showProgressAnimation();") do
     = field_set_tag do
       = hidden_field_tag :itemListId, :value => params[:id]
@@ -43,4 +43,3 @@
 
 :javascript
   changeFormAction("#{(params[:search_type].nil?)?params[:search_type2]:params[:search_type]}");
-= render 'shared/modal_waiting_panel'

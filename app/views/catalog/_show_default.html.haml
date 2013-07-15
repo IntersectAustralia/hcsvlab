@@ -11,7 +11,8 @@
     - doc = documents[0]
     - type = doc[MetadataHelper::TYPE].to_s
     - if type == "Text"
-      = raw render_primary_text(document)
+      %pre
+        = raw render_primary_text(document)
     - elsif type == "Image"
       %img{:src => doc[MetadataHelper::SOURCE], :style => "max-width:50%;"}/
     - elsif type == "Video"
@@ -23,7 +24,8 @@
     - else
       = raw render_no_primary_document
   - elsif has_only_text_documents?(document)
-    = raw render_primary_text(document)
+    %pre
+      = raw render_primary_text(document)
   - else
     = raw render_no_primary_document
 %h3

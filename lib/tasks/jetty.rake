@@ -3,6 +3,7 @@
 tasks = Rake.application.instance_variable_get '@tasks'
 tasks.delete 'jetty:clean'
 tasks.delete 'jetty:config'
+tasks.delete 'jetty:start'
 
 namespace :jetty do 
 
@@ -31,4 +32,33 @@ namespace :jetty do
 		system 'git submodule update'
 	end
 
+	desc "Start jetty"
+	task :start => :environment do
+    Jettywrapper.start(JETTY_CONFIG)
+    puts "jetty started at PID #{Jettywrapper.pid(JETTY_CONFIG)}"
+    puts "Waiting for Fedora and Solr to be ready...".yellow
+    sleep 30
+    
+	  while !ping(Blacklight.solr_config[:url]) do
+	    sleep 5
+	  end
+    puts "Fedora and Solr ready".green
+	end
+
 end
+
+require 'timeout'
+
+def ping(host)
+  begin
+    Timeout.timeout(5) do 
+    	res = Net::HTTP.get(URI(host))
+    	return true
+    end
+  rescue Errno::ECONNREFUSED
+    return false
+  rescue Timeout::Error
+    return false
+  end
+end
+

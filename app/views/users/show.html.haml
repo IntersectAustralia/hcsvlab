@@ -1,30 +1,32 @@
 - title 'User Details'
-.well
+.well.clearfix
   - if @user.pending_approval?
-    .user_details_menu
+    .pull-left
+      = link_to 'Back', access_requests_users_path, :class => "btn"
+    .user_details_menu.pull-right
       - if can?(:approve, @user) then
-        = link_to "Approve", edit_approval_user_path(@user), :method => :get, :class => "btn"
+        = link_to "Approve", edit_approval_user_path(@user), :method => :get, :class => "btn btn-primary"
         &nbsp;
       - if can?(:reject, @user) then
-        = link_to "Reject", reject_user_path(@user), :method => :put, :class => "btn"
+        = link_to "Reject", reject_user_path(@user), :method => :put, :class => "btn btn-danger"
         &nbsp;
-        = link_to "Reject as Spam", reject_as_spam_user_path(@user), :method => :put, :class => "btn"
+        = link_to "Reject as Spam", reject_as_spam_user_path(@user), :method => :put, :class => "btn btn-warning"
         &nbsp;
-      = link_to 'Back', access_requests_users_path, :class => "btn"
 
   - if @user.approved?
-    .user_details_menu
+    .pull-left
+      = link_to 'Back', users_path, :class => "btn"
+    .user_details_menu.pull-right
       - if can?(:update_role, User)
-        = link_to 'Edit role', edit_role_user_path(@user), :class => "btn"
+        = link_to 'Edit role', edit_role_user_path(@user), :class => "btn btn-primary"
         &nbsp;
       - if can?(:deactivate, User)
         - if @user == current_user
-          = link_to "Deactivate", deactivate_user_path(@user), :confirm => "This is the user you are currently logged is as. Are you sure you want to deactivate it?" , :method => :put, :class => "btn"
+          = link_to "Deactivate", deactivate_user_path(@user), :confirm => "This is the user you are currently logged is as. Are you sure you want to deactivate it?" , :method => :put, :class => "btn btn-warning"
           &nbsp;
         - else
-          = link_to "Deactivate", deactivate_user_path(@user), :method => :put, :class => "btn"
+          = link_to "Deactivate", deactivate_user_path(@user), :method => :put, :class => "btn btn-warning"
           &nbsp;
-      = link_to 'Back', users_path, :class => "btn"
 
   - if @user.deactivated?
     .user_details_menu

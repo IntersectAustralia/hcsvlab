@@ -1,21 +1,19 @@
 .loading-div-background
-.loading-div.ui-corner-all
-  =image_tag "loading.gif", :style=>'margin:30px; width:30px; height:30px;', :alt=>'Loading..'
-  %h2{:style=>'color:gray;font-weight:normal;'}
-    Please wait....
-:javascript
-  $(document).ready(function(){
-    hideProgressAnimation();
-  });
+  .loading-div.ui-corner-all
+    =image_tag "loading.gif", :style=>'margin:30px; width:30px; height:30px;', :alt=>'Loading..'
+    %h2{:style=>'color:gray;font-weight:normal;'}
+      Please wait....
+  :javascript
+    $(document).ready(function(){
+      hideProgressAnimation();
+    });
 
-  window.onunload = function(){};
+    window.onunload = function(){};
 
-  function showProgressAnimation() {
-    $('.loading-div-background').show();
-    $('.loading-div').show();
-  }
+    function showProgressAnimation() {
+      $('.loading-div-background').show();
+    }
 
-  function hideProgressAnimation() {
-    $('.loading-div-background').hide();
-    $('.loading-div').hide();
-  }
+    function hideProgressAnimation() {
+      $('.loading-div-background').hide();
+    }

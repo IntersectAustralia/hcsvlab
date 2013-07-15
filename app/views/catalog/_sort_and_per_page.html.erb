@@ -57,6 +57,7 @@
 
   <% end %>
 </div>
+
 <%= render :partial=>"shared/modal_waiting_panel" %>
 
 
@@ -121,19 +122,19 @@
   });
 
   jQuery("A[href='#add_to_existing_item_list']").click( function() {
-      generateDocumentIds("#document_ids");
-      itemListId=$(this).attr('id');
-      jQuery("#item_list_id").val(itemListId);
-      jQuery("#add_all_items").val("false");
-      jQuery("#add_to_item_list").submit();
-      });
+    generateDocumentIds("#document_ids");
+    itemListId=$(this).attr('id');
+    jQuery("#item_list_id").val(itemListId);
+    jQuery("#add_all_items").val("false");
+    jQuery("#add_to_item_list").submit();
+  });
 
   jQuery("A[href='#add_all_to_existing_item_list']").click( function() {
-      itemListId=$(this).attr('id');
-      jQuery("#item_list_id").val(itemListId);
-      jQuery("#add_all_items").val("true");
-      jQuery("#add_to_item_list").submit();
-      });
+    itemListId=$(this).attr('id');
+    jQuery("#item_list_id").val(itemListId);
+    jQuery("#add_all_items").val("true");
+    jQuery("#add_to_item_list").submit();
+  });
   //Set focus to the first element in the form of the modal panel
   jQuery('#new-item-list').on('shown', function () {
     jQuery('input:text:visible:first', this).focus();
