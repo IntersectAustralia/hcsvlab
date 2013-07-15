@@ -2,7 +2,7 @@
 .span9
   - if (!params[:id].nil?)
     = render 'search_form'
-  - if (!@result.nil? && !@result.empty?)
+  - if ("OK".eql?(@result[:status]))
     %table.table.table-striped
       %tr
         %th
@@ -11,7 +11,7 @@
           Matching documents
         %th
           Term Occurrences
-      - @result.each_pair do |key, value|
+      - @result[:data].each_pair do |key, value|
         %tr
           %td
             =key
@@ -19,6 +19,8 @@
             =value[:num_docs]
           %td
             =value[:num_occurrences]
-  - else
+  - elsif ("NO_MATCHING_DOCUMENTS".eql?(@result[:status]))
     .alert.alert-info No document matches with your search
+  - elsif ("NO_FACET_VALUES_DEFINED".eql?(@result[:status]))
+    .alert.alert-info No defined values for the selected facet.
 = render 'shared/nectar_attribution'

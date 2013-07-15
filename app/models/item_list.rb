@@ -310,7 +310,7 @@ class ItemList < ActiveRecord::Base
   #
   def doFrequencySearch(query, facet)
     if (query.strip.empty?)
-      result = {:error => "Frequency search does not allow empty searches"}
+      result = {:status => "INPUT_ERROR", :message => "Frequency search does not allow empty searches"}
       return result
     end
 
@@ -322,6 +322,13 @@ class ItemList < ActiveRecord::Base
     else
       result = SimpleFrequencySearch.new.executeFrequencySearchOnSimpleTerm(query, facet, id)
     end
+
+    if (result.nil? || result.empty?)
+      result = {:status => "NO_MATCHING_DOCUMENTS"}
+    elsif (result[:status].nil?)
+      result[:status] = "OK"
+    end
+
     result
   end
 
