@@ -29,13 +29,12 @@ else
     PREFIX dada:<http://purl.org/dada/schema/0.2#>
     PREFIX cp:<" + queryConfig[corpus]['corpus_prefix'] + ">
     select * where
-    { 
+    {
       ?anno a dada:Annotation .
       ?anno cp:val ?label .
       ?anno dada:targets ?loc .
       ?loc dada:start ?start .
       ?loc dada:end ?end . "
-  q.sub! "corpus_name", corpus.to_s
   if @type.present?
     q << "?anno dada:type '" + @type.to_s.strip + "' ."
   end
