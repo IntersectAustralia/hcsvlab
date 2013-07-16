@@ -80,10 +80,10 @@ class TranscriptsController < ApplicationController
 
   def find_doc_by_extension(ext)
     # FIX: document is opened multiple times, this could be reduced to one time
-    documents = item_documents_from_id(params['id'], [PURL::SOURCE])
+    documents = item_documents_from_id(params['id'], [MetadataHelper::SOURCE])
     result = nil
     documents.each do |document|
-      uri = document[PURL::SOURCE]
+      uri = document[MetadataHelper::SOURCE]
       if uri.ends_with? ext
         result = uri
         break

@@ -745,7 +745,7 @@ module Blacklight::BlacklightHelperBehavior
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item
-    query = RDF::Query.new({:item => {PURL::IS_PART_OF => :corpus}})
+    query = RDF::Query.new({:item => {MetadataHelper::IS_PART_OF => :corpus}})
     item_results = query.execute(graph)
 
     unless item_results.size == 0
@@ -753,7 +753,7 @@ module Blacklight::BlacklightHelperBehavior
 
       # Look for references to Documents within the metadata and
       # find their fields as specified in uris.
-      query = RDF::Query.new({item => {AUSNC::DOCUMENT => :document}})
+      query = RDF::Query.new({item => {MetadataHelper::DOCUMENT => :document}})
       document_results = query.execute(graph)
 
       document_results.each { |result|
