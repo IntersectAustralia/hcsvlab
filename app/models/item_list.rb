@@ -1,4 +1,4 @@
-require "./lib/item_list/frequency_search_helper"
+require "#{Rails.root}/lib/item_list/frequency_search_helper.rb"
 
 class ItemList < ActiveRecord::Base
   include Blacklight::BlacklightHelperBehavior
