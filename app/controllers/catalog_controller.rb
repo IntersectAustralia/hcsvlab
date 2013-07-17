@@ -262,7 +262,7 @@ class CatalogController < ApplicationController
     end
   end
 
-  def segments
+  def annotations
     @response, @document = get_solr_response_for_doc_id
     begin
       @item = Item.find(params[:id])

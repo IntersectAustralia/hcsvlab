@@ -31,28 +31,37 @@ else
     select * where
     {
       ?anno a dada:Annotation .
-      ?anno cp:val ?label .
-      ?anno dada:targets ?loc .
-      ?loc dada:start ?start .
-      ?loc dada:end ?end . "
+      OPTIONAL { ?anno cp:val ?label . }
+      OPTIONAL { ?anno dada:type ?type . }
+      OPTIONAL { 
+        ?anno dada:targets ?loc .
+        OPTIONAL { ?loc dada:start ?start . }
+        OPTIONAL { ?loc dada:end ?end . }
+      }
+      "
+
   if @type.present?
     q << "?anno dada:type '" + @type.to_s.strip + "' ."
   end
   if @label.present?
     q << "?anno cp:val '" + @label.to_s.strip + "' ."
   end
+
   q << "}"
 
   query = SPARQL.parse(q)
-  segs = query.execute(repo)
-  node(:segments_found) { segs.count }
+  anns = query.execute(repo)
 
-  node(:segments) do
+  node(:annotations_found) { anns.count }
+
+  node(:annotations) do
     hash = {}
-    segs.each do |seg|
-      hash[:label] = seg[:label].to_s
-      hash[:start] = seg[:start].to_f
-      hash[:end] = seg[:end].to_f
+    anns.each do |ann|
+
+      hash[:type] = ann[:type].to_s
+      hash[:label] = ann[:label].to_s
+      hash[:start] = ann[:start].to_f
+      hash[:end] = ann[:end].to_f
       data << hash.clone
     end
     data
