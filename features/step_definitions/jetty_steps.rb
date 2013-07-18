@@ -1,15 +1,34 @@
+require "#{Rails.root}/lib/tasks/fedora_helper.rb"
+require "#{Rails.root}/app/processors/solr_worker.rb"
+
 SAMPLE_FOLDER = "#{Rails.root}/test/samples"
 
 And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, pid|
+  rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
 
-  # item = create_item_from_file(rdf_file)
-  # look_for_annotations(item, rdf_file)
-  # look_for_documents(item, corpus_dir, rdf_file)
-
-  item = Item.new(pid: pid)
-  item.descMetadata.graph.load("#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf", :format => :ttl, :validate => true)
+  item = Item.create(pid: pid)
+  item.descMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
   item.label = item.descMetadata.graph.statements.first.subject
   item.save!
+
+  look_for_annotations(item, rdf_file)
+  look_for_documents(item, "#{SAMPLE_FOLDER}/#{corpus}", rdf_file)
+ 
+  item.save!
+
+  # update solr
+  Solr_Worker.new.on_message("index #{pid}")
+
+end
+
+And /^I have "([^:]*):([^:]*)" with id "(hcsvlab:\d+)" indexed$/ do |corpus, prefix, pid|
+  rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
+
+  item = Item.create(pid: pid)
+  item.descMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
+  item.label = item.descMetadata.graph.statements.first.subject
+  item.save!
+
   xml = File.read("#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-solr.xml")
   # replace HCSVLAB_ID in solr xml
   xml.gsub!("HCSVLAB_ID", pid)
@@ -25,10 +44,6 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   res = Net::HTTP.start(uri.hostname, uri.port) do |http|
     http.request(req)
   end
-
+ 
   res.code.to_i.should eq(200)
-
-# add documents
-
-# add annotations
 end

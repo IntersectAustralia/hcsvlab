@@ -10,21 +10,18 @@ def clear_jetty
   res = Net::HTTP.start(uri.hostname, uri.port) do |http|
     http.request(req)
   end
+
   # clear Fedora
-  # TODO ActiveFedora is still not finding the objects to delete
+  Item.delete_all
+  Document.delete_all
 
-  # puts "Preparing to delete all objects in the #{Rails.env} fedora."
-  # objects = []
-  # ActiveFedora::Base.find_each do |object|
-  #   objects << object
-  # end
-  # puts "Found #{objects.length} objects to delete"
-  # objects.each_with_index do |object, i|
-  #   puts "Count: #{i}. Deleting #{object.pid}"
-  #   object.delete
-  # end
-  # puts "All objects in the #{Rails.env} fedora deleted."
+end
 
+# Reserve first 10 for Item testing
+def reserve_fedora_pids
+  (1..10).each do |num|
+    Item.create(pid: "hcsvlab:#{num}")
+  end
 end
 
 #make sure jetty is started and clean
@@ -46,11 +43,14 @@ puts 'Test jetty ready'.green
 `echo '' > #{Rails.root}/log/test.log`
 clear_jetty
 
+reserve_fedora_pids
+
 at_exit do
   clear_jetty
 end
 
 Before do
   clear_jetty
+  
 end
 

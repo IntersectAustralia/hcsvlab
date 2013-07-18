@@ -4,9 +4,9 @@ Feature: Managing Item Lists
   So that I can organise my collection
 
   Background:
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "cooee:1-001" with id "hcsvlab:2"
-    Given I ingest "cooee:1-001" with id "hcsvlab:3"
+    Given I have "cooee:1-001" with id "hcsvlab:1" indexed
+    Given I have "cooee:1-001" with id "hcsvlab:2" indexed
+    Given I have "cooee:1-001" with id "hcsvlab:3" indexed
     Given I have the usual roles and permissions
     Given I have users
       | email                       | first_name | last_name |
