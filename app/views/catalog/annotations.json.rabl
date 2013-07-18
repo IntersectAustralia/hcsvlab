@@ -14,16 +14,17 @@ else
   corpus = @document["DC_is_part_of"].first
   queryConfig = YAML.load_file(Rails.root.join("config", "sparql.yml"))
 
-  q = "
-    PREFIX dada:<http://purl.org/dada/schema/0.2#>
-    select * where
-    {
-      ?anno_coll a dada:AnnotationCollection .
-      ?i dada:annotates ?item .
-    } "
-  query = SPARQL.parse(q)
-  item = query.execute(repo)
-  node(:item) { File.basename(item.first[:item].to_s) }
+  if !@item.primary_text.content.nil?
+    node(:utterance) { catalog_primary_text_url(@item.id) }
+  else
+    uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
+    documents = item_documents(@document, uris)
+    if(documents.present?)
+      node(:utterance) { catalog_document_url(@document.id, documents.first[MetadataHelper::IDENTIFIER]) }
+    else
+      node(:utterance) { "" }
+    end
+  end
 
   q = "
     PREFIX dada:<http://purl.org/dada/schema/0.2#>
