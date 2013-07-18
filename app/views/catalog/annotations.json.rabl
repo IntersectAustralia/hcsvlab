@@ -41,10 +41,10 @@ else
       "
 
   if @type.present?
-    q << "?anno dada:type '" + @type.to_s.strip + "' ."
+    q << "?anno dada:type '" + CGI.escape(@type).to_s.strip + "' ."
   end
   if @label.present?
-    q << "?anno cp:val '" + @label.to_s.strip + "' ."
+    q << "?anno cp:val '" + CGI.escape(@label).to_s.strip + "' ."
   end
 
   q << "}"
