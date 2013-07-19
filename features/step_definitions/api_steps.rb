@@ -63,13 +63,58 @@ Then /^I should get the authentication token json file for "(.*)"$/ do |email|
   page.source.should == "{:auth_token=>\"#{user.authentication_token}\"}"
 end
 
-When /^I should get a JSON response with$/ do |table|
+
+# Taken from cucumber-api-steps, as the step definitions weren't getting detected
+
+Then /^the JSON response should (not)?\s?have "([^"]*)" with the text "([^"]*)"$/ do |negative, json_path, text|
+  json    = JSON.parse(last_response.body)
+  results = JsonPath.new(json_path).on(json).to_a.map(&:to_s)
+  if self.respond_to?(:should)
+    if negative.present?
+      results.should_not include(text)
+    else
+      results.should include(text)
+    end
+  else
+    if negative.present?
+      assert !results.include?(text)
+    else
+      assert results.include?(text)
+    end
+  end
+end
+
+Then /^the JSON response should have "([^"]*)" with a length of (\d+)$/ do |json_path, length|
+  json = JSON.parse(last_response.body)
+  results = JsonPath.new(json_path).on(json)
+  if self.respond_to?(:should)
+    results.length.should == length.to_i
+  else
+    assert_equal length.to_i, results.length
+  end
+end
+
+Then /^show me the response$/ do
+  if last_response.headers['Content-Type'] =~ /json/
+    json_response = JSON.parse(last_response.body)
+    puts last_response.body
+
+    puts JSON.pretty_generate(json_response)
+  elsif last_response.headers['Content-Type'] =~ /xml/
+    puts Nokogiri::XML(last_response.body)
+  else
+    puts last_response.headers
+    puts last_response.body
+  end
+end
+
+Then 'the JSON response should be:' do |json|
+  expected = JSON.parse(json)
   actual = JSON.parse(last_response.body)
-  actual.size.should eq(table.hashes.size)
-  count = 0
-  table.hashes.each do |attributes|
-    actual[count]["name"].should eq(attributes["name"])
-    actual[count]["num_items"].to_s.should eq(attributes["num_items"])
-    count += 1
+
+  if self.respond_to?(:should)
+    actual.should == expected
+  else
+    assert_equal actual, response
   end
 end

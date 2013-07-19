@@ -47,3 +47,13 @@ And /^I have "([^:]*):([^:]*)" with id "(hcsvlab:\d+)" indexed$/ do |corpus, pre
  
   res.code.to_i.should eq(200)
 end
+
+
+Then /^I should get the primary text for "([^:]*):([^:]*)"$/ do |corpus, prefix|
+  last_response.headers['Content-Type'].should == "text/plain"
+  last_response.headers['Content-Disposition'].should include("filename=\"#{prefix}-plain.txt\"")
+  last_response.headers['Content-Disposition'].should include("attachment")
+
+  rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-plain.txt"
+  last_response.body.should eq(File.read(rdf_file))
+end

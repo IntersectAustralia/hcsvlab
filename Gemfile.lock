@@ -198,6 +198,8 @@ GEM
       json (>= 1.7.5)
       rdf (>= 1.0)
     json_pure (1.8.0)
+    jsonpath (0.5.3)
+      multi_json
     kaminari (0.14.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -476,6 +478,7 @@ DEPENDENCIES
   hydra-head (~> 6.0.0)
   jettywrapper
   jquery-rails (= 2.3.0)
+  jsonpath
   launchy
   linkeddata
   mimemagic

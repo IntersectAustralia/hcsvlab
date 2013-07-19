@@ -51,6 +51,15 @@ module NavigationHelpers
       when /^the catalog page$/
         catalog_index_path(options)
 
+      when /^the catalog annotations page for "(.*)"$/
+        catalog_annotations_path(Item.find($1), options)
+
+      when /^the catalog primary text page for "(.*)"$/
+        catalog_primary_text_path(Item.find($1), options)
+
+      when /^the catalog page for "(.*)"$/
+        catalog_path(Item.find($1), options)
+
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:
 #

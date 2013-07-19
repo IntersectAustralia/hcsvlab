@@ -66,6 +66,9 @@ group :test do
   gem "poltergeist"
   gem "selenium-webdriver"
 end
+
+gem "jsonpath"
+
 gem 'zeroclipboard-rails'
 gem "haml"
 gem "haml-rails"
