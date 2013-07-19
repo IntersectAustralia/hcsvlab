@@ -11,6 +11,15 @@ When /^I make a (JSON )?request for (.*) with the API token for "(.*)"$/ do |jso
   end
 end
 
+When /^I make a (JSON )?request for (.*) with the API token for "(.*)" with params$/ do |json, page_name, email, table|
+  user = User.find_by_email!(email)
+  if json.present?
+    get path_to(page_name), table.hashes.first.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
+  else
+    get path_to(page_name)
+  end
+end
+
 When /^I make a (JSON )?request for (.*) with the API token for "(.*)" outside the header$/ do |json, page_name, email|
   user = User.find_by_email!(email)
   if json.present?
