@@ -15,7 +15,7 @@ else
   queryConfig = YAML.load_file(Rails.root.join("config", "sparql.yml"))
 
   if !@item.primary_text.content.nil?
-    node(:utterance) { catalog_primary_text_url(@item.id) }
+    node(:utterance) { catalog_primary_text_url(@item.id, format: :json) }
   else
     uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
     documents = item_documents(@document, uris)

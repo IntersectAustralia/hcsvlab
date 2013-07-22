@@ -98,35 +98,44 @@ Feature: Browsing via API
     And the JSON response should have "$..name" with the text "Test 1"
     And the JSON response should have "$..name" with the text "Test 2"
 
+  Scenario: Get item details
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should have
+      | json_path           | text                                                   |
+      | $..annotations_url  | http://example.org/catalog/hcsvlab:1/annotations.json  |
+      | $..primary_text_url | http://example.org/catalog/hcsvlab:1/primary_text.json |
+
   Scenario: Get annotations for item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text","annotations_found":2,"annotations":[{"type":"pageno","label":"11","start":2460.0,"end":2460.0},{"type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
+    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text.json","annotations_found":2,"annotations":[{"type":"pageno","label":"11","start":2460.0,"end":2460.0},{"type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
     """
 
   Scenario: Get specific annotations for item by label
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
       | label |
-      |   11  |
+      | 11    |
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text","annotations_found":1,"annotations":[{"type":"pageno","label":"11","start":2460.0,"end":2460.0}]}
+    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text.json","annotations_found":1,"annotations":[{"type":"pageno","label":"11","start":2460.0,"end":2460.0}]}
     """
 
   Scenario: Get specific annotations for item by type
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
-      |  type  |
+      | type     |
       | ellipsis |
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text","annotations_found":1,"annotations":[{"type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
+    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text.json","annotations_found":1,"annotations":[{"type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
     """
 
   Scenario: Download primary_text from item

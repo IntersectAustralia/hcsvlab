@@ -46,6 +46,10 @@ node(:primary_text_url) do
   end
 end
 
+node(:annotations_url) do
+  catalog_annotations_url(@document.id, format: :json)
+end
+
 node(:documents) do
 
   data = []
