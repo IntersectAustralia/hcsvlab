@@ -116,7 +116,10 @@ after 'deploy:update' do
   deploy.restart
   deploy.additional_symlinks
   deploy.write_tag
-  deploy.cleanup
+  #deploy.cleanup
+  # We need to use our own cleanup task since there is an issue on Capistrano deploy:cleanup task
+  #https://github.com/capistrano/capistrano/issues/474
+  deploy.customcleanup
 end
 
 after 'deploy:finalize_update' do
@@ -391,6 +394,13 @@ namespace :deploy do
     rescue StandardError => e
       puts e.message
     end
+  end
+
+  # We need to define our own cleanup task since there is an issue on Capistrano deploy:cleanup task
+  #https://github.com/capistrano/capistrano/issues/474
+  task :customcleanup, :except => {:no_release => true} do
+      count = fetch(:keep_releases, 5).to_i
+      run "ls -1dt #{releases_path}/* | tail -n +#{count + 1} | #{try_sudo} xargs rm -rf"
   end
 end
 
