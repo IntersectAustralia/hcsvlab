@@ -7,9 +7,20 @@ def create_item_from_file(rdf_file)
   item = Item.new
   item.save!
 
-  item.descMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
-  item.label = item.descMetadata.graph.statements.first.subject
+  item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
+  item.label = item.rdfMetadata.graph.statements.first.subject
 
+  query = RDF::Query.new({
+                             :item => {
+                                 RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
+                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                             }
+                         })
+
+  result = query.execute(item.rdfMetadata.graph)[0]
+  item.collection = last_bit(result.collection.to_s)
+  item.collection_id = result.identifier.to_s
+  
   puts "Item = " + item.pid.to_s
   return item
 end
@@ -24,7 +35,7 @@ def look_for_documents(item, corpus_dir, rdf_file)
                              }
                          })
 
-  query.execute(item.descMetadata.graph).each do |result|
+  query.execute(item.rdfMetadata.graph).each do |result|
     filepath = corpus_dir + "/" + result.identifier.to_s
     # Only permit certain types (e.g. exlcude 'Raw' and 'Original')
     if ALLOWED_DOCUMENT_TYPES.include? result.type.to_s
@@ -32,7 +43,10 @@ def look_for_documents(item, corpus_dir, rdf_file)
       Find.find(corpus_dir) do |path|
         if File.basename(path).eql? result.identifier.to_s and File.file? path
           doc = Document.new
-          doc.descMetadata.graph.load(rdf_file, :format => :ttl)
+          doc.file_name = last_bit(result.source.to_s)
+          doc.type = result.type.to_s
+          doc.mime_type = mime_type_lookup(doc.file_name[0])
+          doc.rdfMetadata.graph.load(rdf_file, :format => :ttl)
           doc.label = result.source
           doc.item = item
           # Only create a datastream for certain file types
@@ -59,13 +73,15 @@ def look_for_annotations(item, metadata_filename)
 
   if File.exists?(annotation_filename)
     doc = Document.new
-    doc.descMetadata.graph.load(annotation_filename, :format => :ttl)
+    doc.rdfMetadata.graph.load(annotation_filename, :format => :ttl)
     query = RDF::Query.new({
                                :annotation => {
                                    RDF::URI("http://purl.org/dada/schema/0.2#partof") => :part_of
                                }
                            })
-    results = query.execute(doc.descMetadata.graph)
+    results = query.execute(doc.rdfMetadata.graph)
+    doc.file_name = annotation_filename
+    doc.type = 'Annotation'
     doc.label = results[0][:part_of] unless results.size == 0
     doc.item = item
     doc.save
@@ -74,3 +90,55 @@ def look_for_annotations(item, metadata_filename)
   end
 end
 
+#
+# Extract the last part of a path/URI/slash-separated-list-of-things
+#
+def last_bit(uri)
+  str = uri.to_s                # just in case it is not a String object
+  return str if str.match(/\s/) # If there are spaces, then it's not a path(?)
+  return str.split('/')[-1]
+end
+
+#
+# Rough guess at mime_type from file extension
+#
+def mime_type_lookup(file_name)
+    case File.extname(file_name.to_s)
+
+      # Text things
+      when '.txt'
+          return 'text/plain'
+      when '.xml'
+          return 'text/xml'
+
+      # Images
+      when '.jpg'
+          return 'image/jpeg'
+      when '.tif'
+          return 'image/tif'
+
+      # Audio things
+      when '.mp3'
+          return 'audio/mpeg'
+      when '.wav'
+          return 'audio/wav'
+
+      # Video things
+      when '.avi'
+          return 'video/x-msvideo'
+      when '.mov'
+          return 'video/quicktime'
+      when '.mp4'
+          return 'video/mp4'
+
+      # Other stuff
+      when '.doc'
+          return 'application/msword'
+      when '.pdf'
+          return 'application/pdf'
+
+      # Default
+      else
+          return 'application/octet-stream'
+    end
+  end

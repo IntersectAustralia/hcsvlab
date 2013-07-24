@@ -18,7 +18,7 @@ class XMLHelper
   end
 
   def desc_metadata?
-    return content == "descMetadata"
+    return content == "rdfMetadata"
   end
 
   def finished_work?
@@ -67,7 +67,7 @@ class FedoraWorker < ApplicationProcessor
     if xmlHelper.rels_ext?
       symbol = :relsExt
     elsif xmlHelper.desc_metadata?
-      symbol = :descMetadata
+      symbol = :rdfMetadata
     elsif xmlHelper.finished_work?
       symbol = :finishedWork
     else
