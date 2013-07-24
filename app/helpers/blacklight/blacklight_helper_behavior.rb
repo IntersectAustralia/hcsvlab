@@ -702,7 +702,7 @@ module Blacklight::BlacklightHelperBehavior
   def item_documents(document, uris)
     document_descriptors = []
 
-    uri = buildURI(document.id, 'descMetadata')
+    uri = buildURI(document.id, 'rdfMetadata')
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item
@@ -741,7 +741,7 @@ module Blacklight::BlacklightHelperBehavior
   def item_documents_from_id(document_id, uris)
     document_descriptors = []
 
-    uri = buildURI(document_id, 'descMetadata')
+    uri = buildURI(document_id, 'rdfMetadata')
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item

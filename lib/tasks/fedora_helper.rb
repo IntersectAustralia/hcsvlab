@@ -7,8 +7,8 @@ def create_item_from_file(rdf_file)
   item = Item.new
   item.save!
 
-  item.descMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
-  item.label = item.descMetadata.graph.statements.first.subject
+  item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
+  item.label = item.rdfMetadata.graph.statements.first.subject
 
   puts "Item = " + item.pid.to_s
   return item
@@ -24,7 +24,7 @@ def look_for_documents(item, corpus_dir, rdf_file)
                              }
                          })
 
-  query.execute(item.descMetadata.graph).each do |result|
+  query.execute(item.rdfMetadata.graph).each do |result|
     filepath = corpus_dir + "/" + result.identifier.to_s
     # Only permit certain types (e.g. exlcude 'Raw' and 'Original')
     if ALLOWED_DOCUMENT_TYPES.include? result.type.to_s
@@ -32,7 +32,9 @@ def look_for_documents(item, corpus_dir, rdf_file)
       Find.find(corpus_dir) do |path|
         if File.basename(path).eql? result.identifier.to_s and File.file? path
           doc = Document.new
-          doc.descMetadata.graph.load(rdf_file, :format => :ttl)
+          doc.file_name = result.identifier.to_s
+          doc.type = result.type.to_s
+          doc.rdfMetadata.graph.load(rdf_file, :format => :ttl)
           doc.label = result.source
           doc.item = item
           # Only create a datastream for certain file types
@@ -59,13 +61,15 @@ def look_for_annotations(item, metadata_filename)
 
   if File.exists?(annotation_filename)
     doc = Document.new
-    doc.descMetadata.graph.load(annotation_filename, :format => :ttl)
+    doc.rdfMetadata.graph.load(annotation_filename, :format => :ttl)
     query = RDF::Query.new({
                                :annotation => {
                                    RDF::URI("http://purl.org/dada/schema/0.2#partof") => :part_of
                                }
                            })
-    results = query.execute(doc.descMetadata.graph)
+    results = query.execute(doc.rdfMetadata.graph)
+    doc.file_name = annotation_filename
+    doc.type = 'Annotation'
     doc.label = results[0][:part_of] unless results.size == 0
     doc.item = item
     doc.save

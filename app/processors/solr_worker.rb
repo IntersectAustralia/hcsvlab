@@ -102,7 +102,7 @@ private
   # Do the indexing for an Item
   #
   def index_item(object)
-    uri = buildURI(object, 'descMetadata')
+    uri = buildURI(object, 'rdfMetadata')
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item

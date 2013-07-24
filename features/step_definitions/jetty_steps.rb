@@ -7,8 +7,8 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
 
   item = Item.create(pid: pid)
-  item.descMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
-  item.label = item.descMetadata.graph.statements.first.subject
+  item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
+  item.label = item.rdfMetadata.graph.statements.first.subject
   item.save!
 
   look_for_annotations(item, rdf_file)
@@ -25,8 +25,8 @@ And /^I have "([^:]*):([^:]*)" with id "(hcsvlab:\d+)" indexed$/ do |corpus, pre
   rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
 
   item = Item.create(pid: pid)
-  item.descMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
-  item.label = item.descMetadata.graph.statements.first.subject
+  item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
+  item.label = item.rdfMetadata.graph.statements.first.subject
   item.save!
 
   xml = File.read("#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-solr.xml")
