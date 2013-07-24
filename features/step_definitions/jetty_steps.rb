@@ -58,9 +58,3 @@ Then /^I should get the primary text for "([^:]*):([^:]*)"$/ do |corpus, prefix|
   last_response.body.should eq(File.read(rdf_file))
 end
 
-
-When /^Item "([^"]*)" is indexed$/ do |id|
-  sw = Solr_Worker.new
-  sw.on_message("index #{id}")
-end
-
