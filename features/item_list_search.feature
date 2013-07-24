@@ -93,7 +93,7 @@ Feature: Searching item lists
     And I am on the item list page for "Frequency search"
     And the item list "Frequency search" should have 1 items
     When I select "Frequency" from "search_type"
-    When I select "Corpus" from "Facet"
+    When I select "Collection" from "Facet"
     When I fill in "Frequency search for" with "can"
     And I press "execute_frequency_search"
     Then frequency search for "can" in item list "Frequency search" should show this results
@@ -123,7 +123,7 @@ Feature: Searching item lists
     And I am on the item list page for "Frequency search"
     And the item list "Frequency search" should have 1 items
     When I select "Frequency" from "search_type"
-    When I select "Corpus" from "Facet"
+    When I select "Collection" from "Facet"
     When I fill in "Frequency search for" with "what's"
     And I press "execute_frequency_search"
     Then frequency search for "what's" in item list "Frequency search" should show this results
@@ -138,7 +138,7 @@ Feature: Searching item lists
     And I am on the item list page for "Frequency search"
     And the item list "Frequency search" should have 1 items
     When I select "Frequency" from "search_type"
-    When I select "Corpus" from "Facet"
+    When I select "Collection" from "Facet"
     When I fill in "Frequency search for" with ""
     And I press "execute_frequency_search"
     Then frequency search for "" in item list "Frequency search" should show error

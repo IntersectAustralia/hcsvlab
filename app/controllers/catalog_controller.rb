@@ -122,7 +122,7 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('DC_title', :stored_searchable, type: :string), :label => 'Title:'
     config.add_show_field solr_name('DC_created', :stored_searchable, type: :string), :label => 'Created:'
     config.add_show_field solr_name('DC_identifier', :stored_searchable, type: :string), :label => 'Identifier:'
-    config.add_show_field 'DC_is_part_of', :label => 'Corpus:'
+    config.add_show_field 'DC_is_part_of', :label => 'Collection:'
     config.add_show_field solr_name('DC_Source', :stored_searchable, type: :string), :label => 'Source:'
     config.add_show_field solr_name('AUSNC_itemwordcount', :stored_searchable, type: :string), :label => 'Word Count'
 

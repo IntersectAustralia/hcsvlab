@@ -1,7 +1,7 @@
 :facets:
   -
     :name: DC_is_part_of
-    :label: Corpus
+    :label: Collection
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
