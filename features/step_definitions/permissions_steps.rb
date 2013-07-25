@@ -19,5 +19,6 @@ end
 Given /^I have the usual roles and permissions$/ do
   Role.create!(:name => Role::SUPERUSER_ROLE)
   Role.create!(:name => Role::RESEARCHER_ROLE)
+  Role.create!(:name => Role::DATA_OWNER_ROLE)
 end
 
