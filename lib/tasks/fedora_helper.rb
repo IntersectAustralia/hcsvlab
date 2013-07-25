@@ -44,10 +44,11 @@ def look_for_documents(item, corpus_dir, rdf_file)
         if File.basename(path).eql? result.identifier.to_s and File.file? path
           doc = Document.new
           doc.file_name = last_bit(result.source.to_s)
-          doc.type = result.type.to_s
+          doc.type      = result.type.to_s
           doc.mime_type = mime_type_lookup(doc.file_name[0])
+          doc.label     = result.source.to_s
           doc.rdfMetadata.graph.load(rdf_file, :format => :ttl)
-          doc.label = result.source
+          doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => result.source.to_s)
           doc.item = item
           # Only create a datastream for certain file types
           if STORE_DOCUMENT_TYPES.include? result.type.to_s

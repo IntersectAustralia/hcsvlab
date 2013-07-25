@@ -57,21 +57,21 @@
 <http://ns.ausnc.org.au/corpora/cooee/source/1-001#Original> a foaf:Document ;
     dc:extent 5126 ;
     dc:identifier "1-001.txt" ;
-    dc:source <localhost:8983/COOEE/1-001.txt> ;
+    dc:source <file:///COOEE/1-001.txt> ;
     dc:title "1-001#Original" ;
     dc:type "Original" .
 
 <http://ns.ausnc.org.au/corpora/cooee/source/1-001#Raw> a foaf:Document ;
     dc:extent 5126 ;
     dc:identifier "1-001-raw.txt" ;
-    dc:source <localhost:8983/COOEE/1-001-raw.txt> ;
+    dc:source <file:///COOEE/1-001-raw.txt> ;
     dc:title "1-001#Raw" ;
     dc:type "Raw" .
 
 <http://ns.ausnc.org.au/corpora/cooee/source/1-001#Text> a foaf:Document ;
     dc:extent 4960 ;
     dc:identifier "1-001-plain.txt" ;
-    dc:source <localhost:8983/COOEE/1-001-plain.txt> ;
+    dc:source <file:///COOEE/1-001-plain.txt> ;
     dc:title "1-001#Text" ;
     dc:type "Text" .
 

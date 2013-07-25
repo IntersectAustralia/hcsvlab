@@ -6,14 +6,7 @@ class Document < ActiveFedora::Base
 
     has_metadata 'rdfMetadata',  type: ActiveFedora::RdfxmlRDFDatastream
 
-    has_file_datastream :name => 'file', 
-                        :type => ActiveFedora::Datastream,
-                        :controlGroup => 'E'
-
-    #has_datastream :name         => 'content', 
-    #               :type         => ActiveFedora::Datastream, 
-    #               :controlGroup => 'E', 
-    #               :prefix       => 'content'
+    has_datastream :name => 'content', :type => ActiveFedora::Datastream, :controlGroup => 'E'
 
     has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
