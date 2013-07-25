@@ -51,11 +51,11 @@ Feature: Administer users
     Given "raul@intersect.org.au" has role "researcher"
     And I am on the list users page
     When I follow "Edit role" for "raul@intersect.org.au"
-    And I select "data-owner" from "Role"
+    And I select "data owner" from "Role"
     And I press "Save"
     Then I should be on the user details page for raul@intersect.org.au
     And I should see "The role for raul@intersect.org.au was successfully updated."
-    And I should see field "Role" with value "data-owner"
+    And I should see field "Role" with value "data owner"
 
   Scenario: Cancel out of editing roles
     Given "raul@intersect.org.au" has role "researcher"
