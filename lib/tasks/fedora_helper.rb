@@ -36,20 +36,22 @@ def look_for_documents(item, corpus_dir, rdf_file)
                          })
 
   query.execute(item.rdfMetadata.graph).each do |result|
-    filepath = corpus_dir + "/" + result.identifier.to_s
-    # Only permit certain types (e.g. exlcude 'Raw' and 'Original')
-    if ALLOWED_DOCUMENT_TYPES.include? result.type.to_s
-      # Only create Documents if we have that file
+
+    # Create a document in fedora
+    begin
+      doc = Document.new
+      doc.file_name = last_bit(result.source.to_s)
+      doc.type      = result.type.to_s
+      doc.mime_type = mime_type_lookup(doc.file_name[0])
+      doc.label     = result.source.to_s
+      doc.rdfMetadata.graph.load(rdf_file, :format => :ttl)
+      doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => result.source.to_s)
+      doc.item = item
+      doc.save
+
+      # Create a primary text datastream in the fedora Item for primary text documents
       Find.find(corpus_dir) do |path|
         if File.basename(path).eql? result.identifier.to_s and File.file? path
-          doc = Document.new
-          doc.file_name = last_bit(result.source.to_s)
-          doc.type      = result.type.to_s
-          doc.mime_type = mime_type_lookup(doc.file_name[0])
-          doc.label     = result.source.to_s
-          doc.rdfMetadata.graph.load(rdf_file, :format => :ttl)
-          doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => result.source.to_s)
-          doc.item = item
           # Only create a datastream for certain file types
           if STORE_DOCUMENT_TYPES.include? result.type.to_s
             case result.type.to_s
@@ -64,6 +66,8 @@ def look_for_documents(item, corpus_dir, rdf_file)
           break
         end
       end
+    rescue Exception => e
+      Rails.logger.warn("Error creating document: #{e.message}")
     end
   end
 end

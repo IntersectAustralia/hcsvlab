@@ -284,83 +284,29 @@ class CatalogController < ApplicationController
   
   include Blacklight::BlacklightHelperBehavior
  
-
   def document
-    @response, @document = get_solr_response_for_doc_id
-    uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
-    # TODO: Change this to use ActiveFedora has_many once jetty is updated
-    documents = item_documents(@document, uris)
-    if documents.present?
-      is_cooee = @document[MetadataHelper::short_form(MetadataHelper::IS_PART_OF)][0] == "cooee"
-      documents.each do |values|
-        next unless values[MetadataHelper::IDENTIFIER].to_s.eql?(params[:filename])
+    item = Item.find(params[:id])
+
+    if item.documents.present?
+        #is_cooee = item.collection == "cooee"
+        item.documents.each do |doc|
+            next unless doc.file_name[0] == params[:filename] 
+
+            params[:disposition] = 'Inline'
+            params[:disposition].capitalize!
+
+            send_data doc.datastreams['CONTENT1'].content,
+                      :disposition => params[:disposition],
+                      :filename => doc.file_name[0].to_s,
+                      :type => doc.mime_type[0].to_s
+            return
+        end
+    end
         
-        # We need to get mime-type from somewhere rather than hard coding it.
-        # . I've put in an extension based oojar to work it out, but really robochef should put it in the metadata
+    send_data "No document matching #{params[:filename]}",
+              :disposition => 'Inline',
+              :type => 'text/plain'
 
-        # Disposition probably needs to be a parameter: Inline or Attachment
-
-        # Eventually this should change to get the content from an item's
-        # Document datastream, eg send_data item.datastreams['CONTENT1'].content...
-
-        uri = URI.parse(values[MetadataHelper::SOURCE])
-        type = type_lookup(uri)
-        params[:disposition] = 'Inline'
-        params[:disposition].capitalize!
-        send_data Net::HTTP.get(uri),
-                  :disposition => params[:disposition],
-                  :filename => File.basename(uri.to_s), 
-                  :type => type
-        return
-
-
-        send_data "No document matching #{params[:filename]}",
-                  :disposition => 'Inline',
-                  :type => 'text/plain'
-      end
-    end
-  end
-
-
-  def type_lookup(uri)
-    case File.extname(uri.to_s)
-
-      # Text things
-      when '.txt'
-          return 'text/plain'
-      when '.xml'
-          return 'text/xml'
-
-      # Images
-      when '.jpg'
-          return 'image/jpeg'
-      when '.tif'
-          return 'image/tif'
-
-      # Audio things
-      when '.mp3'
-          return 'audio/mpeg'
-      when '.wav'
-          return 'audio/wav'
-
-      # Video things
-      when '.avi'
-          return 'video/x-msvideo'
-      when '.mov'
-          return 'video/quicktime'
-      when '.mp4'
-          return 'video/mp4'
-
-      # Other stuff
-      when '.doc'
-          return 'application/msword'
-      when '.pdf'
-          return 'applicatiopn/pdf'
-
-      # Default
-      else
-          return 'application/octet-stream'
-    end
   end
 
 end 
