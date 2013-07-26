@@ -87,7 +87,6 @@ GEM
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
-    capistrano-shared_file (0.1.1)
     capistrano_colors (0.5.5)
     capybara (2.1.0)
       mime-types (>= 1.16)
@@ -461,7 +460,6 @@ DEPENDENCIES
   bootstrap-sass
   brakeman
   cancan
-  capistrano-shared_file
   capistrano_colors
   capybara
   celluloid

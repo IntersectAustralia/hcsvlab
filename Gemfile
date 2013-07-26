@@ -118,4 +118,3 @@ gem 'rvm-capistrano'
 # gem "capistrano-ext"
 # gem "capistrano"
 gem "capistrano_colors"
-gem 'capistrano-shared_file'

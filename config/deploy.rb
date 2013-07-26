@@ -3,8 +3,9 @@ require 'bundler/capistrano'
 require 'capistrano/ext/multistage'
 require 'capistrano_colors'
 require 'rvm/capistrano'
-require 'capistrano/shared_file'
 
+set :shared_file_dir, "files"
+set(:shared_file_path) { File.join(shared_path, shared_file_dir) }
 
 set :keep_releases, 5
 set :application, 'hcsvlab-web'
@@ -427,10 +428,21 @@ namespace :deploy do
 
       end
     end
+    after "deploy:setup", "deploy:shared_file:setup"
 
-    desc "Overwritten to do nothing - Do not use"
-    task :print_reminder do
+    desc <<-DESC
+      Symlink shared files to release path.
+
+      WARNING: It DOES NOT warn you when shared files not exist.  \
+      So symlink will be created even when a shared file does not \
+      exist.
+    DESC
+    task :create_symlink, :except => { :no_release => true } do
+      (shared_files || []).each do |path|
+        run "ln -nfs #{shared_file_path}/#{path} #{release_path}/#{path}"
+      end
     end
+    after "deploy:finalize_update", "deploy:shared_file:create_symlink"
   end
 end
 
