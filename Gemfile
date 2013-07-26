@@ -77,10 +77,7 @@ gem "simple_form"
 gem "devise"
 gem "email_spec", :group => :test
 gem "cancan"
-gem 'rvm-capistrano'
-# gem "capistrano-ext"
-# gem "capistrano"
-gem "capistrano_colors"
+
 
 # blacklight and hydra gems
 gem 'blacklight'
@@ -115,3 +112,10 @@ gem 'rabl'
 gem 'whoops_rails_logger', git: 'https://github.com/IntersectAustralia/whoops_rails_logger.git'
 
 gem 'sparql'
+
+# Capistrano stuff
+gem 'rvm-capistrano'
+# gem "capistrano-ext"
+# gem "capistrano"
+gem "capistrano_colors"
+gem 'capistrano-shared_file'

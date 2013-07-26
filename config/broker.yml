@@ -131,7 +131,7 @@ test:
     port: 61613
     reliable: true
     reconnectDelay: 5
- 
+
 qa:
     adapter: stomp
     reliable: false

@@ -3,6 +3,8 @@ require 'bundler/capistrano'
 require 'capistrano/ext/multistage'
 require 'capistrano_colors'
 require 'rvm/capistrano'
+require 'capistrano/shared_file'
+
 
 set :keep_releases, 5
 set :application, 'hcsvlab-web'
@@ -20,8 +22,7 @@ set :scm, 'git'
 #set :git_enable_submodules, 1
 set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
 set :deploy_via, :copy
-set :copy_exclude, [".git/*"]
-
+set :copy_exclude, [".git/*", "features/*", "spec/*", "test/*"]
 
 #version tagging
 set :branch do
@@ -120,13 +121,6 @@ after 'deploy:update' do
   # We need to use our own cleanup task since there is an issue on Capistrano deploy:cleanup task
   #https://github.com/capistrano/capistrano/issues/474
   deploy.customcleanup
-end
-
-after 'deploy:finalize_update' do
-  generate_database_yml
-
-  #solved in Capfile
-  #run "cd #{release_path}; RAILS_ENV=#{stage} rake assets:precompile"
 end
 
 namespace :deploy do
@@ -402,6 +396,42 @@ namespace :deploy do
       count = fetch(:keep_releases, 5).to_i
       run "ls -1dt #{releases_path}/* | tail -n +#{count + 1} | #{try_sudo} xargs rm -rf"
   end
+
+  namespace :shared_file do
+
+    desc <<-DESC
+      Generate shared file dirs under shared/files dir and then copies files over.
+
+      For example, given:
+        set :shared_files, %w(config/database.yml db/seeds.yml)
+
+      The following directories will be generated:
+        shared/files/config/
+        shared/files/db/
+    DESC
+
+    task :setup, :except => { :no_release => true } do
+      if exists?(:shared_files)
+        dirs = shared_files.map {|f| File.join(shared_file_path, File.dirname(f)) }
+        run "#{try_sudo} mkdir -p #{dirs.join(' ')}"
+        run "#{try_sudo} chmod g+w #{dirs.join(' ')}" if fetch(:group_writable, true)
+        run "#{try_sudo} chown -R #{user}.#{group} #{dirs.join(' ')}"
+
+        servers = find_servers(:no_release => false)
+        servers.each do |server|
+          shared_files.each do |file_path|
+            top.upload(file_path, File.join(shared_file_path, file_path))
+            puts "    Uploaded #{file_path} to #{File.join(shared_file_path, file_path)}"
+          end
+        end
+
+      end
+    end
+
+    desc "Overwritten to do nothing - Do not use"
+    task :print_reminder do
+    end
+  end
 end
 
 namespace :backup do
@@ -435,25 +465,15 @@ task :do_set_password, :roles => :app do
   put YAML::dump(buffer), "#{shared_path}/env_config/sample_password.yml", :mode => 0664
 end
 
-desc "After updating code we need to populate a new database.yml"
-task :generate_database_yml, :roles => :app do
-  require "yaml"
-  #set :production_database_password, proc { Capistrano::CLI.password_prompt("Database password: ") }
-
-  buffer = YAML::load_file('config/database.yml')
-  # get rid of unneeded configurations
-  # buffer.delete('test')
-  # buffer.delete('development')
-  # buffer.delete('cucumber')
-  # buffer.delete('spec')
-
-  # Populate production password
-  #buffer[rails_env]['password'] = production_database_password
-
-
-  put YAML::dump(buffer), "#{release_path}/config/database.yml", :mode => 0664
-end
-
 after 'multistage:ensure' do
   set(:rails_env) { "#{defined?(rails_env) ? rails_env : stage.to_s}" }
+  set :shared_files, %W(
+    config/environments/#{stage}.rb
+    config/deploy/#{stage}.rb
+    config/broker.yml 
+    config/database.yml 
+    config/fedora.yml 
+    config/hcsvlab-web_config.yml 
+    config/linguistics.yml 
+    config/solr.yml)
 end
