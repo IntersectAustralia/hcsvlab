@@ -8,11 +8,17 @@ class Collection < ActiveFedora::Base
 
   has_many :items, :property => :is_member_of
 
+  belongs_to :user, :property => :data_owner
+
   # uri is the unique id of the collection, e.g. http://ns.ausnc.org.au/corpora/cooee
   delegate :uri,        to: 'descMetadata'
 
   # short_name is a nice human readable handy-type name, e.g. COOEE
   delegate :short_name, to: 'descMetadata'
+
+
+  # ---------------------------------------
+
 
   #
   # Find a collection using its uri
@@ -37,4 +43,5 @@ class Collection < ActiveFedora::Base
     Rails.logger.warn "Multiple collections with short name = #{short_name}" if results.count > 1
     return Item.find(results[0])
   end
+
 end
