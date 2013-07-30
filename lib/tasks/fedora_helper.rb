@@ -26,7 +26,7 @@ def create_item_from_file(rdf_file)
 end
 
 def create_collection(collection_name, corpus_dir)
-  if collection_name == "ice" #ice has different directory structure
+  if collection_name == "ice" && File.basename(corpus_dir)!="ice" #ice has different directory structure
     dir = File.expand_path("../../..", corpus_dir)
   else
     dir = File.expand_path("..", corpus_dir)
