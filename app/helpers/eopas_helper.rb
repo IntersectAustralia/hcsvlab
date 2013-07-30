@@ -11,6 +11,7 @@ module EopasHelper
     media_count = 0
     documents.each do |document|
       uri = document[MetadataHelper::SOURCE]
+      next if uri.nil?
       if uri.ends_with? 'xml'
         xml = uri
         doc_count += 1

@@ -22,6 +22,8 @@ private
   FOAF_BASE_URI       = 'http://xmlns.com/foaf/0.1/'
   RDF_BASE_URI        = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 
+  AUSTALK_BASE_URI = 'http://ns.austalk.edu.au/'
+
   @@lookup = {}
   @@prefixes = {
     ACE_BASE_URI         => "ACE",
@@ -39,7 +41,9 @@ private
     FEDORA_BASE_URI      => "FEDORA",
     FOAF_BASE_URI        => "FOAF",
     OLAC_BASE_URI        => "OLAC",
-    RDF_BASE_URI         => "RDF"
+    RDF_BASE_URI         => "RDF",
+
+    AUSTALK_BASE_URI     => "AUSTALK"
   }
 
 public
@@ -119,6 +123,17 @@ public
   RDF_TYPE = RDF::URI(RDF_BASE_URI + 'type') unless const_defined?(:RDF_TYPE)
 
   @@lookup[RDF_TYPE.to_s] = prefixes[RDF_BASE_URI] + "_type"
+
+  #
+  # AUSTALK
+  #
+  AUSTALK_COMPONENT     = RDF::URI(AUSTALK_BASE_URI + 'component') unless const_defined?(:AUSTALK_COMPONENT)
+  AUSTALK_COMPONENTNAME = RDF::URI(AUSTALK_BASE_URI + 'componentName') unless const_defined?(:AUSTALK_COMPONENTNAME)
+  AUSTALK_PROMPT        = RDF::URI(AUSTALK_BASE_URI + 'prompt') unless const_defined?(:AUSTALK_PROMPT)
+  AUSTALK_PROTOTYPE     = RDF::URI(AUSTALK_BASE_URI + 'prototype') unless const_defined?(:AUSTALK_PROTOTYPE)
+  AUSTALK_SESSION       = RDF::URI(AUSTALK_BASE_URI + 'session') unless const_defined?(:AUSTALK_SESSION)
+  AUSTALK_TIMESTAMP     = RDF::URI(AUSTALK_BASE_URI + 'timestamp') unless const_defined?(:AUSTALK_TIMESTAMP)
+  AUSTALK_VERSION       = RDF::URI(AUSTALK_BASE_URI + 'version') unless const_defined?(:AUSTALK_VERSION)
 
   #
   # short_form - return a shortened form of the given uri (which will
