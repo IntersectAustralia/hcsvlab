@@ -209,6 +209,10 @@ namespace :fedora do
 
     item.save!
 
+    if Collection.where(short_name: item.collection).count == 0
+      create_collection(item.collection.first, corpus_dir)
+    end
+
     # Msg to fedora.apim.update
 
     client = Stomp::Client.open "stomp://localhost:61613"

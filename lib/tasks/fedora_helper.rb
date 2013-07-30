@@ -25,6 +25,33 @@ def create_item_from_file(rdf_file)
   return item
 end
 
+def create_collection(collection_name, corpus_dir)
+  if collection_name == "ice" #ice has different directory structure
+    dir = File.expand_path("../../..", corpus_dir)
+  else
+    dir = File.expand_path("..", corpus_dir)
+  end
+  
+  if Dir.entries(dir).include?(collection_name + ".n3")
+    coll_metadata = dir + "/" + collection_name + ".n3"
+  else
+    puts "No collection metadata file found - " + dir + "/" + collection_name + ".n3"
+    return
+  end
+
+  coll = Collection.new
+  coll.save!
+
+  coll.rdfMetadata.graph.load(coll_metadata, :format => :ttl, :validate => true)
+  coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s
+  coll.uri = coll.label
+  coll.short_name = collection_name
+  coll.save!
+
+  puts "Collection Metadata = " + coll.pid.to_s
+  return
+end
+
 def look_for_documents(item, corpus_dir, rdf_file)
   #Text
   query = RDF::Query.new({
