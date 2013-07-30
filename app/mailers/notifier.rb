@@ -28,6 +28,18 @@ class Notifier < ActionMailer::Base
           :subject => PREFIX + "There has been a new access request")
   end
 
+  def notify_superusers_of_issue(issue_report)
+    superusers_emails = User.get_superuser_emails
+    @issue_report = issue_report
+    unless (@issue_report.screenshot.nil?)
+      attachments['screenshot.jpg'] = File.read(@issue_report.screenshot)
+    end
+    mail( :to => superusers_emails,
+          :from => APP_CONFIG['account_request_admin_notification_sender'],
+          :reply_to => @issue_report.user_email,
+          :subject => PREFIX + "An issue has been reported")
+  end
+
   def notify_user_that_they_cant_reset_their_password(user)
     @user = user
     mail( :to => @user.email,

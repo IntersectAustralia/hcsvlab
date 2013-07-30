@@ -54,4 +54,7 @@ HcsvlabWeb::Application.routes.draw do
   # resources :media_items, :transcripts
   match '/eopas/:id' => 'transcripts#show', :as => 'eopas'
 
+  resources :issue_reports, :only => [:new, :create] do
+  end
+
 end

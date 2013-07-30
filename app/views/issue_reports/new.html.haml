@@ -1,0 +1,10 @@
+%h1 Report An Issue
+= simple_form_for(@issue_report) do |f|
+  .inputs
+    = f.input :description, as: :text, :width => 10, :height=> 10
+    = f.input :include_screenshot, :as => :boolean, :label => "Include Screenshot"
+    = f.input :url, :readonly => true
+    Your email will be submitted with this report, along with the software version you are using and the URL you were visiting when the problem occurred.
+  .form-actions
+    = f.submit "Send Feedback", :class => "btn btn-primary", :id => "submit-button"
+    = link_to 'Cancel', root_path, :class => "btn"
