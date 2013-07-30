@@ -5,7 +5,6 @@ class IssueReport
   extend ActiveModel::Naming
 
   attr_accessor :user_email, :description, :url, :screenshot, :timestamp, :include_screenshot
-
   validates_presence_of :user_email
   validates_presence_of :url
   validates_presence_of :description
