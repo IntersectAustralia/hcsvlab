@@ -15,8 +15,18 @@ class IssueReportsController < ApplicationController
 
     #take a screenshot. The use of 'localhost' addresses will cause imgkit to hang, so we bypass the process on localhost
     if (@issue_report.include_screenshot == '1' && !@issue_report.url.include?("http://localhost"))
-      kit = IMGKit.new(@isssue_report.url, :quality => 50)
-      file = kit.to_file('tmp/file.jpg')
+      #get filename
+      prefix = "#{Rails.root}/tmp/screenshot_#{@issue_report.timestamp.strftime("%d%m%Y%H%M%S")}"
+      filename = "#{prefix}.jpg"
+      id=0
+      while File.exists?(filename) do
+        filename = "#{prefix}-#{id}.jpg"
+        id += 1
+      end
+      file = File.new(filename, "w")
+      #render the screenshot using imgkit
+      kit = IMGKit.new(@issue_report.url, :quality => 50)
+      img   = kit.to_file(filename)
       @issue_report.screenshot = file.path
     end
 
@@ -27,6 +37,8 @@ class IssueReportsController < ApplicationController
       flash.now.alert = "The issue was not reported."
       render :new, {@issue_report => @issue_report}
     end
+
+    File.delete(filename) unless (filename.nil?)
 
   end
 
