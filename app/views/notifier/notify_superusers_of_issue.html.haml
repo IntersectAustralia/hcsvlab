@@ -1,12 +1,15 @@
 %p An issue has been reported with the following details:
+%p
+  Email: #{@issue_report.user_email}
 
-Timestamp: <%= @issue_report.timestamp %>
+  Timestamp: #{@issue_report.timestamp}
 
-Reported By: <%= @issue_report.user_email %>
+  Application Version:
+    = render 'shared/tag'
 
-Application Version: <%= render 'shared/tag' %>
+  URL: #{@issue_report.url}
 
-URL: <%= @issue_report.url %>
+  Description: #{@issue_report.description}
 
-Description: <%= @issue_report.description %>
-
+  - unless @issue_report.screenshot.nil?
+    %p A screenshot of the issue has been attached.
