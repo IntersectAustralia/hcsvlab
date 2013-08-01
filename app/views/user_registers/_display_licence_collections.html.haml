@@ -1,0 +1,71 @@
+#content
+  = render :partial => 'sort_and_per_page'
+
+  %table.table.table-condensed
+    %tbody
+      %tr
+        %th.title Collections Title
+        %th.collection Collections
+        %th.owner Owner
+        %th.access Access
+        %th.status Status
+      %tr.documentHeadersdf.clearfixsdf
+        %td.title
+          AusNC Collections
+        %td.collection
+          8
+        %td.owner
+          user@email.com
+        %td.access
+          Requested
+        %td.status
+          %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} View Licence
+      %tr.documentHeadersdf.clearfixsdf
+        %td.title
+          PARADISEC Collections
+        %td.collection
+          180
+        %td.owner
+          user@email.com
+        %td.access
+          Granted
+        %td.status
+          Agreed to on 04/08/2013
+      %tr.documentHeadersdf.clearfixsdf
+        %td.title
+          BLALA Collections
+        %td.collection
+          180
+        %td.owner
+          user@email.com
+        %td.access
+          .btn.btn-primary.btn-mini Request Access
+        %td.status
+          %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} View Licence
+
+      %tr.documentHeadersdf.clearfixsdf
+        %td.title
+          AVOZES Collections
+        %td.collection
+          1
+        %td.owner
+          user@email.com
+        %td.access
+          Granted
+        %td.status
+          %a.btn.btn-warning.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} View Licence
+
+
+#licence_agreement_details.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-header
+    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+    %h3#myModalLabel Sample GNU Licence
+    %p Read licence and agree to proceed
+  #new_item_list_dialog.modal-body{:title => "New Item List"}
+    %p
+      View all Associated Collections
+    %p
+      Licence terms
+  .modal-footer
+    %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Disagree
+    %a.btn.btn-primary Agree

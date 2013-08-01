@@ -13,6 +13,7 @@
     - if current_or_guest_user
       %li= link_to "Edit My Details", edit_user_registration_path
       %li= link_to "Change My Password", users_edit_password_path
+      %li= link_to "Licence Agreements", users_licence_agreements_path
       %li#api_token_submenu.dropdown-submenu
         %a{:href => "#"} API Key
         %ul.dropdown-menu

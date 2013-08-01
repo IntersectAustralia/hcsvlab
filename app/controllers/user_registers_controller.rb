@@ -63,6 +63,9 @@ class UserRegistersController < Devise::RegistrationsController
     end
   end
 
+  def licence_agreements
+  end
+
   def download_token
     json_data = {auth_token: current_user.authentication_token}
     send_data json_data, type: :json, filename: "hcsvlab_#{current_user.full_name.downcase.gsub(' ', "_")}_token.json"

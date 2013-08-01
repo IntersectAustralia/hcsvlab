@@ -12,6 +12,7 @@ HcsvlabWeb::Application.routes.draw do
 
   devise_scope :user do
     get "/users/edit_password", :to => "user_registers#edit_password" #allow users to edit their own password
+    get "/users/licence_agreements", :to => "user_registers#licence_agreements" #allow users to edit their own password
     put "/users/update_password", :to => "user_registers#update_password" #allow users to edit their own password
     put "/users/generate_token", :to => "user_registers#generate_token" #allow users to generate an API token
     get "/users/download_token", :to => "user_registers#download_token"
