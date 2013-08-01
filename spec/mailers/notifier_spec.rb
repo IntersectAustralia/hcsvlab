@@ -43,13 +43,13 @@ describe Notifier do
   it "should send the right email" do
     address = 'user@email.org'
     url = 'http://www.fake.org'
-    report = FactoryGirl.create(:issue_report, :user_email => address, :url => url, :description => description)
+    report = IssueReport.new(:user_email => address, :url => url, :description => "something went wrong on this page")
     User.should_receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
-    email = Notifier.create_notify_superusers_of_issue(report).deliver
+    email = Notifier.notify_superusers_of_issue(report).deliver
 
     # check that the email has been queued for sending
     ActionMailer::Base.deliveries.empty?.should eq(false)
-    email.subject.should eq("HCSVLAB - A new issue has been reported")
+    email.subject.should eq("HCSVLAB - An issue has been reported")
     email.to.should eq(["super1@intersect.org.au", "super2@intersect.org.au"])
   end
  

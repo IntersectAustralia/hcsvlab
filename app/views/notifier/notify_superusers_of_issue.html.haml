@@ -1,12 +1,12 @@
 %p An issue has been reported with the following details:
 %p
   Email: #{@issue_report.user_email}
-
+  %br/
   Timestamp: #{@issue_report.timestamp}
-
+  %br/
   Application Version:
   = render 'shared/tag'
-
+  %br/
   URL: #{@issue_report.url}
-
+  %br/
   Description: #{@issue_report.description}
