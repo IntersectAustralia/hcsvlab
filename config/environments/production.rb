@@ -3,7 +3,7 @@ HcsvlabWeb::Application.configure do
   # TODO: set your own correct URL for action mailer
   config.action_mailer.default_url_options = { :host => 'ic2-hcsvlab-v1-webapp-vm.intersect.org.au' }
   
-  config.galaxy_url = 'hcsvlab-v1-galaxy.intersect.org.au:8080/root'
+  config.galaxy_url = 'http://hcsvlab-v1-galaxy.intersect.org.au/root'
 
   # Settings specified here will take precedence over those in config/application.rb
 
