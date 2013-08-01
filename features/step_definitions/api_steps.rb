@@ -1,5 +1,5 @@
 Then /^I should get a (\d+) response code$/ do |status|
-  page.status_code.should include(status.to_i)
+  last_response.status.should == status.to_i
 end
 
 When /^I make a (JSON )?request for (.*) with the API token for "(.*)"$/ do |json, page_name, email|
