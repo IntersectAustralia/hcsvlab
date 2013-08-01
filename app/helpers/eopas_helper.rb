@@ -3,49 +3,45 @@ require 'open-uri'
 
 module EopasHelper
 
-  def eopas_viewable?(documents)
+  def eopas_viewable?(id)
+    Rails.logger.debug("Checking if #{id.to_s} is viewable in EOPAS")
     media = false
-    xml = nil
     transcription = nil
     doc_count = 0
     media_count = 0
-    documents.each do |document|
-      uri = document[MetadataHelper::SOURCE]
-      next if uri.nil?
-      if uri.ends_with? 'xml'
-        xml = uri
+    item = Item.find(id)
+    item.documents.each do |document|
+      file_name = document.file_name[0]
+      next if file_name.nil?
+      if file_name.ends_with? 'xml'
+        transcription = is_transcription? document.datastreams['CONTENT1'].content
         doc_count += 1
       else
-        media_format = detect_media_format uri
+        media_format = detect_media_format document.datastreams['CONTENT1'].content
         if media_format == 'audio' or media_format == 'video'
           media = true
           media_count += 1
         end
       end
     end
-    if xml
-      transcription = is_transcription? xml.to_str
-    end
+    Rails.logger.debug("#{id.to_s}: media= #{media} transcription= #{transcription} media_count= #{media_count} doc_count=#{doc_count}")
     media && transcription && media_count == 1 && doc_count == 1
   end
 
-  def is_transcription?(url)
+  def is_transcription?(data)
     # NOTE: Will return false if URL is unavailable
     begin
-      uri = URI.parse(url)
-      data = uri.read
       transcription = detect_format data
     rescue
+      Rails.logger.warn("Exception detecting transcription")
       transcription = nil
     end
     transcription
   end
 
-  def detect_media_format(url)
+  def detect_media_format(data)
     type = nil
     begin
-      data = open url
-      puts url
       # NOTE: This will result in performance issues over a network
       mimetype = MimeMagic.by_magic(data)
       if mimetype.type == 'application/ogg'

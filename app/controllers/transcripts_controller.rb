@@ -16,6 +16,8 @@ class TranscriptsController < ApplicationController
   TRANSCRIPT_FIELDS = %w(title date depositor country_code language_code copyright license private
       source source_cache transcript_format participants_attributes description format recorded_on)
 
+  FEDORA_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env] unless const_defined?(:FEDORA_CONFIG)
+  
   def show
     attributes = document_to_attribues params['id']
     @transcript = load_transcript attributes
@@ -24,7 +26,9 @@ class TranscriptsController < ApplicationController
 
   def load_transcript(attributes)
     puts "Trans: #{attributes['transcription']}"
-    data = open(attributes['transcription']).read.force_encoding('UTF-8')
+    doc = attributes['transcription']
+    #data = open(attributes['transcription']).read.force_encoding('UTF-8')
+    data = doc.datastreams['CONTENT1'].content
     file_format = detect_format data
 
     attributes = filter_attributes(attributes, TRANSCRIPT_FIELDS)
@@ -42,9 +46,9 @@ class TranscriptsController < ApplicationController
 
   def load_media(attributes)
     # TODO change this to allow other formats
-    url = find_doc_by_extension('ogg')
-    attributes['format'] = detect_media_format url
-    media = get_media(attributes['format'], url)
+    doc = find_doc_by_extension('ogg')
+    attributes['format'] = detect_media_format doc.datastreams['CONTENT1'].content
+    media = get_media(attributes['format'], doc)
     attributes['media'] = media
     attributes = filter_attributes(attributes, MEDIA_ITEM_FIELDS)
     media_item = MediaItem.new attributes
@@ -61,15 +65,16 @@ class TranscriptsController < ApplicationController
     result
   end
 
-  def get_media(type, url)
+  def get_media(type, doc)
+    # TODO: Can we make the media player work with the data rather than a url to Fedora?
     media = OpenStruct.new
     if type == 'audio'
       audio = OpenStruct.new
-      audio.url = url
+      audio.url = FEDORA_CONFIG["url"].to_s "/objects/#{doc.pid}/datastreams/CONTENT1/content"
       media.audio = audio
     elsif type == 'video'
       video = OpenStruct.new
-      video.url = url
+      video.url = FEDORA_CONFIG["url"].to_s + "/objects/#{doc.pid}/datastreams/CONTENT1/content"
       media.video = video
       poster = OpenStruct.new
       poster.url = ''
@@ -80,12 +85,14 @@ class TranscriptsController < ApplicationController
 
   def find_doc_by_extension(ext)
     # FIX: document is opened multiple times, this could be reduced to one time
-    documents = item_documents_from_id(params['id'], [MetadataHelper::SOURCE])
+    item = Item.find(params[:id])
+    documents = item.documents
+    #documents = item_documents_from_id(params['id'], [MetadataHelper::SOURCE])
     result = nil
     documents.each do |document|
-      uri = document[MetadataHelper::SOURCE]
-      if uri.ends_with? ext
-        result = uri
+      #uri = document[MetadataHelper::SOURCE]
+      if document.file_name[0].ends_with? ext
+        result = document
         break
       end
     end
