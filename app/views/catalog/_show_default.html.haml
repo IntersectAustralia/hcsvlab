@@ -35,7 +35,7 @@
     - if should_render_show_field? document, field
       %dt{:class => "blacklight-#{solr_fname.parameterize}"}
         = render_document_show_field_label document, :field => solr_fname
-      - if solr_fname == 'OLAC_language_tesim'
+      - if solr_fname == 'OLAC_language'
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
           = raw render_language_codes document[solr_fname]
       - elsif solr_fname == 'DC_type'

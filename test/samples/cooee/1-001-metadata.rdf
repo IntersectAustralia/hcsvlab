@@ -26,7 +26,7 @@
     ns1:register "Private Written" ;
     ns1:texttype "Private Correspondence" ;
     schema:localityName dbpedia:New_South_Wales ;
-    dc:created "1788" ;
+    dc:created "10/11/1791" ;
     dc:identifier "1-001" ;
     dc:isPartOf corpus:cooee ;
     dc:source "Niall, 1998" ;

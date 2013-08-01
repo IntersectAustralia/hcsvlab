@@ -20,12 +20,8 @@ Then /^I should see fields displayed$/ do |table|
   table.hashes.each do |row|
     field = row[:field]
     value = row[:value]
-    div_id = field.tr(" ,", "_").downcase
-    div_scope = "div#display_#{div_id}"
-    with_scope(div_scope) do
-      page.should have_content(field)
-      page.should have_content(value)
-    end
+    page.should have_content(field)
+    page.should have_content(value)
   end
 end
 
@@ -59,8 +55,13 @@ Then /^I should get a security error "([^"]*)"$/ do |message|
   current_path.should == path_to("the home page")
 end
 
-Then /^I should see link "([^"]*)"$/ do |text|
-  page.should have_link(text)
+Then /^I should see link "([^"]*)"(?: to "([^"]*)")?$/ do |text, url|
+  if url
+    page.should have_link(text, {:href => url})
+  else
+    page.should have_link(text)
+  end
+
 end
 
 Then /^I should not see link "([^"]*)"$/ do |text|

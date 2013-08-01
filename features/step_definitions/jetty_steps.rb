@@ -9,6 +9,15 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   item = Item.create(pid: pid)
   item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
   item.label = item.rdfMetadata.graph.statements.first.subject
+  query = RDF::Query.new({
+                             :item => {
+                                 RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
+                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                             }
+                         })
+  result = query.execute(item.rdfMetadata.graph)[0]
+  item.collection = last_bit(result.collection.to_s)
+  item.collection_id = result.identifier.to_s
   item.save!
 
   look_for_annotations(item, rdf_file)

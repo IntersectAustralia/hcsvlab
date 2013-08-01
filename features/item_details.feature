@@ -12,31 +12,43 @@ Feature: Displaying Items
       | researcher@intersect.org.au | Researcher | One       |
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
-    And I have done a search with corpus "cooee"
-    And I should see the applied facet "Collection" with the value "cooee"
-    And I should get exactly 3 results
-    And I should see "1 - 3 of 3"
+    And I am on the catalog page for "hcsvlab:1"
 
-  @javascript
-  Scenario: Clicking through to an Item's details
-    And I should see "cooee:1-001"
-    And I follow "cooee:1-001"
-    #
-    # General
-    #
+  Scenario: HCSVLAB-272 - Clicking through to an COOEE Item's details
     And I should see "cooee:1-001"
     And I should see "Primary Document"
     And I should see "Documents"
-    And I should see "Collection"
-    And I should see "Created"
-    And I should see "Mode"
-    And I should see "Speech Style"
-    And I should see "Interactivity"
-    And I should see "Communication Context"
-    And I should see "Audience"
-    And I should see "Discourse Type"
-    And I should see "Language (ISO 639-3 Code)"
-    And I should see "Type"
-    #
-    # Preserve format of Primary Document (HCSVLAB-433)
-    # And I should see "Dear Sir,\n"
+    And I should see link "eng" to "http://www-01.sil.org/iso639-3/documentation.asp?id=eng"
+    And I should see fields displayed
+      | field                                     | value                                 |
+      | Collection                                | cooee                                 |
+      | Created                                   | 10/11/1791                            |
+      | Collection                                | cooee                                 |
+      | Word Count                                | 924                                   |
+      | Mode                                      | unspecified                           |
+      | Speech Style                              | unspecified                           |
+      | Interactivity                             | unspecified                           |
+      | Communication Context                     | unspecified                           |
+      | Discourse Type                            | letter                                |
+      | Discourse Type                            | unspecified                           |
+      | Language (ISO 639-3 Code)                 | eng                                   |
+      | Audience                                  | unspecified                           |
+      | Documents                                 | 1-001#Original, 1-001#Raw, 1-001#Text |
+      | Type                                      | Original, Raw, Text                   |
+      | Extent                                    | 5126, 5126, 4960                      |
+      | register                                  | Private Written                       |
+      | texttype                                  | Private Correspondence                |
+      | http_ns_ausnc_org_au_schemas_localityName | New_South_Wales                       |
+      | source                                    | Niall, 1998                           |
+      | pages                                     | 10-11                                 |
+      | speaker                                   | 1-001addressee, 1-001author           |
+      | date_group                                | 1790 - 1799                           |
+
+
+#
+# Preserve format of Primary Document (HCSVLAB-433)
+# And I should see "Dear Sir,\n"
+# And show me the page
+# And I follow "1-001-plain.txt"
+# Then I should get a 200 response code
+# Then I should get the primary text for "cooee:1-001"
