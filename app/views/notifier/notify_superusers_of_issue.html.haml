@@ -5,11 +5,8 @@
   Timestamp: #{@issue_report.timestamp}
 
   Application Version:
-    = render 'shared/tag'
+  = render 'shared/tag'
 
   URL: #{@issue_report.url}
 
   Description: #{@issue_report.description}
-
-  - unless @issue_report.screenshot.nil?
-    %p A screenshot of the issue has been attached.
