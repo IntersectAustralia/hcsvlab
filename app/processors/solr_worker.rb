@@ -372,6 +372,7 @@ private
   def delete(object)
     get_solr_connection()
     @@solr.delete_by_id(object)
+    @@solr.commit
   end
 
   #
