@@ -1,4 +1,4 @@
-class LicencesController < ActionController::Base
+class LicencesController < ApplicationController
   before_filter :authenticate_user!
   #load_and_authorize_resource
 
@@ -11,21 +11,22 @@ class LicencesController < ActionController::Base
 
   end
 
-  def createNewLicense
+  def create
     name = params[:name]
     text = params[:text]
-    collection = eval(params[:collections])
+    #collection = eval(params[:collections])
 
-    newLicence = License.new
-    #newLicence.save!
+    newLicence = Licence.new
+    newLicence.save!
 
     newLicence.name = name
     newLicence.text = text
-    newLicence.type = License::LicenceType::PRIVATE
-    newLicence.owner = current_user.id
-    #newLicence.save!
+    newLicence.type = Licence::LICENSE_TYPE_PRIVATE
+    newLicence.ownerId = current_user.id.to_s
+    newLicence.ownerEmail = current_user.email
+    newLicence.save!
 
-    flash[:notice] = "file uploaded"
-    render :index
+    flash[:notice] = "Licence created successfully"
+    redirect_to new_licence_path
   end
 end
