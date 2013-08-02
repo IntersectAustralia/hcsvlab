@@ -70,7 +70,7 @@ class TranscriptsController < ApplicationController
     media = OpenStruct.new
     if type == 'audio'
       audio = OpenStruct.new
-      audio.url = FEDORA_CONFIG["url"].to_s "/objects/#{doc.pid}/datastreams/CONTENT1/content"
+      audio.url = FEDORA_CONFIG["url"].to_s + "/objects/#{doc.pid}/datastreams/CONTENT1/content"
       media.audio = audio
     elsif type == 'video'
       video = OpenStruct.new
