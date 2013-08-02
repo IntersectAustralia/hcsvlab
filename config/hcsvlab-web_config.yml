@@ -2,6 +2,7 @@ defaults: &defaults
   password_reset_email_sender: kali@intersect.org.au
   account_request_user_status_email_sender: kali@intersect.org.au
   account_request_admin_notification_sender: kali@intersect.org.au
+  default_data_owner: davidc@intersect.org.au
 
 development:
   <<: *defaults
@@ -11,6 +12,7 @@ test:
 
 production:
   <<: *defaults
+  default_data_owner: steve.cassidy@mq.edu.au
 
 qa:
   <<: *defaults
@@ -27,4 +29,5 @@ staging2:
   password_reset_email_sender: jared@intersect.org.au
   account_request_user_status_email_sender: jared@intersect.org.au
   account_request_admin_notification_sender: jared@intersect.org.au
+  default_data_owner: jared@intersect.org.au
 
