@@ -214,11 +214,13 @@ namespace :fedora do
     end
 
     # Msg to fedora.apim.update
-
-    client = Stomp::Client.open "stomp://localhost:61613"
-    client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
-    client.close
-
+    begin
+      client = Stomp::Client.open "stomp://localhost:61613"
+      client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
+      client.close
+    rescue Exception => msg 
+      puts "Error sending message via stomp: #{msg}"
+    end
     return item.pid
   end
 
