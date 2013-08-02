@@ -3,6 +3,14 @@ require "#{Rails.root}/app/processors/solr_worker.rb"
 
 SAMPLE_FOLDER = "#{Rails.root}/test/samples"
 
+And /^I ingest "([^:]*):([^:]*)"$/ do |corpus, prefix|
+  rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
+  response = `RAILS_ENV=test bundle exec rake fedora:ingest_one #{rdf_file}`
+  pid = response[/(hcsvlab:\d+)/, 1]
+  Solr_Worker.new.on_message("index #{pid}")
+  #puts "Ingested #{rdf_file.to_s} as #{pid.to_s}"   
+end
+
 And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, pid|
   rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
 

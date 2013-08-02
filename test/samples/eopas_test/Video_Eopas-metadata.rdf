@@ -1,0 +1,44 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
+
+<http://catalog.paradisec.org.au/repository/NT5/Kalsarap> a ausnc:AusNCObject ;
+    ausnc:document <http://ns.ausnc.org.au/corpora/eopas_test/source/Video_Eopas_transcript.xml>,
+        <http://ns.ausnc.org.au/corpora/eopas_test/source/Video_Eopas_video.ogg> ;
+    dc:accessRights "Open (subject to agreeing to PDSC access form)" ;
+    dc:bibliographicCitation "Nick Thieberger (collector), Kalsarap Namaf (speaker); Kalsarap Namaf telling stories, X-DV/MP4/MXF,  http://catalog.paradisec.org.au/collections/NT5/items/Kalsarap 2013-04-16." ;
+    dc:box "northlimit=-17.75; southlimit=-17.81; westlimit=168.31; eastlimit=168.38" ;
+    dc:coverage "VU" ;
+    dc:description "Epakor - spring story, epakor (Text 108), Litrapog (Text 102) and Litrapog and Kaltog (Text 103). Language as given:" ;
+    dc:identifier "Video_Eopas" ;
+    dc:isPartOf corpus:eopas_test ;
+    dc:rights "Open (subject to agreeing to PDSC access form)" ;
+    dc:title "Kalsarap Namaf telling stories" ;
+    olac:compiler <http://ns.ausnc.org.au/corpora/eopas_test/person/Nick_Thieberger> ;
+    olac:depositor <http://ns.ausnc.org.au/corpora/eopas_test/person/Nick_Thieberger> ;
+    olac:language "erk" ;
+    olac:linguistic_field "language_documentation",
+        "text_and_corpus_linguistics" ;
+    olac:linguistic_type "primary_text" ;
+    olac:speaker <http://ns.ausnc.org.au/corpora/eopas_test/person/Kalsarap_Namaf> .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/person/Kalsarap_Namaf> a foaf:Person ;
+    foaf:name "Kalsarap Namaf" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/source/Video_Eopas_transcript.xml> a foaf:Document ;
+    dc:identifier "Video_Eopas_transcript.xml" ;
+    dc:source <file:///data/eopas_test/Video_Eopas_transcript.xml> ;
+    dc:title "Video_Eopas_transcript.xml" ;
+    dc:type "Other" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/source/Video_Eopas_video.ogg> a foaf:Document ;
+    dc:identifier "Video_Eopas_video.ogg" ;
+    dc:source <file:///data/eopas_test/Video_Eopas_video.ogg> ;
+    dc:title "Video_Eopas_video.ogg" ;
+    dc:type "Audio" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/person/Nick_Thieberger> a foaf:Person ;
+    foaf:name "Nick Thieberger" .
+

@@ -1,0 +1,2306 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<eopas xmlns:dc='http://purl.org/dc/elements/1.1/'>
+<header>
+<meta name='dc:type' value='text/xml' />
+<meta name='dc:source' value='108.xml' />
+<meta name='dc:creator' value='Nick Thieberger' />
+<meta name='dc:language' value='erk' />
+<meta name='dc:date' value='2000-03-28 00:00:00 UTC' />
+</header>
+<interlinear>
+<phrase endTime='0.0' id='o_108-001' startTime='0.0'>
+<transcription>Ipitlak nai iskei ito Ertap. </transcription>
+<wordlist>
+<word>
+<text>Ipitlak</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>piatlak</text>
+<text kind='gloss'>have</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nai</text>
+<text kind='gloss'>water</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>iskei</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>skei</text>
+<text kind='gloss'>one</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ito</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>to</text>
+<text kind='gloss'>stay</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Ertap.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Ertap</text>
+<text kind='gloss'>p.name</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>There is a spring at Eratap</translation>
+</phrase>
+<phrase endTime='0.0' id='o_108-002' startTime='0.0'>
+<transcription>Nai nen rusoso ki Epakor. </transcription>
+<wordlist>
+<word>
+<text>Nai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nai</text>
+<text kind='gloss'>water</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>rusoso</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ru=</text>
+<text kind='gloss'>3P.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>sos</text>
+<text kind='gloss'>call</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-o</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ki</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ki</text>
+<text kind='gloss'>PREP</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Epakor.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Epakor</text>
+<text kind='gloss'>p.name</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>This spring is called Epakor.</translation>
+</phrase>
+<phrase endTime='8.008' id='o_108-003' startTime='0.017'>
+<transcription>Akam telaap ni esan uleka, me nai ne, ipi nai nen kin iser totur faat. </transcription>
+<wordlist>
+<word>
+<text>Akam</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>akam</text>
+<text kind='gloss'>2P.</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>telaap</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>te-</text>
+<text kind='gloss'>the</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>laap</text>
+<text kind='gloss'>many</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ni</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ni</text>
+<text kind='gloss'>of</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>esan</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>esa</text>
+<text kind='gloss'>here</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>uleka,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>u=</text>
+<text kind='gloss'>2P.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>lek</text>
+<text kind='gloss'>look</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-a</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>but</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nai</text>
+<text kind='gloss'>water</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ne,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ne</text>
+<text kind='gloss'>this</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipi</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>pi</text>
+<text kind='gloss'>be</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nai</text>
+<text kind='gloss'>water</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kin</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kin</text>
+<text kind='gloss'>REL</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>iser</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>ser</text>
+<text kind='gloss'>flow</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>totur</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>totur</text>
+<text kind='gloss'>go_through</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>faat.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>faat</text>
+<text kind='gloss'>stone</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>Many of you from here have seen it, but this spring is one that flows through a rock.</translation>
+</phrase>
+<phrase endTime='17.1' id='o_108-004' startTime='11.64'>
+<transcription>Me kineu aleka ipi tenmaagwen neu nen asees leka. </transcription>
+<wordlist>
+<word>
+<text>Me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kineu</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kineu</text>
+<text kind='gloss'>1S.</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>aleka</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>a=</text>
+<text kind='gloss'>1S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>lek</text>
+<text kind='gloss'>look</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-a</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipi</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>pi</text>
+<text kind='gloss'>be</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tenmaagwen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>te-</text>
+<text kind='gloss'>DET-</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>nmaagwen</text>
+<text kind='gloss'>wonder</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>neu</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>neu</text>
+<text kind='gloss'>1S.POS</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>asees</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>a=</text>
+<text kind='gloss'>1S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>sees</text>
+<text kind='gloss'>small</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>leka.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>lek</text>
+<text kind='gloss'>look</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-a</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>But I have seen it, it amazed me when I was small and saw it.</translation>
+</phrase>
+<phrase endTime='22.573' id='o_108-005' startTime='17.1'>
+<transcription>Go amurin na katrausi, akam, akit tukfo tu tae. </transcription>
+<wordlist>
+<word>
+<text>Go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>amurin</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>a=</text>
+<text kind='gloss'>1S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>mur</text>
+<text kind='gloss'>want</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-i</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-n</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>na</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>na</text>
+<text kind='gloss'>COMP</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>katrausi,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ka=</text>
+<text kind='gloss'>1S.IRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>traus</text>
+<text kind='gloss'>tell</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-i</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>akam,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>akam</text>
+<text kind='gloss'>2P.</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>akit</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>akit</text>
+<text kind='gloss'>1P.incS</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tukfo</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>tuk=</text>
+<text kind='gloss'>1P.incIRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>fo</text>
+<text kind='gloss'>PSP:IR</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tu</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>to</text>
+<text kind='gloss'>stay</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tae.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>And I want to tell you about it so that we will know about it.</translation>
+</phrase>
+<phrase endTime='28.94' id='o_108-006' startTime='22.573'>
+<transcription>Selwan nai nen ito, ipitlak faat iskei itu kor nameten. </transcription>
+<wordlist>
+<word>
+<text>Selwan</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>selwan</text>
+<text kind='gloss'>while</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nai</text>
+<text kind='gloss'>water</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ito,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>to</text>
+<text kind='gloss'>stay</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipitlak</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>piatlak</text>
+<text kind='gloss'>have</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>faat</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>faat</text>
+<text kind='gloss'>stone</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>iskei</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>skei</text>
+<text kind='gloss'>one</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>itu</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tu</text>
+<text kind='gloss'>PROG</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kor</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kor</text>
+<text kind='gloss'>cover</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nameten.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>namt</text>
+<text kind='gloss'>eye</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-e</text>
+<text kind='gloss'>-V</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-n</text>
+<text kind='gloss'>-3S.DP</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>When this spring was there, there was a rock that covered its source.</translation>
+</phrase>
+<phrase endTime='34.773' id='o_108-007' startTime='28.94'>
+<transcription>Me namten ipan pato elag Elakmamiel. </transcription>
+<wordlist>
+<word>
+<text>Me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>namten</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>namet</text>
+<text kind='gloss'>eye</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-e</text>
+<text kind='gloss'>-V</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-n</text>
+<text kind='gloss'>-3S.DP</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipan</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>pan</text>
+<text kind='gloss'>go</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>pato</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>pato</text>
+<text kind='gloss'>be_at</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>elag</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>elag</text>
+<text kind='gloss'>high</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Elakmamiel.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Elakmamiel</text>
+<text kind='gloss'>p.name</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>But the source was up at Elakmamiel.</translation>
+</phrase>
+<phrase endTime='42.815' id='o_108-008' startTime='34.773'>
+<transcription>Nlaken, kineu asees tu Ertap, go atae esan kin namet nai nen itkos. </transcription>
+<wordlist>
+<word>
+<text>Nlaken,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nlaken</text>
+<text kind='gloss'>because</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kineu</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kineu</text>
+<text kind='gloss'>1S.</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>asees</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>a=</text>
+<text kind='gloss'>1S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>sees</text>
+<text kind='gloss'>small</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tu</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>tu</text>
+<text kind='gloss'>stay</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Ertap,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Ertap</text>
+<text kind='gloss'>p.name</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>atae</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>a=</text>
+<text kind='gloss'>1S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>esan</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>esan</text>
+<text kind='gloss'>place</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kin</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kin</text>
+<text kind='gloss'>REL</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>namet</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>namet</text>
+<text kind='gloss'>eye</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nai</text>
+<text kind='gloss'>water</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>itkos.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tok</text>
+<text kind='gloss'>stay</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>wes</text>
+<text kind='gloss'>there</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>Because I was small at Eratap and I knew the place where the spring was.</translation>
+</phrase>
+<phrase endTime='48.075' id='o_108-009' startTime='42.855'>
+<transcription>Teetwei ifwel kumur p̃asol nalenan knen, </transcription>
+<wordlist>
+<word>
+<text>Teetwei</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>teetwei</text>
+<text kind='gloss'>before</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ifwel</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>f</text>
+<text kind='gloss'>CND</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>wel</text>
+<text kind='gloss'>like</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kumur</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ku=</text>
+<text kind='gloss'>2S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>mur</text>
+<text kind='gloss'>want</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>p̃asol</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>p̃a=</text>
+<text kind='gloss'>2S.IRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>sol</text>
+<text kind='gloss'>take</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nalenan</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nalenan</text>
+<text kind='gloss'>truth</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>knen,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>knen</text>
+<text kind='gloss'>of_it</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>Long ago, if you wanted to find out the truth of it,</translation>
+</phrase>
+<phrase endTime='53.9' id='o_108-010' startTime='49.15'>
+<transcription>p̃afo mas nkas, nap̃rat keskei me p̃afaskin Elakmamiel, </transcription>
+<wordlist>
+<word>
+<text>p̃afo</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>p̃a=</text>
+<text kind='gloss'>2S.IRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>fo</text>
+<text kind='gloss'>PSP:IR</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>mas</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>mas</text>
+<text kind='gloss'>saw</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nkas,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nkas</text>
+<text kind='gloss'>tree</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nap̃rat</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nap̃rat</text>
+<text kind='gloss'>tree.sp</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>keskei</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ke=</text>
+<text kind='gloss'>3S.IRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>skei</text>
+<text kind='gloss'>one</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>p̃afaskin</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>p̃a=</text>
+<text kind='gloss'>2S.IRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>fas</text>
+<text kind='gloss'>push:IR</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ki</text>
+<text kind='gloss'>-TR</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-n</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Elakmamiel,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Elakmamiel</text>
+<text kind='gloss'>p.name</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>you would cut a tree, a Nap̃rat tree, and you would push it in to Elakmamiel,</translation>
+</phrase>
+<phrase endTime='60.25' id='o_108-011' startTime='55.45'>
+<transcription>me selwan kupaski, malen kumai pak elau Epakor, </transcription>
+<wordlist>
+<word>
+<text>me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>selwan</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>selwan</text>
+<text kind='gloss'>while</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kupaski,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ku=</text>
+<text kind='gloss'>2S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>pas</text>
+<text kind='gloss'>push</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ki</text>
+<text kind='gloss'>-TR</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>malen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>malnen</text>
+<text kind='gloss'>then</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kumai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ku=</text>
+<text kind='gloss'>2S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>mai</text>
+<text kind='gloss'>come</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>pak</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>pak</text>
+<text kind='gloss'>to</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>elau</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>elau</text>
+<text kind='gloss'>sea</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Epakor,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Epakor</text>
+<text kind='gloss'>p.name</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>and when you pushed it, when you come to Epakor,</translation>
+</phrase>
+<phrase endTime='68.43' id='o_108-012' startTime='60.37'>
+<transcription>kulek nap̃rat sees nen kin ito sal elau, iplak nmaagwen, ipi nmaagwen p̃ur. </transcription>
+<wordlist>
+<word>
+<text>kulek</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ku=</text>
+<text kind='gloss'>2S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>lek</text>
+<text kind='gloss'>look</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nap̃rat</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nap̃rat</text>
+<text kind='gloss'>tree.sp</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>sees</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>sees</text>
+<text kind='gloss'>small</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kin</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kin</text>
+<text kind='gloss'>REL</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ito</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>to</text>
+<text kind='gloss'>PROG</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>sal</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>sal</text>
+<text kind='gloss'>float</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>elau,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>elau</text>
+<text kind='gloss'>sea</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>iplak</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>plak</text>
+<text kind='gloss'>with</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nmaagwen,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nmaagwen</text>
+<text kind='gloss'>wonder</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipi</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>pi</text>
+<text kind='gloss'>be</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nmaagwen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nmaagwen</text>
+<text kind='gloss'>wonder</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>p̃ur.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>p̃ur</text>
+<text kind='gloss'>big</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>you will see the small piece of Nap̃rat floating in the sea, it is amazing, it is really amazing.</translation>
+</phrase>
+<phrase endTime='75.93' id='o_108-013' startTime='70.53'>
+<transcription>Go aleka ito panpan tuk mees. Me Tata Sailas, ipreg talm̃at wes. </transcription>
+<wordlist>
+<word>
+<text>Go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>aleka</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>a=</text>
+<text kind='gloss'>1S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>lek</text>
+<text kind='gloss'>look</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-a</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ito</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>to</text>
+<text kind='gloss'>stay</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>panpan</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>panpan</text>
+<text kind='gloss'>until</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tuk</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>tuk</text>
+<text kind='gloss'>until</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>mees.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>mees</text>
+<text kind='gloss'>today</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Tata</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Tata</text>
+<text kind='gloss'>grandfather</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Sailas,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Sailas</text>
+<text kind='gloss'>Sailas</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipreg</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>preg</text>
+<text kind='gloss'>make</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>talm̃at</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>talm̃at</text>
+<text kind='gloss'>garden</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>wes.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>wes</text>
+<text kind='gloss'>there</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>I have seen it, and it is still there today. And Tata Sailas made a garden there.</translation>
+</phrase>
+<phrase endTime='85.78' id='o_108-014' startTime='76.55'>
+<transcription>Go nai-, naor nen imsai to ip̃on. Go natam̃ol rumer kano- rutap tae san itkos mau. Me </transcription>
+<wordlist>
+<word>
+<text>Go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nai-,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nai-</text>
+<text kind='gloss'>***</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>naor</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>naor</text>
+<text kind='gloss'>place</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>imsai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3sgRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>msai</text>
+<text kind='gloss'>holey</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>to</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>to</text>
+<text kind='gloss'>stay</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ip̃on.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>p̃on</text>
+<text kind='gloss'>shut</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>natam̃ol</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>natam̃ol</text>
+<text kind='gloss'>person</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>rumer</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ru=</text>
+<text kind='gloss'>3P.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>mer</text>
+<text kind='gloss'>again</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kano-</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kano</text>
+<text kind='gloss'>unable</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>rutap</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ru=</text>
+<text kind='gloss'>3P.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tap</text>
+<text kind='gloss'>not</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tae</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>san</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>san</text>
+<text kind='gloss'>there</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>itkos</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>to</text>
+<text kind='gloss'>stay</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>wes</text>
+<text kind='gloss'>there</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>mau.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>mau</text>
+<text kind='gloss'>NEG2</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>but</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>And the place where the hole was is closed. And people don't know where that place is. But</translation>
+</phrase>
+<phrase endTime='90.81' id='o_108-015' startTime='86.21'>
+<transcription>komam nen kin utae, teesa ni maarik Sailas, gar rutae. </transcription>
+<wordlist>
+<word>
+<text>komam</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>komam</text>
+<text kind='gloss'>1P.ex</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kin</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>REL</text>
+<text kind='gloss'>REL</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>utae,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>u=</text>
+<text kind='gloss'>1P.exRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>teesa</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>teesa</text>
+<text kind='gloss'>child</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ni</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ni</text>
+<text kind='gloss'>of</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>maarik</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>maarik</text>
+<text kind='gloss'>mister</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Sailas,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Sailas</text>
+<text kind='gloss'>Sailas</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>gar</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>gar</text>
+<text kind='gloss'>3P.</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>rutae.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ru=</text>
+<text kind='gloss'>3P.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>we who know, the children of Mister Sailas, they know.</translation>
+</phrase>
+<phrase endTime='97.96' id='o_108-016' startTime='92.39'>
+<transcription>Me nam̃er laap, ni Ertap rutae tete rutae, me tete rutap tae mau. </transcription>
+<wordlist>
+<word>
+<text>Me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nam̃er</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nam̃er</text>
+<text kind='gloss'>people</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>laap,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>laap</text>
+<text kind='gloss'>many</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ni</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ni</text>
+<text kind='gloss'>of</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Ertap</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Ertap</text>
+<text kind='gloss'>p.name</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>rutae</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ru=</text>
+<text kind='gloss'>3P.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tete</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>tete</text>
+<text kind='gloss'>some</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>rutae,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ru=</text>
+<text kind='gloss'>3P.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>but</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tete</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>tete</text>
+<text kind='gloss'>some</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>rutap</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ru=</text>
+<text kind='gloss'>3P.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tap</text>
+<text kind='gloss'>not</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tae</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>mau.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>mau</text>
+<text kind='gloss'>NEG2</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>And many people from Eratap know, some know, and some don't know. </translation>
+</phrase>
+<phrase endTime='107.04' id='o_108-017' startTime='98.16'>
+<transcription>Me Tata Sailas ipreg talm̃at go talm̃at nen, ilao na nafis, </transcription>
+<wordlist>
+<word>
+<text>Me</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>me</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Tata</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Tata</text>
+<text kind='gloss'>grandfather</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>Sailas</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>Sailas</text>
+<text kind='gloss'>Sailas</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipreg</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>preg</text>
+<text kind='gloss'>make</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>talm̃at</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>talm̃at</text>
+<text kind='gloss'>garden</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>talm̃at</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>talm̃at</text>
+<text kind='gloss'>garden</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ilao</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>lao</text>
+<text kind='gloss'>plant</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>na</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>na</text>
+<text kind='gloss'>DET</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nafis,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nafis</text>
+<text kind='gloss'>plant.sp</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>And Grandather Sailas made a garden and in this garden, he planted Nafis (Fijian asparagus)</translation>
+</phrase>
+<phrase endTime='112.01' id='o_108-018' startTime='107.34'>
+<transcription>go kutae nafis, ipi tenmatun iskei nen kin ipu ntan naor laap. </transcription>
+<wordlist>
+<word>
+<text>go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kutae</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ku=</text>
+<text kind='gloss'>2S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>tae</text>
+<text kind='gloss'>know</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nafis,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nafis</text>
+<text kind='gloss'>plant.sp</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipi</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>pi</text>
+<text kind='gloss'>be</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>tenmatun</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>te-</text>
+<text kind='gloss'>the-</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>nmatun</text>
+<text kind='gloss'>thing</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>iskei</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>skei</text>
+<text kind='gloss'>one</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kin</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kin</text>
+<text kind='gloss'>REL</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ipu</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>pu</text>
+<text kind='gloss'>pull</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ntan</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ntan</text>
+<text kind='gloss'>ground</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>naor</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>naor</text>
+<text kind='gloss'>place</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>laap.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>laap</text>
+<text kind='gloss'>many</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>and you know Nafis, it is something that grows all over the ground.</translation>
+</phrase>
+<phrase endTime='120.26' id='o_108-019' startTime='113.27'>
+<transcription>Go mees namet nai nen kip̃on kumer kano pam̃ori. </transcription>
+<wordlist>
+<word>
+<text>Go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>mees</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>mees</text>
+<text kind='gloss'>today</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>namet</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>namet</text>
+<text kind='gloss'>eye</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nai</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nai</text>
+<text kind='gloss'>water</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kip̃on</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ki=</text>
+<text kind='gloss'>3S.PS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>p̃on</text>
+<text kind='gloss'>shut</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kumer</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ku=</text>
+<text kind='gloss'>2S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>mer</text>
+<text kind='gloss'>again</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kano</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>kano</text>
+<text kind='gloss'>unable</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>pam̃ori.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>pam̃or</text>
+<text kind='gloss'>find</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-i</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>And today the spring is blocked and you can't find it.</translation>
+</phrase>
+<phrase endTime='125.01' id='o_108-020' startTime='121.29'>
+<transcription>Ipi natrauswen sees m̃as, go apsawi ki mus nen kofo nrogo. </transcription>
+<wordlist>
+<word>
+<text>Ipi</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>i=</text>
+<text kind='gloss'>3S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>pi</text>
+<text kind='gloss'>be</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>natrauswen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>natrauswen</text>
+<text kind='gloss'>story</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>sees</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>sees</text>
+<text kind='gloss'>small</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>m̃as,</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>m̃as</text>
+<text kind='gloss'>only</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>go</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>go</text>
+<text kind='gloss'>and</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>apsawi</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>a=</text>
+<text kind='gloss'>1S.RS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>psawi</text>
+<text kind='gloss'>thanks</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>ki</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ki</text>
+<text kind='gloss'>TR</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>mus</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>mus</text>
+<text kind='gloss'>2P.O</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nen</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nen</text>
+<text kind='gloss'>that</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>kofo</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>ko=</text>
+<text kind='gloss'>2P.IRS=</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>fo</text>
+<text kind='gloss'>PSP:IR</text>
+</morpheme>
+</morphemelist>
+</word>
+<word>
+<text>nrogo.</text>
+<morphemelist>
+<morpheme>
+<text kind='morpheme'>nrog</text>
+<text kind='gloss'>feel</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-o</text>
+<text kind='gloss'>-TS</text>
+</morpheme>
+<morpheme>
+<text kind='morpheme'>-ø</text>
+<text kind='gloss'>-3S.O</text>
+</morpheme>
+</morphemelist>
+</word>
+</wordlist>
+<translation>It is just a small story and I thank you for listening.</translation>
+</phrase>
+</interlinear>
+</eopas>

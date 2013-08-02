@@ -1,0 +1,63 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
+
+<http://catalog.paradisec.org.au/repository/NT1/98007> a ausnc:AusNCObject ;
+    ausnc:document <http://ns.ausnc.org.au/corpora/eopas_test/source/Audio_Eopas_audio.ogg>,
+        <http://ns.ausnc.org.au/corpora/eopas_test/source/Audio_Eopas_transcript.xml> ;
+    dc:accessRights "Open (subject to agreeing to PDSC access form)" ;
+    dc:bibliographicCitation "Nick Thieberger (collector), Nick Thieberger (depositor, recorder), Kalsarap Namaf (speaker), Iokopeth  (speaker), John Maklen (speaker), Waia Tenene (speaker), 1998; CD19-20, JPEG/MPEG/X-WAV/XML/PLAIN,  http://catalog.paradisec.org.au/collections/NT1/items/98007 2013-04-16." ;
+    dc:box "northlimit=-17.7235; southlimit=-17.8235; westlimit=168.217; eastlimit=168.317" ;
+    dc:coverage "VU" ;
+    dc:created "1998-10-03" ;
+    dc:description "There are time-aligned transcripts of this item. . Language as given: South Efate, Bislama" ;
+    dc:identifier "Audio_Eopas" ;
+    dc:isPartOf corpus:eopas_test ;
+    dc:rights "Open (subject to agreeing to PDSC access form)" ;
+    dc:title "CD19-20" ;
+    olac:compiler <http://ns.ausnc.org.au/corpora/eopas_test/person/Nick_Thieberger> ;
+    olac:depositor <http://ns.ausnc.org.au/corpora/eopas_test/person/Corin_Bone>,
+        <http://ns.ausnc.org.au/corpora/eopas_test/person/Nick_Thieberger> ;
+    olac:language "bis",
+        "erk" ;
+    olac:linguistic_field "language_documentation",
+        "text_and_corpus_linguistics" ;
+    olac:linguistic_type "primary_text" ;
+    olac:recorder <http://ns.ausnc.org.au/corpora/eopas_test/person/Nick_Thieberger> ;
+    olac:speaker <http://ns.ausnc.org.au/corpora/eopas_test/person/Iokopeth>,
+        <http://ns.ausnc.org.au/corpora/eopas_test/person/John_Maklen>,
+        <http://ns.ausnc.org.au/corpora/eopas_test/person/Kalsarap_Namaf>,
+        <http://ns.ausnc.org.au/corpora/eopas_test/person/Waia_Tenene> .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/person/Corin_Bone> a foaf:Person ;
+    foaf:name "Corin Bone" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/person/Iokopeth> a foaf:Person ;
+    foaf:name "Iokopeth" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/person/John_Maklen> a foaf:Person ;
+    foaf:name "John Maklen" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/person/Kalsarap_Namaf> a foaf:Person ;
+    foaf:name "Kalsarap Namaf" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/person/Waia_Tenene> a foaf:Person ;
+    foaf:name "Waia Tenene" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/source/Audio_Eopas_audio.ogg> a foaf:Document ;
+    dc:identifier "Audio_Eopas_audio.ogg" ;
+    dc:source <file:///data/eopas_test/Audio_Eopas_audio.ogg> ;
+    dc:title "Audio_Eopas_audio.ogg" ;
+    dc:type "Audio" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/source/Audio_Eopas_transcript.xml> a foaf:Document ;
+    dc:identifier "Audio_Eopas_transcript.xml" ;
+    dc:source <file:///data/eopas_test/Audio_Eopas_transcript.xml> ;
+    dc:title "Audio_Eopas_transcript.xml" ;
+    dc:type "Other" .
+
+<http://ns.ausnc.org.au/corpora/eopas_test/person/Nick_Thieberger> a foaf:Person ;
+    foaf:name "Nick Thieberger" .
+
