@@ -1,6 +1,6 @@
 Feature: Displaying Items in EOPAS
   As a Researcher,
-  I want to view audio and video in EOPAS if I have a transcript and a media file
+  I want to view audio and video in EOPAS if I have a correct transcript and a media file
 
   Background:
     Given I have the usual roles and permissions
@@ -34,9 +34,13 @@ Feature: Displaying Items in EOPAS
       | Language (ISO 639-3 Code)                 | bis, erk                              |
       | Audience                                  | unspecified                           |
       | Type                                      | Audio, Other                          |
-    And I should see "View in EOPAS"    
+    And I should see "View in EOPAS"  
     And I follow "View in EOPAS"
     And I should see "Media Player"
+    And I should see "Back to Item Details"
+    And I follow "Back to Item Details"
+    And I follow "Audio_Eopas_transcript.xml"
+    And I should see "Natopu nen kin ito esan ga"
 
   Scenario: View Video in EOPAS
     Given I ingest "eopas_test:Video_Eopas"
@@ -63,11 +67,6 @@ Feature: Displaying Items in EOPAS
     And I should see "View in EOPAS"    
     And I follow "View in EOPAS"
     And I should see "Media Player"
-
-#
-# Preserve format of Primary Document (HCSVLAB-433)
-# And I should see "Dear Sir,\n"
-# And show me the page
-# And I follow "1-001-plain.txt"
-# Then I should get a 200 response code
-# Then I should get the primary text for "cooee:1-001"
+    And I follow "Back to Item Details"
+    And I follow "Video_Eopas_transcript.xml"
+    And I should see "Ipitlak nai iskei ito Ertap"
