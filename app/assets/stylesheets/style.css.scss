@@ -13,6 +13,31 @@ display: inline-block;
 border-color: rgba(0, 0, 0, 0.25);
 }
 
+/* FORM ELEMENTS ///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {
+  border-color: #00abff;
+  outline: 0;
+  outline: thin dotted \9;
+  -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none;
+}
+
 textarea{
   width: 555px;
   height: 200px;
@@ -102,6 +127,31 @@ color: #7F3F00;
   text-decoration: none;
 }
 
+.navbar .nav > li.current {
+  position: relative;
+}
+
+.navbar .nav > li > span {
+  float: none;
+  padding: 15px 20px;
+  color: #333;
+  text-decoration: none;
+  text-shadow: 0 0px 0 white;
+  display: block;
+  background-color: rgba(255,255,255,0.1);
+}
+.navbar .nav > li.current > span::before {
+content: "";
+display: inline-block;
+border-top: 10px solid transparent;
+border-bottom: 10px solid #FFF;
+border-left: 10px solid transparent;
+border-right: 10px solid transparent;
+position: absolute;
+margin: 0px;
+bottom: 0px;
+left: 40%;
+}
 
 .sidenav h5 {
   border-top: 1px solid #DDD;
@@ -514,15 +564,6 @@ th.checkbox_header span.btn input[type="checkbox"] { vertical-align: top; }
 #documents th { vertical-align: middle; }
 
 
-.navbar .nav > li > span {
-float: none;
-padding: 15px 20px;
-color: #333;
-text-decoration: none;
-text-shadow: 0 0px 0 white;
-display: block;
-background-color: #FFD875;
-}
 
 #header-navbar-fixed-top .navbar-inner {
   padding-top: 0px;

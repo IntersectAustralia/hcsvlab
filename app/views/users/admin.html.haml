@@ -1,6 +1,6 @@
-- title 'User Management'
-
-- if can?(:read, User)
-  = link_to "List Approved Users", users_path, :class => "btn"
-- if can?(:access_requests, User)
-  = link_to "View Access Requests", access_requests_users_path, :class => "btn"
+-# - title 'User Management'
+= render 'admin_menu'
+.span9
+  %h2 Administer the HCS vLab system
+  -# = render 'display_licence_collections'
+= render 'shared/modal_waiting_panel'
