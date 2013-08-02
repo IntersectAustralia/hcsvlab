@@ -48,13 +48,13 @@
 
 <http://ns.ausnc.org.au/corpora/eopas_test/source/Audio_Eopas_audio.ogg> a foaf:Document ;
     dc:identifier "Audio_Eopas_audio.ogg" ;
-    dc:source <file:///data/eopas_test/Audio_Eopas_audio.ogg> ;
+    dc:source <file:///data_hcsvlab/eopas_test/Audio_Eopas_audio.ogg> ;
     dc:title "Audio_Eopas_audio.ogg" ;
     dc:type "Audio" .
 
 <http://ns.ausnc.org.au/corpora/eopas_test/source/Audio_Eopas_transcript.xml> a foaf:Document ;
     dc:identifier "Audio_Eopas_transcript.xml" ;
-    dc:source <file:///data/eopas_test/Audio_Eopas_transcript.xml> ;
+    dc:source <file:///data_hcsvlab/eopas_test/Audio_Eopas_transcript.xml> ;
     dc:title "Audio_Eopas_transcript.xml" ;
     dc:type "Other" .
 
