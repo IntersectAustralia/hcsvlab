@@ -46,7 +46,11 @@ def create_collection(collection_name, corpus_dir)
   coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s
   coll.uri = coll.label
   coll.short_name = collection_name
+  coll.save
+  puts "Looking for data owner for collection #{collection_name}"
+  set_data_owner(coll)
   coll.save!
+
 
   puts "Collection Metadata = " + coll.pid.to_s
   return
@@ -120,6 +124,63 @@ def look_for_annotations(item, metadata_filename)
     item.add_named_datastream('annotation_set', :dsLocation => "file://" + annotation_filename, :mimeType => 'text/plain')
     puts "Annotation Document = #{doc.pid.to_s}" unless Rails.env.test?
   end
+end
+
+#
+# Find and set the data owner for the given collection
+#
+def set_data_owner(collection)
+
+  # See if there is a responsible person specified in the collection's metadata
+  query = RDF::Query.new({
+                             :collection => {
+                                 MetadataHelper::LOC_RESPONSIBLE_PERSON => :person
+                             }
+                         })
+
+  results = query.execute(collection.rdfMetadata.graph)
+  data_owner = find_system_user(results)
+  data_owner = find_default_owner() if data_owner.nil?
+  if data_owner.nil?
+    puts "Cannot determine data owner for collection #{collection_name} (in file #{coll_metadata})"
+  else
+    puts "Setting data owner to #{data_owner.email}"
+    collection.data_owner = data_owner
+  end
+end
+
+
+#
+# Given an RDF query result set, find the first system user corresponding to a :person
+# in that result set. Or nil, should there be no such user/an empty result set.
+#
+def find_system_user(results)
+  results.each { |result|
+    next unless result.has_variables?([:person])
+    q = result[:person].to_s
+    u = User.find_all_by_email(q)
+    u.each { |user|
+      puts "   user #{user.id} with e-mail #{user.email}"
+    }
+    return u[0] if u.size > 0
+  }
+  puts "   no user found"
+  return nil
+end
+
+
+#
+# Find the default data owner
+#
+def find_default_owner()
+  puts "looking for default_data_owner in the APP_CONFIG, e-mail is #{APP_CONFIG['default_data_owner']}"
+  email = APP_CONFIG["default_data_owner"]
+  u = User.find_all_by_email(email)
+  u.each { |user|
+    puts "   user #{user.id} with e-mail #{user.email}"
+  }
+  return u[0] if u.size > 0
+  return nil
 end
 
 #
