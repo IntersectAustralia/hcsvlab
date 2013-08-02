@@ -8,7 +8,6 @@ class User < ActiveRecord::Base
 
   belongs_to :role
   has_many :item_lists
-  has_many :collections
 
 
   # Setup accessible attributes (status/approved flags should NEVER be accessible by mass assignment)
