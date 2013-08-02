@@ -1,0 +1,25 @@
+= tinymce_assets
+.span9
+  %table
+    %tr
+      %td Short Name
+      %td URI
+    - @collections.each do |aCollection|
+      %tr
+        %td=aCollection.short_name
+        %td=aCollection.uri
+.span9
+  = form_tag({:action => 'create'}, :method=>"POST") do
+    = field_set_tag do
+      .input-prepend.input-append.search-form
+        = hidden_field_tag 'collections', @collections.map{ |obj| obj[:uri] }.to_s
+        = label_tag 'Name'
+        = text_field_tag 'name'
+        = label_tag 'Text'
+        = text_area_tag 'text', nil, rows: 10, cols: 25, class: "tinymce"
+        %button{:name => "commit", :type => "submit"}
+          Apply
+
+= render 'shared/nectar_attribution'
+= tinymce
+

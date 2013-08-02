@@ -118,3 +118,5 @@ gem 'rvm-capistrano'
 # gem "capistrano-ext"
 # gem "capistrano"
 gem "capistrano_colors"
+
+gem 'tinymce-rails'

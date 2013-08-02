@@ -34,6 +34,7 @@
           %li{:class => li_class}
             = link_to 'Download API Key', users_download_token_path
       %li= link_to "Report An Issue", new_issue_report_path(:url => request.original_url)
+      %li= link_to "Licence Management", new_licence_path
       - if current_user.is_superuser?
         %li.divider
         %li= link_to "Admin", admin_users_path
