@@ -21,6 +21,7 @@ private
   OLAC_BASE_URI       = 'http://www.language-archives.org/OLAC/1.1/'
   FOAF_BASE_URI       = 'http://xmlns.com/foaf/0.1/'
   RDF_BASE_URI        = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  LOC_BASE_URI        = 'http://id.loc.gov/vocabulary/relators/'
 
   AUSTALK_BASE_URI = 'http://ns.austalk.edu.au/'
 
@@ -42,6 +43,7 @@ private
     FOAF_BASE_URI        => "FOAF",
     OLAC_BASE_URI        => "OLAC",
     RDF_BASE_URI         => "RDF",
+    LOC_BASE_URI         => "LoC",
 
     AUSTALK_BASE_URI     => "AUSTALK"
   }
@@ -123,6 +125,14 @@ public
   RDF_TYPE = RDF::URI(RDF_BASE_URI + 'type') unless const_defined?(:RDF_TYPE)
 
   @@lookup[RDF_TYPE.to_s] = prefixes[RDF_BASE_URI] + "_type"
+
+
+  #
+  # LoC
+  #
+  LOC_RESPONSIBLE_PERSON = RDF::URI(LOC_BASE_URI + 'rpy') unless const_defined?(:LOC_RESPONSIBLE_PERSON)
+
+  @@lookup[LOC_RESPONSIBLE_PERSON.to_s] = prefixes[LOC_BASE_URI] + "_responsible_person"
 
   #
   # AUSTALK
