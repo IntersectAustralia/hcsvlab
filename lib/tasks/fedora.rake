@@ -35,6 +35,11 @@ namespace :fedora do
     annotations = parse_boolean(ENV['annotations'], true)
 
     if (corpus_dir.nil?) || (!Dir.exists?(corpus_dir))
+      if corpus_dir.nil?
+        puts "No corpus directory specified."
+      else
+        puts "Corpus directory #{corpus_dir} does not exist."
+      end
       puts "Usage: rake fedora:ingest corpus=<corpus folder> [amount=<amount>] [random=<boolean>] [annotations=<boolean>]"
       puts "       <amount> can be an absolute number or a percentage: eg. 10 or 10%"
       puts "       <random> defaults to false"
@@ -53,14 +58,22 @@ namespace :fedora do
 
     puts "Emptying Fedora"
 
+    puts "Items..."
     Item.find_each do |item|
       puts item.pid.to_s
       item.delete
     end
 
+    puts "Documents..."
     Document.find_each do |doc|
       puts doc.pid.to_s
       doc.delete
+    end
+
+    puts "Collections..."
+    Collection.find_each do |coll|
+      puts coll.pid.to_s
+      coll.delete
     end
 
   end
