@@ -9,7 +9,8 @@ Feature: Change my password
 
   Scenario: Change password
     Given I am on the home page
-    When I follow "Change My Password"
+    When I follow "My Account"
+    When I follow "Change Account Password"
     And I fill in "New password" with "Pass.123"
     And I fill in "Confirm new password" with "Pass.123"
     And I fill in "Current password" with "Pas$w0rd"
@@ -20,17 +21,19 @@ Feature: Change my password
 
   Scenario: Change password not allowed if current password is empty
     Given I am on the home page
-    When I follow "Change My Password"
+    When I follow "My Account"
+    When I follow "Change Account Password"
     And I fill in "New password" with "Pass.123"
     And I fill in "Confirm new password" with "Pass.123"
     And I press "Update"
     Then I should see "Current password can't be blank"
-    And I should see "Change Password"
+    And I should see "Change Account Password"
     And I should be able to log in with "georgina@intersect.org.au" and "Pas$w0rd"
 
   Scenario: Change password not allowed if current password is incorrect
     Given I am on the home page
-    When I follow "Change My Password"
+    When I follow "My Account"
+    When I follow "Change Account Password"
     And I fill in "New password" with "Pass.123"
     And I fill in "Confirm new password" with "Pass.123"
     And I fill in "Current password" with "asdf"
@@ -40,7 +43,8 @@ Feature: Change my password
 
   Scenario: Change password not allowed if confirmation doesn't match new password
     Given I am on the home page
-    When I follow "Change My Password"
+    When I follow "My Account"
+    When I follow "Change Account Password"
     And I fill in "New password" with "Pass.123"
     And I fill in "Confirm new password" with "Pass.1233"
     And I fill in "Current password" with "Pas$w0rd"
@@ -50,7 +54,8 @@ Feature: Change my password
 
   Scenario: Change password not allowed if new password blank
     Given I am on the home page
-    When I follow "Change My Password"
+    When I follow "My Account"
+    When I follow "Change Account Password"
     And I fill in "Current password" with "Pas$w0rd"
     And I press "Update"
     Then I should see "Password can't be blank"
@@ -58,7 +63,8 @@ Feature: Change my password
 
   Scenario: Change password not allowed if new password doesn't meet password rules
     Given I am on the home page
-    When I follow "Change My Password"
+    When I follow "My Account"
+    When I follow "Change Account Password"
     And I fill in "New password" with "Pass.abc"
     And I fill in "Confirm new password" with "Pass.abc"
     And I fill in "Current password" with "Pas$w0rd"

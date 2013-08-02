@@ -3,17 +3,14 @@
   .facets-collapse
     .facet_limit
       %h5.twiddle
-        %a My Details
+        = link_to "Edit Account Details", account_edit_path
     .facet_limit
       %h5.twiddle
-        %a Change my Password
+        = link_to "Change Account Password", account_edit_password_path
     .facet_limit
       %h5.twiddle
-        %a Licence Agreements
+        = link_to "Licence Agreements", account_licence_agreements_path
     .facet_limit
       %h5.twiddle
-        %a API Key
-    .facet_limit
-      %h5.twiddle
-        %a Report an Issue
+        = link_to "Report An Issue", new_issue_report_path(:url => request.original_url)
 

@@ -11,9 +11,8 @@
       %li= link_to t('blacklight.header_links.search_history'), search_history_path
     %li.divider
     - if current_or_guest_user
-      %li= link_to "Edit My Details", edit_user_registration_path
-      %li= link_to "Change My Password", users_edit_password_path
-      %li= link_to "Licence Agreements", users_licence_agreements_path
+      %li= link_to "My Account", account_path
+      -# %li= link_to "My Licence Agreements", account_licence_agreements_path
       %li#api_token_submenu.dropdown-submenu
         %a{:href => "#"} API Key
         %ul.dropdown-menu
@@ -21,23 +20,24 @@
           - if li_class.present?
             %li.disabled
               %a#api_token_display{:href => "#"} No API Key generated
-            %li= link_to 'Generate API Key', users_generate_token_path, :method => :put
+            %li= link_to 'Generate API Key', account_generate_token_path, :method => :put
           - else
             %li.disabled
               %a{:href => "#"}= current_user.authentication_token
-            %li= link_to 'Regenerate API Key', users_generate_token_path, :method => :put, :confirm => 'Are you sure you want to regenerate your token? You will need to update any scripts that used the previous token.'
-            %li= link_to 'Delete API Key', users_delete_token_path, :method => :delete, :confirm => 'Are you sure you want to delete your token? You will no longer be able to perform API actions.'
+            %li= link_to 'Regenerate API Key', account_generate_token_path, :method => :put, :confirm => 'Are you sure you want to regenerate your token? You will need to update any scripts that used the previous token.'
+            %li= link_to 'Delete API Key', account_delete_token_path, :method => :delete, :confirm => 'Are you sure you want to delete your token? You will no longer be able to perform API actions.'
           %li.divider
           %li{:class => li_class}
             %a#zc_copy_token{"data-clipboard-text" => current_user.authentication_token, :href => "#"}
               Copy to Clipboard
           %li{:class => li_class}
-            = link_to 'Download API Key', users_download_token_path
-      %li= link_to "Report An Issue", new_issue_report_path(:url => request.original_url)
-      %li= link_to "Licence Management", new_licence_path
+            = link_to 'Download API Key', account_download_token_path
       - if current_user.is_superuser?
         %li.divider
-        %li= link_to "Admin", admin_users_path
+        %li= link_to "Admin", admin_index_path
+        %li= link_to "Licence Management", new_licence_path
+      %li.divider
+      %li= link_to "Report An Issue", new_issue_report_path(:url => request.original_url)
     %li.divider
     - if has_user_authentication_provider?
       - if current_user
