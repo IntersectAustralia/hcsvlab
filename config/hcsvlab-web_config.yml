@@ -24,6 +24,7 @@ staging:
   password_reset_email_sender: jared@intersect.org.au
   account_request_user_status_email_sender: jared@intersect.org.au
   account_request_admin_notification_sender: jared@intersect.org.au
+  default_data_owner: jared@intersect.org.au
 
 staging2:
   password_reset_email_sender: jared@intersect.org.au
