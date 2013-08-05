@@ -1,4 +1,4 @@
-class Datastream::LicenseMetadata < ActiveFedora::OmDatastream
+class Datastream::LicenceMetadata < ActiveFedora::OmDatastream
 
 	set_terminology do |t|
 		t.root(path: "fields")

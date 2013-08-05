@@ -154,6 +154,13 @@ namespace :fedora do
 
   end
 
+  #
+  # Ingest and create default set of licenses
+  #
+  task :ingest_licences => :environment do
+    create_default_licences
+  end
+
 
   def ingest_corpus(corpus_dir, num_spec=:all, shuffle=false, annotations=true)
 

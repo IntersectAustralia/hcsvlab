@@ -51,8 +51,7 @@ def create_collection(collection_name, corpus_dir)
   set_data_owner(coll)
   coll.save!
 
-
-  puts "Collection Metadata = " + coll.pid.to_s
+  puts "Collection Metadata = " + coll.pid.to_s unless Rails.env.test?
   return
 end
 
@@ -182,6 +181,27 @@ def find_default_owner()
   return u[0] if u.size > 0
   return nil
 end
+
+
+#
+# Ingest default set of licences
+#
+def create_default_licences
+  Rails.root.join("config", "licences").children.each do |lic|
+    l = Licence.new
+    l.save!
+
+    lic_info = YAML.load_file(lic)
+    l.name = lic_info['name']
+    l.text = lic_info['text']
+    l.type = Licence::LICENCE_TYPE_PUBLIC
+    l.label = l.name
+    l.save!
+
+    puts "Licence '#{l.name[0].to_s}' = #{l.pid.to_s}" unless Rails.env.test?
+  end
+end
+
 
 #
 # Extract the last part of a path/URI/slash-separated-list-of-things

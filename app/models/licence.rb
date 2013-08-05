@@ -1,12 +1,12 @@
 class Licence < ActiveFedora::Base
 
-  LICENSE_TYPE_PRIVATE = "PRIVATE"
-  LICENSE_TYPE_PUBLIC = "PUBLIC"
+  LICENCE_TYPE_PRIVATE = "PRIVATE"
+  LICENCE_TYPE_PUBLIC = "PUBLIC"
 
-	has_metadata 'descMetadata', type: Datastream::LicenseMetadata
+  has_metadata 'descMetadata', type: Datastream::LicenceMetadata
 
-	delegate :name, to: 'descMetadata'
-	delegate :text, to: 'descMetadata'
+  delegate :name, to: 'descMetadata'
+  delegate :text, to: 'descMetadata'
   delegate :type, to: 'descMetadata'
   delegate :ownerId, to: 'descMetadata'
   delegate :ownerEmail, to: 'descMetadata'
