@@ -153,10 +153,13 @@ class User < ActiveRecord::Base
     "#{first_name} #{last_name}".strip
   end
 
+  def cannot_own_data?
+    return !((Role.superuser_roles + Role.data_owner_roles).include? self.role)
+  end
+
   private
 
   def initialize_status
     self.status = "U" unless self.status
   end
-
 end
