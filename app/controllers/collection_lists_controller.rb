@@ -1,0 +1,84 @@
+class CollectionListsController < ApplicationController
+  before_filter :authenticate_user!
+  #load_and_authorize_resource
+
+  # Set itemList tab as current selected
+  set_tab :collectionList
+
+  def index
+    @userCollectionLists = CollectionList.find_by_owner_id(current_user.id)
+  end
+
+  def show
+    @userCollectionLists = CollectionList.find_by_owner_id(current_user.id)
+    @currentCollectionList = CollectionList.find(params[:id])
+    #respond_to do |format|
+    #  format.json
+    #  format.html { render :index }
+    #end
+
+  end
+
+  def create
+    if params[:all_collections] == 'true'
+      collections = Collection.find_by_owner_email_and_unassigned(current_user.email).map{ |c| c.id}
+    else
+      collections = params[:sel_collection_ids].split(",")
+    end
+
+    collectionList = CollectionList.new
+    collectionList.name = params[:collection_list][:name]
+    collectionList.ownerEmail = current_user.email
+    collectionList.ownerId = current_user.id.to_s
+
+    if collectionList.save
+      add_collections_to_collection_list(collectionList, collections)
+      flash[:notice] = 'Collections list created successfully'
+      redirect_to collectionList
+    end
+  end
+
+  def add_collections
+    if params[:all_collections_for_existing] == "true"
+      collections = Collection.find_by_owner_email_and_unassigned(current_user.email).map{ |c| c.id}
+    else
+      collections = params[:sel_collection_ids].split(",")
+    end
+
+    collectionLists = CollectionList.find(params[:id])
+
+    add_collections_to_collection_list(collectionLists, collections)
+    flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collectionLists.name}"
+    redirect_to collectionLists
+  end
+
+  def destroy
+    bench_start = Time.now
+
+    collectionList = CollectionList.find(params[:id])
+
+    name = collectionList.name[0]
+    collectionList.collections.each do |aCollection|
+      aCollection.collectionList = nil
+      aCollection.save!
+    end
+
+    collectionList.delete
+
+    Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+
+    flash[:notice] = "Collection list #{name} deleted successfully"
+    redirect_to collection_lists_path
+  end
+
+  private
+
+  def add_collections_to_collection_list(collection_list, collections_ids)
+    collection_list.add_collections(collections_ids) unless collection_list.nil?
+
+    collections_ids.each do |aCollectionId|
+      aCollection = Collection.find(aCollectionId)
+      aCollection.setCollectionList(collection_list)
+    end
+  end
+end

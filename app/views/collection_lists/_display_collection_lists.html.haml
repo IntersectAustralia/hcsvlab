@@ -1,0 +1,31 @@
+.span3{:id=>"sidebar"}
+  .facets.sidenav{:id => "facets"}
+    %h4 Item List
+    - if (@userCollectionLists.empty?)
+      %div
+        %h5{} Empty
+    -else
+      .facets-collapse
+        - @userCollectionLists.each do |collectionList|
+          - selectedClass="selected" if (collectionList.id.eql?(params[:id]))
+          .facet_limit
+            %h5{:class => "twiddle"}
+              =link_to collection_list_path(collectionList) do
+                %span{:class => selectedClass}
+                  %div{:style=>"display:inline-block;width:90%;"}
+                    =collectionList.name[0]
+              %div{:style=>"display:inline-block;"}
+                =link_to(collectionList, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Collections List "'+ collectionList.name[0] + '"?\', event));', :id => "delete_collections_list_#{collectionList.id}") do
+                  %i{:class=>"icon-trash"}
+
+:javascript
+  function confirmDelete(text, event) {
+    if (confirm(text)) {
+      showProgressAnimation();
+      return true;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+
+    return false;
+  }

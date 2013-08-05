@@ -5,15 +5,23 @@
         Add Collections to Selected
         %span.caret
       %ul#create_list_drop_down.dropdown-menu
+        -@collectionLists.each do |aCollectionList|
+          %li
+            %a{:href => "#add_all_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
+              =aCollectionList.name[0]
         %li
-          %a#create_item_list.testclass{"data-toggle" => "modal", :href => "#new-item-list", :role => "button"} Create New Meta Collection
+          %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Meta Collection
     .css-dropdown.pull-left
       %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
         Add Collections to All
         %span.caret
       %ul#create_list_all_drop_down.dropdown-menu
+        -@collectionLists.each do |aCollectionList|
+          %li
+            %a{:href => "#add_all_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
+              =aCollectionList.name[0]
         %li
-          %a#create_all_item_list{"data-toggle" => "modal", :href => "#new-item-list", :role => "button"} Create New Meta Collection
+          %a#create_all_collection_list{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Meta Collection
     #per_page-dropdown.css-dropdown.pull-right.hidden-phone
       %span.hide-text Number of results to display per page
       %button.btn.dropdown-toggle{"data-toggle" => "dropdown"}/
@@ -46,39 +54,122 @@
               %span.btn
                 %input#allnonecheckbox{:onclick => "toggleItemList(this)", :type => "checkbox"}/
           %th.name Collection
-          %th.description Description
           %th.owner Owner
           %th.licence Meta Collection(s)
       %tbody
-        %tr
-          %td.checkbox_field
-            %input.toggle_item_list{:name => "hcsvlab:16131", :type => "checkbox"}/
-          %td.name
-            %a{"data-counter" => "1", :href => "/catalog/hcsvlab:16131"} CollectionOne
-          %td.description Lizst and the Faust Phenomonon
-          %td.owner user@email.com
-          %td.licence AusNC Collections
-        %tr
-          %td.checkbox_field
-            %input.toggle_item_list{:name => "hcsvlab:16134", :type => "checkbox"}/
-          %td.name
-            %a{"data-counter" => "2", :href => "/catalog/hcsvlab:16134"} CollectionTwo
-          %td.description How Great Was Weber?
-          %td.owner user@email.com
-          %td.licence AusNC Collections
-        %tr
-          %td.checkbox_field
-            %input.toggle_item_list{:name => "hcsvlab:15999", :type => "checkbox"}/
-          %td.name
-            %a{"data-counter" => "3", :href => "/catalog/hcsvlab:15999"} CollectionThree
-          %td.description Sensitive Massage
-          %td.owner user@email.com
-          %td.licence AusNC Collections
-        %tr
-          %td.checkbox_field
-            %input.toggle_item_list{:name => "hcsvlab:16002", :type => "checkbox"}/
-          %td.name
-            %a{"data-counter" => "4", :href => "/catalog/hcsvlab:16002"} CollectionFour
-          %td.description The Magnetic Factor
-          %td.owner user@email.com
-          %td.licence AusNC Collections
+        - @collections.each do |aCollection|
+          %tr
+            %td.checkbox_field
+              -if (aCollection.collectionList.nil?)
+                %input.toggle_item_list{:name => "#{aCollection.id}", :type => "checkbox"}/
+            %td.name
+              = aCollection.short_name[0]
+            %td.owner
+              =aCollection.private_data_owner[0]
+            %td.licence
+              =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.name[0]
+
+
+%div{id: "new_collection_list", class:"modal hide fade", tabindex:"-1", role:"dialog", 'aria-labelledby'=>"myModalLabel", 'aria-hidden'=>"true"}
+  = form_for(CollectionList.new) do |f|
+    %div{class:"modal-header"}
+      %button{type:"button", class:"close", :"data-dismiss"=>"modal", "aria-hidden"=>"true"}
+        ×
+      %h3{id:"myModalLabel"}
+        Create New Collection list
+    %div{id:"new_item_list_dialog", class:"modal-body", title:"New Item List"}
+      %p
+        %div{id:"item_list_error", class:"create_item_list_error"}
+        %br
+        = f.label :name
+        = f.text_field :name
+
+        = hidden_field_tag :sel_collection_ids
+        = hidden_field_tag :all_collections
+
+    %div{class:"modal-footer"}
+      %a{class:"btn", :"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
+        Close
+      = f.submit "Create Collections List", class: "btn btn-primary"
+
+
+= render :partial=>"shared/modal_waiting_panel"
+
+
+= form_tag({:controller => "collection_lists", :action => "add_collections"}, :id => "add_to_collection_list", :onSubmit => "showProgressAnimation();")  do
+  = hidden_field_tag :id, "", {id: "collection_list_id"}
+  = hidden_field_tag :sel_collection_ids_for_existing
+  = hidden_field_tag :all_collections_for_existing
+
+
+:javascript
+  jQuery("#new_collection_list").submit( function() {
+      var new_name = jQuery("#item_list_name").val().trim()
+      if(new_name == "") {
+        jQuery("#item_list_error").text("Name can't be blank");
+        return false;
+      }
+      var error = false;
+      jQuery('a[href$="add_to_existing_collection_list"]').each(function() {
+        if(this.text.trim() == new_name) {
+          jQuery("#collection_list_error").text("Collection list name already exists");
+          error = true;
+        }
+      });
+      if(error)
+        return false;
+      jQuery("#new_collection_list").hide();
+      showProgressAnimation();
+      });
+
+  function generateCollectionsIds(field) {
+    jQuery(field).val("");
+    checks = document.getElementsByClassName('toggle_item_list');
+    for (var i=0, n=checks.length; i<n; i++) {
+      if (checks[i].checked) {
+        var existing = jQuery(field).val();
+        if (existing == "") {
+          jQuery(field).val(checks[i].name);
+        }
+        else {
+          jQuery(field).val(existing + "," + checks[i].name);
+        }
+      }
+    }
+  };
+
+  function clearData() {
+    jQuery("#collection_list_error").text("");
+    jQuery("#collection_list_name").val("");
+  };
+
+  jQuery("#create_collection_list").click( function() {
+  	clearData();
+    generateCollectionsIds("#sel_collection_ids");
+    jQuery("#all_collections").val("false");
+  });
+
+  jQuery("#create_all_collection_list").click( function() {
+  	clearData();
+    jQuery("#all_collections").val("true");
+  });
+
+  jQuery("A[href='#add_to_existing_collection_list']").click( function() {
+    collectionListId=$(this).attr('id');
+    generateCollectionsIds("#sel_collection_ids_for_existing");
+    jQuery("#collection_list_id").val(collectionListId);
+    jQuery("#all_collections_for_existing").val("false");
+    jQuery("#add_to_collection_list").submit();
+  });
+
+  jQuery("A[href='#add_all_to_existing_collection_list']").click( function() {
+    collectionListId=$(this).attr('id');
+    jQuery("#collection_list_id").val(collectionListId);
+    jQuery("#all_collections_for_existing").val("true");
+    jQuery("#add_to_collection_list").submit();
+  });
+
+  //Set focus to the first element in the form of the modal panel
+  jQuery('#new_collection_list').on('shown', function () {
+    jQuery('input:text:visible:first', this).focus();
+  })

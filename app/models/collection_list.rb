@@ -11,4 +11,17 @@ class CollectionList  < ActiveFedora::Base
   delegate :ownerId, to: 'descMetadata'
   delegate :ownerEmail, to: 'descMetadata'
 
+  def add_collections(collection_ids)
+    collection_ids.each do |aCollectionsId|
+      self.collections=[] if self.collections.nil?
+
+      self.collections << Collection.find(aCollectionsId.to_s)
+    end
+    self.save!
+  end
+
+  def self.find_by_owner_id(userId)
+    return CollectionList.find(ownerId:userId.to_s)
+  end
+
 end
