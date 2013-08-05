@@ -11,4 +11,13 @@ class CollectionList  < ActiveFedora::Base
   delegate :ownerId, to: 'descMetadata'
   delegate :ownerEmail, to: 'descMetadata'
 
+
+  #
+  # Adds licence to collection list
+  #
+  def add_licence(licence_id)
+  	Rails.logger.debug "Adding licence #{licence_id} to collection list #{self.id}"
+  	self.licence = Licence.find(licence_id)
+  	self.save
+  end
 end

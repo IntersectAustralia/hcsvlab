@@ -1,20 +1,19 @@
 = tinymce_assets
-.span9
-  %div
-    The licence will be applied to the following collections.
-  %table{class:"table table-striped"}
-    %tr
-      %td ID
-      %td Name
-    - @collectionLists.each do |aCollectionList|
+- if !@CollectionList.nil?
+  .span9
+    %div
+      This licence will be applied to the following collection list:
+    %table{class:"table table-striped"}
       %tr
-        %td=aCollectionList.id
-        %td=aCollectionList.name
+        %td ID
+        %td Name
+      %tr
+        %td=@CollectionList.id
+        %td=@CollectionList.name.first
 .span9
   = form_tag({:action => 'create'}, :method=>"POST") do
     = field_set_tag do
       .input-prepend.input-append.search-form
-        = hidden_field_tag 'collectionLists', @collectionLists.map{ |obj| obj.id }.to_s
         = label_tag 'name', "Licence name"
         = text_field_tag 'name'
         = label_tag 'text', "Licence text"

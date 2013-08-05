@@ -68,8 +68,13 @@ HcsvlabWeb::Application.routes.draw do
         #  post 'createNewLicence'
         #end
       end
-      resource :licence, :only => [:index, :new, :create], :path => "/licence" do
+
+      resources :licences, :only => [:index, :new, :create], :path => "/licences" do
         get :index
+
+        collection do
+          post 'add_licence_to_collection'
+        end
         #collection do
         #  get 'newLicenceForm'
         #  post 'createNewLicence'

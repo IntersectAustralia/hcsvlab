@@ -3,23 +3,19 @@ class LicencesController < ApplicationController
   load_and_authorize_resource
 
   def index
+    @licences = Licence.where(type: Licence::LICENCE_TYPE_PUBLIC).to_a.concat(Licence.where(ownerId: current_user.id.to_s).to_a)
+    @collection_lists = CollectionList.where(ownerId: current_user.id.to_s).to_a
   end
 
   def show
   end
 
   def new
-
-    #TODO: The List of collection list to which we are going to assing the new licence is going to come as a param in the request
-    #TODO: Uncomment and adapt this lines.
-    #@collectionLists = []
-    #params[:collectionListIds].each do |aCollectionListId|
-    #  @collectionLists << CollectionList.find(aCollectionListId)
-    #end
-
-    # TODO: By now I will get all the CollectionList instances
-    @collectionLists = CollectionList.all
-
+    if params[:collection].present?
+      @CollectionList = CollectionList.find(params[:collection])
+    else
+      @CollectionList = nil
+    end
   end
 
   def create
@@ -50,4 +46,13 @@ class LicencesController < ApplicationController
     #TODO: This should redirect to
     redirect_to licence_path
   end
+
+  def add_licence_to_collection
+    collection = CollectionList.find(params[:collection_id])
+    collection.add_licence(params[:licence_id])
+
+    flash[:notice] = "Successfully added licence to #{collection.name.first}"
+    redirect_to licences_path
+  end
+
 end
