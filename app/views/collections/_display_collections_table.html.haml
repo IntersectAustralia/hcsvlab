@@ -1,0 +1,84 @@
+#content
+  #sortAndPerPage.clearfix
+    .css-dropdown.pull-left
+      %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
+        Add Collections to Selected
+        %span.caret
+      %ul#create_list_drop_down.dropdown-menu
+        %li
+          %a#create_item_list.testclass{"data-toggle" => "modal", :href => "#new-item-list", :role => "button"} Create New Meta Collection
+    .css-dropdown.pull-left
+      %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
+        Add Collections to All
+        %span.caret
+      %ul#create_list_all_drop_down.dropdown-menu
+        %li
+          %a#create_all_item_list{"data-toggle" => "modal", :href => "#new-item-list", :role => "button"} Create New Meta Collection
+    #per_page-dropdown.css-dropdown.pull-right.hidden-phone
+      %span.hide-text Number of results to display per page
+      %button.btn.dropdown-toggle{"data-toggle" => "dropdown"}/
+      %a{:href => "#"} 20 per page
+      %span.caret
+      %ul.dropdown-menu
+        %li
+          %a{:href => "/?f%5Bdate_group%5D%5B%5D=1910+-+1919&per_page=10"}
+            10
+            %span.hide-text per page
+        %li
+          %a{:href => "/?f%5Bdate_group%5D%5B%5D=1910+-+1919&per_page=20"}
+            20
+            %span.hide-text per page
+        %li
+          %a{:href => "/?f%5Bdate_group%5D%5B%5D=1910+-+1919&per_page=50"}
+            50
+            %span.hide-text per page
+        %li
+          %a{:href => "/?f%5Bdate_group%5D%5B%5D=1910+-+1919&per_page=100"}
+            100
+            %span.hide-text per page
+
+  #documents
+    %table#blacklight_results.table.table-condensed
+      %thead
+        %tr
+          %th.checkbox_header
+            %label{:for => "allnonecheckbox"}
+              %span.btn
+                %input#allnonecheckbox{:onclick => "toggleItemList(this)", :type => "checkbox"}/
+          %th.name Collection
+          %th.description Description
+          %th.owner Owner
+          %th.licence Meta Collection(s)
+      %tbody
+        %tr
+          %td.checkbox_field
+            %input.toggle_item_list{:name => "hcsvlab:16131", :type => "checkbox"}/
+          %td.name
+            %a{"data-counter" => "1", :href => "/catalog/hcsvlab:16131"} CollectionOne
+          %td.description Lizst and the Faust Phenomonon
+          %td.owner user@email.com
+          %td.licence AusNC Collections
+        %tr
+          %td.checkbox_field
+            %input.toggle_item_list{:name => "hcsvlab:16134", :type => "checkbox"}/
+          %td.name
+            %a{"data-counter" => "2", :href => "/catalog/hcsvlab:16134"} CollectionTwo
+          %td.description How Great Was Weber?
+          %td.owner user@email.com
+          %td.licence AusNC Collections
+        %tr
+          %td.checkbox_field
+            %input.toggle_item_list{:name => "hcsvlab:15999", :type => "checkbox"}/
+          %td.name
+            %a{"data-counter" => "3", :href => "/catalog/hcsvlab:15999"} CollectionThree
+          %td.description Sensitive Massage
+          %td.owner user@email.com
+          %td.licence AusNC Collections
+        %tr
+          %td.checkbox_field
+            %input.toggle_item_list{:name => "hcsvlab:16002", :type => "checkbox"}/
+          %td.name
+            %a{"data-counter" => "4", :href => "/catalog/hcsvlab:16002"} CollectionFour
+          %td.description The Magnetic Factor
+          %td.owner user@email.com
+          %td.licence AusNC Collections
