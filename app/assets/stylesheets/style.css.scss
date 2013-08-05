@@ -46,6 +46,38 @@ textarea{
 #facets h4 { font-weight: 200; color: #FFF; background: #333; padding: 10px 14px; -webkit-border-radius: 4px 4px 0 0; -moz-border-radius: 4px 4px 0 0; border-radius: 4px 4px 0 0; }
 #facets span.selected { color: #f6b717; }
 
+/* LAYOUT ELEMENTS /////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+.label.licence {
+  padding: 3px 7px 3px 7px;
+  padding-right: 25px;
+  background: #FFD875;
+  color: #444;
+  font-weight: normal;
+  border: 1px solid #f6b717;
+  display: inline-block;
+  position: relative;
+  -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+}
+
+.label .remove {
+background: url(/assets/blacklight/remove.png) no-repeat center center;
+border-bottom: none;
+border-left: 1px solid #f6b717;
+display: block;
+height: 100%;
+outline: none;
+position: absolute;
+right: 0;
+text-indent: -9999px;
+top: 0;
+width: 20px;
+z-index: 5;
+opacity: 0.5;
+}
+
+
 .footer { margin: 60px 0 0 0; padding: 20px 0 40px 0; clear: both; border-top: 1px solid #DDD; color: #999; float: left; }
 .navbar-inner {
   min-height: 40px;
