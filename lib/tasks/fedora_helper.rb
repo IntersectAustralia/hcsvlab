@@ -142,6 +142,8 @@ def set_data_owner(collection)
   data_owner = find_default_owner() if data_owner.nil?
   if data_owner.nil?
     puts "Cannot determine data owner for collection #{collection.short_name}"
+  elsif data_owner.cannot_own_data?
+    puts "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
     puts "Setting data owner to #{data_owner.email}"
     collection.data_owner = data_owner
