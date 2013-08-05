@@ -94,15 +94,30 @@ namespace :fedora do
     #objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
     objects = find_corpus_items corpus
 
-    puts "Removing " + objects.count.to_s + " objects"
+    puts "Removing " + objects.count.to_s + " Items"
+
+    documents = []
 
     objects.each do |obj|
       id = obj["id"].to_s
-      puts "Removing: " + id.to_s
-      fobj=ActiveFedora::Base.find(id)
+      puts "Removing Item: " + id.to_s
+      fobj=Item.find(id)
+      fobj.documents.each { |doc|
+        documents << doc
+      }
       fobj.delete
     end
 
+    puts "Removing " + documents.size.to_s + " Documents"
+    documents.each { |doc|
+      puts "Removing Document: " + doc.pid
+      doc.delete
+    }
+
+    Collection.find_by_short_name(corpus).each { |collection|
+      puts "Removing collection object #{collection.pid}"
+      collection.delete
+    }
   end
 
 
