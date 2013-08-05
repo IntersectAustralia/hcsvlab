@@ -236,7 +236,8 @@ namespace :fedora do
     unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
       raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
     end
-    puts "Ingesting item: " + rdf_file.to_s
+    puts "#{Time.new.to_s} - Ingesting item: " + rdf_file.to_s
+    STDOUT.flush
 
     item = create_item_from_file(rdf_file)
     look_for_annotations(item, rdf_file) if annotations
