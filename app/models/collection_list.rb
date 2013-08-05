@@ -11,6 +11,13 @@ class CollectionList  < ActiveFedora::Base
   delegate :ownerId, to: 'descMetadata'
   delegate :ownerEmail, to: 'descMetadata'
 
+  def self.find_by_owner_id(userId)
+    return CollectionList.find(ownerId:userId.to_s)
+  end
+
+  #
+  # Adds collections to a Collection List
+  #
   def add_collections(collection_ids)
     collection_ids.each do |aCollectionsId|
       self.collections=[] if self.collections.nil?
@@ -20,8 +27,12 @@ class CollectionList  < ActiveFedora::Base
     self.save!
   end
 
-  def self.find_by_owner_id(userId)
-    return CollectionList.find(ownerId:userId.to_s)
+  #
+  # Adds licence to collection list
+  #
+  def add_licence(licence_id)
+  	Rails.logger.debug "Adding licence #{licence_id} to collection list #{self.id}"
+  	self.licence = Licence.find(licence_id)
+  	self.save
   end
-
 end

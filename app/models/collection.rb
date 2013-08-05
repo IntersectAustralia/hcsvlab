@@ -48,14 +48,14 @@ class Collection < ActiveFedora::Base
   # Find a collection using its uri
   #
   def Collection.find_by_uri(uri)
-    return Collection.where(uri: uri)
+    return Collection.where(uri: uri).all
   end
 
   #
   # Find a collection using its short_name
   #
   def Collection.find_by_short_name(short_name)
-    return Collection.where(short_name: short_name)
+    return Collection.where(short_name: short_name).all
   end
 
   def setCollectionList(collectionList)
