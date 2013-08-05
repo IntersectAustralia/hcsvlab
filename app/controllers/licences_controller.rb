@@ -1,6 +1,6 @@
 class LicencesController < ApplicationController
   before_filter :authenticate_user!
-  #load_and_authorize_resource
+  load_and_authorize_resource
 
   def index
   end
@@ -9,15 +9,25 @@ class LicencesController < ApplicationController
   end
 
   def new
-    @collections = Collection.all
+
+    #TODO: The List of collection list to which we are going to assing the new licence is going to come as a param in the request
+    #TODO: Uncomment and adapt this lines.
+    #@collectionLists = []
+    #params[:collectionListIds].each do |aCollectionListId|
+    #  @collectionLists << CollectionList.find(aCollectionListId)
+    #end
+
+    # TODO: By now I will get all the CollectionList instances
+    @collectionLists = CollectionList.all
 
   end
 
   def create
     name = params[:name]
     text = params[:text]
-    #collection = eval(params[:collections])
+    collectionListIds = eval(params[:collectionLists])
 
+    # First we have to create the collection.
     newLicence = Licence.new
     newLicence.save!
 
@@ -28,7 +38,16 @@ class LicencesController < ApplicationController
     newLicence.ownerEmail = current_user.email
     newLicence.save!
 
+    # Now lets assign the licence to every collection list
+    collectionListIds.each do |aCollectionListId|
+      aCollectionList = CollectionList.find(aCollectionListId)
+      aCollectionList.licence = newLicence
+      aCollectionList.save!
+    end
+
     flash[:notice] = "Licence created successfully"
-    redirect_to new_licence_path
+
+    #TODO: This should redirect to
+    redirect_to licence_path
   end
 end

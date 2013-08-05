@@ -1,21 +1,23 @@
 = tinymce_assets
 .span9
-  %table
+  %div
+    The licence will be applied to the following collections.
+  %table{class:"table table-striped"}
     %tr
-      %td Short Name
-      %td URI
-    - @collections.each do |aCollection|
+      %td ID
+      %td Name
+    - @collectionLists.each do |aCollectionList|
       %tr
-        %td=aCollection.short_name
-        %td=aCollection.uri
+        %td=aCollectionList.id
+        %td=aCollectionList.name
 .span9
   = form_tag({:action => 'create'}, :method=>"POST") do
     = field_set_tag do
       .input-prepend.input-append.search-form
-        = hidden_field_tag 'collections', @collections.map{ |obj| obj[:uri] }.to_s
-        = label_tag 'Name'
+        = hidden_field_tag 'collectionLists', @collectionLists.map{ |obj| obj.id }.to_s
+        = label_tag 'name', "Licence name"
         = text_field_tag 'name'
-        = label_tag 'Text'
+        = label_tag 'text', "Licence text"
         = text_area_tag 'text', nil, rows: 10, cols: 25, class: "tinymce"
         %button{:name => "commit", :type => "submit"}
           Apply
