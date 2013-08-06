@@ -1,0 +1,5 @@
+- if @paging.num_pages > 1
+  %div{class:"row record-padding"}
+    %div{class:"span12"}
+      %div{class:"pagination"}
+        = paginate Kaminari.paginate_array(@collections, :total_count => @paging.total_count).page(@paging.current_page).per(@paging.per_page)
