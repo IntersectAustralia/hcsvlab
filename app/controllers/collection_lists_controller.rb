@@ -42,7 +42,7 @@ class CollectionListsController < ApplicationController
     if params[:all_collections_for_existing] == "true"
       collections = Collection.find_by_owner_email_and_unassigned(current_user.email).map{ |c| c.id}
     else
-      collections = params[:sel_collection_ids].split(",")
+      collections = params[:sel_collection_ids_for_existing].split(",")
     end
 
     collectionLists = CollectionList.find(params[:id])

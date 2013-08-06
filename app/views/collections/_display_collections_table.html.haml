@@ -7,7 +7,7 @@
       %ul#create_list_drop_down.dropdown-menu
         -@collectionLists.each do |aCollectionList|
           %li
-            %a{:href => "#add_all_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
+            %a{:href => "#add_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
               =aCollectionList.name[0]
         %li
           %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
