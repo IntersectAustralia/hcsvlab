@@ -18,6 +18,8 @@
         = text_field_tag 'name'
         = label_tag 'text', "Licence text"
         = text_area_tag 'text', nil, rows: 10, cols: 25, class: "tinymce"
+        - if !@CollectionList.nil?
+          = hidden_field_tag 'collectionList', @CollectionList.id.to_s
         %button{:name => "commit", :type => "submit"}
           Apply
 

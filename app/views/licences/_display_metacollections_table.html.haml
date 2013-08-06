@@ -19,7 +19,8 @@
         - @collection_lists.each_with_index do |coll_list, index|
           %tr
             %td.name
-              %a{"data-counter" => "#{index+1}", :href => "#"}= coll_list.name.first
+              =link_to coll_list.name.first, collection_list_path(coll_list)
+
             %td.owner= coll_list.ownerEmail.first
             %td.licence
               .css-dropdown

@@ -2,7 +2,7 @@
   #sortAndPerPage.clearfix
     .css-dropdown.pull-left
       %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
-        Add Collections to Selected
+        Add selected to Collection list
         %span.caret
       %ul#create_list_drop_down.dropdown-menu
         -@collectionLists.each do |aCollectionList|
@@ -10,10 +10,10 @@
             %a{:href => "#add_all_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
               =aCollectionList.name[0]
         %li
-          %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Meta Collection
+          %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
     .css-dropdown.pull-left
       %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
-        Add Collections to All
+        Add all to a Collections List
         %span.caret
       %ul#create_list_all_drop_down.dropdown-menu
         -@collectionLists.each do |aCollectionList|
@@ -21,7 +21,7 @@
             %a{:href => "#add_all_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
               =aCollectionList.name[0]
         %li
-          %a#create_all_collection_list{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Meta Collection
+          %a#create_all_collection_list{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
     #per_page-dropdown.css-dropdown.pull-right.hidden-phone
       %span.hide-text Number of results to display per page
       %button.btn.dropdown-toggle{"data-toggle" => "dropdown"}/
@@ -55,7 +55,7 @@
                 %input#allnonecheckbox{:onclick => "toggleItemList(this)", :type => "checkbox"}/
           %th.name Collection
           %th.owner Owner
-          %th.licence Meta Collection(s)
+          %th.licence Collection List
       %tbody
         - @collections.each do |aCollection|
           %tr

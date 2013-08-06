@@ -21,7 +21,7 @@ class LicencesController < ApplicationController
   def create
     name = params[:name]
     text = params[:text]
-    collectionListIds = eval(params[:collectionLists])
+    collectionListId = params[:collectionList]
 
     # First we have to create the collection.
     newLicence = Licence.new
@@ -29,14 +29,14 @@ class LicencesController < ApplicationController
 
     newLicence.name = name
     newLicence.text = text
-    newLicence.type = Licence::LICENSE_TYPE_PRIVATE
+    newLicence.type = Licence::LICENCE_TYPE_PRIVATE
     newLicence.ownerId = current_user.id.to_s
     newLicence.ownerEmail = current_user.email
     newLicence.save!
 
     # Now lets assign the licence to every collection list
-    collectionListIds.each do |aCollectionListId|
-      aCollectionList = CollectionList.find(aCollectionListId)
+    if (!collectionListId.nil?)
+      aCollectionList = CollectionList.find(collectionListId)
       aCollectionList.licence = newLicence
       aCollectionList.save!
     end
@@ -44,7 +44,7 @@ class LicencesController < ApplicationController
     flash[:notice] = "Licence created successfully"
 
     #TODO: This should redirect to
-    redirect_to licence_path
+    redirect_to licences_path
   end
 
 end
