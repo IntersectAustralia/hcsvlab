@@ -121,6 +121,10 @@ class User < ActiveRecord::Base
     self.role == Role.find_by_name(Role::RESEARCHER_ROLE)
   end
 
+  def is_data_owner?
+    self.role == Role.find_by_name(Role::DATA_OWNER_ROLE)
+  end
+
   def approve_access_request
     self.status = 'A'
     save!(:validate => false)

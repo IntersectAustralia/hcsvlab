@@ -42,7 +42,10 @@ class Ability
       can :admin, User
       can :reject, User
       can :approve, User
-      can :add_licence_to_collection, Licence
+    end
+
+    if user.is_data_owner?
+      can :add_licence_to_collection, CollectionList, :ownerId => user.id
     end
 
     if user.is_superuser?

@@ -47,12 +47,4 @@ class LicencesController < ApplicationController
     redirect_to licence_path
   end
 
-  def add_licence_to_collection
-    collection = CollectionList.find(params[:collection_id])
-    collection.add_licence(params[:licence_id])
-
-    flash[:notice] = "Successfully added licence to #{collection.name.first}"
-    redirect_to licences_path
-  end
-
 end

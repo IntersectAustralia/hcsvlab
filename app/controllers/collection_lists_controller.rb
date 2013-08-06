@@ -71,6 +71,14 @@ class CollectionListsController < ApplicationController
     redirect_to collection_lists_path
   end
 
+  def add_licence_to_collection
+    collection = CollectionList.find(params[:collection_id])
+    collection.add_licence(params[:licence_id])
+
+    flash[:notice] = "Successfully added licence to #{collection.name.first}"
+    redirect_to licences_path
+  end
+
   private
 
   def add_collections_to_collection_list(collection_list, collections_ids)

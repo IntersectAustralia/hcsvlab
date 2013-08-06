@@ -2,7 +2,7 @@
   #sortAndPerPage.clearfix
     %a.btn.pull-left{:href => new_licence_path} Create New Licence
 
-  = form_tag({:controller => "licences", :action => "add_licence_to_collection"}, :id => "add_licence_form") do
+  = form_tag({:controller => "collection_lists", :action => "add_licence_to_collection"}, :id => "add_licence_form") do
     = hidden_field_tag :collection_id
     = hidden_field_tag :licence_id
 
@@ -36,16 +36,18 @@
                   %li
                     = link_to("Create New", {:controller => "licences", :action => "new", :collection => coll_list.id}, :collection => coll_list.id)
             %td
-              %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms#{index}", :role => "button"} View Licence Terms
-          .modal.hide.fade{:id => "licence_terms#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
-            .modal-header
-              %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-              %h3#myModalLabel= coll_list.licence.name.first
-            #licence_terms_dialog.modal-body{:title => "Licence Terms"}
-              %pre
-                %textarea#licence_terms_content{:readonly => "true"}= coll_list.licence.text.first
-            .modal-footer
-              %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+              - if coll_list.licence.present?
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms#{index}", :role => "button"} View Licence Terms
+          - if coll_list.licence.present?
+            .modal.hide.fade{:id => "licence_terms#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+              .modal-header
+                %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+                %h3#myModalLabel= coll_list.licence.name.first
+              #licence_terms_dialog.modal-body{:title => "Licence Terms"}
+                %pre
+                  %textarea#licence_terms_content{:readonly => "true"}= coll_list.licence.text.first
+              .modal-footer
+                %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 
 :javascript
 
