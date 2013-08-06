@@ -1,27 +1,27 @@
-= tinymce_assets
-- if !@CollectionList.nil?
-  .span9
+= render 'admin/admin_menu'
+.span9
+  %h2 Create a new Licence
+  = tinymce_assets
+  - if !@CollectionList.nil?
     %div
       This licence will be applied to the following collection list:
-    %table{class:"table table-striped"}
+    %table.table.table-striped
       %tr
         %td ID
         %td Name
       %tr
         %td=@CollectionList.id
         %td=@CollectionList.name.first
-.span9
   = form_tag({:action => 'create'}, :method=>"POST") do
     = field_set_tag do
-      .input-prepend.input-append.search-form
-        = label_tag 'name', "Licence name"
-        = text_field_tag 'name'
-        = label_tag 'text', "Licence text"
-        = text_area_tag 'text', nil, rows: 10, cols: 25, class: "tinymce"
-        - if !@CollectionList.nil?
-          = hidden_field_tag 'collectionList', @CollectionList.id.to_s
-        %button{:name => "commit", :type => "submit"}
-          Apply
+      = label_tag 'name', "Licence name"
+      = text_field_tag 'name'
+      = label_tag 'text', "Licence text"
+      = text_area_tag 'text', nil, rows: 10, cols: 25, class: "tinymce"
+      - if !@CollectionList.nil?
+        = hidden_field_tag 'collectionList', @CollectionList.id.to_s
+      .form-actions
+        %button.btn.btn-primary{:name => "commit", :type => "submit"} Create
 
 = render 'shared/nectar_attribution'
 = tinymce
