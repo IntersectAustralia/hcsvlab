@@ -845,7 +845,11 @@ border: 1px solid #BCBCBC;
 #searchbar input { width: 85px; }
 }
 
-
+.mce-container-body.mce-fullscreen {
+  left: 0;
+  position: fixed;
+  top: 50px;
+}
 
 
 
