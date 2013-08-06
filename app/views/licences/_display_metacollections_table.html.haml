@@ -46,7 +46,7 @@
                 %h3#myModalLabel= coll_list.licence.name.first
               #licence_terms_dialog.modal-body{:title => "Licence Terms"}
                 %pre
-                  %textarea#licence_terms_content{:readonly => "true"}= coll_list.licence.text.first
+                  %textarea#licence_terms_content{:readonly => "true"}= strip_tags(coll_list.licence.text.first).gsub('&nbsp;', '')
               .modal-footer
                 %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 
