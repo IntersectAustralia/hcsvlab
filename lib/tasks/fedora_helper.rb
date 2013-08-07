@@ -74,7 +74,6 @@ def look_for_documents(item, corpus_dir, rdf_file)
       doc.type      = result.type.to_s
       doc.mime_type = mime_type_lookup(doc.file_name[0])
       doc.label     = result.source.to_s
-      doc.rdfMetadata.graph.load(rdf_file, :format => :ttl)
       doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => result.source.to_s)
       doc.item = item
       doc.save

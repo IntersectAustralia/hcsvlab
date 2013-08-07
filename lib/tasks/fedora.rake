@@ -238,11 +238,9 @@ namespace :fedora do
     end
     puts "#{Time.new.to_s} - Ingesting item: " + rdf_file.to_s
     STDOUT.flush
-
     item = create_item_from_file(rdf_file)
     look_for_annotations(item, rdf_file) if annotations
     look_for_documents(item, corpus_dir, rdf_file)
-
     item.save!
 
     if Collection.where(short_name: item.collection).count == 0
