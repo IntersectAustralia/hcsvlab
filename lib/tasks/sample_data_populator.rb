@@ -7,23 +7,20 @@ def populate_data
 end
 
 def create_test_users
-  create_user(:email => "georgina@intersect.org.au", :first_name => "Georgina", :last_name => "Edwards")
   create_user(:email => "marc@intersect.org.au", :first_name => "Marc", :last_name => "Ziani de F")
-  create_user(:email => "shuqian@intersect.org.au", :first_name => "Shuqian", :last_name => "Hon")
-  create_user(:email => "ilya@intersect.org.au", :first_name => "Ilya", :last_name => "Anisimoff")
   create_user(:email => "chrisk@intersect.org.au", :first_name => "Chris", :last_name => "Kenward")
   create_user(:email => "jared@intersect.org.au", :first_name => "Jared", :last_name => "Berghold")
   create_user(:email => "davidc@intersect.org.au", :first_name => "David", :last_name => "Clarke")
   create_user(:email => "matthew@intersect.org.au", :first_name => "Matt", :last_name => "Hillman")
+  create_user(:email => "gabriel@intersect.org.au", :first_name => "Gabriel", :last_name => "Gasser Noblia")
   create_unapproved_user(:email => "unapproved1@intersect.org.au", :first_name => "Unapproved", :last_name => "One")
   create_unapproved_user(:email => "unapproved2@intersect.org.au", :first_name => "Unapproved", :last_name => "Two")
-  set_role("georgina@intersect.org.au", Role::SUPERUSER_ROLE)
   set_role("marc@intersect.org.au", Role::SUPERUSER_ROLE)
-  set_role("shuqian@intersect.org.au", Role::SUPERUSER_ROLE)
   set_role("chrisk@intersect.org.au", Role::SUPERUSER_ROLE)
   set_role("jared@intersect.org.au", Role::SUPERUSER_ROLE)
   set_role("davidc@intersect.org.au", Role::SUPERUSER_ROLE)
   set_role("matthew@intersect.org.au", Role::SUPERUSER_ROLE)
+  set_role("gabriel@intersect.org.au", Role::SUPERUSER_ROLE)
 end
 
 def set_role(email, role)
