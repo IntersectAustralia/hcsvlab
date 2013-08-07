@@ -21,8 +21,16 @@ class CollectionList  < ActiveFedora::Base
   def add_collections(collection_ids)
     collection_ids.each do |aCollectionsId|
       self.collections=[] if self.collections.nil?
-
-      self.collections << Collection.find(aCollectionsId.to_s)
+      begin
+        aCollection = Collection.find(aCollectionsId.to_s)
+        # We are only adding Collections that are not assigned to any other Collection List.
+        if (aCollection.collectionList.nil?)
+          self.collections << aCollection
+          aCollection.setCollectionList(self)
+        end
+      rescue ActiveFedora::ObjectNotFoundError
+        # If the Collection does not exist, then do nothing.
+      end
     end
     self.save!
   end

@@ -11,7 +11,12 @@ class CollectionListsController < ApplicationController
 
   def show
     @userCollectionLists = CollectionList.find_by_owner_id(current_user.id)
-    @currentCollectionList = CollectionList.find(params[:id])
+
+    begin
+      @currentCollectionList = CollectionList.find(params[:id])
+    rescue ActiveFedora::ObjectNotFoundError
+      @currentCollectionList = nil
+    end
     #respond_to do |format|
     #  format.json
     #  format.html { render :index }
@@ -26,16 +31,23 @@ class CollectionListsController < ApplicationController
       collections = params[:sel_collection_ids].split(",")
     end
 
-    collectionList = CollectionList.new
-    collectionList.name = params[:collection_list][:name]
-    collectionList.ownerEmail = current_user.email
-    collectionList.ownerId = current_user.id.to_s
+    if (collections.length > 0)
+      collectionList = CollectionList.new
+      collectionList.name = params[:collection_list][:name]
+      collectionList.ownerEmail = current_user.email
+      collectionList.ownerId = current_user.id.to_s
 
-    if collectionList.save
-      add_collections_to_collection_list(collectionList, collections)
-      flash[:notice] = 'Collections list created successfully'
-      redirect_to collectionList
+      if collectionList.save
+        add_collections_to_collection_list(collectionList, collections)
+        flash[:notice] = 'Collections list created successfully'
+        redirect_to collectionList
+      end
+    else
+      flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
+      redirect_to collection_path
     end
+
+
   end
 
   def add_collections
@@ -45,11 +57,17 @@ class CollectionListsController < ApplicationController
       collections = params[:sel_collection_ids_for_existing].split(",")
     end
 
-    collectionLists = CollectionList.find(params[:id])
+    if (collections.length > 0)
+      collectionLists = CollectionList.find(params[:id])
 
-    add_collections_to_collection_list(collectionLists, collections)
-    flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collectionLists.name}"
-    redirect_to collectionLists
+      add_collections_to_collection_list(collectionLists, collections)
+      flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collectionLists.name}"
+      redirect_to collectionLists
+    else
+      flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
+      redirect_to collection_path
+    end
+
   end
 
   def destroy
@@ -83,10 +101,5 @@ class CollectionListsController < ApplicationController
 
   def add_collections_to_collection_list(collection_list, collections_ids)
     collection_list.add_collections(collections_ids) unless collection_list.nil?
-
-    collections_ids.each do |aCollectionId|
-      aCollection = Collection.find(aCollectionId)
-      aCollection.setCollectionList(collection_list)
-    end
   end
 end

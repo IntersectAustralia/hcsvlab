@@ -77,9 +77,9 @@
         ×
       %h3{id:"myModalLabel"}
         Create New Collection list
-    %div{id:"new_item_list_dialog", class:"modal-body", title:"New Item List"}
+    %div{id:"new_collection_list_dialog", class:"modal-body", title:"New Collection List"}
       %p
-        %div{id:"item_list_error", class:"create_item_list_error"}
+        %div{id:"collection_list_error", class:"create_collection_list_error"}
         %br
         = f.label :name
         = f.text_field :name
@@ -90,7 +90,7 @@
     %div{class:"modal-footer"}
       %a{class:"btn", :"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
         Close
-      = f.submit "Create Collections List", class: "btn btn-primary"
+      = f.submit "Create Collections List", class: "btn btn-primary", id:"new_collection_list_submit"
 
 
 = render :partial=>"shared/modal_waiting_panel"
@@ -104,9 +104,11 @@
 
 :javascript
   jQuery("#new_collection_list").submit( function() {
-      var new_name = jQuery("#item_list_name").val().trim()
+      jQuery("#new_collection_list_submit").attr('disabled','disabled');
+      var new_name = jQuery("#collection_list_name").val().trim()
       if(new_name == "") {
-        jQuery("#item_list_error").text("Name can't be blank");
+        jQuery("#collection_list_error").text("Name can't be blank");
+        jQuery("#new_collection_list_submit").removeAttr('disabled');
         return false;
       }
       var error = false;
@@ -116,9 +118,12 @@
           error = true;
         }
       });
-      if(error)
+      if(error) {
+        jQuery("#new_collection_list_submit").removeAttr('disabled');
         return false;
+      }
       jQuery("#new_collection_list").hide();
+      jQuery("#new_collection_list_submit").removeAttr('disabled');
       showProgressAnimation();
       });
 

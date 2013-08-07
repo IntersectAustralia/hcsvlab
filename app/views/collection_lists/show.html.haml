@@ -1,32 +1,36 @@
 = render 'display_collection_lists'
 .span9
-  %table
-    %tr
-      %td
-        %b
-          Name:
-      %td
-        = @currentCollectionList.name[0]
-    %tr
-      %td
-        %b
-          Owner:
-      %td
-        = @currentCollectionList.ownerEmail[0]
-  %br
-  %h3
-    Collections assigned to this Collection List.
-  %table.table.table-striped
-    %tr
-      %td
-        URI
-      %td
-        Short Name
-    -@currentCollectionList.collections.each do |aCollection|
+  - if @currentCollectionList.nil?
+    %div
+      Collection List not found
+  -else
+    %table
       %tr
         %td
-          = aCollection.uri[0]
+          %b
+            Name:
         %td
-          = aCollection.short_name[0]
+          = @currentCollectionList.name[0]
+      %tr
+        %td
+          %b
+            Owner:
+        %td
+          = @currentCollectionList.ownerEmail[0]
+    %br
+    %h3
+      Collections assigned to this Collection List
+    %table.table.table-striped
+      %tr
+        %td
+          URI
+        %td
+          Short Name
+      -@currentCollectionList.collections.each do |aCollection|
+        %tr
+          %td
+            = aCollection.uri[0]
+          %td
+            = aCollection.short_name[0]
 = render 'shared/nectar_attribution'
 = render 'shared/modal_waiting_panel'
