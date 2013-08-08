@@ -1,3 +1,5 @@
+include ActionView::Helpers::SanitizeHelper
+
 class LicencesController < ApplicationController
   before_filter :authenticate_user!
   load_and_authorize_resource
@@ -30,14 +32,17 @@ class LicencesController < ApplicationController
 
   def create
     name = params[:name]
-    text = params[:text]
+    text = params[:text].gsub('\'', '"')
     collectionListId = params[:collectionList]
 
     begin
+      tags = %w(a acronym b strong i em li ul ol h1 h2 h3 h4 h5 h6 blockquote br cite sub sup ins p table td tr)
+      sanitizedText = sanitize(text, tags: tags, attributes: %w(href title))
+
       # First we have to create the collection.
       newLicence = Licence.new
       newLicence.name = name
-      newLicence.text = text
+      newLicence.text = sanitizedText
       newLicence.type = Licence::LICENCE_TYPE_PRIVATE
       newLicence.ownerId = current_user.id.to_s
       newLicence.ownerEmail = current_user.email
