@@ -1,6 +1,6 @@
 #content
-  #sortAndPerPage.clearfix
-    %a.btn.pull-left{:href => new_licence_path} Create New Licence
+  -# #sortAndPerPage.clearfix
+  -#   %a.btn.pull-left{:href => new_licence_path} Create New Licence
 
   = form_tag({:controller => "collection_lists", :action => "add_licence_to_collection"}, :id => "add_licence_form") do
     = hidden_field_tag :collection_id
@@ -36,7 +36,7 @@
                       %a{:href => "#add_licence", :onClick => "add_licence('#{coll_list.id}', '#{lic.id}');"}= lic.flat_name
                   %li
                     = link_to("Create New", {:controller => "licences", :action => "new", :collection => coll_list.id}, :collection => coll_list.id)
-            %td
+            %td.terms
               - if coll_list.licence.present?
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms#{index}", :role => "button"} View Licence Terms
           - if coll_list.licence.present?
@@ -45,8 +45,7 @@
                 %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
                 %h3#myModalLabel= coll_list.licence.flat_name
               #licence_terms_dialog.modal-body{:title => "Licence Terms"}
-                %pre
-                  %textarea#licence_terms_content{:readonly => "true"}= strip_tags(coll_list.licence.flat_text).gsub('&nbsp;', '')
+                %p#licence_terms_content{:readonly => "true"}= strip_tags(coll_list.licence.flat_text.first).gsub('&nbsp;', '')
               .modal-footer
                 %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 

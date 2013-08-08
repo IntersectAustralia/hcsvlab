@@ -77,6 +77,10 @@ z-index: 5;
 opacity: 0.5;
 }
 
+label.btn.checkbox input[type="checkbox"] {
+  margin: 3px 10px 0 0;
+}
+
 #licence_terms_content {
   width:100%
 }

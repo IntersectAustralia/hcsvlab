@@ -9,44 +9,14 @@
           %li
             %a{:href => "#add_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
               =aCollectionList.name[0]
+        %li.divider
         %li
           %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
-    .css-dropdown.pull-left
-      %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
-        Add all to a Collections List
-        %span.caret
-      %ul#create_list_all_drop_down.dropdown-menu
-        -@collectionLists.each do |aCollectionList|
-          %li
-            %a{:href => "#add_all_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
-              =aCollectionList.name[0]
-        %li
-          %a#create_all_collection_list{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
-    #per_page-dropdown.css-dropdown.pull-right.hidden-phone
-      %span.hide-text Number of results to display per page
-      %button.btn.dropdown-toggle{"data-toggle" => "dropdown"}/
-      %a{:href => "#"}= ((params[:per_page].nil?)? 20.to_s : params[:per_page]) + " per page"
-      %span.caret
-      %ul.dropdown-menu
-        %li
-          %a{:href => "#", :onclick => "insertParam('per_page', 10)"}
-            10
-            %span.hide-text per page
-        %li
-          %a{:href => "#", :onclick => "insertParam('per_page', 20)"}
-            20
-            %span.hide-text per page
-        %li
-          %a{:href => "#", :onclick => "insertParam('per_page', 50)"}
-            50
-            %span.hide-text per page
-        %li
-          %a{:href => "#", :onclick => "insertParam('per_page', 100)"}
-            100
-            %span.hide-text per page
+    %label#showhide-assigned.btn.checkbox
+      %input{:type => "checkbox"} Hide grouped Collections
 
   #documents
-    %table#blacklight_results.table.table-condensed
+    %table.table.table-condensed
       %thead
         %tr
           %th.checkbox_header
@@ -54,8 +24,9 @@
               %span.btn
                 %input#allnonecheckbox{:onclick => "toggleItemList(this)", :type => "checkbox"}/
           %th.name Collection
-          %th.owner Owner
-          %th.licence Collection List
+          %th.collection Collection List
+          %th.licence Licence
+          %th.terms Licence Terms
       %tbody
         - @collections.each do |aCollection|
           %tr
@@ -64,22 +35,38 @@
                 %input.toggle_item_list{:name => "#{aCollection.id}", :type => "checkbox"}/
             %td.name
               = aCollection.short_name[0]
-            %td.owner
-              =aCollection.private_data_owner[0]
+            %td.collection
+              -if !(aCollection.collectionList.nil?)
+                .label.licence
+                  =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.name[0]
+                  %a.remove
             %td.licence
-              =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.name[0]
+              -if (aCollection.collectionList.nil?)
+                .css-dropdown
+                  %button.dropdown-toggle.btn.btn-mini{ "data-toggle" => "dropdown" }
+                    Add Licence
+                    %span.caret
+                  %ul.dropdown-menu
+                    %li
+                      %a{:href => "#add_licence", :onClick => "add_licence"} Licence Name
+                    %li.divider
+                    %li
+                      = link_to("Create New", {:controller => "licences", :action => "new"})
+              -else
+                =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.licence.name.first
+            %td.terms
+              -if !(aCollection.collectionList.nil?)
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "", :role => "button"} View Licence Terms
 
 
-%div{id: "new_collection_list", class:"modal hide fade", tabindex:"-1", role:"dialog", 'aria-labelledby'=>"myModalLabel", 'aria-hidden'=>"true"}
+#new_collection_list.modal.hide.fade{ tabindex:"-1", role:"dialog", 'aria-labelledby'=>"myModalLabel", 'aria-hidden'=>"true"}
   = form_for(CollectionList.new) do |f|
-    %div{class:"modal-header"}
-      %button{type:"button", class:"close", :"data-dismiss"=>"modal", "aria-hidden"=>"true"}
-        ×
-      %h3{id:"myModalLabel"}
-        Create New Collection list
-    %div{id:"new_collection_list_dialog", class:"modal-body", title:"New Collection List"}
+    .modal-header
+      %h3#myModalLabel Create New Collection list
+      %button.close{ type:"button", :"data-dismiss"=>"modal", "aria-hidden"=>"true"} ×
+    #new_collection_list_dialog.modal-body{ title:"New Collection List"}
       %p
-        %div{id:"collection_list_error", class:"create_collection_list_error"}
+        #collection_list_error.create_collection_list_error
         %br
         = f.label :name
         = f.text_field :name
@@ -87,8 +74,8 @@
         = hidden_field_tag :sel_collection_ids
         = hidden_field_tag :all_collections
 
-    %div{class:"modal-footer"}
-      %a{class:"btn", :"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
+    .modal-footer
+      %a.btn{:"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
         Close
       = f.submit "Create Collections List", class: "btn btn-primary", id:"new_collection_list_submit"
 

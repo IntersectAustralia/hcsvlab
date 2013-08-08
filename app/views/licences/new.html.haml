@@ -1,17 +1,12 @@
 = render 'admin/admin_menu'
 .span9
-  %h2 Create a new Licence
+  - if @CollectionList.nil?
+    %h2 Create a new Licence
+  - else
+    %h2
+      Create a new Licence for
+      =@CollectionList.name.first
   = tinymce_assets
-  - if !@CollectionList.nil?
-    %div
-      This licence will be applied to the following collection list:
-    %table.table.table-striped
-      %tr
-        %td ID
-        %td Name
-      %tr
-        %td=@CollectionList.id
-        %td=@CollectionList.name.first
   - if (!@errors.nil? and !@errors.empty?)
     %div
       ERRORS:
