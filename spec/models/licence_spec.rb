@@ -5,8 +5,9 @@ describe Licence do
   describe "Licence Descriptive Metadata" do
 
     it "should persist metadata about a Licence" do
+      rnd = Random.new.rand(1..10000).to_s
       l = Licence.new
-      l.name = "CC Licence"
+      l.name = "CC Licence " + rnd
       l.text = "Various text outlining terms of the licence"
       l.type = Licence::LICENCE_TYPE_PUBLIC
 
@@ -15,14 +16,16 @@ describe Licence do
       l.ownerEmail = u.email
 
       l.save
+
+      puts "RRRRRRR: " + l.errors.inspect
       pid = l.pid
 
       lic = Licence.find(pid)
-      lic.name[0].should eq "CC Licence"
-      lic.text[0].should eq "Various text outlining terms of the licence"
-      lic.type[0].should eq Licence::LICENCE_TYPE_PUBLIC
-      lic.ownerId[0].to_i.should eq u.id
-      lic.ownerEmail[0].should eq "test@intersect.org.au"
+      lic.flat_name.should eq "CC Licence " + rnd
+      lic.flat_text.should eq "Various text outlining terms of the licence"
+      lic.flat_type.should eq Licence::LICENCE_TYPE_PUBLIC
+      lic.flat_ownerId.to_i.should eq u.id
+      lic.flat_ownerEmail.should eq "test@intersect.org.au"
     end
 
   end

@@ -35,7 +35,7 @@ describe CollectionList do
       pid = c.pid
 
       coll = CollectionList.find(pid)
-      coll.licence.name[0].should eq "Creative Commons"
+      coll.licence.name[0].should match /Creative Commons [0-9]+/
       coll.licence.text[0].should eq "Creative Commons Licence Terms"
       coll.licence.type[0].should eq Licence::LICENCE_TYPE_PUBLIC
       coll.licence.ownerEmail[0].should eq "test@intersect.org.au"
