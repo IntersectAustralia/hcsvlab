@@ -26,14 +26,14 @@
               .css-dropdown
                 %button.dropdown-toggle.btn.btn-mini{ "data-toggle" => "dropdown" }
                   - if coll_list.licence.present?
-                    = coll_list.licence.name.first
+                    = coll_list.licence.flat_name
                   - else
                     Add Licence
                   %span.caret
                 %ul.dropdown-menu
                   - @licences.each do |lic|
                     %li
-                      %a{:href => "#add_licence", :onClick => "add_licence('#{coll_list.id}', '#{lic.id}');"}= lic.name.first
+                      %a{:href => "#add_licence", :onClick => "add_licence('#{coll_list.id}', '#{lic.id}');"}= lic.flat_name
                   %li
                     = link_to("Create New", {:controller => "licences", :action => "new", :collection => coll_list.id}, :collection => coll_list.id)
             %td
@@ -43,10 +43,10 @@
             .modal.hide.fade{:id => "licence_terms#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
               .modal-header
                 %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                %h3#myModalLabel= coll_list.licence.name.first
+                %h3#myModalLabel= coll_list.licence.flat_name
               #licence_terms_dialog.modal-body{:title => "Licence Terms"}
                 %pre
-                  %textarea#licence_terms_content{:readonly => "true"}= strip_tags(coll_list.licence.text.first).gsub('&nbsp;', '')
+                  %textarea#licence_terms_content{:readonly => "true"}= strip_tags(coll_list.licence.flat_text).gsub('&nbsp;', '')
               .modal-footer
                 %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 

@@ -23,28 +23,32 @@ class LicencesController < ApplicationController
     text = params[:text]
     collectionListId = params[:collectionList]
 
-    # First we have to create the collection.
-    newLicence = Licence.new
-    newLicence.save!
+    begin
+      # First we have to create the collection.
+      newLicence = Licence.new
+      newLicence.name = name
+      newLicence.text = text
+      newLicence.type = Licence::LICENCE_TYPE_PRIVATE
+      newLicence.ownerId = current_user.id.to_s
+      newLicence.ownerEmail = current_user.email
+      newLicence.save!
 
-    newLicence.name = name
-    newLicence.text = text
-    newLicence.type = Licence::LICENCE_TYPE_PRIVATE
-    newLicence.ownerId = current_user.id.to_s
-    newLicence.ownerEmail = current_user.email
-    newLicence.save!
+      # Now lets assign the licence to every collection list
+      if (!collectionListId.nil?)
+        aCollectionList = CollectionList.find(collectionListId)
+        aCollectionList.licence = newLicence
+        aCollectionList.save!
+      end
 
-    # Now lets assign the licence to every collection list
-    if (!collectionListId.nil?)
-      aCollectionList = CollectionList.find(collectionListId)
-      aCollectionList.licence = newLicence
-      aCollectionList.save!
+      flash[:notice] = "Licence created successfully"
+
+      #TODO: This should redirect to
+      redirect_to licences_path
+    rescue ActiveFedora::RecordInvalid => e
+      @params = params
+      @errors = e.record.errors.messages
+      render 'licences/new'
     end
-
-    flash[:notice] = "Licence created successfully"
-
-    #TODO: This should redirect to
-    redirect_to licences_path
   end
 
 end

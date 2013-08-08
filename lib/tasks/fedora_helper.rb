@@ -190,17 +190,25 @@ end
 #
 def create_default_licences
   Rails.root.join("config", "licences").children.each do |lic|
-    l = Licence.new
-    l.save!
-
     lic_info = YAML.load_file(lic)
-    l.name = lic_info['name']
-    l.text = lic_info['text']
-    l.type = Licence::LICENCE_TYPE_PUBLIC
-    l.label = l.name
-    l.save!
 
-    puts "Licence '#{l.name[0].to_s}' = #{l.pid.to_s}" unless Rails.env.test?
+    begin
+      l = Licence.new
+      l.name = lic_info['name']
+      l.text = lic_info['text']
+      l.type = Licence::LICENCE_TYPE_PUBLIC
+      l.label = l.name
+
+      l.save!
+    rescue Exception => e
+      puts "Licence Name: #{l.name} not ingested."
+      puts "ERROR: #{l.errors.messages.inspect}"
+      puts ""
+      next
+    else
+      puts "Licence '#{l.name[0].to_s}' = #{l.pid.to_s}" unless Rails.env.test?
+    end
+
   end
 end
 
