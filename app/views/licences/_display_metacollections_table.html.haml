@@ -14,6 +14,7 @@
           %th.owner Owner
           %th.licence Licence
           %th.status Licence Terms
+          %th.actions
       %tbody
         %tr
         - @collection_lists.each_with_index do |coll_list, index|
@@ -39,6 +40,10 @@
             %td.terms
               - if coll_list.licence.present?
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms#{index}", :role => "button"} View Licence Terms
+            %td.actions
+              =link_to(coll_list, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Collections List "'+ coll_list.name[0] + '"?\', event));', :id => "delete_collections_list_#{coll_list.id}") do
+                %i.icon-trash
+
           - if coll_list.licence.present?
             .modal.hide.fade{:id => "licence_terms#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
               .modal-header

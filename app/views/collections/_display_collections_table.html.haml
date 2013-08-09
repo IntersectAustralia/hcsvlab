@@ -53,7 +53,7 @@
                     %li
                       = link_to("Create New", {:controller => "licences", :action => "new"})
               -else
-                =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.licence.name.first
+                -# =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.licence.name.first
             %td.terms
               -if !(aCollection.collectionList.nil?)
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "", :role => "button"} View Licence Terms

@@ -40,11 +40,11 @@ class CollectionListsController < ApplicationController
       if collectionList.save
         add_collections_to_collection_list(collectionList, collections)
         flash[:notice] = 'Collections list created successfully'
-        redirect_to collectionList
+        redirect_to licences_path
       end
     else
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
-      redirect_to collection_path
+      redirect_to licences_path
     end
 
 
@@ -62,10 +62,10 @@ class CollectionListsController < ApplicationController
 
       add_collections_to_collection_list(collectionLists, collections)
       flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collectionLists.name}"
-      redirect_to collectionLists
+      redirect_to licences_path
     else
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
-      redirect_to collection_path
+      redirect_to licences_path
     end
 
   end
@@ -86,7 +86,7 @@ class CollectionListsController < ApplicationController
     Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
 
     flash[:notice] = "Collection list #{name} deleted successfully"
-    redirect_to collection_lists_path
+    redirect_to licences_path
   end
 
   def add_licence_to_collection
