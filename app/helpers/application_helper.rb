@@ -31,6 +31,15 @@ module ApplicationHelper
     "#{h current_user.full_name}<b class=\"caret\"></b>".html_safe
   end  
 
+  # helper class for tabs, adds 'active' class when on the input path
+  def activepath?(test_path)
+    return 'active' if request.path == test_path
+  end
+
+  def activepath_fuzzy?(test_path)
+    return 'active' if request.path.include?(test_path) == true
+  end
+
   private
   def render_field_content(label, content)
     div_class = cycle("field_bg","field_nobg")

@@ -4,11 +4,11 @@
     - if can?(:read, User)
       .facet_limit
         %h5.twiddle
-          = link_to "List Approved Users", users_path, :class => ""
+          = link_to "List Approved Users", users_path, :class => activepath?(users_path)
     - if can?(:access_requests, User)
       .facet_limit
         %h5.twiddle
-          = link_to "View Access Requests", access_requests_users_path, :class => ""
+          = link_to "View Access Requests", access_requests_users_path, :class => activepath?(access_requests_users_path)
     .facet_limit
       %h5.twiddle
-        = link_to "Manage Licences", licences_path, :class => ""
+        = link_to "Manage Licences", licences_path, :class => activepath?(licences_path)

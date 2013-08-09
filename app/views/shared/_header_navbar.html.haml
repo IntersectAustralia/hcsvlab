@@ -1,0 +1,13 @@
+#header-navbar-fixed-top.navbar.navbar-fixed-top
+  .navbar-inner
+    .container
+      .row-fluid
+        %a.btn.btn-navbar{"data-target" => ".nav-collapse", "data-toggle" => "collapse"}
+        = link_to "HCS vLab", root_path, :class => "brand"
+        %ul.nav
+          %li{ class: activepath?(root_path) }
+            = link_to "Discover", root_path
+          %li{ class: activepath?(item_lists_path) }
+            = link_to "Item Lists", item_lists_path
+        %ul.nav.pull-right
+          = render :partial => '/user_util_links'
