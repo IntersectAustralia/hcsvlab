@@ -8,7 +8,7 @@
   
   <fields>
 
-    <field name="DC_is_part_of"               type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="HCSvLab_collection"          type="string" stored="true" indexed="true" multiValued="true" required="false"/>
     <field name="date_group"                  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
     <field name="AUSNC_mode"                  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
     <field name="AUSNC_speech_style"          type="string" stored="true" indexed="true" multiValued="true" required="false"/>
@@ -19,7 +19,8 @@
     <field name="OLAC_language"               type="string" stored="true" indexed="true" multiValued="true" required="false"/>
     <field name="DC_type"                     type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
 
-    <field name="id" type="string" stored="true" indexed="true" multiValued="false" required="true"/>
+    <field name="HCSvLab_ident" type="string" stored="true" indexed="true" multiValued="false" required="false"/>
+    <field name="id"            type="string" stored="true" indexed="true" multiValued="false" required="true"/>
     <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
     <field name="full_text" type="text" indexed="true" stored="true" multiValued="false" termVectors="true" termPositions="true" termOffsets="true"/>
     <field name="all_metadata" type="text_ws" indexed="true" stored="true" multiValued="true"/>   

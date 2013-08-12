@@ -18,7 +18,8 @@ node(:metadata) do
   do_not_display = {'id' => nil,
              'timestamp' => nil,
              MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
-      'date_group_tesim' => nil,    
+             MetadataHelper::short_form(MetadataHelper::IDENT) => nil,
+      'date_group_tesim' => nil,
           'all_metadata' => nil,
              '_version_' => nil,
             'item_lists' => nil} 
@@ -57,7 +58,7 @@ node(:documents) do
   documents = item_documents(@document, uris)
 
   if documents.present?
-    is_cooee = @document[MetadataHelper::short_form(MetadataHelper::IS_PART_OF)][0] == "cooee"
+    is_cooee = @document[MetadataHelper::short_form(MetadataHelper::COLLECTION)][0] == "cooee"
     type_format = get_type_format(@document, is_cooee)
     hash = {}
     documents.each do |values|

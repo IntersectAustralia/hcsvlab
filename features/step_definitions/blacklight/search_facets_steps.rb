@@ -1,6 +1,6 @@
 # -*- encoding : utf-8 -*-
 Then /^I should see the applied facet "([^\"]*)" with the value "([^\"]*)"$/ do |filter, text|
-  page.should have_selector(".facet_limit") 
+  page.should have_selector(".facet_limit")
   page.should have_selector("h5", :text => filter)
   page.should have_selector("span.selected", :text => text)
 end

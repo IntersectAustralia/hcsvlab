@@ -7,6 +7,8 @@ Feature: Browsing via API
     Given I have users
       | email                        | first_name | last_name |
       | researcher1@intersect.org.au | Researcher | One       |
+      | data_owner@intersect.org.au  | Data_Owner | One       |
+    And "data_owner@intersect.org.au" has role "data owner"
     And "researcher1@intersect.org.au" has role "researcher"
     And "researcher1@intersect.org.au" has an api token
     And "researcher1@intersect.org.au" has item lists

@@ -206,38 +206,14 @@ module Blacklight::BlacklightHelperBehavior
   def document_heading document=nil
     document ||= @document
     begin
-      f1 = MetadataHelper::short_form(MetadataHelper::IS_PART_OF)
-      f2 = MetadataHelper::short_form(MetadataHelper::IDENTIFIER) + "_tesim"
-      if document.has_key?(f1)
-        l1 = document[f1][0]
-      else
-        l1 = ""
-      end
-      if document.has_key?(f2)
-        l2 = document[f2][0]
-      else
-        l2 = ""
-      end
-      l1 + ":" + l2
+      document[MetadataHelper.short_form(MetadataHelper::IDENT)]
     rescue
       document[blacklight_config.show.heading] || document.id
     end
   end
 
   def main_link_label(document)
-    f1 = MetadataHelper::short_form(MetadataHelper::IS_PART_OF)
-    f2 = MetadataHelper::short_form(MetadataHelper::IDENTIFIER) + "_tesim"
-    if document.has_key?(f1)
-      l1 = document[f1].join(', ')
-    else
-      l1 = ""
-    end
-    if document.has_key?(f2)
-      l2 = document[f2].join(', ')
-    else
-      l2 = ""
-    end
-    l1 + ":" + l2
+    document[MetadataHelper.short_form(MetadataHelper::IDENT)]
   end
 
   ##

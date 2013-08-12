@@ -1,6 +1,6 @@
 :facets:
   -
-    :name: DC_is_part_of
+    :name: HCSvLab_collection
     :label: Collection
     :limit: 2000
     :partial: 'catalog/sorted_facet'

@@ -3,9 +3,9 @@ ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 STORE_DOCUMENT_TYPES = ['Text']
 
 
-def create_item_from_file(rdf_file)
+def create_item_from_file(corpus_dir, rdf_file)
   item = Item.new
-  item.save!
+#  item.save!
 
   item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
   item.label = item.rdfMetadata.graph.statements.first.subject
@@ -20,7 +20,12 @@ def create_item_from_file(rdf_file)
   result = query.execute(item.rdfMetadata.graph)[0]
   item.collection = last_bit(result.collection.to_s)
   item.collection_id = result.identifier.to_s
-  
+
+  if Collection.where(short_name: item.collection).count == 0
+    create_collection(item.collection.first, corpus_dir)
+  end
+
+  item.save!
   puts "Item = " + item.pid.to_s
   return item
 end
@@ -40,7 +45,7 @@ def create_collection(collection_name, corpus_dir)
   end
 
   coll = Collection.new
-  coll.save!
+#  coll.save!
 
   coll.rdfMetadata.graph.load(coll_metadata, :format => :ttl, :validate => true)
   coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s

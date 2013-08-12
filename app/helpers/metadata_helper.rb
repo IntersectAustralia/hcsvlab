@@ -22,6 +22,7 @@ private
   FOAF_BASE_URI       = 'http://xmlns.com/foaf/0.1/'
   RDF_BASE_URI        = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   LOC_BASE_URI        = 'http://id.loc.gov/vocabulary/relators/'
+  HCSVLAB_BASE_URI    = 'http://hcsvlab.org/vocabulary/'
 
   AUSTALK_BASE_URI = 'http://ns.austalk.edu.au/'
 
@@ -45,7 +46,9 @@ private
     RDF_BASE_URI         => "RDF",
     LOC_BASE_URI         => "LoC",
 
-    AUSTALK_BASE_URI     => "AUSTALK"
+    AUSTALK_BASE_URI     => "AUSTALK",
+
+    HCSVLAB_BASE_URI     => "HCSvLab"
   }
 
 public
@@ -144,6 +147,12 @@ public
   AUSTALK_SESSION       = RDF::URI(AUSTALK_BASE_URI + 'session') unless const_defined?(:AUSTALK_SESSION)
   AUSTALK_TIMESTAMP     = RDF::URI(AUSTALK_BASE_URI + 'timestamp') unless const_defined?(:AUSTALK_TIMESTAMP)
   AUSTALK_VERSION       = RDF::URI(AUSTALK_BASE_URI + 'version') unless const_defined?(:AUSTALK_VERSION)
+
+  #
+  # HCSVLAB
+  #
+  COLLECTION = RDF::URI(HCSVLAB_BASE_URI + 'collection') unless const_defined?(:COLLECTION)
+  IDENT      = RDF::URI(HCSVLAB_BASE_URI + 'ident') unless const_defined?(:IDENT)
 
   #
   # short_form - return a shortened form of the given uri (which will

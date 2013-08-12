@@ -138,7 +138,7 @@ namespace :fedora do
     end
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    reindex_item(item_id, stomp_client)
+    reindex_item_by_id(item_id, stomp_client)
     stomp_client.close
   end
 
@@ -162,9 +162,28 @@ namespace :fedora do
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     objects.each do |obj|
-      id = obj["id"].to_s
-      reindex_item(id, stomp_client)
+      reindex_item(obj, stomp_client)
     end
+    stomp_client.close
+
+  end
+
+
+  #
+  # Reindex the whole blinkin' lot
+  #
+  task :reindex_all => :environment do
+
+    items = Item.all
+
+    puts "Reindexing everything - " + items.size.to_s + " objects"
+
+    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+
+    items.each { |item|
+      reindex_item(item, stomp_client)
+    }
+
     stomp_client.close
 
   end
@@ -238,14 +257,14 @@ namespace :fedora do
     end
     puts "#{Time.new.to_s} - Ingesting item: " + rdf_file.to_s
     STDOUT.flush
-    item = create_item_from_file(rdf_file)
+    item = create_item_from_file(corpus_dir, rdf_file)
     look_for_annotations(item, rdf_file) if annotations
     look_for_documents(item, corpus_dir, rdf_file)
     item.save!
 
-    if Collection.where(short_name: item.collection).count == 0
-      create_collection(item.collection.first, corpus_dir)
-    end
+#    if Collection.where(short_name: item.collection).count == 0
+#      create_collection(item.collection.first, corpus_dir)
+#    end
 
     # Msg to fedora.apim.update
     begin
@@ -259,10 +278,15 @@ namespace :fedora do
   end
 
 
-  def reindex_item(item_id, stomp_client)
-    puts "Reindexing item: " + item_id
-    Item.find(item_id).update_index
-    stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
+  def reindex_item(item, stomp_client)
+    puts "Reindexing item: " + item.id
+    item.update_index
+    stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item.id}")
+  end
+
+
+  def reindex_item_by_id(item_id, stomp_client)
+    reindex_item(Item.find(item_id), stomp_client)
   end
 
 

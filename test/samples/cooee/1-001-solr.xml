@@ -10,7 +10,8 @@
   <field name="http_ns_ausnc_org_au_schemas_localityName_tesim">New_South_Wales</field>
   <field name="DC_created_tesim">1788</field>
   <field name="DC_identifier_tesim">1-001</field>
-  <field name="DC_is_part_of">cooee</field>
+  <field name="HCSvLab_collection">cooee</field>
+  <field name="HCSvLab_ident">cooee:1-001</field>
   <field name="DC_source_tesim">Niall, 1998</field>
   <field name="PURL_BIBO_pages_tesim">10-11</field>
   <field name="OLAC_language">eng</field>

@@ -9,6 +9,7 @@ development:
 
 test:
   <<: *defaults
+  default_data_owner: data_owner@intersect.org.au
 
 production:
   <<: *defaults

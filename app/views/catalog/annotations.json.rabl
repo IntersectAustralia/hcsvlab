@@ -11,7 +11,7 @@ else
   data = []
   uri = buildURI(@item.id, 'annotationSet1')
   repo = RDF::Repository.load(uri)
-  corpus = @document["DC_is_part_of"].first
+  corpus = @document[MetadataHelper::short_form(MetadataHelper::COLLECTION)].first
   queryConfig = YAML.load_file(Rails.root.join("config", "sparql.yml"))
 
   if !@item.primary_text.content.nil?

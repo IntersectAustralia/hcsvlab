@@ -230,14 +230,29 @@ private
   def make_solr_document(object, results, full_text, extras)
     result = {}
     configured_fields_found = Set.new()
+    ident_parts = {}
 
-    results.each { |binding| 
+    results.each { |binding|
+
+      # Set the defaults for field and value
+      field = binding[:predicate].to_s
+      value = last_bit(binding[:object])
+
+      # Now check for special cases
       if binding[:predicate] == MetadataHelper::CREATED
-        field = binding[:predicate].to_s
         value = binding[:object].to_s
-      else
-        field = binding[:predicate].to_s
-        value = last_bit(binding[:object])
+      elsif binding[:predicate] == MetadataHelper::IS_PART_OF
+        # Check whether this is telling us the object is part of a collection
+        collection = find_collection(binding[:object])
+
+        unless collection.nil?
+          # This is pointing at a collection, so treat it differently
+          field = MetadataHelper::COLLECTION
+          value = collection.short_name[0]
+          ident_parts[:collection] = value
+        end
+      elsif binding[:predicate] == MetadataHelper::IDENTIFIER
+        ident_parts[:identifier] = value
       end
 
 
@@ -275,6 +290,9 @@ private
     ::Solrizer::Extractor.insert_solr_field_value(result, :item_lists, default_il)
     logger.debug "\tAdding configured field #{:id} with value #{object}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
+    ident = ident_parts[:collection] + ":" + ident_parts[:identifier]
+    logger.debug "\tAdding configured field #{:HCSvLab_ident} with value #{ident}"
+    ::Solrizer::Extractor.insert_solr_field_value(result, :HCSvLab_ident, ident)
 
     # Add in defaults for the configured fields we haven't found so far
     @@configured_fields.each { |field|
@@ -515,6 +533,23 @@ private
   # Utility methods
   # =============================================================================
   #
+
+  #
+  # Look for a collection which the given URI might indicate. If we find one,
+  # return it, otherwise return nil.
+  #
+  def find_collection(uri)
+    uri = uri.to_s
+    c = Collection.find_by_uri(uri)
+    c = Collection.find_by_short_name(last_bit(uri)) if c.size == 0
+    if c.size == 0
+      c = nil
+    else
+      c = c[0]
+    end
+    return c
+  end
+
 
   #
   # Extract the last part of a path/URI/slash-separated-list-of-things

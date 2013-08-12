@@ -48,6 +48,7 @@
                'timestamp' => nil,
                'full_text' => nil,
      MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
+     MetadataHelper::short_form(MetadataHelper::IDENT) => nil,
                  'date_group_tesim' => nil,
                  'all_metadata' => nil,
                  '_version_' => nil,
@@ -69,7 +70,7 @@
 - if documents.empty?
   %em This Item has no documents
 - else
-  - is_cooee = document[MetadataHelper::short_form(MetadataHelper::IS_PART_OF)][0] == "cooee"
+  - is_cooee = document[MetadataHelper::short_form(MetadataHelper::COLLECTION)][0] == "cooee"
   - type_format = get_type_format(document, is_cooee)
   %table.document-table.table.table-striped{:border => "0"}
     %thead

@@ -28,6 +28,10 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   item.collection_id = result.identifier.to_s
   item.save!
 
+  if Collection.where(short_name: item.collection).count == 0
+    create_collection(item.collection.first, "#{SAMPLE_FOLDER}/#{corpus}")
+  end
+
   look_for_annotations(item, rdf_file)
   look_for_documents(item, "#{SAMPLE_FOLDER}/#{corpus}", rdf_file)
  
