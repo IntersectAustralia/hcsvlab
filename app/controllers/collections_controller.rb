@@ -1,6 +1,6 @@
 class CollectionsController < ApplicationController
   before_filter :authenticate_user!
-  load_and_authorize_resource
+  #load_and_authorize_resource
 
   PER_PAGE_RESULTS = 20
 
@@ -17,6 +17,17 @@ class CollectionsController < ApplicationController
   end
 
   def new
+  end
+
+  def add_licence_to_collection
+    collection = Collection.find(params[:collection_id])
+    licence = Licence.find (params[:licence_id])
+
+    collection.setLicence(licence)
+
+    flash[:notice] = "Successfully added licence to #{collection.flat_short_name}"
+    redirect_to licences_path
+
   end
 
   private

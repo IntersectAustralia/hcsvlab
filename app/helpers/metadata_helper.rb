@@ -153,6 +153,7 @@ public
   #
   COLLECTION = RDF::URI(HCSVLAB_BASE_URI + 'collection') unless const_defined?(:COLLECTION)
   IDENT      = RDF::URI(HCSVLAB_BASE_URI + 'ident') unless const_defined?(:IDENT)
+  HAS_LICENCE= RDF::URI(HCSVLAB_BASE_URI + 'has_licence') unless const_defined?(:HAS_LICENCE)
 
   #
   # short_form - return a shortened form of the given uri (which will

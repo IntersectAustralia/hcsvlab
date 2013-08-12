@@ -7,13 +7,15 @@ class LicencesController < ApplicationController
   PER_PAGE_RESULTS = 20
 
   def index
-    @licences = Licence.where(type: Licence::LICENCE_TYPE_PUBLIC).to_a.concat(Licence.where(ownerId: current_user.id.to_s).to_a)
-    @collection_lists = CollectionList.where(ownerId: current_user.id.to_s).to_a
-    #
-    # used to populate the drop downs
-    @collectionLists = CollectionList.find(ownerEmail: current_user.email)
+    # gets PUBLIC licences and the user licences.
+    @licences = Licence.find(type: Licence::LICENCE_TYPE_PUBLIC).to_a.concat(Licence.where(ownerId: current_user.id.to_s).to_a)
 
+    # gets the Collections list of the logged user.
+    @collection_lists = CollectionList.find(ownerId: current_user.id.to_s).to_a
+
+    # gets the Collections of the logged user.
     @collections = Collection.find(private_data_owner: current_user.email)
+
 
     create_pagination_structure(params)
 
@@ -23,10 +25,15 @@ class LicencesController < ApplicationController
   end
 
   def new
-    if params[:collection].present?
-      @CollectionList = CollectionList.find(params[:collection])
+    if params[:collectionList].present?
+      @CollectionList = CollectionList.find(params[:collectionList])
+      @Collection = nil
+    elsif params[:collection].present?
+      @Collection = Collection.find(params[:collection])
+      @CollectionList = nil
     else
       @CollectionList = nil
+      @Collection = nil
     end
   end
 
@@ -34,6 +41,7 @@ class LicencesController < ApplicationController
     name = params[:name]
     text = params[:text].gsub('\'', '"')
     collectionListId = params[:collectionList]
+    collectionId = params[:collection]
 
     begin
       tags = %w(a acronym b strong i em li ul ol h1 h2 h3 h4 h5 h6 blockquote br cite sub sup ins p table td tr)
@@ -51,8 +59,10 @@ class LicencesController < ApplicationController
       # Now lets assign the licence to every collection list
       if (!collectionListId.nil?)
         aCollectionList = CollectionList.find(collectionListId)
-        aCollectionList.licence = newLicence
-        aCollectionList.save!
+        aCollectionList.add_licence(newLicence.id)
+      elsif (!collectionId.nil?)
+        aCollection = Collection.find(collectionId)
+        aCollection.setLicence(newLicence)
       end
 
       flash[:notice] = "Licence created successfully"

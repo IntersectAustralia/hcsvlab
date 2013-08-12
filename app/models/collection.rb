@@ -8,6 +8,7 @@ class Collection < ActiveFedora::Base
 
   has_many :items, :property => :is_member_of
   belongs_to :collectionList, :property => :is_part_of
+  belongs_to :licence, :property => :has_licence
 
   # uri is the unique id of the collection, e.g. http://ns.ausnc.org.au/corpora/cooee
   delegate :uri,        to: 'descMetadata'
@@ -18,6 +19,21 @@ class Collection < ActiveFedora::Base
   # data_owner is the e-mail address of the colection's owner.
   delegate :private_data_owner, to: 'descMetadata'
 
+
+  # ActiveFedora returns the value as an array, we need the first value
+  def flat_short_name
+    self[:short_name].first
+  end
+
+  # ActiveFedora returns the value as an array, we need the first value
+  def flat_uri
+    self[:uri].first
+  end
+
+  # ActiveFedora returns the value as an array, we need the first value
+  def flat_private_data_owner
+    self[:private_data_owner].first
+  end
 
   # ---------------------------------------
 
@@ -60,6 +76,11 @@ class Collection < ActiveFedora::Base
 
   def setCollectionList(collectionList)
     self.collectionList = collectionList
+    self.save!
+  end
+
+  def setLicence(aLicence)
+    self.licence = aLicence
     self.save!
   end
 

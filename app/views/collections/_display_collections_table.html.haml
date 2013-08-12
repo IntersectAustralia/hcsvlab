@@ -5,15 +5,15 @@
         Add selected to Collection list
         %span.caret
       %ul#create_list_drop_down.dropdown-menu
-        -@collectionLists.each do |aCollectionList|
+        -@collection_lists.each do |aCollectionList|
           %li
             %a{:href => "#add_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
-              =aCollectionList.name[0]
+              =aCollectionList.flat_name
         %li.divider
         %li
           %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
     %label#showhide-assigned.btn.checkbox
-      %input{:type => "checkbox"} Hide grouped Collections
+      %input{type: "checkbox", onClick: "show_or_hide_grouped_collections()"} Hide grouped Collections
 
   #documents
     %table.table.table-condensed
@@ -28,35 +28,48 @@
           %th.licence Licence
           %th.terms Licence Terms
       %tbody
-        - @collections.each do |aCollection|
-          %tr
+        - @collections.each_with_index do |aCollection, index|
+          %tr{class: (aCollection.collectionList.nil?)? "" : "groupedCollection" }
             %td.checkbox_field
               -if (aCollection.collectionList.nil?)
                 %input.toggle_item_list{:name => "#{aCollection.id}", :type => "checkbox"}/
             %td.name
-              = aCollection.short_name[0]
+              = aCollection.flat_short_name
             %td.collection
               -if !(aCollection.collectionList.nil?)
                 .label.licence
-                  =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.name[0]
+                  =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.flat_name
                   %a.remove
             %td.licence
               -if (aCollection.collectionList.nil?)
                 .css-dropdown
                   %button.dropdown-toggle.btn.btn-mini{ "data-toggle" => "dropdown" }
-                    Add Licence
+                    - if aCollection.licence.present?
+                      = aCollection.licence.flat_name
+                    - else
+                      Add Licence
                     %span.caret
                   %ul.dropdown-menu
-                    %li
-                      %a{:href => "#add_licence", :onClick => "add_licence"} Licence Name
+                    - @licences.each do |lic|
+                      %li
+                        %a{:href => "#add_licence_to_collection", :onClick => "add_licence_to_collection('#{aCollection.id}', '#{lic.id}');"}= lic.flat_name
                     %li.divider
                     %li
-                      = link_to("Create New", {:controller => "licences", :action => "new"})
+                      = link_to("Create New", {:controller => "licences", :action => "new", :collection => aCollection.id}, :collection => aCollection.id, :onClick => "showProgressAnimation();")
               -else
-                -# =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.licence.name.first
+                =(aCollection.collectionList.licence.nil?)? "" :aCollection.collectionList.licence.flat_name
             %td.terms
-              -if !(aCollection.collectionList.nil?)
-                %a.btn.btn-mini{"data-toggle" => "modal", :href => "", :role => "button"} View Licence Terms
+              -if (aCollection.licence.present?)
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms_collection#{index}", :role => "button"} View Licence Terms
+                .modal.hide.fade.in{:id => "licence_terms_collection#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+                  .modal-header
+                    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+                    %h3#myModalLabel= aCollection.licence.flat_name
+                  #licence_terms_dialog.modal-body{:title => "Licence Terms"}
+                    #licence_terms_content{:readonly => "true"}= aCollection.licence.flat_text.html_safe
+                  .modal-footer
+                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+
 
 
 #new_collection_list.modal.hide.fade{ tabindex:"-1", role:"dialog", 'aria-labelledby'=>"myModalLabel", 'aria-hidden'=>"true"}
@@ -69,30 +82,31 @@
         #collection_list_error.create_collection_list_error
         %br
         = f.label :name
-        = f.text_field :name
+        = f.text_field :name, {value:"", id: "name_for_add_collection_to_new_collection_list"}
 
-        = hidden_field_tag :sel_collection_ids
-        = hidden_field_tag :all_collections
+        = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_new_collection_list"}
+        = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_new_collection_list"}
 
     .modal-footer
       %a.btn{:"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
         Close
       = f.submit "Create Collections List", class: "btn btn-primary", id:"new_collection_list_submit"
 
+= form_tag({:controller => "collection_lists", :action => "add_collections"}, :id => "add_collection_to_collection_list", :onSubmit => "showProgressAnimation();")  do
+  = hidden_field_tag :id, nil, {id: "id_for_add_collection_to_collection_list"}
+  = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_collection_list"}
+  = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_collection_list"}
+
+= form_tag({:controller => "collections", :action => "add_licence_to_collection"}, :id => "add_licence_to_collection_form", :onSubmit => "showProgressAnimation();") do
+  = hidden_field_tag :collection_id, nil, {id: "collection_id_for_add_licence_to_collection"}
+  = hidden_field_tag :licence_id, nil, {id: "licence_id_for_add_licence_to_collection"}
 
 = render :partial=>"shared/modal_waiting_panel"
-
-
-= form_tag({:controller => "collection_lists", :action => "add_collections"}, :id => "add_to_collection_list", :onSubmit => "showProgressAnimation();")  do
-  = hidden_field_tag :id, "", {id: "collection_list_id"}
-  = hidden_field_tag :sel_collection_ids_for_existing
-  = hidden_field_tag :all_collections_for_existing
-
 
 :javascript
   jQuery("#new_collection_list").submit( function() {
       jQuery("#new_collection_list_submit").attr('disabled','disabled');
-      var new_name = jQuery("#collection_list_name").val().trim()
+      var new_name = jQuery("#name_for_add_collection_to_new_collection_list").val().trim()
       if(new_name == "") {
         jQuery("#collection_list_error").text("Name can't be blank");
         jQuery("#new_collection_list_submit").removeAttr('disabled');
@@ -160,30 +174,58 @@
     jQuery("#collection_list_name").val("");
   };
 
+  function show_or_hide_grouped_collections() {
+    if (jQuery(".groupedCollection")[0].style.display == "none") {
+      jQuery(".groupedCollection").css( "display", "" );
+    } else {
+      jQuery(".groupedCollection").css( "display", "none" );
+    }
+  }
+
+  function add_licence_to_collection(collection_id, licence_id) {
+    showProgressAnimation();
+    $("#collection_id_for_add_licence_to_collection").val(collection_id);
+    $("#licence_id_for_add_licence_to_collection").val(licence_id);
+    $("#add_licence_to_collection_form").submit();
+  };
+
+  /*
+   * This will fill the form for the action: "ADD SELECTED TO A NEW COLLECTION LIST"
+   */
   jQuery("#create_collection_list").click( function() {
   	clearData();
-    generateCollectionsIds("#sel_collection_ids");
-    jQuery("#all_collections").val("false");
+    generateCollectionsIds("#collection_ids_for_add_collection_to_new_collection_list");
+    jQuery("#add_all_collections_for_add_collection_to_new_collection_list").val("false");
   });
 
+
+  /*
+   * This will fill the form for the action: "ADD ALL TO A NEW COLLECTION LIST"
+   */
   jQuery("#create_all_collection_list").click( function() {
   	clearData();
-    jQuery("#all_collections").val("true");
+    jQuery("#add_all_collections_for_add_collection_to_new_collection_list").val("true");
   });
 
+  /*
+   * This will fill the form for the action: "ADD SELECTED TO AN EXISTING COLLECTION LIST"
+   */
   jQuery("A[href='#add_to_existing_collection_list']").click( function() {
     collectionListId=$(this).attr('id');
-    generateCollectionsIds("#sel_collection_ids_for_existing");
-    jQuery("#collection_list_id").val(collectionListId);
-    jQuery("#all_collections_for_existing").val("false");
-    jQuery("#add_to_collection_list").submit();
+    generateCollectionsIds("#collection_ids_for_add_collection_to_collection_list");
+    jQuery("#id_for_add_collection_to_collection_list").val(collectionListId);
+    jQuery("#add_all_collections_for_add_collection_to_collection_list").val("false");
+    jQuery("#add_collection_to_collection_list").submit();
   });
 
+  /*
+   * This will fill the form for the action: "ADD ALL TO AN EXISTING COLLECTION LIST"
+   */
   jQuery("A[href='#add_all_to_existing_collection_list']").click( function() {
     collectionListId=$(this).attr('id');
-    jQuery("#collection_list_id").val(collectionListId);
-    jQuery("#all_collections_for_existing").val("true");
-    jQuery("#add_to_collection_list").submit();
+    jQuery("#id_for_add_collection_to_collection_list").val(collectionListId);
+    jQuery("#add_all_collections_for_add_collection_to_collection_list").val("true");
+    jQuery("#add_collection_to_collection_list").submit();
   });
 
   //Set focus to the first element in the form of the modal panel

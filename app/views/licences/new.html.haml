@@ -1,11 +1,18 @@
 = render 'admin/admin_menu'
 .span9
-  - if @CollectionList.nil?
-    %h2 Create a new Licence
-  - else
+  - if (!@CollectionList.nil?)
     %h2
-      Create a new Licence for
-      =@CollectionList.name.first
+      Create a new Licence for Collection List
+      =@CollectionList.flat_name
+  - elsif (!@Collection.nil?)
+    %h2
+      Create a new Licence for Collection
+      =@Collection.flat_short_name
+  -else
+    %h2 Create a new Licence
+
+  - if @CollectionList.nil?
+  - else
   = tinymce_assets
   - if (!@errors.nil? and !@errors.empty?)
     %div
@@ -21,6 +28,8 @@
       = text_area_tag 'text', ((@params.nil?)? nil:@params[:text]), rows: 10, cols: 25, class: "tinymce"
       - if !@CollectionList.nil?
         = hidden_field_tag 'collectionList', @CollectionList.id.to_s
+      - elsif !@Collection.nil?
+        = hidden_field_tag 'collection', @Collection.id.to_s
       .form-actions
         %button.btn.btn-primary{:name => "commit", :type => "submit"} Create
 

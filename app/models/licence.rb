@@ -52,7 +52,6 @@ class Licence < ActiveFedora::Base
   def uniqueLicenceName
     licencesNames = Licence.find(type:LICENCE_TYPE_PUBLIC).map {|aLicence| aLicence.flat_name}
     if (!self.flat_ownerId.nil? and !self.flat_ownerId.empty?)
-      puts "Owner is not null: " + self.flat_ownerId.to_s
       licencesNames << Licence.find(ownerId: self.ownerId).map {|aLicence| aLicence.flat_name}
     end
     if (licencesNames.include?(self.flat_name))

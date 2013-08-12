@@ -2,62 +2,76 @@
   -# #sortAndPerPage.clearfix
   -#   %a.btn.pull-left{:href => new_licence_path} Create New Licence
 
-  = form_tag({:controller => "collection_lists", :action => "add_licence_to_collection"}, :id => "add_licence_form") do
-    = hidden_field_tag :collection_id
-    = hidden_field_tag :licence_id
-
   #collections
-    %table#blacklight_results.table.table-condensed
-      %thead
-        %tr
-          %th.name Collection List
-          %th.owner Owner
-          %th.licence Licence
-          %th.status Licence Terms
-          %th.actions
-      %tbody
-        %tr
-        - @collection_lists.each_with_index do |coll_list, index|
+    - if (@collection_lists.empty?)
+      %div
+        There are no Collection Lists created.
+    - else
+      %table#blacklight_results.table.table-condensed
+        %thead
           %tr
-            %td.name
-              =link_to coll_list.name.first, collection_list_path(coll_list)
+            %th.name Collection List
+            %th.owner Owner
+            %th.licence Licence
+            %th.status Licence Terms
+            %th.actions
+        %tbody
+          %tr
+          - @collection_lists.each_with_index do |coll_list, index|
+            %tr
+              %td.name
+                =link_to coll_list.flat_name, collection_list_path(coll_list)
 
-            %td.owner= coll_list.ownerEmail.first
-            %td.licence
-              .css-dropdown
-                %button.dropdown-toggle.btn.btn-mini{ "data-toggle" => "dropdown" }
-                  - if coll_list.licence.present?
-                    = coll_list.licence.flat_name
-                  - else
-                    Add Licence
-                  %span.caret
-                %ul.dropdown-menu
-                  - @licences.each do |lic|
+              %td.owner= coll_list.flat_ownerEmail
+              %td.licence
+                .css-dropdown
+                  %button.dropdown-toggle.btn.btn-mini{ "data-toggle" => "dropdown" }
+                    - if coll_list.licence.present?
+                      = coll_list.licence.flat_name
+                    - else
+                      Add Licence
+                    %span.caret
+                  %ul.dropdown-menu
+                    - @licences.each do |lic|
+                      %li
+                        %a{:href => "#add_licence_to_collection_list", :onClick => "add_licence_to_collection_list('#{coll_list.id}', '#{lic.id}');"}= lic.flat_name
+                    %li.divider
                     %li
-                      %a{:href => "#add_licence", :onClick => "add_licence('#{coll_list.id}', '#{lic.id}');"}= lic.flat_name
-                  %li
-                    = link_to("Create New", {:controller => "licences", :action => "new", :collection => coll_list.id}, :collection => coll_list.id)
-            %td.terms
-              - if coll_list.licence.present?
-                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms#{index}", :role => "button"} View Licence Terms
-            %td.actions
-              =link_to(coll_list, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Collections List "'+ coll_list.name[0] + '"?\', event));', :id => "delete_collections_list_#{coll_list.id}") do
-                %i.icon-trash
+                      = link_to("Create New", {:controller => "licences", :action => "new", :collectionList => coll_list.id}, :collectionList => coll_list.id, :onClick => "showProgressAnimation();")
+              %td.terms
+                - if coll_list.licence.present?
+                  %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms_collection_list#{index}", :role => "button"} View Licence Terms
+                  .modal.hide.fade.in{:id => "licence_terms_collection_list#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+                    .modal-header
+                      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+                      %h3#myModalLabel= coll_list.licence.flat_name
+                    #licence_terms_dialog.modal-body{:title => "Licence Terms"}
+                      #licence_terms_content{:readonly => "true"}= coll_list.licence.flat_text.html_safe
+                    .modal-footer
+                      %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+              %td.actions
+                =link_to(coll_list, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Collections List "'+ coll_list.flat_name + '"?\', event));', :id => "delete_collections_list_#{coll_list.id}") do
+                  %i.icon-trash
 
-          - if coll_list.licence.present?
-            .modal.hide.fade{:id => "licence_terms#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
-              .modal-header
-                %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                %h3#myModalLabel= coll_list.licence.flat_name
-              #licence_terms_dialog.modal-body{:title => "Licence Terms"}
-                %p#licence_terms_content{:readonly => "true"}= strip_tags(coll_list.licence.flat_text.first).gsub('&nbsp;', '')
-              .modal-footer
-                %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+= form_tag({:controller => "collection_lists", :action => "add_licence_to_collection_list"}, :id => "add_licence_to_collection_list_form", :onSubmit => "showProgressAnimation();") do
+  = hidden_field_tag :id, nil,  {id: "id_for_add_licence_to_collection_list"}
+  = hidden_field_tag :licence_id, nil, {id: "licence_id_add_licence_to_collection_list"}
 
 :javascript
 
-  function add_licence(collection_id, licence_id) {
-    $("#collection_id").val(collection_id);
-    $("#licence_id").val(licence_id);
-    $("#add_licence_form").submit();
+  function add_licence_to_collection_list(collection_id, licence_id) {
+    $("#id_for_add_licence_to_collection_list").val(collection_id);
+    $("#licence_id_add_licence_to_collection_list").val(licence_id);
+    $("#add_licence_to_collection_list_form").submit();
   };
+
+  function confirmDelete(text, event) {
+    if (confirm(text)) {
+      showProgressAnimation();
+      return true;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+
+    return false;
+  }

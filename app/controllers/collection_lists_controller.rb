@@ -25,10 +25,10 @@ class CollectionListsController < ApplicationController
   end
 
   def create
-    if params[:all_collections] == 'true'
+    if params[:add_all_collections] == 'true'
       collections = Collection.find_by_owner_email_and_unassigned(current_user.email).map{ |c| c.id}
     else
-      collections = params[:sel_collection_ids].split(",")
+      collections = params[:collection_ids].split(",")
     end
 
     if (collections.length > 0)
@@ -51,17 +51,17 @@ class CollectionListsController < ApplicationController
   end
 
   def add_collections
-    if params[:all_collections_for_existing] == "true"
+    if params[:add_all_collections] == "true"
       collections = Collection.find_by_owner_email_and_unassigned(current_user.email).map{ |c| c.id}
     else
-      collections = params[:sel_collection_ids_for_existing].split(",")
+      collections = params[:collection_ids].split(",")
     end
 
     if (collections.length > 0)
-      collectionLists = CollectionList.find(params[:id])
+      collectionList = CollectionList.find(params[:id])
 
-      add_collections_to_collection_list(collectionLists, collections)
-      flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collectionLists.name}"
+      add_collections_to_collection_list(collectionList, collections)
+      flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collectionList.flat_name}"
       redirect_to licences_path
     else
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
@@ -75,9 +75,10 @@ class CollectionListsController < ApplicationController
 
     collectionList = CollectionList.find(params[:id])
 
-    name = collectionList.name[0]
+    name = collectionList.flat_name
     collectionList.collections.each do |aCollection|
       aCollection.collectionList = nil
+      aCollection.licence = nil
       aCollection.save!
     end
 
@@ -89,11 +90,11 @@ class CollectionListsController < ApplicationController
     redirect_to licences_path
   end
 
-  def add_licence_to_collection
-    collection = CollectionList.find(params[:collection_id])
-    collection.add_licence(params[:licence_id])
+  def add_licence_to_collection_list
+    collectionList = CollectionList.find(params[:id])
+    collectionList.add_licence(params[:licence_id])
 
-    flash[:notice] = "Successfully added licence to #{collection.name.first}"
+    flash[:notice] = "Successfully added licence to #{collectionList.flat_name}"
     redirect_to licences_path
   end
 

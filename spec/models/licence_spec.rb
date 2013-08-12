@@ -16,8 +16,6 @@ describe Licence do
       l.ownerEmail = u.email
 
       l.save
-
-      puts "RRRRRRR: " + l.errors.inspect
       pid = l.pid
 
       lic = Licence.find(pid)
