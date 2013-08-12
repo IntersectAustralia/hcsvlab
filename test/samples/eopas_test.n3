@@ -1,0 +1,14 @@
+@prefix eopas_test: <http://ns.ausnc.org.au/corpus/EOPAS_TEST/EOPAS_TEST> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix cld: <http://purl.org/cld/terms/> .
+@prefix marcrel: <http://www.loc.gov/loc.terms/relators/> .
+
+eopas_test:
+      a dcmitype:Collection ;
+      dc:title "Data for testing the EOPAS connections" ;
+      dcterms:alternative "EOPAS_TEST" ;
+      dcterms:abstract "The Pacific and Regional Archive for Digital Sources in Endangered Cultures offers a facility for digital conservation and access to endangered materials from all over the world. Our research group has developed models to ensure that the archive can provide access to interested communities and conforms to emerging international standards for digital archiving. A primary motivation for this project is making field recordings available to those recorded and their descendants." ;
+      .
+

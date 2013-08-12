@@ -12,8 +12,12 @@
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
+/log/*.output
 /tmp
 /.idea
 /coverage
 
 *.swp
+
+# Not everyone has a Mac...
+.DS_Store
