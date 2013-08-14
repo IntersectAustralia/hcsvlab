@@ -97,8 +97,8 @@ Feature: Searching item lists
     When I fill in "Frequency search for" with "can"
     And I press "execute_frequency_search"
     Then frequency search for "can" in item list "Frequency search" should show this results
-      | facetValue | matchingDocuments | termOccurrences |
-      | auslit     | 1                 | 131             |
+      | facetValue | matchingDocuments | totalDocs | termOccurrences | totalWords |
+      | auslit     | 1                 | 1         | 131             | 89728      |
 
   Scenario: Doing a frequency search for words word (what)
     And "researcher@intersect.org.au" has item lists
@@ -112,8 +112,8 @@ Feature: Searching item lists
     When I fill in "Frequency search for" with "what"
     And I press "execute_frequency_search"
     Then frequency search for "what" in item list "Frequency search" should show this results
-      | facetValue      | matchingDocuments | termOccurrences   |
-      | 1890 - 1899     | 1                 | 219               |
+      | facetValue      | matchingDocuments | totalDocs | termOccurrences | totalWords |
+      | 1890 - 1899     | 1                 | 1         | 219             | 89728      |
 
   Scenario: Doing a frequency search for words with apostrophes (what's)
     And "researcher@intersect.org.au" has item lists
@@ -127,8 +127,8 @@ Feature: Searching item lists
     When I fill in "Frequency search for" with "what's"
     And I press "execute_frequency_search"
     Then frequency search for "what's" in item list "Frequency search" should show this results
-      | facetValue | matchingDocuments | termOccurrences |
-      | auslit     | 1                 | 10              |
+      | facetValue | matchingDocuments | totalDocs | termOccurrences | totalWords |
+      | auslit     | 1                 | 1         | 10              | 89728      |
 
   Scenario: Doing an empty frequency search
     And "researcher@intersect.org.au" has item lists
