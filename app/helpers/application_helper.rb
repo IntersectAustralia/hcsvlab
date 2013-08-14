@@ -70,4 +70,21 @@ module ApplicationHelper
     html.html_safe
   end
 
+  def render_frequency_search_items(num, den, zero_dp = true)
+    if num == "###"
+      return num
+    end
+
+    num = num.to_i
+    den = den.to_i
+
+    if den == 0
+      result = '0 / 0'
+    elsif zero_dp
+      result = sprintf('%d / %d (%3d%%)', num, den, (num*100)/den)
+    else
+      result = sprintf('%d / %d (%6.3f%%)', num, den, (num*100.0)/den)
+    end
+    return result
+  end
 end
