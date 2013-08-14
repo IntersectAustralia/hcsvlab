@@ -14,6 +14,14 @@ Feature: Managing Collection Lists and Licences
     And I am on the licences page
 
   @javascript
+  Scenario: Verifying initial page data
+    And I should see "There are no Collection Lists created."
+    And The Collection table should have
+      |collection |collection_list    | licence     | licence_terms |
+      |cooee      |                   | Add Licence |               |
+      |austlit    |                   | Add Licence |               |
+
+  @javascript
   Scenario: Creating an empty Collection List
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
