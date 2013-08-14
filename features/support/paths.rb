@@ -60,6 +60,9 @@ module NavigationHelpers
       when /^the catalog page for "(.*)"$/
         catalog_path(Item.find($1), options)
 
+      when /^the licences page$/
+        licences_path(options)
+
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:
 #

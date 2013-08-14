@@ -1,7 +1,6 @@
 include ActiveFedora::DatastreamCollections
 
-class CollectionList  < ActiveFedora::Base
-
+class CollectionList < ActiveFedora::Base
   has_metadata 'descMetadata', type: Datastream::CollectionListMetadata
 
   has_many :collections, :property => :is_member_of
@@ -67,7 +66,7 @@ class CollectionList  < ActiveFedora::Base
   #
   # Adds licence to collection list
   #
-  def add_licence(licence_id)
+  def setLicence(licence_id)
   	Rails.logger.debug "Adding licence #{licence_id} to collection list #{self.id}"
   	aLicence = Licence.find(licence_id)
 
@@ -80,8 +79,28 @@ class CollectionList  < ActiveFedora::Base
   	self.save!
   end
 
+  def delete
+    removeLicenceFromCollections
+    super
+  end
+
   private
 
+  #
+  # Removes the licence of every Collection contained in this Collection List
+  #
+  def removeLicenceFromCollections
+    self.collections.each do |aCollection|
+      aCollection.collectionList = nil
+      aCollection.licence = nil
+      aCollection.save!
+    end
+  end
+
+  #
+  # Checks that that licence of this Collection List is the same than the licence of the Collections contained in
+  # this Collection List.
+  #
   def sameLicenceIntegrityCheck
     if (!collections.nil?)
       error = false

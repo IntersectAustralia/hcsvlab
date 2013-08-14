@@ -103,3 +103,13 @@ Then /^pause$/ do
   puts "Press Enter to continue"
   STDIN.getc
 end
+
+# can be helpful for @javascript features. This will open an Inspector page
+# For this you need to set the debug driver in env.rb file
+And /^Show Browser Inspector$/ do
+  page.driver.debug
+end
+
+And /^I fill in tiny_mce editor with "([^"]*)"$/ do |text|
+  evaluate_script("tinyMCE.activeEditor.setContent('" + text + "');")
+end

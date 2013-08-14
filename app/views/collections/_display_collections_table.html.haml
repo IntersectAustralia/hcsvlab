@@ -16,13 +16,13 @@
       %input{type: "checkbox", onClick: "show_or_hide_grouped_collections()"} Hide grouped Collections
 
   #documents
-    %table.table.table-condensed
+    %table#collections.table.table-condensed
       %thead
         %tr
           %th.checkbox_header
             %label{:for => "allnonecheckbox"}
               %span.btn
-                %input#allnonecheckbox{:onclick => "toggleItemList(this)", :type => "checkbox"}/
+                %input#allnonecheckbox{:onclick => "toggleCollection(this)", :type => "checkbox"}/
           %th.name Collection
           %th.collection Collection List
           %th.licence Licence
@@ -32,7 +32,7 @@
           %tr{class: (aCollection.collectionList.nil?)? "" : "groupedCollection" }
             %td.checkbox_field
               -if (aCollection.collectionList.nil?)
-                %input.toggle_item_list{:name => "#{aCollection.id}", :type => "checkbox"}/
+                %input.toggle_collection{:name => "#{aCollection.id}", :type => "checkbox", :id => "checkbox_collection_#{index}"}/
             %td.name
               = aCollection.flat_short_name
             %td.collection
@@ -81,7 +81,7 @@
       %p
         #collection_list_error.create_collection_list_error
         %br
-        = f.label :name
+        = f.label :name, {for:"name_for_add_collection_to_new_collection_list"}
         = f.text_field :name, {value:"", id: "name_for_add_collection_to_new_collection_list"}
 
         = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_new_collection_list"}
@@ -130,7 +130,7 @@
 
   function generateCollectionsIds(field) {
     jQuery(field).val("");
-    checks = document.getElementsByClassName('toggle_item_list');
+    checks = document.getElementsByClassName('toggle_collection');
     for (var i=0, n=checks.length; i<n; i++) {
       if (checks[i].checked) {
         var existing = jQuery(field).val();

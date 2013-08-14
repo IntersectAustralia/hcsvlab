@@ -271,16 +271,22 @@ Then /^show me the page$/ do
 end
 
 When /^I confirm the popup$/ do
-  page.driver.browser.switch_to.alert.accept
+  if (!Capybara.javascript_driver == :poltergeist) and (!Capybara.javascript_driver == :poltergeist_debug)
+    page.driver.browser.switch_to.alert.accept
+  end
 end
 
 Then /^The popup text should contain "([^"]*)"$/ do |text|
-  alert_text = page.driver.browser.switch_to.alert.text
-  assert (alert_text.include? text), "Alert text did not include '#{text}' - \n#{alert_text}"
+  if (!Capybara.javascript_driver == :poltergeist) and (!Capybara.javascript_driver == :poltergeist_debug)
+    alert_text = page.driver.browser.switch_to.alert.text
+    assert (alert_text.include? text), "Alert text did not include '#{text}' - \n#{alert_text}"
+  end
 end
 
 When /^I dismiss the popup$/ do
-  page.driver.browser.switch_to.alert.dismiss
+  if (!Capybara.javascript_driver == :poltergeist) and (!Capybara.javascript_driver == :poltergeist_debug)
+    page.driver.browser.switch_to.alert.dismiss
+  end
 end
 
 When /^I click "([^"]*)"$/ do |text|

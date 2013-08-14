@@ -192,8 +192,8 @@ end
 #
 # Ingest default set of licences
 #
-def create_default_licences
-  Rails.root.join("config", "licences").children.each do |lic|
+def create_default_licences(rootPath = "config")
+  Rails.root.join(rootPath, "licences").children.each do |lic|
     lic_info = YAML.load_file(lic)
 
     begin

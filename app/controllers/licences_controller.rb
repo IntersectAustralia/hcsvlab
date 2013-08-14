@@ -59,7 +59,7 @@ class LicencesController < ApplicationController
       # Now lets assign the licence to every collection list
       if (!collectionListId.nil?)
         aCollectionList = CollectionList.find(collectionListId)
-        aCollectionList.add_licence(newLicence.id)
+        aCollectionList.setLicence(newLicence.id)
       elsif (!collectionId.nil?)
         aCollection = Collection.find(collectionId)
         aCollection.setLicence(newLicence)

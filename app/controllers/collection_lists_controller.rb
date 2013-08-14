@@ -76,12 +76,6 @@ class CollectionListsController < ApplicationController
     collectionList = CollectionList.find(params[:id])
 
     name = collectionList.flat_name
-    collectionList.collections.each do |aCollection|
-      aCollection.collectionList = nil
-      aCollection.licence = nil
-      aCollection.save!
-    end
-
     collectionList.delete
 
     Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
@@ -92,7 +86,7 @@ class CollectionListsController < ApplicationController
 
   def add_licence_to_collection_list
     collectionList = CollectionList.find(params[:id])
-    collectionList.add_licence(params[:licence_id])
+    collectionList.setLicence(params[:licence_id])
 
     flash[:notice] = "Successfully added licence to #{collectionList.flat_name}"
     redirect_to licences_path

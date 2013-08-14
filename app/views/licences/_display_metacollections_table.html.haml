@@ -7,7 +7,7 @@
       %div
         There are no Collection Lists created.
     - else
-      %table#blacklight_results.table.table-condensed
+      %table#collection_lists.table.table-condensed
         %thead
           %tr
             %th.name Collection List
@@ -16,7 +16,6 @@
             %th.status Licence Terms
             %th.actions
         %tbody
-          %tr
           - @collection_lists.each_with_index do |coll_list, index|
             %tr
               %td.name

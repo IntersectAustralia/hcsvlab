@@ -14,6 +14,9 @@ def clear_jetty
   # clear Fedora
   Item.delete_all
   Document.delete_all
+  Collection.delete_all
+  CollectionList.delete_all
+  Licence.delete_all
 
 end
 

@@ -52,10 +52,12 @@ class Licence < ActiveFedora::Base
   def uniqueLicenceName
     licencesNames = Licence.find(type:LICENCE_TYPE_PUBLIC).map {|aLicence| aLicence.flat_name}
     if (!self.flat_ownerId.nil? and !self.flat_ownerId.empty?)
-      licencesNames << Licence.find(ownerId: self.ownerId).map {|aLicence| aLicence.flat_name}
+      #licencesNames << Licence.find(ownerId: self.ownerId).map {|aLicence| aLicence.flat_name}
+      licencesNames.concat Licence.find(ownerId: self.ownerId).map {|aLicence| aLicence.flat_name}
     end
+
     if (licencesNames.include?(self.flat_name))
-      errors[:base] << "This licence name already exists"
+      errors[:base] << "Licence name '#{self.flat_name}' already exists"
     end
   end
 end

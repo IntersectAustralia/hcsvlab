@@ -18,3 +18,10 @@ function toggleItemList(main) {
 		checks[i].checked = main.checked;
 	}
 }
+
+function toggleCollection(main) {
+    checks = document.getElementsByClassName('toggle_collection');
+    for (var i=0, n=checks.length; i<n; i++) {
+        checks[i].checked = main.checked;
+    }
+}

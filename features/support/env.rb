@@ -68,5 +68,10 @@ Capybara.register_driver :poltergeist do |app|
     Capybara::Poltergeist::Driver.new(app, {debug: false})
 end
 
+Capybara.register_driver :poltergeist_debug do |app|
+  Capybara::Poltergeist::Driver.new(app, :inspector => true)
+end
+
 Capybara.javascript_driver = :poltergeist
-# Capybara.javascript_driver = :selenium
+#Capybara.javascript_driver = :poltergeist_debug
+#Capybara.javascript_driver = :selenium
