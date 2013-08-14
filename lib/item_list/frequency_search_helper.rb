@@ -23,6 +23,10 @@ module FrequencySearchHelper
       params[:fq] = 'item_lists:' + itemListId.to_s
       # first I need to get all the facets and its values
       params[:q] = '*:*'
+
+      params[:fl] = %w(id AUSNC_itemwordcount_tesim)
+      params[:fl] << facet
+
       (response, document_list) = get_search_results params
       all_facet_fields = response[:facet_counts][:facet_fields]
 
@@ -31,6 +35,22 @@ module FrequencySearchHelper
         return result
       end
 
+      # Get the total word counts
+      all_facet_wcs = {}
+      no_words_count = 0
+      all_facet_fields[facet].each_index { |i|
+        all_facet_wcs[all_facet_fields[facet][i]] = 0 if i%2 == 0
+      }
+      document_list.each { |document|
+        facet_value = document[facet][0]
+        words = document["AUSNC_itemwordcount_tesim"]
+        if words.nil?
+          no_words_count += 1
+        else
+          words = document["AUSNC_itemwordcount_tesim"][0].to_i
+          all_facet_wcs[facet_value] = all_facet_wcs[facet_value] + words
+        end
+      }
 
       # get search result from solr
       params[:q] = "{!qf=full_text pf=''}#{query}"
@@ -46,7 +66,7 @@ module FrequencySearchHelper
       process_bench_start = Time.now
 
       #process the information
-      result = processSimpleFrequencySearchResults(all_facet_fields, facet_fields, document_list, termVectors, facet, query)
+      result = processSimpleFrequencySearchResults(all_facet_fields, all_facet_wcs, facet_fields, document_list, termVectors, facet, query)
 
       Rails.logger.debug("Data processing time for '#{query}' in Simple frequency search: (#{'%.1f' % ((Time.now.to_f - process_bench_start.to_f)*1000)}ms)")
 
@@ -57,7 +77,7 @@ module FrequencySearchHelper
 
     private
 
-    def processSimpleFrequencySearchResults(all_facet_fields, facet_fields, document_list, termVectors, facet_field_restriction, query)
+    def processSimpleFrequencySearchResults(all_facet_fields, all_facet_wcs, facet_fields, document_list, termVectors, facet_field_restriction, query)
       facetsWithResults = facet_fields[facet_field_restriction]
       allFacets = all_facet_fields[facet_field_restriction]
 
@@ -70,7 +90,8 @@ module FrequencySearchHelper
         # number of document for that facet in the next index.
         facetValue = allFacets[i]
 
-        result[:data][facetValue] = {:num_docs => 0, :num_occurrences => 0}
+        result[:data][facetValue] = {:num_docs => 0, :num_occurrences => 0,
+                                     :total_docs => allFacets[i+1], :total_words => all_facet_wcs[facetValue]}
 
         i = i + 2
       end
@@ -82,7 +103,7 @@ module FrequencySearchHelper
         facetValue = facetsWithResults[i]
         facetNumDocs = facetsWithResults[i+1]
 
-        result[:data][facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
+        result[:data][facetValue][:num_docs] = facetNumDocs
 
         i = i + 2
       end
@@ -100,7 +121,8 @@ module FrequencySearchHelper
             # If for some reason the facet is not in the Hash, I won't make the process fail, but
             # I will show the text "###" in the number of documents. This should not happen.
             if (result[:data][facet].nil?)
-              result[:data][facet] = {:num_docs => "###", :num_occurrences => 0}
+              result[:data][facet][:num_docs] = "###"
+              result[:data][facet][:num_occurrences] = 0
             end
             result[:data][facet][:num_occurrences] = result[:data][facet][:num_occurrences] + aDocument[:TF1]
           end
@@ -178,8 +200,10 @@ module FrequencySearchHelper
       # first I need to get all the facets and its values
 
       params[:q] = '*:*'
-      params[:fl] = "id"
+      params[:fl] = %w(id AUSNC_itemwordcount_tesim)
+      params[:fl] << facet
       params[:fq] = 'item_lists:' + itemListId.to_s
+
       (response, document_list) = get_search_results params
       all_facet_fields = response[:facet_counts][:facet_fields]
 
@@ -187,6 +211,23 @@ module FrequencySearchHelper
         result = {:status => "NO_FACET_VALUES_DEFINED"}
         return result
       end
+
+      # Get the total word counts
+      all_facet_wcs = {}
+      no_words_count = 0
+      all_facet_fields[facet].each_index { |i|
+        all_facet_wcs[all_facet_fields[facet][i]] = 0 if i%2 == 0
+      }
+      document_list.each { |document|
+        facet_value = document[facet][0]
+        words = document["AUSNC_itemwordcount_tesim"]
+        if words.nil?
+          no_words_count += 1
+        else
+          words = document["AUSNC_itemwordcount_tesim"][0].to_i
+          all_facet_wcs[facet_value] = all_facet_wcs[facet_value] + words
+        end
+      }
 
       # get search result from solr
       params[:q] = "{!qf=full_text pf=''}#{query}"
@@ -204,7 +245,7 @@ module FrequencySearchHelper
       process_bench_start = Time.now
 
       #process the information
-      result = processComplexFrequencySearchResults(all_facet_fields, facet_fields, document_list, highlighting, facet)
+      result = processComplexFrequencySearchResults(all_facet_fields, all_facet_wcs, facet_fields, document_list, highlighting, facet)
 
       Rails.logger.debug("Data processing time for '#{query}' in Complex frequency search: (#{'%.1f' % ((Time.now.to_f - process_bench_start.to_f)*1000)}ms)")
 
@@ -218,7 +259,7 @@ module FrequencySearchHelper
     #
     # Process all the information retrieved from SOLR.
     #
-    def processComplexFrequencySearchResults(all_facet_fields, facet_fields, document_list, highlighting, facet_field_restriction)
+    def processComplexFrequencySearchResults(all_facet_fields, all_facet_wcs, facet_fields, document_list, highlighting, facet_field_restriction)
 
       facetsWithResults = facet_fields[facet_field_restriction]
       allFacets = all_facet_fields[facet_field_restriction]
@@ -232,7 +273,8 @@ module FrequencySearchHelper
         # number of document for that facet in the next index.
         facetValue = allFacets[i]
 
-        result[:data][facetValue] = {:num_docs => 0, :num_occurrences => 0}
+        result[:data][facetValue] = {:num_docs => 0, :num_occurrences => 0,
+                                     :total_docs => allFacets[i+1], :total_words => all_facet_wcs[facetValue]}
 
         i = i + 2
       end
@@ -244,7 +286,7 @@ module FrequencySearchHelper
         facetValue = facetsWithResults[i]
         facetNumDocs = facetsWithResults[i+1]
 
-        result[:data][facetValue] = {:num_docs => facetNumDocs, :num_occurrences => 0}
+        result[:data][facetValue][:num_docs] = facetNumDocs
 
         i = i + 2
       end
@@ -270,7 +312,8 @@ module FrequencySearchHelper
             # If for some reason the facet is not in the Hash, I won't make the process fail, but
             # I will show the text "###" in the number of documents. This should not happen.
             if (result[:data][facet].nil?)
-              result[:data][facet] = {:num_docs => "###", :num_occurrences => 0}
+              result[:data][facet][:num_docs] = "###"
+              result[:data][facet][:num_occurrences] = 0
             end
             if (!value[:full_text].nil?)
               value[:full_text].each do |aMatch|
