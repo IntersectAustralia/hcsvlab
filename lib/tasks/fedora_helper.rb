@@ -52,7 +52,6 @@ def create_collection(collection_name, corpus_dir)
   coll.uri = coll.label
   coll.short_name = collection_name
   coll.save
-  puts "Looking for data owner for collection #{collection_name}"
   set_data_owner(coll)
   coll.save!
 
@@ -145,11 +144,11 @@ def set_data_owner(collection)
   data_owner = find_system_user(results)
   data_owner = find_default_owner() if data_owner.nil?
   if data_owner.nil?
-    puts "Cannot determine data owner for collection #{collection.short_name}"
+    logger.debug "Cannot determine data owner for collection #{collection.short_name}"
   elsif data_owner.cannot_own_data?
-    puts "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
+    logger.debug "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
-    puts "Setting data owner to #{data_owner.email}"
+    logger.debug "Setting data owner to #{data_owner.email}"
     collection.data_owner = data_owner
   end
 end
@@ -164,12 +163,8 @@ def find_system_user(results)
     next unless result.has_variables?([:person])
     q = result[:person].to_s
     u = User.find_all_by_email(q)
-    u.each { |user|
-      puts "   user #{user.id} with e-mail #{user.email}"
-    }
     return u[0] if u.size > 0
   }
-  puts "   no user found"
   return nil
 end
 
@@ -178,12 +173,9 @@ end
 # Find the default data owner
 #
 def find_default_owner()
-  puts "looking for default_data_owner in the APP_CONFIG, e-mail is #{APP_CONFIG['default_data_owner']}"
+  logger.debug "looking for default_data_owner in the APP_CONFIG, e-mail is #{APP_CONFIG['default_data_owner']}"
   email = APP_CONFIG["default_data_owner"]
   u = User.find_all_by_email(email)
-  u.each { |user|
-    puts "   user #{user.id} with e-mail #{user.email}"
-  }
   return u[0] if u.size > 0
   return nil
 end
