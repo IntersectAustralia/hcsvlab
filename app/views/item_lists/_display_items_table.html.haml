@@ -8,7 +8,8 @@
         %ul.dropdown-menu
           %li
             = link_to("Clear Item List", {:controller => "item_lists", :action => "clear"}, :method => 'POST', :id => params[:id].to_i)
-            = link_to("Use List in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
+            = link_to("Use Item List in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
+            %a{"data-toggle" => "modal", :href => "#get_r_script", :role => "button"} Use Item List in R
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
       - if (@document_list.empty?)
       - else
@@ -20,3 +21,16 @@
       = render 'galaxy_link', :title => "Use Item List in Galaxy "
       = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => params[:id]}
       = render 'results_pagination'
+  .modal.hide.fade.in{:id => "get_r_script","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+      %h3#myModalLabel= @item_list.name + " R Script"
+    #r_script_dialog.modal-body
+      %p
+        Copy the following code into your R environment.
+        Make sure you have all the required R packages installed prior to execution.
+      %hr
+      %pre
+        #r_script_content{:readonly => "true"}= @item_list.getRScript(root_url, current_user.id)
+    .modal-footer
+      %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
