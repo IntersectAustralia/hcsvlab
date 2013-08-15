@@ -9,7 +9,7 @@
           %li
             = link_to("Clear Item List", {:controller => "item_lists", :action => "clear"}, :method => 'POST', :id => params[:id].to_i)
             = link_to("Use Item List in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
-            %a{"data-toggle" => "modal", :href => "#get_r_script", :role => "button"} Use Item List in R
+            %a{"data-toggle" => "modal", :href => "#get_r_script", :role => "button"} Use Item List in Emu/R
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
       - if (@document_list.empty?)
       - else
@@ -24,7 +24,7 @@
   .modal.hide.fade.in{:id => "get_r_script","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
     .modal-header
       %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-      %h3#myModalLabel= @item_list.name + " R Script"
+      %h3#myModalLabel= @item_list.name + " Emu/R Script"
     #r_script_dialog.modal-body
       %p
         Copy the following code into your R environment.
