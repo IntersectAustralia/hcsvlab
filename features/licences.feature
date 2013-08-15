@@ -18,8 +18,8 @@ Feature: Managing Collection Lists and Licences
     And I should see "There are no Collection Lists created."
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |                   | Add Licence |               |
       |austlit    |                   | Add Licence |               |
+      |cooee      |                   | Add Licence |               |
 
   @javascript
   Scenario: Creating an empty Collection List
@@ -44,8 +44,8 @@ Feature: Managing Collection Lists and Licences
       |Collection List 1  | data_owner@intersect.org.au | Add Licence |               |
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |Collection List 1  |             |               |
-      |austlit    |                   | Add Licence |               |
+      |austlit    |Collection List 1  |             |               |
+      |cooee      |                   | Add Licence |               |
 
   @javascript
   Scenario: Creating a Collection List with all Collection
@@ -61,8 +61,8 @@ Feature: Managing Collection Lists and Licences
       |Collection List 1  | data_owner@intersect.org.au | Add Licence |               |
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |Collection List 1  |             |               |
       |austlit    |Collection List 1  |             |               |
+      |cooee      |Collection List 1  |             |               |
 
   @javascript
   Scenario: Creating two collection lists with one collection each
@@ -78,8 +78,8 @@ Feature: Managing Collection Lists and Licences
       |Collection List 1  | data_owner@intersect.org.au | Add Licence |               |
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |Collection List 1  |             |               |
-      |austlit    |                   | Add Licence |               |
+      |austlit    |Collection List 1  |             |               |
+      |cooee      |                   | Add Licence |               |
     Then I check "allnonecheckbox"
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
@@ -93,22 +93,22 @@ Feature: Managing Collection Lists and Licences
       |Collection List 2  | data_owner@intersect.org.au | Add Licence |               |
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |Collection List 1  |             |               |
-      |austlit    |Collection List 2  |             |               |
+      |austlit    |Collection List 1  |             |               |
+      |cooee      |Collection List 2  |             |               |
 
   @javascript
   Scenario: Assign licence to a Collection
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |                   | Add Licence |               |
       |austlit    |                   | Add Licence |               |
+      |cooee      |                   | Add Licence |               |
     And I click Add Licence for the 1st collection
     And I follow "Creative Commons v3.0 BY-NC"
     Then The Collection table should have
       |collection |collection_list    | licence                     | licence_terms       |
-      |cooee      |                   | Creative Commons v3.0 BY-NC | View Licence Terms  |
-      |austlit    |                   | Add Licence                 |                     |
-    And I should see "Successfully added licence to cooee"
+      |austlit    |                   | Creative Commons v3.0 BY-NC | View Licence Terms  |
+      |cooee      |                   | Add Licence                 |                     |
+    And I should see "Successfully added licence to austlit"
 
   @javascript
   Scenario: Assign licence to a Collection List
@@ -124,8 +124,8 @@ Feature: Managing Collection Lists and Licences
       |Collection List 1  | data_owner@intersect.org.au | Add Licence |               |
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |Collection List 1  |             |               |
-      |austlit    |                   | Add Licence |               |
+      |austlit    |Collection List 1  |             |               |
+      |cooee      |                   | Add Licence |               |
     Then I click Add Licence for the 1st collection list
     And I follow "Creative Commons v3.0 BY-NC"
     And The Collection Lists table should have
@@ -133,8 +133,8 @@ Feature: Managing Collection Lists and Licences
       |Collection List 1  | data_owner@intersect.org.au | Creative Commons v3.0 BY-NC | View Licence Terms  |
     And The Collection table should have
       |collection |collection_list    | licence                     | licence_terms       |
-      |cooee      |Collection List 1  | Creative Commons v3.0 BY-NC | View Licence Terms  |
-      |austlit    |                   | Add Licence                 |                     |
+      |austlit    |Collection List 1  | Creative Commons v3.0 BY-NC | View Licence Terms  |
+      |cooee      |                   | Add Licence                 |                     |
 
   @javascript
   Scenario: Remove a collection list
@@ -150,29 +150,28 @@ Feature: Managing Collection Lists and Licences
       |Collection List 1  | data_owner@intersect.org.au | Add Licence |               |
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |Collection List 1  |             |               |
-      |austlit    |                   | Add Licence |               |
+      |austlit    |Collection List 1  |             |               |
+      |cooee      |                   | Add Licence |               |
     Then I click on the remove icon for the 1st collection list
     And The popup text should contain "Are you sure you want to remove the Collections List"
     Then I confirm the popup
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |                   | Add Licence |               |
       |austlit    |                   | Add Licence |               |
-
+      |cooee      |                   | Add Licence |               |
 
   @javascript
   Scenario: View licence terms of a Collection
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |                   | Add Licence |               |
       |austlit    |                   | Add Licence |               |
+      |cooee      |                   | Add Licence |               |
     And I click Add Licence for the 1st collection
     And I follow "Creative Commons v3.0 BY-NC"
     Then The Collection table should have
       |collection |collection_list    | licence                     | licence_terms       |
-      |cooee      |                   | Creative Commons v3.0 BY-NC | View Licence Terms  |
-      |austlit    |                   | Add Licence                 |                     |
+      |austlit    |                   | Creative Commons v3.0 BY-NC | View Licence Terms  |
+      |cooee      |                   | Add Licence                 |                     |
     When I click View Licence Terms for the 1st collection
     Then I should see "THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENCE."
 
@@ -180,8 +179,8 @@ Feature: Managing Collection Lists and Licences
   Scenario: Create new licence and assign it to a collection
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |                   | Add Licence |               |
       |austlit    |                   | Add Licence |               |
+      |cooee      |                   | Add Licence |               |
     And I click Add Licence for the 1st collection
     And I follow "Create New"
     And I fill in "Licence name" with "Licence 1"
@@ -190,8 +189,8 @@ Feature: Managing Collection Lists and Licences
     Then I should see "Licence created successfully"
     Then The Collection table should have
       |collection |collection_list    | licence        | licence_terms       |
-      |cooee      |                   | Licence 1      | View Licence Terms  |
-      |austlit    |                   | Add Licence    |                     |
+      |austlit    |                   | Licence 1      | View Licence Terms  |
+      |cooee      |                   | Add Licence    |                     |
     When I click View Licence Terms for the 1st collection
     Then I should see "This is the text of Licence 1"
 
@@ -199,8 +198,8 @@ Feature: Managing Collection Lists and Licences
   Scenario: Create duplicated licence
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |                   | Add Licence |               |
       |austlit    |                   | Add Licence |               |
+      |cooee      |                   | Add Licence |               |
     And I click Add Licence for the 1st collection
     And I follow "Create New"
     And I fill in "Licence name" with "Licence 1"
@@ -209,8 +208,8 @@ Feature: Managing Collection Lists and Licences
     Then I should see "Licence created successfully"
     Then The Collection table should have
       |collection |collection_list    | licence        | licence_terms       |
-      |cooee      |                   | Licence 1      | View Licence Terms  |
-      |austlit    |                   | Add Licence    |                     |
+      |austlit    |                   | Licence 1      | View Licence Terms  |
+      |cooee      |                   | Add Licence    |                     |
     And I click Add Licence for the 1st collection
     And I follow "Create New"
     And I fill in "Licence name" with "Licence 1"
@@ -222,8 +221,8 @@ Feature: Managing Collection Lists and Licences
   Scenario: Create licence with empty name
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |                   | Add Licence |               |
       |austlit    |                   | Add Licence |               |
+      |cooee      |                   | Add Licence |               |
     And I click Add Licence for the 1st collection
     And I follow "Create New"
     And I fill in "Licence name" with ""
@@ -235,8 +234,8 @@ Feature: Managing Collection Lists and Licences
   Scenario: Create licence with empty text
     And The Collection table should have
       |collection |collection_list    | licence     | licence_terms |
-      |cooee      |                   | Add Licence |               |
       |austlit    |                   | Add Licence |               |
+      |cooee      |                   | Add Licence |               |
     And I click Add Licence for the 1st collection
     And I follow "Create New"
     And I fill in "Licence name" with "Licence 1"
