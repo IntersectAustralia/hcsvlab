@@ -46,8 +46,6 @@ class CollectionListsController < ApplicationController
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
       redirect_to licences_path
     end
-
-
   end
 
   def add_collections
@@ -67,6 +65,24 @@ class CollectionListsController < ApplicationController
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
       redirect_to licences_path
     end
+  end
+
+  def remove_collection
+    collectionListId = params[:collectionListId]
+    collectionId = params[:collectionId]
+
+    collectionList = CollectionList.find(collectionListId)
+    colListSize = collectionList.collections.length
+    colListName = collectionList.flat_name
+    collectionList.remove_collection(collectionId)
+
+    if (colListSize <= 1)
+      flash[:notice] = "The collection list '#{colListName}' was removed."
+    else
+      flash[:notice] = "The collection was removed from '#{collectionList.flat_name}'."
+    end
+
+    redirect_to licences_path
 
   end
 
