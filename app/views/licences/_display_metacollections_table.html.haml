@@ -19,7 +19,20 @@
           - @collection_lists.each_with_index do |coll_list, index|
             %tr
               %td.name
-                =link_to coll_list.flat_name, collection_list_path(coll_list)
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection_list#{index}", :role => "button"}=coll_list.flat_name
+                .modal.hide.fade.in{:id => "collection_list#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+                  .modal-header
+                    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+                    %h3#myModalLabel= coll_list.flat_name
+                  #collection_list_detail_dialog.modal-body{:title => "Licence Terms"}
+                    #collection_list_detail_content{:readonly => "true"}
+                      %table
+                        - coll_list.collections.each do |aCollection|
+                          %tr
+                            %td
+                              =aCollection.flat_short_name
+                  .modal-footer
+                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 
               %td.owner= coll_list.flat_ownerEmail
               %td.licence
