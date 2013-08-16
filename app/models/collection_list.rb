@@ -11,6 +11,7 @@ class CollectionList < ActiveFedora::Base
   delegate :ownerEmail, to: 'descMetadata'
 
   validates_presence_of :flat_name, message: 'Collection List Name can not be blank'
+  validates_length_of :flat_name, maximum: 255, message:"Name is too long (maximum is 255 characters)"
   validates_presence_of :flat_ownerId, message: 'Collection List owner id can not be empty'
   validates_presence_of :flat_ownerEmail, message: 'Collection List owner email can not be empty'
 
