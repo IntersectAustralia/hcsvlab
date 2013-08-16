@@ -1,7 +1,17 @@
 require 'spec_helper'
 
 describe CollectionList do
-  
+  before(:each) do
+    CollectionList.delete_all
+    Collection.delete_all
+    Licence.delete_all
+  end
+  after(:each) do
+    CollectionList.delete_all
+    Collection.delete_all
+    Licence.delete_all
+  end
+
   describe "Collection List Descriptive Metadata" do
 
     it "should persist metadata about a Collection List" do
@@ -24,13 +34,6 @@ describe CollectionList do
   end
 
   describe "Collection List Licence" do
-    before(:each) do
-      CollectionList.all.each {|l| l.delete}
-      Collection.all.each {|l| l.delete}
-      Licence.all.each {|l| l.delete}
-
-    end
-
     it "should persist licence information for a Collection List" do
       u = FactoryGirl.create(:user, :status => 'A', :email => "test@intersect.org.au")
       c = FactoryGirl.create(:collection_list, :ownerId => u.id.to_s, :ownerEmail => u.email)
