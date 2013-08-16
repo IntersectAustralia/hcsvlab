@@ -38,7 +38,8 @@
             %td.collection
               -if !(aCollection.collectionList.nil?)
                 .label.licence
-                  =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.flat_name
+                  %span
+                    =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.flat_name
                   = link_to("" , {:controller=>"collection_lists", :action => "remove_collection", :collectionListId => aCollection.collectionList.id, :collectionId => aCollection.id},
                                   :class=>"remove", :onClick => "return (confirmRemoveCollection(#{aCollection.collectionList.collections.length}, '#{aCollection.collectionList.flat_name}', '#{aCollection.flat_short_name}', event));")
             %td.licence
@@ -58,7 +59,8 @@
                     %li
                       = link_to("Create New", {:controller => "licences", :action => "new", :collection => aCollection.id}, :collection => aCollection.id, :onClick => "showProgressAnimation();")
               -else
-                =(aCollection.collectionList.licence.nil?)? "" :aCollection.collectionList.licence.flat_name
+                %span
+                  =(aCollection.collectionList.licence.nil?)? "" :aCollection.collectionList.licence.flat_name
             %td.terms
               -if (aCollection.licence.present?)
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms_collection#{index}", :role => "button"} View Licence Terms

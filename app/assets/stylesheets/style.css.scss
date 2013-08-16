@@ -60,7 +60,12 @@ textarea{
   border: 1px solid #f6b717;
   display: inline-block;
   position: relative;
+  text-shadow: none;
   -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .label .remove {
@@ -716,6 +721,49 @@ th.checkbox_header span.btn input[type="checkbox"] { vertical-align: top; }
 
 .modal button.close  {
   display: block;
+}
+
+.modal.fade.in {
+  top: 10%;
+}
+
+.modal-body {
+  position: relative;
+  overflow-y: auto;
+  max-height: 400px;
+  padding: 15px;
+}
+
+td.licence span {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.licence .dropdown-toggle {
+  padding: 0 20px 0 6px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+}
+
+.dropdown-toggle.btn-mini span {
+  margin-top: 2px;
+  position: absolute;
+  right: 8px;
+  top: 30%;
+}
+
+td.name a.btn {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
 }
 
 .btn-group > .btn:first-child {
