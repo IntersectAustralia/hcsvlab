@@ -5,8 +5,9 @@ Feature: Managing Collection Lists and Licences
   Background:
     Given I have the usual roles and permissions
     Given I have users
-      | email                       | first_name   | last_name | role_id |
-      | data_owner@intersect.org.au | dataOwner    | One       | 3       |
+      | email                       | first_name   | last_name |
+      | data_owner@intersect.org.au | dataOwner    | One       |
+    Given "data_owner@intersect.org.au" has role "data owner"
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given I ingest licences

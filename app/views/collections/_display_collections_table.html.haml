@@ -39,7 +39,8 @@
               -if !(aCollection.collectionList.nil?)
                 .label.licence
                   =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.flat_name
-                  %a.remove
+                  = link_to("" , {:controller=>"collection_lists", :action => "remove_collection", :collectionListId => aCollection.collectionList.id, :collectionId => aCollection.id},
+                                  :class=>"remove", :onClick => "return (confirmRemoveCollection(#{aCollection.collectionList.collections.length}, '#{aCollection.collectionList.flat_name}', '#{aCollection.flat_short_name}', event));")
             %td.licence
               -if (aCollection.collectionList.nil?)
                 .css-dropdown
@@ -188,6 +189,24 @@
     $("#licence_id_for_add_licence_to_collection").val(licence_id);
     $("#add_licence_to_collection_form").submit();
   };
+
+  /*
+   *
+   */
+  function confirmRemoveCollection(collectionsInCollectionList, collectionListName, collectionName, event) {
+    answer = true;
+    if (collectionsInCollectionList > 1) {
+      answer = confirm("Are you sure you want to remove the collection '" + collectionName + "' from '" + collectionListName + "'?");
+    } else {
+      answer = confirm("The collection list '" + collectionListName + "' has only 1 Collection, by removing '" + collectionName + "', you will be deleting the collection list.\n\nDo you want to proceed?");
+    }
+
+    if (answer) {
+      showProgressAnimation();
+    }
+
+    return answer;
+  }
 
   /*
    * This will fill the form for the action: "ADD SELECTED TO A NEW COLLECTION LIST"

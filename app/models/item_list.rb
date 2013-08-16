@@ -262,6 +262,35 @@ class ItemList < ActiveRecord::Base
   end
 
   #
+  # 
+  #
+  def getRScript(root_url, user_id)
+    user = User.find(user_id)
+    if user.authentication_token.nil? #generate auth token if one doesn't already exist
+      user.reset_authentication_token!
+    end
+    return  "library(RCurl)\nlibrary(emu)\nlibrary(wrassp)\n" +
+            "library(emuSX)\nlibrary(rjson)\n" +
+            "header = 'X-API-KEY: #{user.authentication_token}'\n" +
+            "item_list = fromJSON(getURL('#{root_url}item_lists/#{self.id}.json', httpheader=header))\n" +
+            "l = c(); s = c(); e = c(); u = c()\n" +
+            "segment_list=make.seglist(l, s, e, u, 'query', 'segment', 'hcsvlab')\n\n" +
+            "for(i in 1:length(item_list$items))\n{\n" +
+            "  item = fromJSON(getURL(item_list$items[i], httpheader=header))\n" +
+            "  segments = fromJSON(getURL(paste(item$annotations_url, '?type=phonetic', sep=''), httpheader=header))\n\n" +
+            "  if(is.null(segments$error))\n  {\n" +
+            "    l = c(); s = c(); e = c(); u = c()\n" +
+            "    for(i in 1:length(segments$annotations))\n    {\n" +
+            "      l = c(l, segments$annotations[[i]]$label)\n" +
+            "      s = c(s, segments$annotations[[i]]$start*1000)\n" +
+            "      e = c(e, segments$annotations[[i]]$end*1000)\n" +
+            "      u = c(u, segments$utterance)\n    }\n\n" +
+            "    segment_list = rbind(segment_list, make.seglist(l, s, e, u, 'query', 'segment', 'hcsvlab'))\n" +
+            "    forest(segments$utterance, Header=header)\n" +
+            "  }\n}"
+  end
+
+  #
   # Perform a Concordance search for a given term
   #
   def doConcordanceSearch(term)

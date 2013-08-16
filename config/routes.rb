@@ -72,6 +72,7 @@ HcsvlabWeb::Application.routes.draw do
         collection do
           post 'add_collections'
           post 'add_licence_to_collection_list'
+          get 'remove_collection'
         end
       end
 

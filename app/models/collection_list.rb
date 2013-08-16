@@ -3,7 +3,7 @@ include ActiveFedora::DatastreamCollections
 class CollectionList < ActiveFedora::Base
   has_metadata 'descMetadata', type: Datastream::CollectionListMetadata
 
-  has_many :collections, :property => :is_member_of
+  has_many :collections, :property => :is_part_of
   belongs_to :licence, :property => :has_licence
 
   delegate :name, to: 'descMetadata'
@@ -61,6 +61,20 @@ class CollectionList < ActiveFedora::Base
       end
     end
     self.save!
+  end
+
+  #
+  # Removes a collection from its Collection List
+  #
+  def remove_collection(collectionId)
+    if (collections.length <= 1)
+      self.delete
+    else
+      collection = Collection.find(collectionId)
+      collection.collectionList = nil
+      collection.licence = nil
+      collection.save!
+    end
   end
 
   #
