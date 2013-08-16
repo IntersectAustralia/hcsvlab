@@ -15,11 +15,11 @@
   - else
   = tinymce_assets
   - if (!@errors.nil? and !@errors.empty?)
-    %div
-      ERRORS:
-    - @errors.each do |key, value|
-      %p
-        = value.first
+    .info.alert-error
+      %strong ERRORS:
+      - @errors.each do |key, value|
+        %p
+          = value.first
   = form_tag({:action => 'create'}, :method=>"POST") do
     = field_set_tag do
       = label_tag 'name', "Licence name"
@@ -35,4 +35,3 @@
 
 = render 'shared/nectar_attribution'
 = tinymce
-
