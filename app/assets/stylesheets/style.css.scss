@@ -60,7 +60,12 @@ textarea{
   border: 1px solid #f6b717;
   display: inline-block;
   position: relative;
+  text-shadow: none;
   -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .label .remove {
@@ -129,6 +134,23 @@ border-width: 0 0 0px;
 
 .input-append input, .input-append select, .input-append .uneditable-input {
 -webkit-border-radius: 3px 0 0 3px; -moz-border-radius: 3px 0 0 3px; border-radius: 3px 0 0 3px;
+}
+
+.info {
+padding: 8px 35px 8px 14px;
+margin-bottom: 20px;
+text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+background-color: #fcf8e3;
+border: 1px solid #fbeed5;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+}
+
+.info.alert-error {
+background-color: #f2dede;
+border-color: #eed3d7;
+color: #b94a48;
 }
 
 /* NAVBAR //////////////////////////////////////////////////////////////////////////////////////////
@@ -406,6 +428,16 @@ margin: 0 auto;
 
 
 
+/* LIGHTBOX ////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+.modal .modal-body ul, .modal .modal-body ol {
+  -webkit-margin-before: 0em;
+  -webkit-margin-after: 0em;
+  -webkit-margin-start: 0px;
+  -webkit-margin-end: 0px;
+  -webkit-padding-start: 20px;
+}
 
 
 
@@ -716,6 +748,49 @@ th.checkbox_header span.btn input[type="checkbox"] { vertical-align: top; }
 
 .modal button.close  {
   display: block;
+}
+
+.modal.fade.in {
+  top: 10%;
+}
+
+.modal-body {
+  position: relative;
+  overflow-y: auto;
+  max-height: 400px;
+  padding: 15px;
+}
+
+td.licence span {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.licence .dropdown-toggle {
+  padding: 0 20px 0 6px;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+}
+
+.dropdown-toggle.btn-mini span {
+  margin-top: 2px;
+  position: absolute;
+  right: 8px;
+  top: 30%;
+}
+
+td.name a.btn {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
 }
 
 .btn-group > .btn:first-child {

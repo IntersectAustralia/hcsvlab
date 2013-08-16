@@ -1,7 +1,13 @@
 require 'spec_helper'
 
 describe Licence do
-  
+  before(:each) do
+    Licence.delete_all
+  end
+  after(:each) do
+    Licence.delete_all
+  end
+
   describe "Licence Descriptive Metadata" do
 
     it "should persist metadata about a Licence" do
