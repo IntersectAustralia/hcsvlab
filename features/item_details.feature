@@ -10,6 +10,9 @@ Feature: Displaying Items
     Given I have users
       | email                       | first_name | last_name |
       | researcher@intersect.org.au | Researcher | One       |
+    Given I have user "researcher@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
     And I am on the catalog page for "hcsvlab:1"

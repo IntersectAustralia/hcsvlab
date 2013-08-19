@@ -21,6 +21,12 @@ def create_item_from_file(corpus_dir, rdf_file)
   item.collection = last_bit(result.collection.to_s)
   item.collection_id = result.identifier.to_s
 
+  # Add Groups to the created item
+  puts "Creating Item groups (discor, read, edit)"
+  item.set_discover_groups(["#{item.collection.first}-discover"], [])
+  item.set_read_groups(["#{item.collection.first}-read"], [])
+  item.set_edit_groups(["#{item.collection.first}-edit"], [])
+
   if Collection.where(short_name: item.collection).count == 0
     create_collection(item.collection.first, corpus_dir)
   end
@@ -52,7 +58,7 @@ def create_collection(collection_name, corpus_dir)
   coll.uri = coll.label
   coll.short_name = collection_name
   coll.save
-  puts "Looking for data owner for collection #{collection_name}"
+  #puts "Looking for data owner for collection #{collection_name}"
   set_data_owner(coll)
   coll.save!
 
@@ -145,11 +151,11 @@ def set_data_owner(collection)
   data_owner = find_system_user(results)
   data_owner = find_default_owner() if data_owner.nil?
   if data_owner.nil?
-    puts "Cannot determine data owner for collection #{collection.short_name}"
+    #puts "Warning: Cannot determine data owner for collection #{collection.short_name}"
   elsif data_owner.cannot_own_data?
-    puts "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
+    #puts "Warning: Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
-    puts "Setting data owner to #{data_owner.email}"
+    #puts "Setting data owner to #{data_owner.email}"
     collection.data_owner = data_owner
   end
 end
@@ -165,11 +171,11 @@ def find_system_user(results)
     q = result[:person].to_s
     u = User.find_all_by_email(q)
     u.each { |user|
-      puts "   user #{user.id} with e-mail #{user.email}"
+      #puts "   user #{user.id} with e-mail #{user.email}"
     }
     return u[0] if u.size > 0
   }
-  puts "   no user found"
+  #puts "   no user found"
   return nil
 end
 
@@ -178,11 +184,11 @@ end
 # Find the default data owner
 #
 def find_default_owner()
-  puts "looking for default_data_owner in the APP_CONFIG, e-mail is #{APP_CONFIG['default_data_owner']}"
+  #puts "looking for default_data_owner in the APP_CONFIG, e-mail is #{APP_CONFIG['default_data_owner']}"
   email = APP_CONFIG["default_data_owner"]
   u = User.find_all_by_email(email)
   u.each { |user|
-    puts "   user #{user.id} with e-mail #{user.email}"
+    #puts "   user #{user.id} with e-mail #{user.email}"
   }
   return u[0] if u.size > 0
   return nil

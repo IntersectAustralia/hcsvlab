@@ -52,6 +52,12 @@ And /^I have "([^:]*):([^:]*)" with id "(hcsvlab:\d+)" indexed$/ do |corpus, pre
   item = Item.create(pid: pid)
   item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
   item.label = item.rdfMetadata.graph.statements.first.subject
+
+  # Add Groups to the created item
+  item.set_discover_groups(["#{corpus}-discover"], [])
+  item.set_read_groups(["#{corpus}-read"], [])
+  item.set_edit_groups(["#{corpus}-edit"], [])
+
   item.save!
 
   xml = File.read("#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-solr.xml")

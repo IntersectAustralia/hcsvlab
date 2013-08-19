@@ -294,6 +294,14 @@ private
     logger.debug "\tAdding configured field #{:HCSvLab_ident} with value #{ident}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :HCSvLab_ident, ident)
 
+    #Create permission fields
+    logger.debug "\tAdding discover Permission field with value #{ident_parts[:collection]}-discover"
+    ::Solrizer::Extractor.insert_solr_field_value(result, :'discover_access_group_ssim', "#{ident_parts[:collection]}-discover")
+    logger.debug "\tAdding read Permission field with value #{ident_parts[:collection]}-read"
+    ::Solrizer::Extractor.insert_solr_field_value(result, :'read_access_group_ssim', "#{ident_parts[:collection]}-read")
+    logger.debug "\tAdding edit Permission field with value #{ident_parts[:collection]}-edit"
+    ::Solrizer::Extractor.insert_solr_field_value(result, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
+
     # Add in defaults for the configured fields we haven't found so far
     @@configured_fields.each { |field|
       add_field(result, field, "unspecified") unless configured_fields_found.include?(field)
