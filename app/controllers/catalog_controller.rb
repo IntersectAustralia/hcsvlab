@@ -249,23 +249,31 @@ class CatalogController < ApplicationController
 
   # override default show method to allow for json response
   def show
-    @response, @document = get_solr_response_for_doc_id
+    if Item.where(id: params[:id]).count != 0
+      @response, @document = get_solr_response_for_doc_id
+    elsif(Item.where(id: params[:id]).count == 0 and request.format.html?)
+      flash[:error] = "Sorry, you have requested a record that doesn't exist."
+      redirect_to root_url and return
+    end
     respond_to do |format|
       format.html { setup_next_and_previous_documents }
       format.json {}
       # Add all dynamically added (such as by document extensions)
       # export formats.
-      @document.export_formats.each_key do |format_name|
-        # It's important that the argument to send be a symbol;
-        # if it's a string, it makes Rails unhappy for unclear reasons. 
-        format.send(format_name.to_sym) { render :text => @document.export_as(format_name), :layout => false }
+      if !@document.nil?
+        @document.export_formats.each_key do |format_name|
+          # It's important that the argument to send be a symbol;
+          # if it's a string, it makes Rails unhappy for unclear reasons. 
+          format.send(format_name.to_sym) { render :text => @document.export_as(format_name), :layout => false }
+        end
       end
-
     end
   end
 
   def annotations
-    @response, @document = get_solr_response_for_doc_id
+    if Item.where(id: params[:id]).count != 0
+      @response, @document = get_solr_response_for_doc_id
+    end
     begin
       @item = Item.find(params[:id])
     rescue Exception => e
