@@ -26,14 +26,14 @@ def create_item_from_file(corpus_dir, rdf_file)
   end
 
   # Add Groups to the created item
-  puts "    Creating Item groups (discover, read, edit)"
+  #puts "    Creating Item groups (discover, read, edit)"
   item.set_discover_groups(["#{item.collection.first}-discover"], [])
   item.set_read_groups(["#{item.collection.first}-read"], [])
   item.set_edit_groups(["#{item.collection.first}-edit"], [])
   # Add complete permission for data_owner
   data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
   if (!data_owner.nil?)
-    puts "    Creating Item users (discover, read, edit) with #{data_owner}"
+    #puts "    Creating Item users (discover, read, edit) with #{data_owner}"
     item.set_discover_users([data_owner], [])
     item.set_read_users([data_owner], [])
     item.set_edit_users([data_owner], [])
@@ -96,14 +96,14 @@ def look_for_documents(item, corpus_dir, rdf_file)
       doc.item = item
 
       # Add Groups to the created document
-      puts "    Creating document groups (discover, read, edit)"
+      #puts "    Creating document groups (discover, read, edit)"
       doc.set_discover_groups(["#{item.collection.first}-discover"], [])
       doc.set_read_groups(["#{item.collection.first}-read"], [])
       doc.set_edit_groups(["#{item.collection.first}-edit"], [])
       # Add complete permission for data_owner
       data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
       if (!data_owner.nil?)
-        puts "    Creating document users (discover, read, edit) with #{data_owner}"
+        #puts "    Creating document users (discover, read, edit) with #{data_owner}"
         doc.set_discover_users([data_owner], [])
         doc.set_read_users([data_owner], [])
         doc.set_edit_users([data_owner], [])
@@ -153,14 +153,14 @@ def look_for_annotations(item, metadata_filename)
     doc.item = item
 
     # Add Groups to the created document
-    puts "    Creating annotations document groups (discover, read, edit)"
+    #puts "    Creating annotations document groups (discover, read, edit)"
     doc.set_discover_groups(["#{item.collection.first}-discover"], [])
     doc.set_read_groups(["#{item.collection.first}-read"], [])
     doc.set_edit_groups(["#{item.collection.first}-edit"], [])
     # Add complete permission for data_owner
     data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
     if (!data_owner.nil?)
-      puts "    Creating annotations document users (discover, read, edit) with #{data_owner}"
+      #puts "    Creating annotations document users (discover, read, edit) with #{data_owner}"
       doc.set_discover_users([data_owner], [])
       doc.set_read_users([data_owner], [])
       doc.set_edit_users([data_owner], [])
