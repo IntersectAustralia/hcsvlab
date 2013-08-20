@@ -11,8 +11,10 @@ class CatalogController < ApplicationController
 
   include Blacklight::Catalog
   include Hydra::Controller::ControllerBehavior
+  include Blacklight::BlacklightHelperBehavior
+
   # These before_filters apply the hydra access controls
-  #before_filter :enforce_show_permissions, :only=>:show
+  #before_filter :enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations]
   # This applies appropriate access controls to all solr queries
   #CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
   # This filters out objects that you want to exclude from search results, like FileAssets
@@ -281,9 +283,7 @@ class CatalogController < ApplicationController
     item = Item.find(@document.id)
     send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
   end
-  
-  include Blacklight::BlacklightHelperBehavior
- 
+
   def document
     item = Item.find(params[:id])
 

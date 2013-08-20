@@ -294,13 +294,23 @@ private
     logger.debug "\tAdding configured field #{:HCSvLab_ident} with value #{ident}"
     ::Solrizer::Extractor.insert_solr_field_value(result, :HCSvLab_ident, ident)
 
-    #Create permission fields
-    logger.debug "\tAdding discover Permission field with value #{ident_parts[:collection]}-discover"
+    #Create group permission fields
+    logger.debug "\tAdding discover Permission field for group with value #{ident_parts[:collection]}-discover"
     ::Solrizer::Extractor.insert_solr_field_value(result, :'discover_access_group_ssim', "#{ident_parts[:collection]}-discover")
-    logger.debug "\tAdding read Permission field with value #{ident_parts[:collection]}-read"
+    logger.debug "\tAdding read Permission field for group with value #{ident_parts[:collection]}-read"
     ::Solrizer::Extractor.insert_solr_field_value(result, :'read_access_group_ssim', "#{ident_parts[:collection]}-read")
-    logger.debug "\tAdding edit Permission field with value #{ident_parts[:collection]}-edit"
+    logger.debug "\tAdding edit Permission field for group with value #{ident_parts[:collection]}-edit"
     ::Solrizer::Extractor.insert_solr_field_value(result, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
+    #Create user permission fields
+    data_owner = Collection.find_by_short_name(ident_parts[:collection]).first.flat_private_data_owner
+    if (!data_owner.nil?)
+      logger.debug "\tAdding discover Permission field for user with value #{data_owner}-discover"
+      ::Solrizer::Extractor.insert_solr_field_value(result, :'discover_access_person_ssim', "#{data_owner}")
+      logger.debug "\tAdding read Permission field for user with value #{ident_parts[:collection]}-read"
+      ::Solrizer::Extractor.insert_solr_field_value(result, :'read_access_person_ssim', "#{data_owner}")
+      logger.debug "\tAdding edit Permission field for user with value #{ident_parts[:collection]}-edit"
+      ::Solrizer::Extractor.insert_solr_field_value(result, :'edit_access_person_ssim', "#{data_owner}")
+    end
 
     # Add in defaults for the configured fields we haven't found so far
     @@configured_fields.each { |field|

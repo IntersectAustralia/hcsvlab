@@ -21,14 +21,22 @@ def create_item_from_file(corpus_dir, rdf_file)
   item.collection = last_bit(result.collection.to_s)
   item.collection_id = result.identifier.to_s
 
+  if Collection.where(short_name: item.collection).count == 0
+    create_collection(item.collection.first, corpus_dir)
+  end
+
   # Add Groups to the created item
-  puts "Creating Item groups (discor, read, edit)"
+  puts "    Creating Item groups (discover, read, edit)"
   item.set_discover_groups(["#{item.collection.first}-discover"], [])
   item.set_read_groups(["#{item.collection.first}-read"], [])
   item.set_edit_groups(["#{item.collection.first}-edit"], [])
-
-  if Collection.where(short_name: item.collection).count == 0
-    create_collection(item.collection.first, corpus_dir)
+  # Add complete permission for data_owner
+  data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
+  if (!data_owner.nil?)
+    puts "    Creating Item users (discover, read, edit) with #{data_owner}"
+    item.set_discover_users([data_owner], [])
+    item.set_read_users([data_owner], [])
+    item.set_edit_users([data_owner], [])
   end
 
   item.save!
@@ -63,7 +71,6 @@ def create_collection(collection_name, corpus_dir)
   coll.save!
 
   puts "Collection Metadata = " + coll.pid.to_s unless Rails.env.test?
-  return
 end
 
 def look_for_documents(item, corpus_dir, rdf_file)
@@ -87,6 +94,21 @@ def look_for_documents(item, corpus_dir, rdf_file)
       doc.label     = result.source.to_s
       doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => result.source.to_s)
       doc.item = item
+
+      # Add Groups to the created document
+      puts "    Creating document groups (discover, read, edit)"
+      doc.set_discover_groups(["#{item.collection.first}-discover"], [])
+      doc.set_read_groups(["#{item.collection.first}-read"], [])
+      doc.set_edit_groups(["#{item.collection.first}-edit"], [])
+      # Add complete permission for data_owner
+      data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
+      if (!data_owner.nil?)
+        puts "    Creating document users (discover, read, edit) with #{data_owner}"
+        doc.set_discover_users([data_owner], [])
+        doc.set_read_users([data_owner], [])
+        doc.set_edit_users([data_owner], [])
+      end
+
       doc.save
 
       # Create a primary text datastream in the fedora Item for primary text documents
@@ -129,6 +151,21 @@ def look_for_annotations(item, metadata_filename)
     doc.type = 'Annotation'
     doc.label = results[0][:part_of] unless results.size == 0
     doc.item = item
+
+    # Add Groups to the created document
+    puts "    Creating annotations document groups (discover, read, edit)"
+    doc.set_discover_groups(["#{item.collection.first}-discover"], [])
+    doc.set_read_groups(["#{item.collection.first}-read"], [])
+    doc.set_edit_groups(["#{item.collection.first}-edit"], [])
+    # Add complete permission for data_owner
+    data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
+    if (!data_owner.nil?)
+      puts "    Creating annotations document users (discover, read, edit) with #{data_owner}"
+      doc.set_discover_users([data_owner], [])
+      doc.set_read_users([data_owner], [])
+      doc.set_edit_users([data_owner], [])
+    end
+
     doc.save
     item.add_named_datastream('annotation_set', :dsLocation => "file://" + annotation_filename, :mimeType => 'text/plain')
     puts "Annotation Document = #{doc.pid.to_s}" unless Rails.env.test?

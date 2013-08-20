@@ -167,7 +167,7 @@ class User < ActiveRecord::Base
   end
 
   #
-  # Add the permission level defined by 'accessType' to the given 'collection'
+  # Adds the permission level defined by 'accessType' to the given 'collection'
   #
   def add_agreement_to_collection(collection, accessType)
     ula = UserLicenceAgreement.new
@@ -176,6 +176,16 @@ class User < ActiveRecord::Base
     ula.user = self
     ula.save
   end
+
+  #
+  # Removes the permission level defined by 'accessType' to the given 'collection'
+  #
+  #def remove_agreement_to_collection(collection, accessType)
+  #  groupName = "#{collection.flat_short_name}-#{accessType}"
+  #  ula = UserLicenceAgreement.where(:groupName=>groupName, :user=>self).first
+  #
+  #  ula.delete if !ula.nil?
+  #end
 
   private
 

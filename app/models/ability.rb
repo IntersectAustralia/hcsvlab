@@ -29,7 +29,7 @@ class Ability
     # alias reject_as_spam to reject so they are considered the same
     alias_action :reject_as_spam, :to => :reject
 
-    return if user.nil? || ! defined? user.role
+    return if user.nil? || ! defined?(user.role)
     #return unless user.role
 
     can :manage, ItemList, :user_id => user.id
