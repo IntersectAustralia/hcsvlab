@@ -269,7 +269,9 @@ class CatalogController < ApplicationController
   end
 
   def annotations
-    @response, @document = get_solr_response_for_doc_id
+    if Item.where(id: params[:id]).count != 0
+      @response, @document = get_solr_response_for_doc_id
+    end
     begin
       @item = Item.find(params[:id])
     rescue Exception => e
