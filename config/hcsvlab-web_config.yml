@@ -2,8 +2,6 @@ defaults: &defaults
   password_reset_email_sender: kali@intersect.org.au
   account_request_user_status_email_sender: kali@intersect.org.au
   account_request_admin_notification_sender: kali@intersect.org.au
-  license_access_request_admin_notification_sender: kali@intersect.org.au
-  issue_report_admin_notification_sender: kali@intersect.org.au
   default_data_owner: davidc@intersect.org.au
 
 development:
@@ -27,17 +25,11 @@ staging:
   password_reset_email_sender: jared@intersect.org.au
   account_request_user_status_email_sender: jared@intersect.org.au
   account_request_admin_notification_sender: jared@intersect.org.au
-  license_access_request_admin_notification_sender: jared@intersect.org.au
-  issue_report_admin_notification_sender: jared@intersect.org.au
   default_data_owner: jared@intersect.org.au
-
 
 staging2:
   password_reset_email_sender: jared@intersect.org.au
   account_request_user_status_email_sender: jared@intersect.org.au
   account_request_admin_notification_sender: jared@intersect.org.au
-  license_access_request_admin_notification_sender: jared@intersect.org.au
-  issue_report_admin_notification_sender: jared@intersect.org.au
   default_data_owner: jared@intersect.org.au
-
 

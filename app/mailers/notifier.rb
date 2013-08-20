@@ -32,16 +32,9 @@ class Notifier < ActionMailer::Base
     superusers_emails = User.get_superuser_emails
     @issue_report = issue_report
     mail( :to => superusers_emails,
-          :from => APP_CONFIG['issue_report_admin_notification_sender'],
+          :from => APP_CONFIG['account_request_admin_notification_sender'],
           :reply_to => @issue_report.user_email,
           :subject => PREFIX + "An issue has been reported")
-  end
-
-  def notify_data_owners_of_license_request(applicant, owner, collection)
-    mail( :to => owner,
-          :from => APP_CONFIG['license_access_request_admin_notification_sender'],
-          :reply_to => applicant,
-          :subject => PREFIX + "There has been a new license acceptance request")
   end
 
   def notify_user_that_they_cant_reset_their_password(user)
