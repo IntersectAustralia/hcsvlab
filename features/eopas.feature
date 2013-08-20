@@ -13,6 +13,9 @@ Feature: Displaying Items in EOPAS
 
   Scenario: View Audio in EOPAS
     Given I ingest "eopas_test:Audio_Eopas"
+    Given I have user "researcher@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | eopas_test      | read        |
     And I am on the catalog page
     And I should see "eopas_test"
     And I follow "eopas_test"
@@ -44,6 +47,9 @@ Feature: Displaying Items in EOPAS
 
   Scenario: View Video in EOPAS
     Given I ingest "eopas_test:Video_Eopas"
+    Given I have user "researcher@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | eopas_test      | read        |
     And I am on the catalog page
     And I should see "eopas_test"
     And I follow "eopas_test"

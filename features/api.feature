@@ -102,6 +102,9 @@ Feature: Browsing via API
 
   Scenario: Get item details
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
     When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
@@ -120,6 +123,9 @@ Feature: Browsing via API
 
   Scenario: Get specific annotations for item by label
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
     When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
       | label |
       | 11    |
@@ -131,6 +137,9 @@ Feature: Browsing via API
 
   Scenario: Get specific annotations for item by type
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
     When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
       | type     |
       | ellipsis |
@@ -142,6 +151,9 @@ Feature: Browsing via API
 
   Scenario: Download primary_text from item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
     When I make a JSON request for the catalog primary text page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     Then I should get the primary text for "cooee:1-001"

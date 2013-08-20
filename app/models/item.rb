@@ -1,6 +1,7 @@
 include ActiveFedora::DatastreamCollections
 
 class Item < ActiveFedora::Base
+    include Hydra::ModelMixins::RightsMetadata
 
     has_metadata 'descMetadata', type: Datastream::ItemMetadata
 
