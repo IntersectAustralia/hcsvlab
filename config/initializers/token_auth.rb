@@ -7,9 +7,7 @@ module Devise
 
         valid = super
         if params[:format] == "json"
-          valid = valid && ((params[:controller] == 'item_lists' &&  %w{index show}.include?(params[:action])) || (params[:controller] == 'catalog' &&  %w{primary_text show annotations}.include?(params[:action])))
-        else
-          valid = valid && (params[:controller] == 'catalog' && params[:action] == 'document')
+          valid = valid && ( (params[:controller] == 'catalog' && params[:action] == 'document') ||(params[:controller] == 'item_lists' &&  %w{index show}.include?(params[:action])) || (params[:controller] == 'catalog' &&  %w{primary_text show annotations}.include?(params[:action])))
         end
         valid
       end

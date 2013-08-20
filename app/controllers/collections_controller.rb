@@ -31,6 +31,15 @@ class CollectionsController < ApplicationController
 
   end
 
+  def send_request_to_owner
+    collection = Collection.find(params[:collection_id])
+
+    Notifier.notify_data_owners_of_license_request(current_user.email, collection.ownerEmail, collection.flat_short_name)
+
+    flash[:notice] = "Sucessfully sent an access request for #{collection.flat_short_name}"
+    redirect_to licences_path
+  end  
+
   private
 
   #
