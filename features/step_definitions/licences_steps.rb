@@ -3,6 +3,7 @@ And /^I choose the (\d+)(?:|st|nd|rd|th) Collection in the list$/ do |position|
 end
 
 And /^The Collection Lists table should have$/ do |table|
+  page.find("#collection_lists")
   table.hashes.each_with_index do |row, index|
     page.should have_xpath("//table[@id='collection_lists']//tr[#{index+1}]//td[@class='name']/a", :text => row[:collection_list])
     page.should have_xpath("//table[@id='collection_lists']//tr[#{index+1}]//td[@class='owner']", :text => row[:owner])
@@ -16,6 +17,7 @@ And /^The Collection Lists table should have$/ do |table|
 end
 
 And /^The Collection table should have$/ do |table|
+  page.find("#collections")
   table.hashes.each_with_index do |row, index|
     page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='name']", :text => row[:collection])
 

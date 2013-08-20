@@ -39,7 +39,7 @@ Feature: Managing Collection Lists and Licences
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
-    Then I wait 5 seconds
+    #Then I wait 5 seconds
     #Then I should see "Collections list created successfully"
     And The Collection Lists table should have
       |collection_list    | owner                       | licence     | licence_terms |
@@ -57,7 +57,7 @@ Feature: Managing Collection Lists and Licences
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
-    Then I wait 5 seconds
+    #Then I wait 5 seconds
     #And I should see "Collections list created successfully"
     And The Collection Lists table should have
       |collection_list    | owner                       | licence     | licence_terms |
@@ -75,7 +75,7 @@ Feature: Managing Collection Lists and Licences
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
-    Then I wait 5 seconds
+    #Then I wait 5 seconds
     #And I should see "Collections list created successfully"
     And The Collection Lists table should have
       |collection_list    | owner                       | licence     | licence_terms |
@@ -90,7 +90,7 @@ Feature: Managing Collection Lists and Licences
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 2"
     And I press "Create Collections List"
-    Then I wait 5 seconds
+    #Then I wait 5 seconds
     #And I should see "Collections list created successfully"
     And The Collection Lists table should have
       |collection_list    | owner                       | licence     | licence_terms |
@@ -123,7 +123,7 @@ Feature: Managing Collection Lists and Licences
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
-    Then I wait 5 seconds
+    #Then I wait 5 seconds
     #And I should see "Collections list created successfully"
     And The Collection Lists table should have
       |collection_list    | owner                       | licence     | licence_terms |
@@ -150,7 +150,7 @@ Feature: Managing Collection Lists and Licences
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
-    Then I wait 5 seconds
+    #Then I wait 5 seconds
     #And I should see "Collections list created successfully"
     And The Collection Lists table should have
       |collection_list    | owner                       | licence     | licence_terms |
