@@ -7,6 +7,7 @@
 # 3. Fedora is up
 # 4. Solr is up
 # 5. The workers are running
+# 6. The web app is running
 #
 
 RET_STATUS=0
@@ -16,14 +17,17 @@ ACTIVEMQ_USER="admin:admin"
 
 FEDORA_ADMIN="fedoraAdmin:fedoraAdmin"
 
-PORT_NUMBER=8983
+WEB_PORT_NUMBER=3000
+JAVA_PORT_NUMBER=8983
 
 if [ ! -z "$RAILS_ENV" -a "$RAILS_ENV" != "development" ]
 then
-  PORT_NUMBER=8080
+  WEB_PORT_NUMBER=80
+  JAVA_PORT_NUMBER=8080
 fi
 
-JAVA_URL="http://localhost:${PORT_NUMBER}/"
+WEB_URL="http://localhost:${WEB_PORT_NUMBER}/"
+JAVA_URL="http://localhost:${JAVA_PORT_NUMBER}/"
 
 echo ""
 echo "Checking HCS vLab environment"
@@ -31,6 +35,7 @@ echo "Checking HCS vLab environment"
 echo ""
 echo "Rails env= $RAILS_ENV"
 echo "Java Container url= $JAVA_URL"
+echo "Web App url= $WEB_URL"
 
 # Disk space
 
@@ -95,7 +100,7 @@ done
 
 if [ "$java_status" == "200"  -o "$java_status" == "302" ]
 then
-  echo "+ The Java Container is listening on port $PORT_NUMBER (status= $java_status)"
+  echo "+ The Java Container is listening on port $JAVA_PORT_NUMBER (status= $java_status)"
 else
   echo "- WARN: It looks like the Java container is not running (status= $java_status)"
   RET_STATUS=1
@@ -139,6 +144,29 @@ else
   echo "- WARN: It looks like something is wrong with the A13g pollers (processes= $a13g_status)"
   RET_STATUS=1
 fi
+
+# Check the web app
+
+echo ""
+echo "Checking the web app..."
+
+let count=0
+while [ $count -lt 15 -a "$web_status" == "" ]
+do
+  sleep 2
+  web_status=`curl -I  ${WEB_URL} 2>/dev/null  | head -1 | awk '{print $2}' `
+  let count=count+1
+done
+
+if [ "$web_status" == "200"  -o "$web_status" == "302" ]
+then
+  echo "+ The Web App is listening on port $WEB_PORT_NUMBER (status= $web_status)"
+else
+  echo "- WARN: It looks like the Web App is not running (status= $web_status)"
+  RET_STATUS=1
+fi
+
+# End
 
 echo ""
 
