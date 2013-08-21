@@ -32,20 +32,29 @@ class CollectionListsController < ApplicationController
     end
 
     if (collections.length > 0)
-      collectionList = CollectionList.new
-      collectionList.name = params[:collection_list][:name]
-      collectionList.ownerEmail = current_user.email
-      collectionList.ownerId = current_user.id.to_s
+      begin
+        collectionList = CollectionList.new
+        collectionList.name = params[:collection_list][:name]
+        collectionList.ownerEmail = current_user.email
+        collectionList.ownerId = current_user.id.to_s
 
-      if collectionList.save
+        collectionList.save
         add_collections_to_collection_list(collectionList, collections)
         flash[:notice] = 'Collections list created successfully'
-        redirect_to licences_path
+      rescue ActiveFedora::RecordInvalid => e
+        errors = ""
+        e.record.errors.messages.each do |key, value|
+          value.each do |value2|
+            errors = errors + " #{value2}"
+          end
+        end
+
+        flash[:error] = "Error creating a collection list. #{errors}"
       end
     else
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
-      redirect_to licences_path
     end
+    redirect_to licences_path
   end
 
   def add_collections

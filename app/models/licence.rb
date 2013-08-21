@@ -12,6 +12,7 @@ class Licence < ActiveFedora::Base
   delegate :ownerEmail, to: 'descMetadata'
 
   validates_presence_of :flat_name, message: 'Licence Name can not be blank'
+  validates_length_of :flat_name, maximum: 255, message:"Name is too long (maximum is 255 characters)"
   validates_presence_of :flat_text, message: 'Licence Text can not be blank'
   validates_presence_of :flat_type, message: 'Type can not be blank'
 

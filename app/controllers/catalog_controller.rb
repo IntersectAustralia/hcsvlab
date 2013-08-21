@@ -11,8 +11,10 @@ class CatalogController < ApplicationController
 
   include Blacklight::Catalog
   include Hydra::Controller::ControllerBehavior
+  include Blacklight::BlacklightHelperBehavior
+
   # These before_filters apply the hydra access controls
-  #before_filter :enforce_show_permissions, :only=>:show
+  #before_filter :enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations]
   # This applies appropriate access controls to all solr queries
   #CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
   # This filters out objects that you want to exclude from search results, like FileAssets
@@ -247,23 +249,31 @@ class CatalogController < ApplicationController
 
   # override default show method to allow for json response
   def show
-    @response, @document = get_solr_response_for_doc_id
+    if Item.where(id: params[:id]).count != 0
+      @response, @document = get_solr_response_for_doc_id
+    elsif(Item.where(id: params[:id]).count == 0 and request.format.html?)
+      flash[:error] = "Sorry, you have requested a record that doesn't exist."
+      redirect_to root_url and return
+    end
     respond_to do |format|
       format.html { setup_next_and_previous_documents }
       format.json {}
       # Add all dynamically added (such as by document extensions)
       # export formats.
-      @document.export_formats.each_key do |format_name|
-        # It's important that the argument to send be a symbol;
-        # if it's a string, it makes Rails unhappy for unclear reasons. 
-        format.send(format_name.to_sym) { render :text => @document.export_as(format_name), :layout => false }
+      if !@document.nil?
+        @document.export_formats.each_key do |format_name|
+          # It's important that the argument to send be a symbol;
+          # if it's a string, it makes Rails unhappy for unclear reasons. 
+          format.send(format_name.to_sym) { render :text => @document.export_as(format_name), :layout => false }
+        end
       end
-
     end
   end
 
   def annotations
-    @response, @document = get_solr_response_for_doc_id
+    if Item.where(id: params[:id]).count != 0
+      @response, @document = get_solr_response_for_doc_id
+    end
     begin
       @item = Item.find(params[:id])
     rescue Exception => e
@@ -281,9 +291,7 @@ class CatalogController < ApplicationController
     item = Item.find(@document.id)
     send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
   end
-  
-  include Blacklight::BlacklightHelperBehavior
- 
+
   def document
     item = Item.find(params[:id])
 

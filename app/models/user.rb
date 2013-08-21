@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
 
   belongs_to :role
   has_many :item_lists
+  has_many :user_licence_agreements
 
 
   # Setup accessible attributes (status/approved flags should NEVER be accessible by mass assignment)
@@ -160,6 +161,31 @@ class User < ActiveRecord::Base
   def cannot_own_data?
     return !((Role.superuser_roles + Role.data_owner_roles).include? self.role)
   end
+
+  def groups
+    return self.user_licence_agreements.map{|a| a.groupName}
+  end
+
+  #
+  # Adds the permission level defined by 'accessType' to the given 'collection'
+  #
+  def add_agreement_to_collection(collection, accessType)
+    ula = UserLicenceAgreement.new
+    ula.groupName = "#{collection.flat_short_name}-#{accessType}"
+    ula.licenceId = collection.licence.id
+    ula.user = self
+    ula.save
+  end
+
+  #
+  # Removes the permission level defined by 'accessType' to the given 'collection'
+  #
+  #def remove_agreement_to_collection(collection, accessType)
+  #  groupName = "#{collection.flat_short_name}-#{accessType}"
+  #  ula = UserLicenceAgreement.where(:groupName=>groupName, :user=>self).first
+  #
+  #  ula.delete if !ula.nil?
+  #end
 
   private
 

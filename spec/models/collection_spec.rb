@@ -1,7 +1,13 @@
 require 'spec_helper'
 
 describe Collection do
-  
+  before(:each) do
+    Collection.delete_all
+  end
+  after(:each) do
+    Collection.delete_all
+  end
+
   describe "Collection Descriptive Metadata" do
 
     it "should persist metadata about a Collection" do

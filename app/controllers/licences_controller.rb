@@ -44,8 +44,8 @@ class LicencesController < ApplicationController
     collectionId = params[:collection]
 
     begin
-      tags = %w(a acronym b strong i em li ul ol h1 h2 h3 h4 h5 h6 blockquote br cite sub sup ins p table td tr)
-      sanitizedText = sanitize(text, tags: tags, attributes: %w(href title))
+      tags = %w(a acronym b strong i em span li ul ol h1 h2 h3 h4 h5 h6 blockquote br cite sub sup ins p table td tr)
+      sanitizedText = sanitize(text, tags: tags, attributes: %w(href title style))
 
       # First we have to create the collection.
       newLicence = Licence.new
@@ -71,6 +71,12 @@ class LicencesController < ApplicationController
       redirect_to licences_path
     rescue ActiveFedora::RecordInvalid => e
       @params = params
+      if (!collectionListId.nil?)
+        @CollectionList = CollectionList.find(collectionListId)
+      end
+      if (!collectionId.nil?)
+        @Collection = Collection.find(collectionId)
+      end
       @errors = e.record.errors.messages
       render 'licences/new'
     end
