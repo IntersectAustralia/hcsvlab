@@ -40,6 +40,11 @@ class Collection < ActiveFedora::Base
     self[:private_data_owner].first
   end
 
+  # ActiveFedora returns the value as an array, we need the first value
+  def flat_private_data_owner
+    self.flat_ownerEmail
+  end
+
   # ---------------------------------------
 
   #
