@@ -2,58 +2,32 @@
   = render :partial => 'sort_and_per_page'
 
   %table.table.table-condensed
-    %tbody
+    %thead
       %tr
-        %th.title Collections Title
+        %th.title Collection or Collection List
         %th.collection Collections
         %th.owner Owner
-        %th.access Access
-        %th.status Status
-      %tr.documentHeadersdf.clearfixsdf
-        %td.title
-          AusNC Collections
-        %td.collection
-          8
-        %td.owner
-          user@email.com
-        %td.access
-          Requested
-        %td.status
-          %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} View Licence
-      %tr.documentHeadersdf.clearfixsdf
-        %td.title
-          PARADISEC Collections
-        %td.collection
-          180
-        %td.owner
-          user@email.com
-        %td.access
-          Granted
-        %td.status
-          Agreed to on 04/08/2013
-      %tr.documentHeadersdf.clearfixsdf
-        %td.title
-          BLALA Collections
-        %td.collection
-          180
-        %td.owner
-          user@email.com
-        %td.access
-          .btn.btn-primary.btn-mini Request Access
-        %td.status
-          %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} View Licence
-
-      %tr.documentHeadersdf.clearfixsdf
-        %td.title
-          AVOZES Collections
-        %td.collection
-          1
-        %td.owner
-          user@email.com
-        %td.access
-          Granted
-        %td.status
-          %a.btn.btn-warning.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} View Licence
+        %th.state State
+        %th.actions Actions
+    %tbody
+      - current_user.get_all_licence_info(true).each_pair do |k, v|
+        %tr.documentHeadersdf.clearfixsdf
+          %td.title
+            =k.flat_name
+          %td.collection
+            =k.is_a?(Collection) ? "N/A" : k.collections.size
+          %td.owner
+            =k.flat_ownerEmail
+          %td.state
+            =v[:state]
+          %td.actions
+            - v[:actions].each do |action|
+              - if action == :view
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} View Licence
+              - if action == :viewForAcceptance
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} Preview Licence
+              - if action == :second_action
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_agreement_details", :role => "button"} Second Action
 
 
 #licence_agreement_details.modal.hide.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}

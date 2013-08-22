@@ -14,7 +14,7 @@ class LicencesController < ApplicationController
     @collection_lists = CollectionList.find(ownerId: current_user.id.to_s).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
 
     # gets the Collections of the logged user.
-    @collections = Collection.find(private_data_owner: current_user.email).to_a.sort! { |a,b| a.flat_short_name.downcase <=> b.flat_short_name.downcase }
+    @collections = Collection.find(private_data_owner: current_user.email).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
 
 
     create_pagination_structure(params)

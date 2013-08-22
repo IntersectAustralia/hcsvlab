@@ -178,6 +178,29 @@ class User < ActiveRecord::Base
   end
 
   #
+  # Does this user have the given permission level (defined by 'accessType')
+  # for the given 'collection'. If 'exact' is true, then it must be exactly
+  # that permission, if false then look for that permission or better.
+  #
+  def has_agreement_to_collection?(collection, accessType, exact=false)
+    if exact
+      group_names = ["#{collection.flat_short_name}-#{accessType}"]
+    else
+      group_names = UserLicenceAgreement::type_or_higher(accessType).map { |t|
+        "#{collection.flat_short_name}-#{t}"
+      }
+    end
+
+    user_licence_agreements.each { |ula|
+      group_names.each { |gn|
+        return true if ula.groupName == gn
+      }
+    }
+
+    return false
+  end
+
+  #
   # Removes the permission level defined by 'accessType' to the given 'collection'
   #
   #def remove_agreement_to_collection(collection, accessType)
@@ -186,6 +209,125 @@ class User < ActiveRecord::Base
   #
   #  ula.delete if !ula.nil?
   #end
+
+  # ===========================================================================
+  # Licence management
+  # ===========================================================================
+
+  #
+  # Return all my licensing information. The form of this is an array of
+  # Hashes. Each Hash contains a Collection or CollectionList and the
+  # information for it. Returns an empty Array (rather than nil) if there is no
+  # licensing information.
+  #
+  def get_all_licence_info(include_own = false)
+    result = []
+
+    CollectionList.all.each do |list|
+      result << get_collection_list_licence_info(list) if can_see_collection_list(list)
+    end
+
+    Collection.all.each do |coll|
+      result << get_collection_licence_info(coll) if can_see_collection(coll) && coll.collectionList.nil?
+    end
+
+    unless include_own
+      result = result.reject { |elt|
+        elt[:state] == "Owner"
+      }
+    end
+
+    return result
+  end
+
+  def get_collection_list_licence_info(list)
+    # TODO: (DC) Actually look up the licence status
+    if list.flat_ownerId == id.to_s
+      # I am the owner of this collection.
+      state = :owner
+    elsif self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
+      state = :accepted
+    else
+      state = :accepted
+    end
+    return {:item => list,
+            :type => :collection_list,
+            :state => state,
+            :state_label => get_name_for_state(state),
+            :actions => get_actions_for_state(state)}
+  end
+
+  def get_collection_licence_info(coll)
+    if coll.data_owner == self
+      # I, like, totally data own this collection.
+      state = :owner
+    elsif self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
+      state = :accepted
+    else
+      state = :not_accepted
+    end
+    return {:item => coll,
+            :type => :collection,
+            :state => state,
+            :state_label => get_name_for_state(state),
+            :actions => get_actions_for_state(state)}
+  end
+
+  def get_name_for_state(state)
+    case state
+      when :unapproved
+        return "Unapproved"
+      when :waiting
+        return "Awaiting Approval"
+      when :rejected
+        return "Rejected"
+      when :approved
+        return "Approved"
+      when :accepted
+        return "Accepted"
+      when :not_accepted
+        return "Not Accepted"
+      when :owner
+        return "Owner"
+      else
+        return "unknown"
+    end
+  end
+
+  def get_actions_for_state(state)
+    case state
+      when :unapproved
+        return %i(viewForRequest)
+      when :waiting
+        return %i(view cancel)
+      when :rejected
+        return %(viewForRequest)
+      when :approved
+        return %i(viewForAcceptance)
+      when :accepted
+        return %i(view)
+      when :not_accepted
+        return %i(viewForAcceptance)
+#        return %i(viewForAcceptance view cancel viewForRequest)
+      else
+        return []
+    end
+  end
+
+  def can_see_collection(coll)
+    # TODO: (DC) check visibility of collections properly (or remove completely if we end up doing it by another mechanism)
+    return false if coll.licence.nil?
+    return true
+  end
+
+  def can_see_collection_list(coll)
+    # TODO: (DC) check visibility of collection lists properly (or remove completely if we end up doing it by another mechanism)
+    return false if coll.licence.nil?
+    return true
+  end
+
+  # end of Licence Management
+  # -------------------------
 
   private
 

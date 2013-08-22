@@ -26,7 +26,7 @@ class CollectionsController < ApplicationController
 
     collection.setLicence(licence)
 
-    flash[:notice] = "Successfully added licence to #{collection.flat_short_name}"
+    flash[:notice] = "Successfully added licence to #{collection.flat_name}"
     redirect_to licences_path
 
   end

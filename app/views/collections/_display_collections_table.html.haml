@@ -34,7 +34,7 @@
               -if (aCollection.collectionList.nil?)
                 %input.toggle_collection{:name => "#{aCollection.id}", :type => "checkbox", :id => "checkbox_collection_#{index}"}/
             %td.name
-              = aCollection.flat_short_name
+              = aCollection.flat_name
             %td.collection
               -if !(aCollection.collectionList.nil?)
                 .label.licence

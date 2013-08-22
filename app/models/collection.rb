@@ -21,6 +21,11 @@ class Collection < ActiveFedora::Base
 
 
   # ActiveFedora returns the value as an array, we need the first value
+  def flat_name
+    flat_short_name
+  end
+
+  # ActiveFedora returns the value as an array, we need the first value
   def flat_short_name
     self[:short_name].first
   end
@@ -31,7 +36,7 @@ class Collection < ActiveFedora::Base
   end
 
   # ActiveFedora returns the value as an array, we need the first value
-  def flat_private_data_owner
+  def flat_ownerEmail
     self[:private_data_owner].first
   end
 
