@@ -49,6 +49,7 @@ HcsvlabWeb::Application.routes.draw do
           get :access_requests
           get :index
           get :admin
+          post :accept_licence_terms
         end
         member do
           put :reject
