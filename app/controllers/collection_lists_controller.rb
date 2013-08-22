@@ -54,7 +54,7 @@ class CollectionListsController < ApplicationController
     else
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
     end
-    redirect_to licences_path
+    redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
   end
 
   def add_collections
@@ -69,11 +69,11 @@ class CollectionListsController < ApplicationController
 
       add_collections_to_collection_list(collectionList, collections)
       flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collectionList.flat_name}"
-      redirect_to licences_path
     else
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
-      redirect_to licences_path
     end
+
+    redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
   end
 
   def remove_collection
@@ -106,7 +106,7 @@ class CollectionListsController < ApplicationController
     Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
 
     flash[:notice] = "Collection list #{name} deleted successfully"
-    redirect_to licences_path
+    redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
   end
 
   def add_licence_to_collection_list
@@ -114,7 +114,8 @@ class CollectionListsController < ApplicationController
     collectionList.setLicence(params[:licence_id])
 
     flash[:notice] = "Successfully added licence to #{collectionList.flat_name}"
-    redirect_to licences_path
+    redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
+
   end
 
   private

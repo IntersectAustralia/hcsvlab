@@ -180,12 +180,12 @@ class User < ActiveRecord::Base
   #
   # Removes the permission level defined by 'accessType' to the given 'collection'
   #
-  #def remove_agreement_to_collection(collection, accessType)
-  #  groupName = "#{collection.flat_short_name}-#{accessType}"
-  #  ula = UserLicenceAgreement.where(:groupName=>groupName, :user=>self).first
-  #
-  #  ula.delete if !ula.nil?
-  #end
+  def remove_agreement_to_collection(collection, accessType)
+    groupName = "#{collection.flat_short_name}-#{accessType}"
+    ula = UserLicenceAgreement.where(:groupName=>groupName, :user_id=>self.id).first
+
+    ula.delete if !ula.nil?
+  end
 
   private
 

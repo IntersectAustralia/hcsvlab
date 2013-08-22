@@ -13,7 +13,7 @@
         %li
           %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
     %label#showhide-assigned.btn.checkbox
-      %input{type: "checkbox", onClick: "show_or_hide_grouped_collections()"} Hide grouped Collections
+      %input{type: "checkbox", id:"hide_show_checkbox", onClick: "hide_grouped_collections(this.checked);"} Hide grouped Collections
 
   #documents
     %table#collections.table.table-condensed
@@ -89,6 +89,8 @@
 
         = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_new_collection_list"}
         = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_new_collection_list"}
+        = hidden_field_tag :hide, nil, {id: "hide_for_add_collection_to_new_collection_list"}
+
 
     .modal-footer
       %a.btn{:"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
@@ -99,10 +101,12 @@
   = hidden_field_tag :id, nil, {id: "id_for_add_collection_to_collection_list"}
   = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_collection_list"}
   = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_collection_list"}
+  = hidden_field_tag :hide, nil, {id: "hide_for_add_collection_to_collection_list"}
 
 = form_tag({:controller => "collections", :action => "add_licence_to_collection"}, :id => "add_licence_to_collection_form", :onSubmit => "showProgressAnimation();") do
   = hidden_field_tag :collection_id, nil, {id: "collection_id_for_add_licence_to_collection"}
   = hidden_field_tag :licence_id, nil, {id: "licence_id_for_add_licence_to_collection"}
+  = hidden_field_tag :hide, nil, {id: "hide_for_add_licence_to_collection"}
 
 = render :partial=>"shared/modal_waiting_panel"
 
@@ -177,8 +181,8 @@
     jQuery("#collection_list_name").val("");
   };
 
-  function show_or_hide_grouped_collections() {
-    if (jQuery(".groupedCollection")[0].style.display == "none") {
+  function hide_grouped_collections(hide) {
+    if (hide == false) {
       jQuery(".groupedCollection").css( "display", "" );
     } else {
       jQuery(".groupedCollection").css( "display", "none" );
@@ -187,8 +191,12 @@
 
   function add_licence_to_collection(collection_id, licence_id) {
     showProgressAnimation();
+
+    var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
+
     $("#collection_id_for_add_licence_to_collection").val(collection_id);
     $("#licence_id_for_add_licence_to_collection").val(licence_id);
+    $("#hide_for_add_licence_to_collection").val(isChecked)
     $("#add_licence_to_collection_form").submit();
   };
 
@@ -215,8 +223,12 @@
    */
   jQuery("#create_collection_list").click( function() {
   	clearData();
+    var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
+
     generateCollectionsIds("#collection_ids_for_add_collection_to_new_collection_list");
-    jQuery("#add_all_collections_for_add_collection_to_new_collection_list").val("false");
+    $("#add_all_collections_for_add_collection_to_new_collection_list").val("false");
+    $("#hide_for_add_collection_to_new_collection_list").val(isChecked)
+
   });
 
 
@@ -233,9 +245,13 @@
    */
   jQuery("A[href='#add_to_existing_collection_list']").click( function() {
     collectionListId=$(this).attr('id');
+    var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
+
     generateCollectionsIds("#collection_ids_for_add_collection_to_collection_list");
-    jQuery("#id_for_add_collection_to_collection_list").val(collectionListId);
-    jQuery("#add_all_collections_for_add_collection_to_collection_list").val("false");
+    $("#id_for_add_collection_to_collection_list").val(collectionListId);
+    $("#add_all_collections_for_add_collection_to_collection_list").val("false");
+    $("#hide_for_add_collection_to_collection_list").val(isChecked)
+
     jQuery("#add_collection_to_collection_list").submit();
   });
 
@@ -253,3 +269,12 @@
   jQuery('#new_collection_list').on('shown', function () {
     jQuery('input:text:visible:first', this).focus();
   })
+
+-if (params[:hide].nil? or "f".eql?(params[:hide]))
+  :javascript
+    $('#hide_show_checkbox').prop('checked', false);
+    hide_grouped_collections(false);
+-else
+  :javascript
+    $('#hide_show_checkbox').prop('checked', true);
+    hide_grouped_collections(true);

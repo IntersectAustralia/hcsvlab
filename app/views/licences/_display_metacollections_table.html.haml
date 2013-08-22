@@ -62,18 +62,39 @@
                     .modal-footer
                       %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               %td.actions
-                =link_to(coll_list, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Collections List "'+ coll_list.flat_name + '"?\', event));', :id => "delete_collections_list_#{coll_list.id}") do
+                %a{:href=>"#", :onclick => "remove_collection_list('#{coll_list.id}', '#{coll_list.flat_name}')"}
                   %i.icon-trash
 
 = form_tag({:controller => "collection_lists", :action => "add_licence_to_collection_list"}, :id => "add_licence_to_collection_list_form", :onSubmit => "showProgressAnimation();") do
   = hidden_field_tag :id, nil,  {id: "id_for_add_licence_to_collection_list"}
   = hidden_field_tag :licence_id, nil, {id: "licence_id_add_licence_to_collection_list"}
+  = hidden_field_tag :hide, nil, {id: "hide_for_add_licence_to_collection_list"}
+
+= form_tag(collection_lists_path, :method=>:delete, :id => "delete_collection_list_form", :onSubmit => "showProgressAnimation();") do
+  = hidden_field_tag :id, nil,  {id: "id_for_delete_collection_list"}
+  = hidden_field_tag :hide, nil, {id: "hide_for_delete_collection_list"}
+
 
 :javascript
 
+  function remove_collection_list(collectionListId, collectionListName) {
+    var confirm = confirmDelete('Are you sure you want to remove the Collections List "'+ collectionListName + '"');
+    if (confirm) {
+      var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
+      var action = $('#delete_collection_list_form').attr('action');
+      $('#delete_collection_list_form').attr('action', action+"/"+collectionListId);
+      $('#id_for_delete_collection_list').val(collectionListId)
+      $("#hide_for_delete_collection_list").val(isChecked)
+      $('#delete_collection_list_form').submit();
+    }
+  }
+
   function add_licence_to_collection_list(collection_id, licence_id) {
+    var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
+
     $("#id_for_add_licence_to_collection_list").val(collection_id);
     $("#licence_id_add_licence_to_collection_list").val(licence_id);
+    $("#hide_for_add_licence_to_collection_list").val(isChecked)
     $("#add_licence_to_collection_list_form").submit();
   };
 
