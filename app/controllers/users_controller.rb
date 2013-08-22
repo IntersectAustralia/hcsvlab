@@ -81,4 +81,27 @@ class UsersController < ApplicationController
       redirect_to(edit_approval_user_path(@user), :alert => "Please select a role for the user.")
     end
   end
+
+
+  #
+  # Accept the licence for the given collection
+  #
+  def accept_licence_terms
+    type = params[:type]
+    coll_id = params[:coll_id]
+
+    if type == "collection"
+      coll = Collection.find(coll_id)
+      current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
+    else
+      list = CollectionList.find(coll_id)
+      list.collections.each { |coll|
+        current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
+      }
+    end
+
+    flash[:notice] = "License terms to #{type} #{coll.flat_short_name} accepted."
+    redirect_to account_licence_agreements_path
+  end
+
 end
