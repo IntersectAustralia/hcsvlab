@@ -33,6 +33,7 @@ class Ability
     #return unless user.role
 
     can :manage, ItemList, :user_id => user.id
+    can :accept_licence_terms, User
 
     superuser = user.is_superuser?
     if superuser
