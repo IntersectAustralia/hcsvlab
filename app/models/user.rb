@@ -248,7 +248,7 @@ class User < ActiveRecord::Base
     elsif self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
       state = :accepted
     else
-      state = :accepted
+      state = :not_accepted
     end
     return {:item => list,
             :type => :collection_list,
