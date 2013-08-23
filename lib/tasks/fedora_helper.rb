@@ -139,36 +139,8 @@ def look_for_annotations(item, metadata_filename)
   return if annotation_filename == metadata_filename # HCSVLAB-441
 
   if File.exists?(annotation_filename)
-    doc = Document.new
-    doc.rdfMetadata.graph.load(annotation_filename, :format => :ttl)
-    query = RDF::Query.new({
-                               :annotation => {
-                                   RDF::URI("http://purl.org/dada/schema/0.2#partof") => :part_of
-                               }
-                           })
-    results = query.execute(doc.rdfMetadata.graph)
-    doc.file_name = annotation_filename
-    doc.type = 'Annotation'
-    doc.label = results[0][:part_of] unless results.size == 0
-    doc.item = item
-
-    # Add Groups to the created document
-    #puts "    Creating annotations document groups (discover, read, edit)"
-    doc.set_discover_groups(["#{item.collection.first}-discover"], [])
-    doc.set_read_groups(["#{item.collection.first}-read"], [])
-    doc.set_edit_groups(["#{item.collection.first}-edit"], [])
-    # Add complete permission for data_owner
-    data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
-    if (!data_owner.nil?)
-      #puts "    Creating annotations document users (discover, read, edit) with #{data_owner}"
-      doc.set_discover_users([data_owner], [])
-      doc.set_read_users([data_owner], [])
-      doc.set_edit_users([data_owner], [])
-    end
-
-    doc.save
     item.add_named_datastream('annotation_set', :dsLocation => "file://" + annotation_filename, :mimeType => 'text/plain')
-    puts "Annotation Document = #{doc.pid.to_s}" unless Rails.env.test?
+    puts "Annotation datastream added for #{File.basename(annotation_filename)}" unless Rails.env.test?
   end
 end
 
