@@ -63,6 +63,12 @@ module NavigationHelpers
       when /^the licences page$/
         licences_path(options)
 
+      when /^the collection page for "(.*)"$/
+        collection_path(Collection.find_by_short_name($1), options)
+
+      when /^the collections page$/
+        collections_path(options)
+
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:
 #
