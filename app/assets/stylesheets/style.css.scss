@@ -256,6 +256,12 @@ li > .dropdown-menu {
   border-top: 1px solid #DDD;
   color: #999;
 }
+
+.facets-collections {
+  overflow-y:auto;
+  height:350px;
+}
+
 .facets-collapse .facet_limit h5:hover {
 background-color: #e6e6e6;
   color: #666;

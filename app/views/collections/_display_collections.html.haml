@@ -1,0 +1,16 @@
+.span3{:id=>"sidebar"}
+  .facets.sidenav{:id => "facets"}
+    %h4 Collections
+    - if (@collections.empty?)
+      %div
+        %h5{} Empty
+    -else
+      .facets-collapse.facets-collections
+        - @collections.each do |collection|
+          - selectedClass="selected" if (collection.id == (params[:id]))
+          .facet_limit
+            %h5{:class => "twiddle"}
+              =link_to collection_path(collection) do
+                %span{:class => selectedClass}
+                  %div{:style=>"display:inline-block;width:90%;"}
+                    =collection.flat_short_name

@@ -38,6 +38,13 @@
       - if solr_fname == 'OLAC_language'
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
           = raw render_language_codes document[solr_fname]
+      - elsif solr_fname == 'HCSvLab_collection'
+        %dd{:class => "blacklight-#{solr_fname.parameterize}"}
+          - coll = Collection.find_by_short_name(document[solr_fname])[0]
+          - if !coll.nil?
+            = link_to(format_duplicates(document[solr_fname]), collection_path(coll))
+          - else
+            = render_document_show_field_value document, :field => solr_fname
       - elsif solr_fname == 'DC_type'
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
           = format_duplicates(document[solr_fname])

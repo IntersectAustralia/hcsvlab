@@ -1,0 +1,14 @@
+%content
+  %h1= @collection.flat_short_name
+.document
+  %h3
+    %span Collection Details
+  %dl.dl-horizontal.dl-invert
+    - collection_show_fields(@collection.id).each do |field|
+      %dt
+        = field.first[0]
+      %dd
+        - if field.first[0] == "RDF_type"
+          = File.basename(field.first[1])
+        - else
+          = field.first[1]

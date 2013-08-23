@@ -750,6 +750,31 @@ module Blacklight::BlacklightHelperBehavior
     return document_descriptors
   end
 
+  def collection_show_fields(collection_id)
+    uri = buildURI(collection_id, 'rdfMetadata')
+    graph = RDF::Graph.load(uri)
+
+    fields = graph.statements.map { |i| {collection_label(MetadataHelper::short_form(i.predicate)) => collection_value(graph, i.predicate)} }.uniq
+  end
+
+  def collection_label(key)
+    config = YAML.load_file("#{Rails.root.to_s}/config/collection_label_map.yml")
+    if config["labels"][key].nil?
+      key
+    else
+      config["labels"][key]
+    end
+  end
+
+  def collection_value(graph, field)
+    matching = graph.find_all { |st| st.predicate == field }
+    if matching.count == 1
+      return matching.first.object
+    else
+      return format_duplicates(matching.map { |i| i.object })
+    end
+  end
+
   #
   # =============================================================================
   # Utility Formatting methods

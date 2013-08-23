@@ -2,19 +2,18 @@ class CollectionsController < ApplicationController
   before_filter :authenticate_user!
   #load_and_authorize_resource
 
+  set_tab :collection
+
   PER_PAGE_RESULTS = 20
 
   def index
-    # used to populate the drop downs
-    @collectionLists = CollectionList.find(ownerEmail: current_user.email)
-
-    @collections = Collection.find(private_data_owner: current_user.email)
-
-    # By now pagination will no be enabled. I will leave it commented, just in case.
-    #create_pagination_structure(params)
+    @collections = Collection.all.sort_by { |coll| coll.flat_short_name}
   end
 
   def show
+    @collections = Collection.all.sort_by { |coll| coll.flat_short_name}
+    @collection = Collection.find(params[:id])
+    render :index
   end
 
   def new

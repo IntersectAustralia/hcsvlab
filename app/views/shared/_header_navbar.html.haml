@@ -9,5 +9,7 @@
             = link_to "Discover", root_path
           %li{ class: activepath?(item_lists_path) }
             = link_to "Item Lists", item_lists_path
+          %li{class: activepath?(collections_path) }
+            = link_to "Collections", collections_path
         %ul.nav.pull-right
           = render :partial => '/user_util_links'

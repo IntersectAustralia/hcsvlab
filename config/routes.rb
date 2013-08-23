@@ -41,6 +41,9 @@ HcsvlabWeb::Application.routes.draw do
   resources :issue_reports, :only => [:new, :create] do
   end
 
+  resources :collections, :only => [:index, :show], :path => "/collections" do
+  end
+
   resources :admin, :only => [:index] do
     collection do
 
@@ -63,8 +66,7 @@ HcsvlabWeb::Application.routes.draw do
         end
       end
 
-      resource :collection, :only => [:index, :new, :create], :path => "/collections" do
-        get :index
+      resources :collections, :only => [:new, :create], :path => "/collections" do
         collection do
           post 'add_licence_to_collection'
         end
