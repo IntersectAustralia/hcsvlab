@@ -142,10 +142,10 @@ Feature: Browsing via API
       | collectionName  | accessType  |
       | cooee           | read        |
     When I make a JSON request for the catalog page for "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 200 response code
-    And the JSON response should be:
+    Then I should get a 404 response code
+    Then the JSON response should be:
     """
-    {"error":"Item does not exist with given id"}
+    {"error":"not-found"}
     """
 
   Scenario: Get annotations for item

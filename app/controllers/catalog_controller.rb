@@ -250,10 +250,15 @@ class CatalogController < ApplicationController
   # override default show method to allow for json response
   def show
     if Item.where(id: params[:id]).count != 0
-      @response, @document = get_solr_response_for_doc_id
-    elsif(Item.where(id: params[:id]).count == 0 and request.format.html?)
-      flash[:error] = "Sorry, you have requested a record that doesn't exist."
-      redirect_to root_url and return
+        @response, @document = get_solr_response_for_doc_id
+    elsif(Item.where(id: params[:id]).count == 0)
+        respond_to do |format|
+            format.html { 
+                flash[:error] = "Sorry, you have requested a record that doesn't exist."
+                redirect_to root_url and return
+            }
+            format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+        end
     end
     respond_to do |format|
       format.html { setup_next_and_previous_documents }
