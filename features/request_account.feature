@@ -11,14 +11,13 @@ Feature: Request an account
   @javascript
   Scenario: HCSVLAB-247 - Request account 
     Given I am on the request account page
+    Then I should see "Once your registration is confirmed, you will get access to collections by agreeing to the licence terms for those collections."
     When I fill in the following:
       | Email            | georgina@intersect.org.au |
       | Password         | paS$w0rd                  |
       | Confirm Password | paS$w0rd                  |
       | First Name       | Fred                      |
       | Last Name        | Bloggs                    |
-    And I check "I agree to the AusNC Terms of Use."
-    And I check "I agree to the PARADISEC Conditions of Access."
     And I press "Submit Request"
     Then I should see "Thanks for requesting an account. You will receive an email when your request has been approved."
     And I should not see "Your account is not active"
