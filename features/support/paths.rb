@@ -46,7 +46,15 @@ module NavigationHelpers
         item_lists_path(options)
 
       when /^the item list page for "(.*)"$/
-        item_list_path(ItemList.find_by_name($1), options)
+        attempts = 10
+        itemList = nil
+        x=0
+        while (itemList.nil? and x < attempts)
+          itemList = ItemList.find_by_name($1)
+          x = x + 1
+          sleep 1000 if itemList.nil?
+        end
+        item_list_path(itemList, options)
 
       when /^the catalog page$/
         catalog_index_path(options)

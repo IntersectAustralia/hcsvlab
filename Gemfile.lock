@@ -410,6 +410,10 @@ GEM
       json_pure (>= 1.4)
       net-http-persistent (>= 1.4)
       rdf (>= 1.0)
+    spreewald (0.6.1)
+      capybara
+      cucumber
+      cucumber-rails
     sprockets (2.2.2)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -504,6 +508,7 @@ DEPENDENCIES
   simplecov-rcov
   solrizer
   sparql
+  spreewald
   stomp
   tabs_on_rails
   therubyracer
