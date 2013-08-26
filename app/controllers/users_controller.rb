@@ -93,14 +93,16 @@ class UsersController < ApplicationController
     if type == "collection"
       coll = Collection.find(coll_id)
       current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
+      name = coll.flat_name
     else
       list = CollectionList.find(coll_id)
       list.collections.each { |coll|
         current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
       }
+      name = list.flat_name
     end
 
-    flash[:notice] = "License terms to #{type} #{coll.flat_short_name} accepted."
+    flash[:notice] = "Licence terms to #{type} #{name} accepted."
     redirect_to account_licence_agreements_path
   end
 
