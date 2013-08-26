@@ -1,6 +1,7 @@
 #content
   = render :partial => 'sort_and_per_page'
 
+  - done_some = false
   %table.table.table-condensed
     %thead
       %tr
@@ -11,6 +12,7 @@
         %th.actions Actions
     %tbody
       - current_user.get_all_licence_info(true).each_with_index do |k, index|
+        - done_some = true
         %tr.documentHeadersdf.clearfixsdf
           %td.title
             =k[:item].flat_name
@@ -72,6 +74,9 @@
                   .modal-footer
                     %a.btn.btn-secondary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Dismiss
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Cancel Request
+  - unless done_some
+    There are no licensed collections or collection lists visible in the system
+
 
 = form_tag({:controller => "users", :action => "accept_licence_terms"}, :id => "accept_licence_terms_form", :onSubmit => "showProgressAnimation();") do
   = hidden_field_tag :type, nil,  {id: "type_for_accept_licence_terms"}
