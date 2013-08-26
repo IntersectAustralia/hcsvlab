@@ -1,21 +1,3 @@
-%h4 AusNC Terms of Use
-%div{class: 'licence_box_AusNC', title: 'AusNC Terms of Use', style: 'overflow: auto; overflow-x: hidden; width:600px; height:200px; border:1px solid gray; padding:5px'}
-  = render :partial => 'ausnc', :locals  => {:f => f}
+%h3 Terms of Use
 
-%h4 PARADISEC Conditions of Access
-%div{class: 'licence_box_PARADIDEC', title: 'PARADISEC Conditions of Access', style: 'overflow: auto; overflow-x: hidden; width:600px; height:200px; border:1px solid gray; padding:5px'}
-  = render :partial => 'paradisec', :locals  => {:f => f}
-
-<script type="text/javascript">
-function checkEnableCommit() {
-var count = 0
-if (document.getElementById("licence_ausnc").checked) { count = count + 1 }
-if (document.getElementById("licence_paradisec").checked) { count = count + 1 }
-document.getElementById("submit-button").disabled = (count != 2)
-}
-$( document ).ready(checkEnableCommit);
-</script>
-%label.checkbox
-  <input type="checkbox" id="licence_ausnc" value="AusNC" onchange="checkEnableCommit()">I agree to the AusNC Terms of Use.
-%label.checkbox
-  <input type="checkbox" id="licence_paradisec" value="PARADISEC" onchange="checkEnableCommit()">I agree to the PARADISEC Conditions of Access.
+Once your registration is confirmed, you will get access to collections by agreeing to the licence terms for those collections.
