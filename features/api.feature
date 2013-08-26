@@ -83,14 +83,17 @@ Feature: Browsing via API
     | the home page                   | 406  |
 
   Scenario Outline: Visit pages with an invalid API token and JSON format
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
     When I make a JSON request for <page> with an invalid API token
     Then I should get a <code> response code
   # home page does not accept json response
   Examples:
-    | page                            | code |
-    | the item lists page             | 401  |
-    | the item list page for "Test 1" | 401  |
-    | the home page                   | 406  |
+    | page                                          | code |
+    | the item lists page                           | 401  |
+    | the item list page for "Test 1"               | 401  |
+    | the catalog page for "hcsvlab:1"              | 401  |
+    | the catalog primary text page for "hcsvlab:1" | 401  |
+    | the home page                                 | 406  |
 
   Scenario: Get item lists for researcher
     When I make a JSON request for the item lists page with the API token for "researcher1@intersect.org.au"
@@ -99,6 +102,27 @@ Feature: Browsing via API
     And the JSON response should have "$..name" with a length of 2
     And the JSON response should have "$..name" with the text "Test 1"
     And the JSON response should have "$..name" with the text "Test 2"
+
+  Scenario: Get item lists for researcher with no item lists
+    Given I have users
+      | email                        | first_name | last_name |
+      | researcher2@intersect.org.au | Researcher | Two       |
+    And "researcher2@intersect.org.au" has role "researcher"
+    And "researcher2@intersect.org.au" has an api token
+    When I make a JSON request for the item lists page with the API token for "researcher2@intersect.org.au"
+    Then I should get a 200 response code
+    Then the JSON response should be:
+    """
+    []
+    """
+  Scenario: Get item list detail for researcher
+    When I make a JSON request for the item list page for "Test 1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should have "$..name" with the text "Test 1"
+
+  Scenario: Get item list detail for researcher for item list that doesn't exist
+    When I make a JSON request for the item list page for item list "666" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
 
   Scenario: Get item details
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
@@ -111,6 +135,18 @@ Feature: Browsing via API
       | json_path           | text                                                   |
       | $..annotations_url  | http://example.org/catalog/hcsvlab:1/annotations.json  |
       | $..primary_text_url | http://example.org/catalog/hcsvlab:1/primary_text.json |
+
+
+  Scenario: Get item details for non-existent item (TODO: should return 404, probably?)
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog page for "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"error":"Item does not exist with given id"}
+    """
 
   Scenario: Get annotations for item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
@@ -157,3 +193,15 @@ Feature: Browsing via API
     When I make a JSON request for the catalog primary text page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     Then I should get the primary text for "cooee:1-001"
+
+  Scenario: Download primary_text from item that doesn't exist
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog primary text page for "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+    Then the JSON response should be:
+    """
+    {"error":"not-found"}
+    """
