@@ -287,9 +287,15 @@ class CatalogController < ApplicationController
   end
 
   def primary_text
-    @response, @document = get_solr_response_for_doc_id
-    item = Item.find(@document.id)
-    send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
+    begin
+        item = Item.find(params[:id])
+        send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
+    rescue Exception => e
+        respond_to do |format|
+            format.html { raise ActionController::RoutingError.new('Not Found') }
+            format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+        end
+    end
   end
 
   def document
