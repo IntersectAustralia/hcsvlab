@@ -110,6 +110,10 @@ And /^Show Browser Inspector$/ do
   page.driver.debug
 end
 
+And /^Save a screenshot with name "([^\"]*)"$/ do |name|
+  page.save_screenshot(name)
+end
+
 And /^I fill in tiny_mce editor with "([^"]*)"$/ do |text|
   evaluate_script("tinyMCE.activeEditor.setContent('" + text + "');")
 end
