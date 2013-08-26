@@ -64,8 +64,7 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 
 #Cucumber::Rails.logger.level = Logger::ERROR
 
-require 'spreewald_support/tolerance_for_selenium_sync_issues'
-
+#require 'spreewald_support/tolerance_for_selenium_sync_issues'
 require 'capybara/poltergeist'
 
 Capybara.register_driver :poltergeist do |app|

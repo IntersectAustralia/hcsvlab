@@ -65,7 +65,7 @@ group :test do
   gem 'simplecov-rcov'
   gem "poltergeist"
   gem "selenium-webdriver"
-  gem 'spreewald'
+  #gem 'spreewald'
 end
 
 gem "jsonpath"

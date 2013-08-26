@@ -48,11 +48,12 @@ module NavigationHelpers
       when /^the item list page for "(.*)"$/
         attempts = 10
         itemList = nil
-        x=0
-        while (itemList.nil? and x < attempts)
+        count=0
+        while (itemList.nil? and count < attempts)
           itemList = ItemList.find_by_name($1)
-          x = x + 1
-          sleep 1000 if itemList.nil?
+          count = count + 1
+          puts "######## ItemList '#{($1)}' not found, retying in 5 secs." if itemList.nil?
+          sleep 5 if itemList.nil?
         end
         item_list_path(itemList, options)
 
