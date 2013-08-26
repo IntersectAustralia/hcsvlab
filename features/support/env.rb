@@ -62,6 +62,10 @@ end
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
+#Cucumber::Rails.logger.level = Logger::ERROR
+
+require 'spreewald_support/tolerance_for_selenium_sync_issues'
+
 require 'capybara/poltergeist'
 
 Capybara.register_driver :poltergeist do |app|
@@ -75,3 +79,7 @@ end
 Capybara.javascript_driver = :poltergeist
 #Capybara.javascript_driver = :poltergeist_debug
 #Capybara.javascript_driver = :selenium
+
+Before do |scenario|
+  puts "Starting Scenario: #{scenario.name}"
+end

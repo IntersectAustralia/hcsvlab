@@ -17,7 +17,6 @@ Feature: Managing Item Lists
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
     And I have done a search with collection "cooee"
-#    Then Show Browser Inspector
     And I should see the applied facet "Collection" with the value "cooee"
     And I should get exactly 3 results
     And I should see "1 - 3 of 3"
