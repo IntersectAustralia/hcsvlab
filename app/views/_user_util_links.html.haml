@@ -35,7 +35,7 @@
       - if current_user.is_superuser? || current_user.is_data_owner?
         %li.divider
         %li= link_to "Admin", admin_index_path
-        %li= link_to "Licence Management", account_licence_agreements_path
+        %li= link_to "Licence Agreements", account_licence_agreements_path
       %li.divider
       %li= link_to "Report An Issue", new_issue_report_path(:url => request.original_url)
     %li.divider
