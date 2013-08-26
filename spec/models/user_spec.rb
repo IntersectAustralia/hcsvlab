@@ -258,5 +258,45 @@ describe User do
       supers.should eq(["a@intersect.org.au", "c@intersect.org.au"])
     end
   end
+
+  describe "User Licence Agreement Acceptance" do
+    before(:each) do
+      CollectionList.delete_all
+      Collection.delete_all
+      Licence.delete_all
+    end
+    after(:each) do
+      CollectionList.delete_all
+      Collection.delete_all
+      Licence.delete_all
+    end
+
+    it "Should add read group to the user" do
+      user = FactoryGirl.create(:user, :status => 'A')
+      collection  = FactoryGirl.create(:collection, :short_name=>"ace")
+      licence = FactoryGirl.create(:licence)
+      collection.licence = licence
+
+      user.add_agreement_to_collection(collection, UserLicenceAgreement::READ_ACCESS_TYPE)
+
+      user.groups.should eq(["ace-read"])
+    end
+
+    it "Should remove read group to the user" do
+      user = FactoryGirl.create(:user, :status => 'A')
+      collection  = FactoryGirl.create(:collection, :short_name=>"ace")
+      licence = FactoryGirl.create(:licence)
+      collection.licence = licence
+
+      user.add_agreement_to_collection(collection, UserLicenceAgreement::READ_ACCESS_TYPE)
+
+      user.groups.should eq(["ace-read"])
+
+      user.remove_agreement_to_collection(collection, UserLicenceAgreement::READ_ACCESS_TYPE)
+      user.reload
+
+      user.groups.should be_empty
+    end
+  end
   
 end

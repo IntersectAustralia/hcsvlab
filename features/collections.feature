@@ -23,6 +23,12 @@ Feature: Collections
     And I should see "austlit"
     And I should see "Select a collection to view"
 
+  Scenario: Access collection details from the collections page
+    Given I am on the collections page
+    And I follow "austlit"
+    Then I should see "austlit"
+    And I should see "Collection Details"
+
   Scenario: Access collection details from item details page
     Given I am on the catalog page for "hcsvlab:1"
     And I follow "cooee"
