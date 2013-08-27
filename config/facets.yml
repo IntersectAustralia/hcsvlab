@@ -20,6 +20,16 @@
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
+    :name: AUSNC_publication_status
+    :label: Publication Status
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: AUSNC_written_mode
+    :label: Written Mode
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
     :name: AUSNC_interactivity
     :label: Interactivity
     :limit: 2000
@@ -27,6 +37,16 @@
   -
     :name: AUSNC_communication_context
     :label: Communication Context
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: AUSNC_communication_medium
+    :label: Communication Medium
+    :limit: 2000
+    :partial: 'catalog/sorted_facet'
+  -
+    :name: AUSNC_communication_setting
+    :label: Communication Setting
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -

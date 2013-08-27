@@ -138,11 +138,12 @@ class CatalogController < ApplicationController
 
     config.add_show_field solr_name('ACE_genre', :stored_searchable, type: :string), :label => 'Genre:'
     config.add_show_field 'AUSNC_audience', :label => 'Audience:'
-    config.add_show_field solr_name('AUSNC_communication_setting', :stored_searchable, type: :string), :label => 'Communication Setting:'
+    config.add_show_field 'AUSNC_communication_setting', :label => 'Communication Setting:'
+    config.add_show_field 'AUSNC_communication_medium', :label => 'Communication Medium:'
     config.add_show_field solr_name('AUSNC_plaintextversion', :stored_searchable, type: :string), :label => 'Plain Text:'
-    config.add_show_field solr_name('AUSNC_publication_status', :stored_searchable, type: :string), :label => 'Publication Status:'
+    config.add_show_field 'AUSNC_publication_status', :label => 'Publication Status:'
     config.add_show_field solr_name('AUSNC_source', :stored_searchable, type: :string), :label => 'Source:'
-    config.add_show_field solr_name('AUSNC_written_mode', :stored_searchable, type: :string), :label => 'Written Mode:'
+    config.add_show_field 'AUSNC_written_mode', :label => 'Written Mode:'
     config.add_show_field solr_name('DC_contributor', :stored_searchable, type: :string), :label => 'Contributor:'
     config.add_show_field solr_name('DC_publisher', :stored_searchable, type: :string), :label => 'Publisher:'
 
