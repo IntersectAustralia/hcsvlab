@@ -91,12 +91,13 @@ Feature: Browsing via API
     Then I should get a <code> response code
   # home page does not accept json response
   Examples:
-    | page                                          | code |
-    | the item lists page                           | 401  |
-    | the item list page for "Test 1"               | 401  |
-    | the catalog page for "hcsvlab:1"              | 401  |
-    | the catalog primary text page for "hcsvlab:1" | 401  |
-    | the home page                                 | 406  |
+    | page                                                               | code |
+    | the item lists page                                                | 401  |
+    | the item list page for "Test 1"                                    | 401  |
+    | the catalog page for "hcsvlab:1"                                   | 401  |
+    | the catalog primary text page for "hcsvlab:1"                      | 401  |
+    | the document content page for file "blah.txt" for item "hcsvlab:1" | 401  |
+    | the home page                                                      | 406  |
 
   Scenario: Get item lists for researcher
     When I make a JSON request for the item lists page with the API token for "researcher1@intersect.org.au"
@@ -209,6 +210,41 @@ Feature: Browsing via API
     {"error":"not-found"}
     """
 
+  Scenario: Download document which exists
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the document content page for file "1-001-plain.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    #Then the JSON response should be:
+    #"""
+    #{"error":"not-found"}
+    #"""
+
+  Scenario: Download document that doesn't exist for item that does exist
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the document content page for file "blah.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+    Then the JSON response should be:
+    """
+    {"error":"not-found"}
+    """
+
+  Scenario: Download document where the item doesn't exist
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the document content page for file "blah.txt" for item "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+    Then the JSON response should be:
+    """
+    {"error":"not-found"}
+    """
   Scenario: Access collection details via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     And I have user "researcher1@intersect.org.au" with the following groups

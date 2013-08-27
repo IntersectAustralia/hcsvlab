@@ -305,28 +305,30 @@ class CatalogController < ApplicationController
   end
 
   def document
-    item = Item.find(params[:id])
+    begin
+        item = Item.find(params[:id])
+        if item.documents.present?
+            #is_cooee = item.collection == "cooee"
+            item.documents.each do |doc|
+                next unless doc.file_name[0] == params[:filename] 
 
-    if item.documents.present?
-        #is_cooee = item.collection == "cooee"
-        item.documents.each do |doc|
-            next unless doc.file_name[0] == params[:filename] 
+                params[:disposition] = 'Inline'
+                params[:disposition].capitalize!
 
-            params[:disposition] = 'Inline'
-            params[:disposition].capitalize!
-
-            send_data doc.datastreams['CONTENT1'].content,
-                      :disposition => params[:disposition],
-                      :filename => doc.file_name[0].to_s,
-                      :type => doc.mime_type[0].to_s
-            return
+                send_data doc.datastreams['CONTENT1'].content,
+                          :disposition => params[:disposition],
+                          :filename => doc.file_name[0].to_s,
+                          :type => doc.mime_type[0].to_s
+                return
+            end
         end
+    rescue Exception => e    
+        # Fall through to return Not Found
     end
-        
-    send_data "No document matching #{params[:filename]}",
-              :disposition => 'Inline',
-              :type => 'text/plain'
-
+    respond_to do |format|
+        format.html { raise ActionController::RoutingError.new('Not Found') }
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+    end
   end
 
 end 
