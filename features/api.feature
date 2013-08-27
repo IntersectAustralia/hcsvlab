@@ -223,12 +223,17 @@ Feature: Browsing via API
     """
 
   Scenario: Download document which exists
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-002" with id "hcsvlab:2"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the document content page for file "1-001-plain.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the document content page for file "1-002-plain.txt" for item "hcsvlab:2" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
+    And the response should be:
+    """
+    This is the plain text file 1-002-plain.txt.
+    
+    """
 
 
   Scenario: Download document that doesn't exist for item that does exist
