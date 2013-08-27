@@ -18,6 +18,10 @@
     <field name="OLAC_discourse_type"         type="string" stored="true" indexed="true" multiValued="true" required="false"/>
     <field name="OLAC_language"               type="string" stored="true" indexed="true" multiValued="true" required="false"/>
     <field name="DC_type"                     type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="AUSNC_written_mode"          type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="AUSNC_communication_setting" type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="AUSNC_publication_status"    type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="AUSNC_communication_medium"  type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
 
     <field name="HCSvLab_ident" type="string" stored="true" indexed="true" multiValued="false" required="false"/>
     <field name="id"            type="string" stored="true" indexed="true" multiValued="false" required="true"/>

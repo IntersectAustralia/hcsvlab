@@ -138,11 +138,12 @@ class CatalogController < ApplicationController
 
     config.add_show_field solr_name('ACE_genre', :stored_searchable, type: :string), :label => 'Genre:'
     config.add_show_field 'AUSNC_audience', :label => 'Audience:'
-    config.add_show_field solr_name('AUSNC_communication_setting', :stored_searchable, type: :string), :label => 'Communication Setting:'
+    config.add_show_field 'AUSNC_communication_setting', :label => 'Communication Setting:'
+    config.add_show_field 'AUSNC_communication_medium', :label => 'Communication Medium:'
     config.add_show_field solr_name('AUSNC_plaintextversion', :stored_searchable, type: :string), :label => 'Plain Text:'
-    config.add_show_field solr_name('AUSNC_publication_status', :stored_searchable, type: :string), :label => 'Publication Status:'
+    config.add_show_field 'AUSNC_publication_status', :label => 'Publication Status:'
     config.add_show_field solr_name('AUSNC_source', :stored_searchable, type: :string), :label => 'Source:'
-    config.add_show_field solr_name('AUSNC_written_mode', :stored_searchable, type: :string), :label => 'Written Mode:'
+    config.add_show_field 'AUSNC_written_mode', :label => 'Written Mode:'
     config.add_show_field solr_name('DC_contributor', :stored_searchable, type: :string), :label => 'Contributor:'
     config.add_show_field solr_name('DC_publisher', :stored_searchable, type: :string), :label => 'Publisher:'
 
@@ -250,10 +251,15 @@ class CatalogController < ApplicationController
   # override default show method to allow for json response
   def show
     if Item.where(id: params[:id]).count != 0
-      @response, @document = get_solr_response_for_doc_id
-    elsif(Item.where(id: params[:id]).count == 0 and request.format.html?)
-      flash[:error] = "Sorry, you have requested a record that doesn't exist."
-      redirect_to root_url and return
+        @response, @document = get_solr_response_for_doc_id
+    elsif(Item.where(id: params[:id]).count == 0)
+        respond_to do |format|
+            format.html { 
+                flash[:error] = "Sorry, you have requested a record that doesn't exist."
+                redirect_to root_url and return
+            }
+            format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+        end
     end
     respond_to do |format|
       format.html { setup_next_and_previous_documents }
@@ -276,45 +282,59 @@ class CatalogController < ApplicationController
     end
     begin
       @item = Item.find(params[:id])
+      if ( ! @item.datastreams["annotationSet1"].nil? )
+        @type = params[:type]
+        @label = params[:label]
+        respond_to do |format|
+            format.json {}
+        end
+        return
+      end
     rescue Exception => e
-      #error handled in json
+        # Fall through to return Not Found
     end 
-    @type = params[:type]
-    @label = params[:label]
     respond_to do |format|
-      format.json {}
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
   end
 
   def primary_text
-    @response, @document = get_solr_response_for_doc_id
-    item = Item.find(@document.id)
-    send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
+    begin
+        item = Item.find(params[:id])
+        send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
+    rescue Exception => e
+        respond_to do |format|
+            format.html { raise ActionController::RoutingError.new('Not Found') }
+            format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+        end
+    end
   end
 
   def document
-    item = Item.find(params[:id])
+    begin
+        item = Item.find(params[:id])
+        if item.documents.present?
+            #is_cooee = item.collection == "cooee"
+            item.documents.each do |doc|
+                next unless doc.file_name[0] == params[:filename] 
 
-    if item.documents.present?
-        #is_cooee = item.collection == "cooee"
-        item.documents.each do |doc|
-            next unless doc.file_name[0] == params[:filename] 
+                params[:disposition] = 'Inline'
+                params[:disposition].capitalize!
 
-            params[:disposition] = 'Inline'
-            params[:disposition].capitalize!
-
-            send_data doc.datastreams['CONTENT1'].content,
-                      :disposition => params[:disposition],
-                      :filename => doc.file_name[0].to_s,
-                      :type => doc.mime_type[0].to_s
-            return
+                send_data doc.datastreams['CONTENT1'].content,
+                          :disposition => params[:disposition],
+                          :filename => doc.file_name[0].to_s,
+                          :type => doc.mime_type[0].to_s
+                return
+            end
         end
+    rescue Exception => e    
+        # Fall through to return Not Found
     end
-        
-    send_data "No document matching #{params[:filename]}",
-              :disposition => 'Inline',
-              :type => 'text/plain'
-
+    respond_to do |format|
+        format.html { raise ActionController::RoutingError.new('Not Found') }
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+    end
   end
 
 end 

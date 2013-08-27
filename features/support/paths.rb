@@ -57,17 +57,20 @@ module NavigationHelpers
         end
         item_list_path(itemList, options)
 
+      when /^the item list page for item list "(.*)"$/
+        item_list_path($1, options)
+
       when /^the catalog page$/
         catalog_index_path(options)
 
       when /^the catalog annotations page for "(.*)"$/
-        catalog_annotations_path(Item.find($1), options)
+        catalog_annotations_path($1, options)
 
       when /^the catalog primary text page for "(.*)"$/
-        catalog_primary_text_path(Item.find($1), options)
+        catalog_primary_text_path($1, options)
 
       when /^the catalog page for "(.*)"$/
-        catalog_path(Item.find($1), options)
+        catalog_path($1, options)
 
       when /^the licences page$/
         licences_path(options)
@@ -75,12 +78,17 @@ module NavigationHelpers
       when /^the collection page for "(.*)"$/
         collection_path(Collection.find_by_short_name($1), options)
 
+      when /^the collection page for id "(.*)"$/
+        collection_path($1, options)
+
       when /^the collections page$/
         collections_path(options)
 
       when /^the licence_agreements page$/
         account_licence_agreements_path(options)
 
+      when /^the document content page for file "(.*)" for item "(.*)"$/
+        catalog_document_path($2, $1, options)
 
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:

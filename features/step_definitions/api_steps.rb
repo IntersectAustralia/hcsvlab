@@ -140,10 +140,14 @@ Then /^show me the response$/ do
   end
 end
 
-Then 'the JSON response should be:' do |json|
-  expected = JSON.parse(json)
-  actual = JSON.parse(last_response.body)
-
+Then /^the (JSON )?response should be:$/ do |json, input|
+  if json.present?
+    expected = JSON.parse(input)
+    actual = JSON.parse(last_response.body)
+  else
+    expected = input
+    actual = last_response.body
+  end
   if self.respond_to?(:should)
     actual.should == expected
   else

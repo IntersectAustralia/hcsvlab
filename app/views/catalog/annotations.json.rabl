@@ -28,7 +28,7 @@ else
 
   q = "
     PREFIX dada:<http://purl.org/dada/schema/0.2#>
-    PREFIX cp:<" + queryConfig[corpus]['corpus_prefix'] + ">
+    PREFIX cp:<" + (queryConfig[corpus]['corpus_prefix'] unless queryConfig[corpus].nil?).to_s + ">
     select * where
     {
       ?anno a dada:Annotation .

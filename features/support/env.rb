@@ -64,7 +64,6 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 
 #Cucumber::Rails.logger.level = Logger::ERROR
 
-#require 'spreewald_support/tolerance_for_selenium_sync_issues'
 require 'capybara/poltergeist'
 
 Capybara.register_driver :poltergeist do |app|
@@ -72,13 +71,13 @@ Capybara.register_driver :poltergeist do |app|
 end
 
 Capybara.register_driver :poltergeist_debug do |app|
-  Capybara::Poltergeist::Driver.new(app, :inspector => true)
+  Capybara::Poltergeist::Driver.new(app, {debug: false, :inspector => true})
 end
 
 Capybara.javascript_driver = :poltergeist
 #Capybara.javascript_driver = :poltergeist_debug
 #Capybara.javascript_driver = :selenium
 
-Before do |scenario|
-  puts "Starting Scenario: #{scenario.name}"
-end
+#Before do |scenario|
+#  puts "Starting Scenario: #{scenario.name}"
+#end

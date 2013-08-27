@@ -27,6 +27,7 @@ Feature: Managing Item Lists
     And I should see "Add All to list"
     And I follow "Add All to list"
     And I follow "Create New List"
+    And I wait 2 seconds
     And I should see "Create New Item List"
     And I fill in "Name" with "Add All Test"
     And I press "Create List"
@@ -47,6 +48,7 @@ Feature: Managing Item Lists
     And I should see "Add Selected to list"
     And I follow "Add Selected to list"
     And I follow "Create New List"
+    And I wait 2 seconds
     And I should see "Create New Item List"
     And I fill in "Name" with "Add Selected Test"
     And I press "Create List"
