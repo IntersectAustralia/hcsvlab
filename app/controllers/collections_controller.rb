@@ -12,8 +12,22 @@ class CollectionsController < ApplicationController
 
   def show
     @collections = Collection.all.sort_by { |coll| coll.flat_short_name}
-    @collection = Collection.find(params[:id])
-    render :index
+    begin
+      @collection = Collection.find(params[:id])
+    rescue Exception => e
+      #error handled below
+    end
+    respond_to do |format|
+      if @collection.nil? or @collection.flat_short_name.nil?
+        format.html { 
+            flash[:error] = "Collection does not exist with the given id"
+            redirect_to collections_path }
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      else
+        format.html { render :index }
+        format.json {}
+      end
+    end
   end
 
   def new

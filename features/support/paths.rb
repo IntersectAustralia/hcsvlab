@@ -78,6 +78,9 @@ module NavigationHelpers
       when /^the collection page for "(.*)"$/
         collection_path(Collection.find_by_short_name($1), options)
 
+      when /^the collection page for id "(.*)"$/
+        collection_path($1, options)
+
       when /^the collections page$/
         collections_path(options)
 

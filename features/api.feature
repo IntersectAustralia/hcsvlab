@@ -205,3 +205,20 @@ Feature: Browsing via API
     """
     {"error":"not-found"}
     """
+
+  Scenario: Access collection details via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the collection page for "cooee" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should have "$..collection_name" with the text "cooee"
+
+  Scenario: Access collection details via the API for non-existant collection
+    Given I make a JSON request for the collection page for id "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+    And the JSON response should be:
+    """
+    {"error":"not-found"}
+    """
