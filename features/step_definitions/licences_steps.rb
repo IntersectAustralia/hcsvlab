@@ -81,4 +81,22 @@ Then /^I should see only the following collections displayed in the facet menu$/
 end
 
 
+Given /^User "([^"]*)" has a Collection List called "([^"]*)" containing$/ do |email, list_name, table|
+  # Create the Collection List
+  list = CollectionList.new()
+  list.name = list_name
 
+  user = User.find_by_user_key(email)
+  list.ownerEmail = email
+  list.ownerId    = user.id.to_s
+
+  # Populate it with the collections mentioned in the table
+  ids = []
+  table.hashes.each_with_index do |row|
+    collection = Collection.find_by_short_name(row[:collection]).to_a.first
+    ids << collection.id
+  end
+
+  list.add_collections(ids)
+  list.save
+end

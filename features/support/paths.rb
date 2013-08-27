@@ -78,6 +78,10 @@ module NavigationHelpers
       when /^the collections page$/
         collections_path(options)
 
+      when /^the licence_agreements page$/
+        account_licence_agreements_path(options)
+
+
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:
 #
