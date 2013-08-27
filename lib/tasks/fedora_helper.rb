@@ -5,7 +5,6 @@ STORE_DOCUMENT_TYPES = ['Text']
 
 def create_item_from_file(corpus_dir, rdf_file)
   item = Item.new
-#  item.save!
 
   item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
   item.label = item.rdfMetadata.graph.statements.first.subject
@@ -18,22 +17,22 @@ def create_item_from_file(corpus_dir, rdf_file)
                          })
 
   result = query.execute(item.rdfMetadata.graph)[0]
-  item.collection = last_bit(result.collection.to_s)
-  item.collection_id = result.identifier.to_s
 
-  if Collection.where(short_name: item.collection).count == 0
-    create_collection(item.collection.first, corpus_dir)
+  collectionName = last_bit(result.collection.to_s)
+
+  if Collection.where(short_name: collectionName).count == 0
+    create_collection(collectionName, corpus_dir)
   end
 
+  item.collection = Collection.find_by_short_name(collectionName).first
+
   # Add Groups to the created item
-  #puts "    Creating Item groups (discover, read, edit)"
-  item.set_discover_groups(["#{item.collection.first}-discover"], [])
-  item.set_read_groups(["#{item.collection.first}-read"], [])
-  item.set_edit_groups(["#{item.collection.first}-edit"], [])
+  item.set_discover_groups(["#{collectionName}-discover"], [])
+  item.set_read_groups(["#{collectionName}-read"], [])
+  item.set_edit_groups(["#{collectionName}-edit"], [])
   # Add complete permission for data_owner
-  data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
+  data_owner = item.collection.flat_private_data_owner
   if (!data_owner.nil?)
-    #puts "    Creating Item users (discover, read, edit) with #{data_owner}"
     item.set_discover_users([data_owner], [])
     item.set_read_users([data_owner], [])
     item.set_edit_users([data_owner], [])
@@ -97,11 +96,11 @@ def look_for_documents(item, corpus_dir, rdf_file)
 
       # Add Groups to the created document
       #puts "    Creating document groups (discover, read, edit)"
-      doc.set_discover_groups(["#{item.collection.first}-discover"], [])
-      doc.set_read_groups(["#{item.collection.first}-read"], [])
-      doc.set_edit_groups(["#{item.collection.first}-edit"], [])
+      doc.set_discover_groups(["#{item.collection.flat_short_name}-discover"], [])
+      doc.set_read_groups(["#{item.collection.flat_short_name}-read"], [])
+      doc.set_edit_groups(["#{item.collection.flat_short_name}-edit"], [])
       # Add complete permission for data_owner
-      data_owner = Collection.find_by_short_name(item.collection).first.flat_private_data_owner
+      data_owner = item.collection.flat_private_data_owner
       if (!data_owner.nil?)
         #puts "    Creating document users (discover, read, edit) with #{data_owner}"
         doc.set_discover_users([data_owner], [])

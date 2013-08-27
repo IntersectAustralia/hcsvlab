@@ -16,9 +16,8 @@ class Item < ActiveFedora::Base
   has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
   has_many :documents, :property => :is_member_of
+  belongs_to :collection, :property => :is_member_of_collection
 
-  delegate :collection,    to: 'descMetadata'
-  delegate :collection_id, to: 'descMetadata'
 
   #
   # Find an item using its collection name and id

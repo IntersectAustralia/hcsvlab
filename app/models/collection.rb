@@ -6,7 +6,7 @@ class Collection < ActiveFedora::Base
   has_metadata 'rdfMetadata', type: ActiveFedora::RdfxmlRDFDatastream
   has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
-  has_many :items, :property => :is_member_of
+  has_many :items, :property => :is_member_of_collection
   belongs_to :collectionList, :property => :is_part_of
   belongs_to :licence, :property => :has_licence
 

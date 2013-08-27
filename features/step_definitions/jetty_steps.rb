@@ -17,6 +17,8 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   item = Item.create(pid: pid)
   item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
   item.label = item.rdfMetadata.graph.statements.first.subject
+  item.save!
+
   query = RDF::Query.new({
                              :item => {
                                  RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
@@ -24,17 +26,31 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
                              }
                          })
   result = query.execute(item.rdfMetadata.graph)[0]
-  item.collection = last_bit(result.collection.to_s)
-  item.collection_id = result.identifier.to_s
-  item.save!
 
-  if Collection.where(short_name: item.collection).count == 0
-    create_collection(item.collection.first, "#{SAMPLE_FOLDER}/#{corpus}")
+  collectionName = last_bit(result.collection.to_s)
+
+  if Collection.where(short_name: collectionName).count == 0
+    create_collection(collectionName, "#{SAMPLE_FOLDER}/#{corpus}")
+  end
+
+  item.collection = Collection.find_by_short_name(collectionName).first
+
+  # Add Groups to the created item
+  item.set_discover_groups(["#{collectionName}-discover"], [])
+  item.set_read_groups(["#{collectionName}-read"], [])
+  item.set_edit_groups(["#{collectionName}-edit"], [])
+  # Add complete permission for data_owner
+  data_owner = item.collection.flat_private_data_owner
+  if (!data_owner.nil?)
+    #puts "    Creating Item users (discover, read, edit) with #{data_owner}"
+    item.set_discover_users([data_owner], [])
+    item.set_read_users([data_owner], [])
+    item.set_edit_users([data_owner], [])
   end
 
   look_for_annotations(item, rdf_file)
   look_for_documents(item, "#{SAMPLE_FOLDER}/#{corpus}", rdf_file)
- 
+
   item.save!
 
   # update solr
