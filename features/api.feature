@@ -24,6 +24,7 @@ Feature: Browsing via API
     | page                            | code |
     | the item lists page             | 302  |
     | the item list page for "Test 1" | 302  |
+    | the collection page for "cooee" | 302  |
     | the home page                   | 200  |
 
   Scenario Outline: Visit pages with an API token OUTSIDE the header and JSON format still doesn't authenticate
@@ -34,6 +35,7 @@ Feature: Browsing via API
     | page                            | code |
     | the item lists page             | 401  |
     | the item list page for "Test 1" | 401  |
+    | the collection page for "cooee" | 401  |
     | the home page                   | 406  |
 
   Scenario Outline: Visit pages with an API token and HTML format doesn't authenticate
@@ -43,6 +45,7 @@ Feature: Browsing via API
     | page                            | code |
     | the item lists page             | 302  |
     | the item list page for "Test 1" | 302  |
+    | the collection page for "cooee" | 302  |
     | the home page                   | 200  |
 
   Scenario Outline: Visit pages with an API token and JSON format authenticates
