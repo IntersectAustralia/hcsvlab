@@ -66,7 +66,7 @@ else
       hash = {}
       documents.each do |values|
         if values.has_key?(MetadataHelper::SOURCE)
-          hash[:url] = catalog_document_api_url(@document.id, filename: values[MetadataHelper::IDENTIFIER], format: :json)
+          hash[:url] = catalog_document_url(@document.id, filename: values[MetadataHelper::IDENTIFIER])
         else
           hash[:url] = values[MetadataHelper::IDENTIFIER]
         end
