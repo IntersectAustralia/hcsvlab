@@ -94,9 +94,11 @@ Feature: Browsing via API
     | page                                                               | code |
     | the item lists page                                                | 401  |
     | the item list page for "Test 1"                                    | 401  |
+    | the collection page for "cooee"                                    | 401  |
     | the catalog page for "hcsvlab:1"                                   | 401  |
     | the catalog primary text page for "hcsvlab:1"                      | 401  |
     | the document content page for file "blah.txt" for item "hcsvlab:1" | 401  |
+    | the catalog annotations page for "hcsvlab:1"                       | 401  |
     | the home page                                                      | 406  |
 
   Scenario: Get item lists for researcher
@@ -161,6 +163,16 @@ Feature: Browsing via API
     {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text.json","annotations_found":2,"annotations":[{"type":"pageno","label":"11","start":2460.0,"end":2460.0},{"type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
     """
 
+  Scenario: Request annotations for item that doesn't have annotations
+    Given I ingest "cooee:1-002" with id "hcsvlab:2"
+    When I make a JSON request for the catalog annotations page for "hcsvlab:2" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+
+  Scenario: Get annotations for item that doesn't exist
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON request for the catalog annotations page for "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+
   Scenario: Get specific annotations for item by label
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
@@ -217,10 +229,7 @@ Feature: Browsing via API
       | cooee           | read        |
     When I make a JSON request for the document content page for file "1-001-plain.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
-    #Then the JSON response should be:
-    #"""
-    #{"error":"not-found"}
-    #"""
+
 
   Scenario: Download document that doesn't exist for item that does exist
     Given I ingest "cooee:1-001" with id "hcsvlab:1"

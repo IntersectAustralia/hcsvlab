@@ -282,13 +282,19 @@ class CatalogController < ApplicationController
     end
     begin
       @item = Item.find(params[:id])
+      if ( ! @item.datastreams["annotationSet1"].nil? )
+        @type = params[:type]
+        @label = params[:label]
+        respond_to do |format|
+            format.json {}
+        end
+        return
+      end
     rescue Exception => e
-      #error handled in json
+        # Fall through to return Not Found
     end 
-    @type = params[:type]
-    @label = params[:label]
     respond_to do |format|
-      format.json {}
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
   end
 
