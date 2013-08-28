@@ -22,11 +22,6 @@ ActiveRecord::Schema.define(:version => 20130819004059) do
     t.string   "user_type"
   end
 
-  create_table "collections", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "item_lists", :force => true do |t|
     t.integer  "user_id",    :null => false
     t.string   "name",       :null => false
