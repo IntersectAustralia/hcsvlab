@@ -75,9 +75,18 @@ Capybara.register_driver :poltergeist_debug do |app|
 end
 
 Capybara.javascript_driver = :poltergeist
+
 #Capybara.javascript_driver = :poltergeist_debug
 #Capybara.javascript_driver = :selenium
 
 #Before do |scenario|
 #  puts "Starting Scenario: #{scenario.name}"
 #end
+
+def set_html_request
+    begin
+      Capybara.current_session.driver.header 'Accept', 'text/html'
+    rescue
+    end
+end
+

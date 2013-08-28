@@ -3,6 +3,7 @@ Then /^I should get the following security outcomes$/ do |table|
     page_to_visit = hash[:page]
     outcome = hash[:outcome]
     message = hash[:message]
+    set_html_request
     visit path_to(page_to_visit)
     if outcome == "error"
       page.should have_content(message)

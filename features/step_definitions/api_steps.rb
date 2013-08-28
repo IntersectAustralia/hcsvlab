@@ -7,8 +7,13 @@ When /^I make a (JSON )?request for (.*) with the API token for "(.*)"$/ do |jso
   if json.present?
     get path_to(page_name), {:format => :json}, {'X-API-KEY' => user.authentication_token}
   else
-    get path_to(page_name)
+    get path_to(page_name), {:format => :html}
   end
+end
+
+When /^I make a request with no accept header for (.*) with the API token for "(.*)"$/ do |page_name, email|
+  user = User.find_by_email!(email)
+  get path_to(page_name), {:format => ""}, {'X-API-KEY' => user.authentication_token}
 end
 
 When /^I make a (JSON )?request for (.*) with the API token for "(.*)" with params$/ do |json, page_name, email, table|
@@ -16,7 +21,7 @@ When /^I make a (JSON )?request for (.*) with the API token for "(.*)" with para
   if json.present?
     get path_to(page_name), table.hashes.first.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
   else
-    get path_to(page_name)
+    get path_to(page_name), {:format => :html}
   end
 end
 
@@ -25,7 +30,7 @@ When /^I make a (JSON )?request for (.*) with the API token for "(.*)" outside t
   if json.present?
     get path_to(page_name), {:format => :json, :api_key => user.authentication_token}
   else
-    get path_to(page_name), {:api_key => user.authentication_token}
+    get path_to(page_name), {:format => :html,:api_key => user.authentication_token}
   end
 end
 
@@ -33,7 +38,7 @@ When /^I make a (JSON )?request for (.*) without an API token$/ do |json, page_n
   if json.present?
     get path_to(page_name), {:format => :json}
   else
-    get path_to(page_name)
+    get path_to(page_name), {:format => :html}
   end
 end
 
@@ -41,7 +46,7 @@ When /^I make a (JSON )?request for (.*) with an invalid API token$/ do |json, p
   if json.present?
     get path_to(page_name), {:format => :json}, {'X-API-KEY' => 'blah'}
   else
-    get path_to(page_name)
+    get path_to(page_name), {:format => :html}
   end
 end
 

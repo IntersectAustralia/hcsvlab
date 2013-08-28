@@ -44,10 +44,12 @@ When /^(.*) within (.*[^:]):$/ do |_step, parent, table_or_string|
 end
 
 Given /^(?:|I )am on (.+)$/ do |page_name|
+  set_html_request
   visit path_to(page_name)
 end
 
 When /^(?:|I )go to (.+)$/ do |page_name|
+  set_html_request
   visit path_to(page_name)
 end
 

@@ -30,6 +30,7 @@ Given /^I have a user "([^"]*)" with role "([^"]*)"$/ do |email, role|
 end
 
 Given /^I am logged in as "([^"]*)"$/ do |email|
+  set_html_request
   visit path_to("the login page")
   fill_in("user_email", :with => email)
   fill_in("user_password", :with => "Pas$w0rd")
@@ -41,6 +42,7 @@ Given /^I have no users$/ do
 end
 
 Then /^I should be able to log in with "([^"]*)" and "([^"]*)"$/ do |email, password|
+  set_html_request
   visit path_to("the logout page")
   visit path_to("the login page")
   fill_in("user_email", :with => email)
@@ -51,6 +53,7 @@ Then /^I should be able to log in with "([^"]*)" and "([^"]*)"$/ do |email, pass
 end
 
 When /^I attempt to login with "([^"]*)" and "([^"]*)"$/ do |email, password|
+  set_html_request
   visit path_to("the login page")
   fill_in("user_email", :with => email)
   fill_in("user_password", :with => password)
@@ -63,6 +66,7 @@ Then /^the failed attempt count for "([^"]*)" should be "([^"]*)"$/ do |email, c
 end
 
 And /^I request a reset for "([^"]*)"$/ do |email|
+  set_html_request
   visit path_to("the home page")
   click_link "Forgot your password?"
   fill_in "Email", :with => email

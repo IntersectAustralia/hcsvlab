@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   prepend_before_filter :get_api_key
   #This will force a reload when the back button is pressed.
   before_filter :set_cache_buster
+  before_filter :default_format_json
 
   include ErrorResponseActions
   
@@ -23,6 +24,12 @@ class ApplicationController < ActionController::Base
     response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
   end
 
+  def default_format_json
+    if request.headers["HTTP_ACCEPT"].to_s.empty? && 
+       params[:format].to_s.empty?
+      request.format = "json"
+    end
+  end
 
   # Adds a few additional behaviors into the application controller 
    include Blacklight::Controller

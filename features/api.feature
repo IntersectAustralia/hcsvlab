@@ -275,3 +275,15 @@ Feature: Browsing via API
     """
     {"error":"not-found"}
     """
+
+  Scenario: Get item details with no Accept header should default to json
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a request with no accept header for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should have
+      | json_path           | text                                                   |
+      | $..annotations_url  | http://example.org/catalog/hcsvlab:1/annotations.json  |
+      | $..primary_text_url | http://example.org/catalog/hcsvlab:1/primary_text.json |

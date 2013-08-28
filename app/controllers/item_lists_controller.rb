@@ -13,8 +13,8 @@ class ItemListsController < ApplicationController
     @response = @item_list.get_items(params[:page], params[:per_page])
     @document_list = @response["response"]["docs"]
     respond_to do |format|
-      format.json
       format.html { render :index }
+      format.json
     end
     
   end
