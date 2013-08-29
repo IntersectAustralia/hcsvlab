@@ -30,7 +30,13 @@ Feature: Managing Subscriptions to Collections
   @javascript
   Scenario: Verifying that my Collections and Collection Lists with a licence do appear on the Licence Agreements page
     And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to Collection "austlit"
+    And I have added a licence to Collection List "List_1"
     And I am on the licence_agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state | actions |
+      | List_1  | 1          | data_owner@intersect.org.au | Owner |         |
+      | austlit | N/A        | data_owner@intersect.org.au | Owner |         |
 
   @javascript
   Scenario: Verifying that other users' Collections and Collection Lists with no licence do not appear on the Licence Agreements page
