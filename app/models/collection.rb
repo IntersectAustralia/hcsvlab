@@ -106,8 +106,11 @@ class Collection < ActiveFedora::Base
     self.save!
   end
 
-  def setLicence(aLicence)
-    self.licence = aLicence
+  def setLicence(licence)
+    unless licence.nil?
+      licence = Licence.find(licence.to_s) unless licence.is_a? Licence
+    end
+    self.licence = licence
     self.save!
   end
 
