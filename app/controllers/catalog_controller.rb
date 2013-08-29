@@ -304,8 +304,9 @@ class CatalogController < ApplicationController
         send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
     rescue Exception => e
         respond_to do |format|
-            format.html { raise ActionController::RoutingError.new('Not Found') }
-            format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+            format.html { flash[:error] = "Sorry, you have requested a document for an item that doesn't exist." 
+                          redirect_to root_path and return }
+            format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
         end
     end
   end
@@ -332,8 +333,10 @@ class CatalogController < ApplicationController
         # Fall through to return Not Found
     end
     respond_to do |format|
-        format.html { raise ActionController::RoutingError.new('Not Found') }
-        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+        #format.html { raise ActionController::RoutingError.new('Not Found') }
+        format.html { flash[:error] = "Sorry, you have requested a document that doesn't exist." 
+                      redirect_to catalog_path(params[:id]) and return}
+        format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
   end
 
