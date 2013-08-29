@@ -2,6 +2,9 @@ include ActiveFedora::DatastreamCollections
 
 class Collection < ActiveFedora::Base
 
+  # Adds useful methods form managing Item groups
+  include Hydra::ModelMixins::RightsMetadata
+
   has_metadata 'descMetadata', type: Datastream::CollectionMetadata
   has_metadata 'rdfMetadata', type: ActiveFedora::RdfxmlRDFDatastream
   has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata

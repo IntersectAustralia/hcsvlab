@@ -66,21 +66,6 @@ And /^I click View Licence Terms for the (\d+)(?:|st|nd|rd|th) collection$/ do |
   link.click
 end
 
-Given /^Collection ownership is$/ do |table|
-  table.hashes.each_with_index do |row|
-    collection = Collection.find_by_short_name(row[:collection]).to_a.first
-
-    collection.private_data_owner = row[:ownerEmail]
-    collection.save
-  end
-end
-
-Then /^I should see only the following collections displayed in the facet menu$/ do |table|
-  collectionInFacet = page.find(:xpath, "//div[@class='facets']//div[@class='blacklight-hcsvlab_collection']//a[@class='facet_select']")
-  puts collectionInFacet.to_s
-end
-
-
 Given /^User "([^"]*)" has a Collection List called "([^"]*)" containing$/ do |email, list_name, table|
   # Create the Collection List
   list = CollectionList.new()

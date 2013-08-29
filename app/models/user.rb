@@ -172,7 +172,7 @@ class User < ActiveRecord::Base
   def add_agreement_to_collection(collection, accessType)
     ula = UserLicenceAgreement.new
     ula.groupName = "#{collection.flat_short_name}-#{accessType}"
-    ula.licenceId = collection.licence.id
+    ula.licenceId = collection.licence.id if !collection.licence.nil?
     ula.user = self
     ula.save
   end

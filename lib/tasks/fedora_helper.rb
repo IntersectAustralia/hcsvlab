@@ -67,6 +67,19 @@ def create_collection(collection_name, corpus_dir)
   coll.save
 
   set_data_owner(coll)
+
+  # Add Groups to the created collection
+  coll.set_discover_groups(["#{collection_name}-discover"], [])
+  coll.set_read_groups(["#{collection_name}-read"], [])
+  coll.set_edit_groups(["#{collection_name}-edit"], [])
+  # Add complete permission for data_owner
+  data_owner = coll.flat_private_data_owner
+  if (!data_owner.nil?)
+    coll.set_discover_users([data_owner], [])
+    coll.set_read_users([data_owner], [])
+    coll.set_edit_users([data_owner], [])
+  end
+
   coll.save!
 
   puts "Collection Metadata = " + coll.pid.to_s unless Rails.env.test?
