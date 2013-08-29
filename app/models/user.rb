@@ -241,7 +241,6 @@ class User < ActiveRecord::Base
   end
 
   def get_collection_list_licence_info(list)
-    # TODO: (DC) Actually look up the licence status
     if list.flat_ownerId == id.to_s
       # I am the owner of this collection.
       state = :owner
