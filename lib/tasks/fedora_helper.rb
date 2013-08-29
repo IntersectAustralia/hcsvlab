@@ -177,7 +177,7 @@ def set_data_owner(collection)
     logger.debug "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
     logger.debug "Setting data owner to #{data_owner.email}"
-    collection.data_owner = data_owner
+    collection.set_data_owner_and_save(data_owner)
   end
 end
 

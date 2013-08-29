@@ -13,7 +13,7 @@ Feature: Managing Subscriptions to Collections
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given I ingest licences
-    Given Collection ownership is
+    Given Collections ownership is
       | collection | ownerEmail                  |
       | cooee      | data_owner@intersect.org.au |
       | austlit    | data_owner@intersect.org.au |
