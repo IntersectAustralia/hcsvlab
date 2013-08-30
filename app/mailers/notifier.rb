@@ -18,7 +18,6 @@ class Notifier < ActionMailer::Base
           :subject => PREFIX + "Your access request has been rejected")
   end
 
-  # notifications for super users
   def notify_superusers_of_access_request(applicant)
     superusers_emails = User.get_superuser_emails
     @user = applicant
@@ -35,6 +34,16 @@ class Notifier < ActionMailer::Base
           :from => APP_CONFIG['account_request_admin_notification_sender'],
           :reply_to => @issue_report.user_email,
           :subject => PREFIX + "An issue has been reported")
+  end
+
+    # notifications for super users
+  def notify_data_owners_of_license_request(user_license_request)
+    @request = user_license_request
+    owner_email = @request.user.email
+    mail( :to => owner_email,
+          :from => APP_CONFIG['license_access_request_notification_sender'],
+          :reply_to => @request.user_email,
+          :subject => PREFIX + "There has been a new license access request for a collection")
   end
 
   def notify_user_that_they_cant_reset_their_password(user)

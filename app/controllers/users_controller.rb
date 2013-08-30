@@ -82,6 +82,27 @@ class UsersController < ApplicationController
     end
   end
 
+  #
+  # Create and send license request for the given collection
+  #
+  def send_license_request
+    coll_id = params[:coll_id]
+
+    @request = IssueReport.new(params[:issue_report])
+    @request.user = current_user
+    @request.timestamp = Time.now
+    #@request.groupName = 
+    #@request.owner_email = 
+
+    if @request.valid?
+      Notifier.notify_data_owner_of_user_license_request(@request).deliver
+      redirect_to(root_path, :notice => "An access request was successfully sent to the collection owner."  )
+    else
+      render :new, {@issue_report => @issue_report}
+    end
+
+  end
+
 
   #
   # Accept the licence for the given collection
