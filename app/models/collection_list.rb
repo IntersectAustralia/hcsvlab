@@ -9,6 +9,7 @@ class CollectionList < ActiveFedora::Base
   delegate :name, to: 'descMetadata'
   delegate :ownerId, to: 'descMetadata'
   delegate :ownerEmail, to: 'descMetadata'
+  delegate :privacy_status, to: 'descMetadata'
 
   validates_presence_of :flat_name, message: 'Collection List Name can not be blank'
   validates_length_of :flat_name, maximum: 255, message:"Name is too long (maximum is 255 characters)"
@@ -44,6 +45,26 @@ class CollectionList < ActiveFedora::Base
   #
   def self.find_by_name(name)
     return CollectionList.where(name: name).all
+  end
+
+  # Setting of privacy status
+  def privacy_status(status)
+    self[:privacy_status] = status
+  end
+
+  # Query of privacy status
+  def privacy_status
+    self[:privacy_status].first
+  end
+
+  # Query of privacy status
+  def private?
+    self[:privacy_status].first
+  end
+
+  # Query of privacy status
+  def public?
+    !self[:privacy_status].first
   end
 
   #

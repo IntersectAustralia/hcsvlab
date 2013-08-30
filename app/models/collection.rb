@@ -24,6 +24,8 @@ class Collection < ActiveFedora::Base
   # data_owner is the e-mail address of the colection's owner.
   delegate :private_data_owner, to: 'descMetadata'
 
+   delegate :privace_status,        to: 'descMetadata'
+
 
   # ActiveFedora returns the value as an array, we need the first value
   def flat_name
@@ -112,6 +114,21 @@ class Collection < ActiveFedora::Base
     end
     self.licence = licence
     self.save!
+  end
+
+  # Setting of privacy status
+  def privacy_status(status)
+    self[:privacy_status] = status
+  end
+
+  # Query of privacy status
+  def private?
+    self[:privacy_status]
+  end
+
+  # Query of privacy status
+  def public?
+    !self[:privacy_status]
   end
 
   #
