@@ -94,7 +94,7 @@ Then /^the Review and Acceptance of Licence Terms table should have$/ do |table|
       page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='collection']", :text => row[:collection])
       page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='owner']", :text => row[:owner])
       page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='state']", :text => row[:state])
-      page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='action']", :text => row[:actions]) unless row[:actions] == ""
+      page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//a[@class='btn btn-mini']", :text => row[:actions]) unless row[:actions] == ""
     end
   end
 
@@ -119,4 +119,14 @@ Given /^Collection ownership is$/ do |table|
     coll.data_owner = user
     coll.save
   end
+end
+
+And /^I click the button in the (\d+)(?:|st|nd|rd|th) row of the "([^"]*)" table$/ do |position, table|
+  button = page.find(:xpath, "//table[@id='#{table}']//tr[#{position}]//td[@class='actions']/a[@class='btn btn-mini']")
+  button.click
+end
+
+And /^I click "([^"]*)" on the (\d+)(?:|st|nd|rd|th) licence dialogue$/ do |name, position|
+  button = page.find(:xpath, "//table[@id='collections']//tr[#{position}]//td[@class='actions']/div[@id='licence_preview#{position.to_i-1}']//a[@text='#{name}']")
+  button.click
 end

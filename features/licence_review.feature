@@ -45,6 +45,42 @@ Feature: Managing Subscriptions to Collections
     Then I should see "There are no licensed collections or collection lists visible in the system"
 
   @javascript
-  Scenario: Verifying that other users; Collections and Collection Lists with a licence do appear on the Licence Agreements page and that I can sign up to them
+  Scenario: Verifying that other users; Collections and Collection Lists with a licence do appear on the Licence Agreements page
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to Collection "austlit"
+    And I have added a licence to Collection List "List_1"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
     And I am on the licence_agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state        | actions                        |
+      | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+      | austlit | N/A        | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+
+  @javascript
+  Scenario: Verifying that I can sign up to licence agreements (not finished)
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to Collection "austlit"
+    And I have added a licence to Collection List "List_1"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence_agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state        | actions                        |
+      | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+      | austlit | N/A        | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+#    When I click the button in the 1st row of the "collections" table
+#    And Save a screenshot with name "log/user3.png"
+#    And I click "Dismiss" on the 1st licence dialogue
+#    Then the Review and Acceptance of Licence Terms table should have
+#      | title   | collection | owner                       | state        | actions                        |
+#      | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+#      | austlit | N/A        | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+#    When I click the button in the 2nd row of the "collections" table
+#    And I click "Accept" on the 2nd licence dialogue
+#    Then the Review and Acceptance of Licence Terms table should have
+#      | title   | collection | owner                       | state    | actions              |
+#      | List_1  | 1          | data_owner@intersect.org.au | Accepted | Review Licence Terms |
+#      | austlit | N/A        | data_owner@intersect.org.au | Accepted | Review Licence Terms |
