@@ -87,3 +87,11 @@ When /^frequency search for "(.*)" in item list "(.*)" should show error$/ do |t
   result = list.doFrequencySearch(term, field.value)
   result[:status].should eq("INPUT_ERROR")
 end
+
+Then(/^I should get the API config file for "(.*?)"$/) do |user|
+  page.response_headers['Content-Type'].should == "text/plain"
+  page.response_headers['Content-Disposition'].should include("filename=\"hcsvlab.config\"")
+  page.response_headers['Content-Disposition'].should include("attachment")
+
+  page.body.should eq(User.find_by_email(user).authentication_token)
+end

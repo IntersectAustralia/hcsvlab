@@ -24,13 +24,25 @@
   .modal.hide.fade.in{:id => "get_r_script","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
     .modal-header
       %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-      %h3#myModalLabel= @item_list.name + " Emu/R Script"
+      %h3#myModalLabel= "Use " + @item_list.name + " in Emu/R"
     #r_script_dialog.modal-body
       %p
-        Copy the following code into your R environment.
+        Copy the following code into your R environment and download the API token file.
         Make sure you have all the required R packages installed prior to execution.
       %hr
+      %p
+        Save the following file to your home directory
+      = "Linux or Unix: /home/<user>"
+      %br
+      = "Mac: /Users/<user>"
+      %br
+      = "Windows: C:\\Users\\<user>"
+      %br
+      %br
+      = link_to "Download API key config file", download_config_file_item_list_path()
+      %hr
       %pre
-        #r_script_content{:readonly => "true"}= @item_list.getRScript(root_url, current_user.id)
+        = preserve do
+          .r_script_content{:readonly => "true"}= @item_list.getRScript(root_url)
     .modal-footer
       %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
