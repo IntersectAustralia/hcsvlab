@@ -1,0 +1,8 @@
+%p An access request to a collection has been made with the following details:
+%p
+  Email: #{@request.user_email}
+  %br/
+  Collection: #{@request.groupName}
+  %br/
+  Timestamp: #{@request.timestamp}
+%p You can manage license access here: #{licenses_url}
