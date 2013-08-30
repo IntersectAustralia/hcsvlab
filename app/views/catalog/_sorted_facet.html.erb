@@ -8,13 +8,15 @@
     <div class="facet_box">
   <% end %>
   <% order.each do |item| -%>
-    <li>
-      <% if facet_in_params?(solr_field, item.value) %>
+    <% if facet_in_params?(solr_field, item.value) %>
+      <li class="selected">
         <%= render_selected_facet_value(solr_field, item) %>
-      <% else %>
+      </li>
+    <% else %>
+      <li>
         <%= render_facet_value(solr_field, item) %>
-      <% end -%>
-    </li>
+      </li>
+    <% end -%>
   <% end %>
   <% if order.size >= 10 %>
     </div>

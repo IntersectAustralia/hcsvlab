@@ -1,16 +1,11 @@
-#facets.facets.sidenav.span3
+.sidenav.static.span3
   %h4 My Account
-  .facets-collapse
-    .facet_limit
-      %h5.twiddle
-        = link_to "Edit Account Details", account_edit_path, class: activepath?(account_edit_path)
-    .facet_limit
-      %h5.twiddle
-        = link_to "Change Account Password", account_edit_password_path, class: activepath?(account_edit_password_path)
-    .facet_limit
-      %h5.twiddle
-        = link_to "Licence Agreements", account_licence_agreements_path, class: activepath?(account_licence_agreements_path)
-    .facet_limit
-      %h5.twiddle
-        = link_to "Report An Issue", new_issue_report_path(:url => request.original_url), class: activepath?(new_issue_report_path)
-
+  %ul.nav
+    %li{ :class => activepath?(account_edit_path) }
+      = link_to "Edit Account Details", account_edit_path
+    %li{ :class => activepath?(account_edit_password_path) }
+      = link_to "Change Account Password", account_edit_password_path
+    %li{ :class => activepath?(account_licence_agreements_path) }
+      = link_to "Licence Agreements", account_licence_agreements_path
+    %li{ :class => activepath?(new_issue_report_path) }
+      = link_to "Report An Issue", new_issue_report_path(:url => request.original_url)

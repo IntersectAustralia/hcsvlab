@@ -1,14 +1,11 @@
-#facets.facets.sidenav.span3
+.sidenav.static.span3
   %h4 HCS vLab Admin
-  .facets-collapse
+  %ul.nav
     - if can?(:read, User)
-      .facet_limit
-        %h5.twiddle
-          = link_to "List Approved Users", users_path, :class => activepath?(users_path)
+      %li{ :class => activepath?(users_path) }
+        = link_to "List Approved Users", users_path
     - if can?(:access_requests, User)
-      .facet_limit
-        %h5.twiddle
-          = link_to "View Access Requests", access_requests_users_path, :class => activepath?(access_requests_users_path)
-    .facet_limit
-      %h5.twiddle
-        = link_to "Manage Licences", licences_path, :class => activepath?(licences_path)
+      %li{ :class => activepath?(access_requests_users_path) }
+        = link_to "View Access Requests", access_requests_users_path
+    %li{ :class => activepath?(licences_path) }
+      = link_to "Manage Licences", licences_path
