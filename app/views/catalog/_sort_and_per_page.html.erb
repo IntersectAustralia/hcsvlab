@@ -87,9 +87,10 @@
         return false;
       jQuery("#new-item-list").hide();
       showProgressAnimation();
-      });
+  });
 
   function generateDocumentIds(field) {
+    jQuery(field).val("");
     checks = document.getElementsByClassName('toggle_item_list');
     for (var i=0, n=checks.length; i<n; i++) {
       if (checks[i].checked) {

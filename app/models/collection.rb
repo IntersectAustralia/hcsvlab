@@ -1,6 +1,11 @@
 include ActiveFedora::DatastreamCollections
+require "#{Rails.root}/lib/solr/solr_helper.rb"
 
 class Collection < ActiveFedora::Base
+  include SolrHelper
+
+  # Adds useful methods form managing Item groups
+  include Hydra::ModelMixins::RightsMetadata
 
   has_metadata 'descMetadata', type: Datastream::CollectionMetadata
   has_metadata 'rdfMetadata', type: ActiveFedora::RdfxmlRDFDatastream
@@ -18,6 +23,8 @@ class Collection < ActiveFedora::Base
 
   # data_owner is the e-mail address of the colection's owner.
   delegate :private_data_owner, to: 'descMetadata'
+
+   delegate :privace_status,        to: 'descMetadata'
 
 
   # ActiveFedora returns the value as an array, we need the first value
@@ -57,7 +64,7 @@ class Collection < ActiveFedora::Base
   #
   # Set the data owner
   #
-  def data_owner=(user)
+  def set_data_owner_and_save(user)
     case user
       when String
         self.private_data_owner = user
@@ -66,6 +73,18 @@ class Collection < ActiveFedora::Base
       else
         self.private_data_owner = user.to_s
     end
+
+    self.set_edit_users([private_data_owner],self.edit_users)
+    self.save
+    self.items.each do |aItem|
+      aItem.set_edit_users([private_data_owner], aItem.edit_users)
+      aItem.save
+      aItem.documents.each do |aDocument|
+        aDocument.set_edit_users([private_data_owner], aDocument.edit_users)
+        aDocument.save
+      end
+    end
+
     return self.private_data_owner
   end
 
@@ -89,9 +108,27 @@ class Collection < ActiveFedora::Base
     self.save!
   end
 
-  def setLicence(aLicence)
-    self.licence = aLicence
+  def setLicence(licence)
+    unless licence.nil?
+      licence = Licence.find(licence.to_s) unless licence.is_a? Licence
+    end
+    self.licence = licence
     self.save!
+  end
+
+  # Setting of privacy status
+  def privacy_status(status)
+    self[:privacy_status] = status
+  end
+
+  # Query of privacy status
+  def private?
+    self[:privacy_status]
+  end
+
+  # Query of privacy status
+  def public?
+    !self[:privacy_status]
   end
 
   #
@@ -100,6 +137,11 @@ class Collection < ActiveFedora::Base
   def self.find_by_owner_email_and_unassigned(userEmail)
     collections = Collection.find(:private_data_owner => userEmail)
     return collections.select{ |c| c.collectionList.nil? }
+  end
+
+  def save
+    super
+    #SolrHelper::store_object(self)
   end
 
 end

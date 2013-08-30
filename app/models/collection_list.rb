@@ -9,6 +9,7 @@ class CollectionList < ActiveFedora::Base
   delegate :name, to: 'descMetadata'
   delegate :ownerId, to: 'descMetadata'
   delegate :ownerEmail, to: 'descMetadata'
+  delegate :privacy_status, to: 'descMetadata'
 
   validates_presence_of :flat_name, message: 'Collection List Name can not be blank'
   validates_length_of :flat_name, maximum: 255, message:"Name is too long (maximum is 255 characters)"
@@ -40,6 +41,33 @@ class CollectionList < ActiveFedora::Base
   end
 
   #
+  # Find a collection using its short_name
+  #
+  def self.find_by_name(name)
+    return CollectionList.where(name: name).all
+  end
+
+  # Setting of privacy status
+  def privacy_status(status)
+    self[:privacy_status] = status
+  end
+
+  # Query of privacy status
+  def privacy_status
+    self[:privacy_status].first
+  end
+
+  # Query of privacy status
+  def private?
+    self[:privacy_status].first
+  end
+
+  # Query of privacy status
+  def public?
+    !self[:privacy_status].first
+  end
+
+  #
   # Adds collections to a Collection List
   #
   def add_collections(collection_ids)
@@ -61,6 +89,7 @@ class CollectionList < ActiveFedora::Base
         # If the Collection does not exist, then do nothing.
       end
     end
+
     self.save!
   end
 
@@ -81,16 +110,17 @@ class CollectionList < ActiveFedora::Base
   #
   # Adds licence to collection list
   #
-  def setLicence(licence_id)
-  	Rails.logger.debug "Adding licence #{licence_id} to collection list #{self.id}"
-  	aLicence = Licence.find(licence_id)
+  def setLicence(licence)
+    licence = Licence.find(licence.to_s) unless licence.is_a? Licence
+
+    Rails.logger.debug "Adding licence #{licence.id} to collection list #{self.id}"
 
     self.collections.each do |aCollection|
-      aCollection.licence = aLicence
+      aCollection.licence = licence
       aCollection.save!
     end
 
-    self.licence = aLicence
+    self.licence = licence
   	self.save!
   end
 

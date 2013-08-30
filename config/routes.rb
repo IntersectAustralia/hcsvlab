@@ -32,6 +32,7 @@ HcsvlabWeb::Application.routes.draw do
         post 'clear'
         get 'concordance_search'
         get 'frequency_search'
+        get 'download_config_file'
       end
   end
 

@@ -262,16 +262,11 @@ class ItemList < ActiveRecord::Base
   end
 
   #
-  # 
+  # Generate R script for item list
   #
-  def getRScript(root_url, user_id)
-    user = User.find(user_id)
-    if user.authentication_token.nil? #generate auth token if one doesn't already exist
-      user.reset_authentication_token!
-    end
-    return  "library(emu)\nlibrary(emuSX)\n" +
-            "key = '#{user.authentication_token}'\n" +
-            "item_list = readItemList('#{root_url}item_lists/#{self.id}.json', key=key)\n"
+  def getRScript(root_url)
+    return  "library(emuSX)\n" +
+            "item_list = readItemList('#{root_url}item_lists/#{self.id}.json')"
   end
 
   #

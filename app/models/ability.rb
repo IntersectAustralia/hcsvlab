@@ -35,6 +35,33 @@ class Ability
     can :manage, ItemList, :user_id => user.id
     can :accept_licence_terms, User
 
+    can :add_licence_to_collection, Collection do |aCollection|
+      (user.email.eql? aCollection.flat_ownerEmail)
+    end
+
+    # User can discover a collection only if he/she is the owner or if he/she was granted
+    # with discover, read or edit access to that collection
+    can :discover, Collection do |aCollection|
+      (user.email.eql? aCollection.flat_ownerEmail) or
+        ((user.groups & aCollection.discover_groups).length > 0) or
+        ((user.groups & aCollection.read_groups).length > 0) or
+        ((user.groups & aCollection.edit_groups).length > 0)
+    end
+    # User can read a collection only if he/she is the owner or if he/she was granted
+    # with read or edit access to that collection
+    can :read, Collection do |aCollection|
+      (user.email.eql? aCollection.flat_ownerEmail) or
+          ((user.groups & aCollection.read_groups).length > 0) or
+          ((user.groups & aCollection.edit_groups).length > 0)
+    end
+    # User can edit a collection only if he/she is the owner or if he/she was granted
+    # with edit access to that collection
+    can :edit, Collection do |aCollection|
+      (user.email.eql? aCollection.flat_ownerEmail) or
+          ((user.groups & aCollection.edit_groups).length > 0)
+    end
+
+
     superuser = user.is_superuser?
     if superuser
       can :read, User

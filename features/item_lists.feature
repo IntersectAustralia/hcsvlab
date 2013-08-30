@@ -105,3 +105,17 @@ Feature: Managing Item Lists
 #TODO check output maybe?
 
   Scenario: Sending Item List to Galaxy
+
+  Scenario: Sending item list to R
+    Given "researcher@intersect.org.au" has item lists
+      | name  |
+      | Test1 |
+    And the item list "Test1" has items hcsvlab:1, hcsvlab:2, hcsvlab:3
+    And I am on the item list page for "Test1"
+    And I follow "Use Item List in Emu/R"
+    Then I should see "Use Test1 in Emu/R"
+    And I should see "Copy the following code into your R environment"
+    And I should see "item_list = readItemList"
+    And I follow "Download API key config file"
+    And I should get the API config file for "researcher@intersect.org.au"
+
