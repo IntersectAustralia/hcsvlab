@@ -47,16 +47,6 @@ class CollectionList < ActiveFedora::Base
     return CollectionList.where(name: name).all
   end
 
-  # Setting of privacy status
-  def privacy_status(status)
-    self[:privacy_status] = status
-  end
-
-  # Query of privacy status
-  def privacy_status
-    self[:privacy_status].first
-  end
-
   # Query of privacy status
   def private?
     self[:privacy_status].first

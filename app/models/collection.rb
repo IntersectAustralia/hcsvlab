@@ -16,7 +16,7 @@ class Collection < ActiveFedora::Base
   belongs_to :licence, :property => :has_licence
 
   # uri is the unique id of the collection, e.g. http://ns.ausnc.org.au/corpora/cooee
-  delegate :uri,        to: 'descMetadata'
+  delegate :uri, to: 'descMetadata'
 
   # short_name is a nice human readable handy-type name, e.g. COOEE
   delegate :short_name, to: 'descMetadata'
@@ -24,7 +24,7 @@ class Collection < ActiveFedora::Base
   # data_owner is the e-mail address of the colection's owner.
   delegate :private_data_owner, to: 'descMetadata'
 
-   delegate :privace_status,        to: 'descMetadata'
+  delegate :privacy_status, to: 'descMetadata'
 
 
   # ActiveFedora returns the value as an array, we need the first value
