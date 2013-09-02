@@ -1,14 +1,11 @@
 Given /^Collections ownership is$/ do |table|
+  # table is a | cooee      | data_owner@intersect.org.au |
   table.hashes.each_with_index do |row|
     collection = Collection.find_by_short_name(row[:collection]).to_a.first
-
-    collection.private_data_owner = row[:ownerEmail]
-    collection.save
-
     user = User.find_by_email(row[:ownerEmail])
-    if (!user.nil?)
-      user.add_agreement_to_collection(collection, UserLicenceAgreement::EDIT_ACCESS_TYPE)
-    end
+
+    collection.set_data_owner_and_save(user)
+    user.add_agreement_to_collection(collection, UserLicenceAgreement::EDIT_ACCESS_TYPE)
 
     #By now this is not going to work since "our" SOLR core is not being updated
     #collection.items.each do |aItem|

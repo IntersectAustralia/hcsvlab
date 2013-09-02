@@ -110,23 +110,12 @@ And /^I have added a licence to Collection List "([^"]*)"$/ do |name|
   list.setLicence(Licence.first.id)
 end
 
-Given /^Collection ownership is$/ do |table|
-  # table is a | cooee      | data_owner@intersect.org.au |
-  table.hashes.each do |row|
-    coll = Collection.find_by_short_name(row[:collection])[0]
-    user = User.find_by_user_key(row[:ownerEmail])
-
-    coll.data_owner = user
-    coll.save
-  end
-end
-
 And /^I click the button in the (\d+)(?:|st|nd|rd|th) row of the "([^"]*)" table$/ do |position, table|
   button = page.find(:xpath, "//table[@id='#{table}']//tr[#{position}]//td[@class='actions']/a[@class='btn btn-mini']")
   button.click
 end
 
 And /^I click "([^"]*)" on the (\d+)(?:|st|nd|rd|th) licence dialogue$/ do |name, position|
-  button = page.find(:xpath, "//table[@id='collections']//tr[#{position}]//td[@class='actions']/div[@id='licence_preview#{position.to_i-1}']//a[@text='#{name}']")
+  button = page.find(:xpath, "//div[@id='licence_preview#{position.to_i-1}']//a", :text => name)
   button.click
 end
