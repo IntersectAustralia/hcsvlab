@@ -27,9 +27,18 @@ module SolrHelper
   #
   # Update Solr with the information we've found
   #
-  def self.store_object(object)
-    get_solr_connection()
+  def self.store_object(object, fieldsToRemove = [])
     solr_object = object.to_solr
+    keysToRemove = []
+    fieldsToRemove.each do |fieldName|
+      keysToRemove << solr_object.select {|k,v| k.match(/#{fieldName}/)}.map {|k,v| k}
+    end
+
+    keysToRemove.flatten.each do |key|
+      solr_object.delete(key)
+    end
+
+    get_solr_connection()
     if (object_exists_in_solr?(object))
       logger.debug "Updating " + object.to_s
       response = @@solr.update :data => solr_object

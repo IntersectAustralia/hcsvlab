@@ -14,9 +14,9 @@ class CatalogController < ApplicationController
   include Blacklight::BlacklightHelperBehavior
 
   # These before_filters apply the hydra access controls
-  #before_filter :enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations]
+  before_filter :enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations]
   # This applies appropriate access controls to all solr queries
-  #CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
+  CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
   # This filters out objects that you want to exclude from search results, like FileAssets
   CatalogController.solr_search_params_logic += [:exclude_unwanted_models]
 
@@ -337,6 +337,17 @@ class CatalogController < ApplicationController
         format.html { flash[:error] = "Sorry, you have requested a document that doesn't exist." 
                       redirect_to catalog_path(params[:id]) and return}
         format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
+    end
+  end
+
+  # when a request for /catalog/BAD_SOLR_ID is made, this method is executed...
+  def invalid_solr_id_error
+    respond_to do |format|
+      format.html { flash[:error] = "Sorry, you have requested a document that doesn't exist."
+                    params.delete(:id)
+                    redirect_to catalog_path() and return
+                  }
+      format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
   end
 

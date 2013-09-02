@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   
   rescue_from CanCan::AccessDenied, :with => :authorization_error
   rescue_from ActiveRecord::RecordNotFound, :with => :resource_not_found
+  rescue_from ActiveFedora::ObjectNotFoundError, :with => :resource_not_found
 
   private
   def get_api_key
