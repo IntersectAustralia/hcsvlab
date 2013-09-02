@@ -32,9 +32,41 @@ class Ability
     return if user.nil? || ! defined?(user.role)
     #return unless user.role
 
-    can :manage, ItemList, :user_id => user.id
+    ############################################################
+    ##          PERMISSIONS OVER USERS                        ##
+    ############################################################
+
+    superuser = user.is_superuser?
+    if superuser
+      can :read, User
+      can :update_role, User
+      can :activate_deactivate, User
+      can :admin, User
+      can :reject, User
+      can :approve, User
+    end
     can :accept_licence_terms, User
 
+    ############################################################
+    ##          PERMISSIONS OVER BLACKLIGHT CATALOG           ##
+    ############################################################
+
+    if user.is_superuser?
+      can :manage, Blacklight::Catalog
+    elsif user.is_researcher?
+      can :read, Blacklight::Catalog
+    end
+
+
+    ############################################################
+    ##          PERMISSIONS OVER ITEM LIST                    ##
+    ############################################################
+
+    can :manage, ItemList, :user_id => user.id
+
+    ############################################################
+    ##          PERMISSIONS OVER COLLECTIONS                  ##
+    ############################################################
     can :add_licence_to_collection, Collection do |aCollection|
       (user.email.eql? aCollection.flat_ownerEmail)
     end
@@ -43,9 +75,9 @@ class Ability
     # with discover, read or edit access to that collection
     can :discover, Collection do |aCollection|
       (user.email.eql? aCollection.flat_ownerEmail) or
-        ((user.groups & aCollection.discover_groups).length > 0) or
-        ((user.groups & aCollection.read_groups).length > 0) or
-        ((user.groups & aCollection.edit_groups).length > 0)
+          ((user.groups & aCollection.discover_groups).length > 0) or
+          ((user.groups & aCollection.read_groups).length > 0) or
+          ((user.groups & aCollection.edit_groups).length > 0)
     end
     # User can read a collection only if he/she is the owner or if he/she was granted
     # with read or edit access to that collection
@@ -61,26 +93,13 @@ class Ability
           ((user.groups & aCollection.edit_groups).length > 0)
     end
 
-
-    superuser = user.is_superuser?
-    if superuser
-      can :read, User
-      can :update_role, User
-      can :activate_deactivate, User
-      can :admin, User
-      can :reject, User
-      can :approve, User
-    end
+    ############################################################
+    ##          PERMISSIONS OVER COLLECTION LIST              ##
+    ############################################################
 
     if user.is_data_owner?
       can :add_licence_to_collection, CollectionList, :ownerId => user.id
     end
-
-    if user.is_superuser?
-        can :manage, Blacklight::Catalog
-    elsif user.is_researcher?
-        can :read, Blacklight::Catalog
-    end    
   end
 
 end

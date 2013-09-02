@@ -1,17 +1,22 @@
 class CollectionsController < ApplicationController
   before_filter :authenticate_user!
-  #load_and_authorize_resource
+  load_and_authorize_resource
 
   set_tab :collection
 
   PER_PAGE_RESULTS = 20
 
   def index
-    @collections = Collection.all.sort_by { |coll| coll.flat_short_name}
+
+    collection = Collection.all.select{|c| can? :discover, c}
+
+    @collections = collection.sort_by { |coll| coll.flat_short_name}
   end
 
   def show
-    @collections = Collection.all.sort_by { |coll| coll.flat_short_name}
+    collection = Collection.all.select{|c| can? :discover, c}
+    @collections = collection.sort_by { |coll| coll.flat_short_name}
+
     begin
       @collection = Collection.find(params[:id])
     rescue Exception => e

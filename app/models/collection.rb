@@ -74,17 +74,25 @@ class Collection < ActiveFedora::Base
         self.private_data_owner = user.to_s
     end
 
-    self.set_edit_users([private_data_owner],self.edit_users)
+    email = private_data_owner.first
+    self.set_discover_users([email],self.discover_users)
+    self.set_read_users([email],self.read_users)
+    self.set_edit_users([email],self.edit_users)
     self.save
+
     self.items.each do |aItem|
-      aItem.set_edit_users([private_data_owner], aItem.edit_users)
+      aItem.set_discover_users([email],aItem.discover_users)
+      aItem.set_read_users([email],aItem.read_users)
+      aItem.set_edit_users([email], aItem.edit_users)
       aItem.save
+
       aItem.documents.each do |aDocument|
-        aDocument.set_edit_users([private_data_owner], aDocument.edit_users)
+        aDocument.set_discover_users([email], aDocument.discover_users)
+        aDocument.set_read_users([email], aDocument.read_users)
+        aDocument.set_edit_users([email], aDocument.edit_users)
         aDocument.save
       end
     end
-
     return self.private_data_owner
   end
 
@@ -138,10 +146,4 @@ class Collection < ActiveFedora::Base
     collections = Collection.find(:private_data_owner => userEmail)
     return collections.select{ |c| c.collectionList.nil? }
   end
-
-  def save
-    super
-    #SolrHelper::store_object(self)
-  end
-
 end
