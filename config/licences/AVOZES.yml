@@ -1,3 +1,204 @@
 name: AVOZES Non-commercial (Academic) Licence
 text: >
-  Licence coming soon...
+  <h1>Non-commercial (Academic) Licence for the AVOZES Data Corpus and Associated Documentation</h1>
+  <div>This licence agreement governs the relationship between the copyright and intellectual property owner
+  (“the licensor”) of the audio-video speech data corpus known as the AVOZES data corpus and “the licensee”.
+  This licence regulates the use of the AVOZES data corpus for <b>non-commercial</b>, in particular <b>academic
+  research, purposes ONLY</b> by the licensee. If at any stage a commercial use of the AVOZES data corpus is
+  intended or actively pursued, a commercial licence must be obtained.</div>
+  <h2>Parties to this Licence Agreement</h2>
+  <ol><li><b>The Licensor:</b><br>
+  Roland Goecke<br>
+  Currently with National ICT Australia, Canberra Laboratory, Locked Bag 8001, Canberra ACT 2601, Australia<br>
+  E-Mail: Roland.Goecke@ieee.org</li>
+  <li><b>The Licensee</b> as detailed in the Licence Schedule at the end of this Licence Agreement</li>
+  <h2 class="avozes_h2">Agreement</h2>
+  <h3 class="avozes_h3">Definitions</h3>
+  <div>In this Licence Agreement, the following expressions have the following meanings:</div>
+  <div>"the Licensed Data" means the audio-video speech data corpus AVOZES and its associated documentation</div>
+  <div>"the Documentation" means the documentation which the Licensor makes available to the Licensee in connection with
+  the Licensed Data</div>
+  <div>"the Licence" means the Licence granted by the Licensor pursuant to this Licence Agreement</div>
+  <div>"the Equipment" means the Licensee's computers and other machinery in respect of which the Licence is
+  granted</div>
+  <div>"the Licence Period" means the Licence period specified in paragraph C in the Licence Schedule</div>
+  <div>"the Licence Schedule" means the Licence Schedule at the end of this Licence Agreement.</div>
+  <h3 class="avozes_h3">Licence</h3>
+  <div>The Licensor grants the Licensee a non-exclusive license to load the Licensed Data into, and to store and run
+  them on, the Equipment in accordance with the terms of this Licence Agreement. The Licensor will not provide any
+  support or assistance with maintenance with respect to the Licensed Data, unless explicitly stated in this Licence
+  Agreement. </div>
+  <div>The Licensed Data and the Documentation may be used only for the purpose of non-commercial, in particular
+  academic, research using the Licensed Data. If at any stage a commercial use of the Licensed Data is intended or
+  actively pursued, a commercial licence must be obtained from the Licensor. </div>
+  <div>Any external and internal publications based on the use of the Licensed Data must be made in accordance with
+  clause 3. </div>
+  <div>The Licensor is not responsible for any damage to, or loss of, the Equipment used for processing and/or storage
+  of the Licensed Data</div> <div>The Licensee will not allow any third party to use the Licensed Data or the
+  Documentation and the Licensee may not use them on behalf of, or for the benefit of, any third party in any way
+  without explicit, prior written permission of the Licensor. </div>
+  <div>The Licensee may not transfer the Licensed Data, the Documentation, or the Licence, or any rights of the Licensee
+  under this Licence Agreement, to any third party. The Licensee may not ship or transmit by any means the Licensed Data
+  or the Documentation to any other destination without the explicit, prior written permission of the Licensor. </div>
+  <div>The Licensee will ensure that all copies of the Licensed Data have been deleted from the Equipment before the
+  Licensee disposes of the Equipment. </div>
+  <div>The Licence does not extend to any data, software or materials except the Licensed Data and the
+  Documentation. </div>
+  <div>The Licensee is permitted to make its copy of the Licensed Data available to other people in its administrative
+  area / organisation. The Licensee agrees to make its students, employees and anyone else within the Licensee’s
+  administrative area / organisation, who may use the Licensee’s copy of the Licensed Data, aware of the provisions of
+  this Licence Agreement. The Licensee is, however, not permitted to produce, distribute or otherwise make available
+  copies of the Licensed Data outside of its administrative area / organisation. </div>
+  <div>The Licensee acknowledges that it is licensed to use the Licensed Data only in accordance with the expressed
+  terms of this Licence Agreement and not further, or in any other way. </div>
+  <div>The Licence will begin on the delivery of the Licensed Data to the Licensee and will continue until the expiry of
+  the Licence Period or until terminated earlier in accordance with clause 9. </div>
+  <h3 class="avozes_h3">Publications Resulting from the Use of the Licensed Data</h3>
+  <div>The Licensee is permitted to publish external and internal research reports (for example, but not limited to,
+  technical reports, conference papers, journal papers, books, student theses, whether in printed, electronic or any
+  other form) which result from the Licensee's use of the Licensed Data in accordance with this Licence Agreement, on
+  the conditi on that the Licensee acknowledges the use of the Licensed Data in the research report in the form of a
+  reference to the following paper:
+  <blockquote>R. Goecke and J.B. Millar, “The Audio-Video Australian English Speech Data Corpus AVOZES”, <em>Proceedings
+  of the 8th International Conference on Spoken Language Processing ICSLP2004</em>, Volume III, pages 2525-2528, Jeju
+  Island, Korea, 4-8 October 2004</blockquote></div>
+  <div>The Licensee is allowed to extract video frames (“frame grabbing”) and audio samples for the purpose of including
+  them in the Licensee's research publications and presentations (conferences, lectures, seminars, web pages), provided
+  that no such publication or presentation contains more than 50 (fifty) video (still) frames and / or more than 10(ten)
+  audio or AV sequences with a maximum length of 30 seconds each, where sequence refers to the data files of the
+  Licensed Data, unless prior written permission has been given by the licensor, and provided that the AVOZES data
+  corpus is referenced as described in clause 3.1. </div>
+  <div>The obligations of clauses 3.1 and 3.2 will remain in full force and effect and continue indefinitely, even if
+  the Licence expires or this Licence Agreement is terminated. </div>
+  <h3 class="avozes_h3">Payment of Licence Fees</h3>
+  <div>The Licensee will pay the Licence Fee specified in paragraph D of the Licence Schedule on the signing of this
+  Licence Agreement. No Licensed Data will be made available to the Licensee until full payment is received by the
+  Licensor. </div>
+  <div>All charges payable by the Licensee under this Licence Agreement will be paid, without deduction or set off when
+  returning the signed agreement to the Licensor prior to the receiving of the Licensed Data. </div>
+  <h3 class="avozes_h3">Warranties</h3>
+  <div>THE EXPRESSED TERMS OF THIS LICENCE AGREEMENT ARE IN LIEU OF ALL WARRANTIES, CONDITIONS, TERMS, UNDERTAKINGS AND
+  OBLIGATIONS IMPLIED BY STATUTE, COMMON LAW, CUSTOM, TRADE USAGE, COURSE OF DEALING OR OTHERWISE INCLUDING, WITHOUT
+  LIMITATION, IMPLIED WARRANTIES AS TO QUALITY OR FITNESS FOR PURPOSE, ALL OF WHICH ARE EXCLUDED FROM THIS AGREEMENT TO
+  THE FULLEST EXTENT PERMITTED BY LAW. </div>
+  <div>As the Licensed Data and the Documentation are supplied solely for the purpose of evaluation and internal
+  research, the Licensor gives no warranty in respect of their quality, functionality or performance, therefore the
+  product is provided "AS IS" without any warranty of any kind, whether expressed or implied. </div>
+  <div>The Licensee acknowledges that the Licensed Data has not been prepared to meet the Licensee's individual
+  requirements and that it is, therefore, the responsibility of the Licensee to ensure that the data, as described in
+  the Documentation, meet the Licensee’s requirements. </div>
+  <div>The Licensor makes no representation and gives no warranty that the Licensed Data will be free from error or that
+  their use will be uninterrupted. </div>
+  <div>The Licensee agrees to defend at its own expense any claim, suit or proceeding bought against the Licensor or the
+  Licensee insofar as it arises from the Licensee's use of the Licensed Data, Documentation or any derivative works, and
+  shall indemnify and hold the Licensor harmless for all claims, damages, costs and expenses awarded to the Licensee or
+  third parties arising from any such claim, suit or proceeding. The Licensor will have the right, at its option, either
+  to obtain for the Licensee th e right to continue the use of the Licensed Data and Documentation, or modify the
+  Licensed Data and Documentation so that they are no longer infringing. In the event that neither of the above options
+  are reasonably available, the sole and exclusive remedy available to the Licensee will be to terminate this Licence
+  Agreement, to cease using and return to the Licensor all copies of the Licensed Data and Documentation on the terms
+  laid out in clause 9 of this Licence Agreement. </div>
+  <h3 class="avozes_h3">Intellectual Property</h3>
+  <div>The copyright and all other intellectual property rights in the Documentation and in the Licensed Data are and
+  will remain the property of the Licensor or its appointed or legal successor. </div>
+  <div>The Licensor reserves the right to grant licenses to use the Licensed Data and the Documentation to third
+  parties. </div>
+  <div>The Licensee acquires no rights in the Licensed Data or in the Documentation, except the Licence. </div>
+  <div>All proprietary and copyright notices are precautionary only and do not imply publication. </div>
+  <div>The Licensee will notify the Licensor immediately, if the Licensee becomes aware of any unauthorised use of the
+  Licensed Data or of the Documentation by any person, company, organisation or institution. </div>
+  <h3 class="avozes_h3">Copying and Amendments</h3>
+  <div>The Licensee may make only as many copies of the Licensed Data and the Documentation as are reasonably necessary
+  for back-up purposes and use of the Licensed Data in accordance with this Licence Agreement. Those copies, and the
+  media on which they are stored, will be the property of the Licensor. The Licensee will ensure that all copies of the
+  Licensed Data and/or the Documentation bear the proprietary and other notices contained in or on the original copy of
+  the Licensed Data supplied to the Licensee. The terms and conditions of this Licence Agreement will apply to all
+  copies as it applies to the Licensed Data. </div>
+  <div>The Licensee will not alter or modify the Licensed Data in any way, nor will the Licensee allow the Licensed Data
+  to be combined with, or to become incorporated in, any other data except as specifically provided for in the
+  Documentation, or by prior explicit written agreement with the Licensor. The Licensee is granted the right to perform
+  experiments with and analyses on the data, use the data in conjunction with other (self-recorded or otherwise
+  acquired) data, and may publish the results of any such work, under the terms and conditions provided in clauses
+  3.1-3.3 of this Licence Agreement. </div>
+  <div>As the Licence is for non-commercial (academic research) purposes only, the Licensee acknowledges that it will
+  have no reason to modify or merge it with any other data except as expressly provided in this Licence Agreement and
+  the Licensee undertakes not to do so. </div>
+  <div>The Licensor, at its discretion, may provide the Licensee with amendments and/or extensions to the Licensed Data.
+  All such amendments and extensions are subject to this Agreement. </div>
+  <h3 class="avozes_h3">Security and Control</h3>
+  <div>The Licensee will:<ol>
+  <li>Effect and maintain adequate security measures to safeguard the Licensed Data and the Documentation from access or
+  use by any unauthorised person </li>
+  <li>Retain the Licensed Data and the Documentation and all copies of either or both under the Licensee's effective
+  control </li>
+  <li>Maintain a full and accurate record of the Licensee's copying and disclosure of the Licensed Data and produce that
+  record to the Licensor on request. </li>
+  </ol></div>
+  <div>The provisions of clause 8.1 will remain in full force and effect and continue indefinitely even if the License
+  or this Agreement is terminated. </div>
+  <h3 class="avozes_h3">Termination</h3>
+  <div>This Licence Agreement shall become effective on the date of completion of signing this Licence Agreement by all
+  agreement parties on the condition of full payment of the Licence Fee. The Licence Agreement will remain in effect
+  until the end of the Licence Period stated in paragraph C in the Licence Schedule, unless otherwise earlier terminated
+  in accordance with this clause 9. </div>
+  <div>Either party may terminate this Licence Agreement if written notice of at least one month has been given to the
+  other party of either a desire to terminate or a substantial or persistent breach which cannot or will not be remedied
+  by the other party.</div>
+  <div>Immediately on the termination of the Licence, the Licensee will return at their own expense and by secure means
+  to the Licensor the Licensed Data, the Documentation and all copies of the Licensed Data and of the Documentation, or
+  if requested by the Licensor, the Licensee will delete the Licensed Data and the Documentation from the Equipment on
+  which they are stored, and destroy all copies of the Licensed Data and the Documentation and will certify these
+  actions in writing to the Licensor. </div>
+  <div> Any termination of the Licence (however it happens) will not affect any accrued rights or liabilities of either
+  party, nor will it affect the coming into force, or the continuing in force of any provision of this Licence Agreement
+  which is expressly, or by implication, intended to come into or to continue in force on or after termination. </div>
+  <h3 class="avozes_h3">Licensee's Warranty</h3>
+  <div>The Licensee warrants to the Licensor that the Licensee has not been induced to enter into this Licence Agreement
+  by any prior representations, whether oral or in writing or in any other form, except as specifically contained in
+  this Licence Agreement, and (except in the case of fraudulent misrepresentations) the Licensee waives any claim for
+  breach of any representation or any misrepresentation, which is not specifically contained in this Licence
+  Agreement. </div>
+  <h3 class="avozes_h3">Liability</h3>
+  <div>As the Licence is granted for non-commercial (academic research) purposes only, the Licensor will have no
+  liability for any loss or damage, whether in contract or in tort, including but not limited to negligence, or arising
+  in any other way, and whether or not foreseeable by the Licensor. </div>
+  <div>In any case the Licensor will not be liable to the Licensee for loss of profits, loss of business, loss of
+  savings, loss of opportunity or any kind of direct, indirect or consequential loss or damage, whether in contract or
+  tort, including but not limited to, negligence, or arising in any other way, and whether or not foreseeable by the
+  Licensor. </div>
+  <div>The Licensee acknowledges that the limitations on and exclusions of the Licensor's liability in this Licence
+  Agreement have been drawn to the Licensee's attention. </div>
+  <div>The Licensor will not be liable to the Licensee for any loss arising out of or contributed to by any failure by
+  the Licensee to keep full and up to-date security copies of the Licensed Data and data it uses, in accordance with
+  best practice. </div>
+  <h3 class="avozes_h3">Waiver of Remedies</h3>
+  <div>No forbearance, delay or indulgence by either the Licensor or the Licensee in enforcing the provisions of this
+  Licence Agreement will prejudice or restrict its rights, and no waiver of any right will operate as a waiver of any
+  subsequent breach. No right, power or remedy conferred in this Agreement on, or reserved to, either the Licensor or
+  the Licensee is exclusive of any other right, power or remedy available to it and each of those rights, powers and
+  remedies including, but not limited to injunctive relief is cumulative.</div>
+  <h3 class="avozes_h3">Entire Agreement</h3>
+  <div>This Licence Agreement supersedes all earlier agreements, arrangements and understandings between the Licensor
+  and the Licensee relating to the Licensed Data. It constitutes the entire agreement between them in respect of its
+  subject matter. No addition to, or modification of, any provision of this Licence Agreement will be binding on the
+  Licensor or on the Licensee unless it is made by a written instrument signed by a duly authorised representative of
+  each of them. </div>
+  <div>If any clause or part of a clause of this Licence Agreement is illegal, unenforceable or invalid, that clause or
+  part is to be treated as removed from this Licence Agreement, but the rest of this Licence Agreement is not affected.
+  </div>
+  <div>If a clause or part of a clause of this Licence Agreement can be read in a way that makes it illegal,
+  unenforceable or invalid, but can also be read in a way that makes it legal, enforceable and valid, it must be read in
+  the latter way. </div>
+  <h3 class="avozes_h3">Notices</h3>
+  <div>All notices to be given under this Licence Agreement must be in writing and sent to the postal address of the
+  intended recipient set out in paragraph B in the Licence Schedule to this Licence Agreement or to any other postal
+  address which the intended recipient may designate by notice given in accordance with this clause. Any notice may be
+  delivered personally or sent by registered express post, and it will be deemed to have been served: if by hand, when
+  delivered; if by registered express post, 72 hours after posting. </div>
+  <h3 class="avozes_h3">Headings</h3>
+  <div>The headings to the clauses of this Licence Agreement are for ease of reference only and do not affect the
+  interpretation or construction of this Licence Agreement. </div>
+  <h3 class="avozes_h3">Law</h3>
+  <div>This Licence Agreement is governed by and to be construed in accordance with the laws of Australia and the
+  Licensee will submit to the jurisdiction of Australian Courts</div>
+
