@@ -32,7 +32,7 @@
                             %td
                               =aCollection.flat_name
                   .modal-footer
-                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+                    %a.btn.pull-right{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 
               %td.owner= coll_list.flat_ownerEmail
               %td.licence
@@ -60,7 +60,7 @@
                     #licence_terms_dialog.modal-body{:title => "Licence Terms"}
                       #licence_terms_content{:readonly => "true"}= coll_list.licence.flat_text.html_safe
                     .modal-footer
-                      %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+                      %a.btn.pull-right{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               %td.actions
                 %a{:href=>"#", :onclick => "remove_collection_list('#{coll_list.id}', '#{coll_list.flat_name}')"}
                   %i.icon-trash

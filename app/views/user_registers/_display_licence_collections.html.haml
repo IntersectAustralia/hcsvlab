@@ -30,12 +30,12 @@
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
                     %h3#myModalLabel= "Licence terms for #{k[:item].flat_name}"
-                    %h4#myModalLabel= k[:item].licence.flat_name
                   .modal-body{:title => "Licence Terms"}
+                    %h4#myModalLabel= k[:item].licence.flat_name
                     %p#licence_preview{:readonly => "true"}
                     = k[:item].licence.flat_text.html_safe
                   .modal-footer
-                    %a.btn.btn-secondary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Dismiss
+                    %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal", onClick: "accept_licence_terms('#{k[:type]}', '#{k[:item].id}');"} Accept
               - if action == :view
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_review#{index}", :role => "button"} Review Licence Terms
@@ -43,24 +43,24 @@
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
                     %h3#myModalLabel= "Licence terms for #{k[:item].flat_name}"
-                    %h4#myModalLabel= k[:item].licence.flat_name
                   .modal-body{:title => "Licence Terms"}
+                    %h4#myModalLabel= k[:item].licence.flat_name
                     %p#licence_review{:readonly => "true"}
                     = k[:item].licence.flat_text.html_safe
                   .modal-footer
-                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Dismiss
+                    %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               - if action == :viewForRequest
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#request_access#{index}", :role => "button"} Request Access
                 .modal.hide.fade.in{:id => "request_access#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
                     %h3#myModalLabel= "Licence terms for #{k[:item].flat_name}"
-                    %h4#myModalLabel= k[:item].licence.flat_name
                   .modal-body{:title => "Licence Terms"}
+                    %h4#myModalLabel= k[:item].licence.flat_name
                     %p#request_access{:readonly => "true"}
                     = k[:item].licence.flat_text.html_safe
                   .modal-footer
-                    %a.btn.btn-secondary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Dismiss
+                    %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Request Access
               - if action == :cancel
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#request_cancel#{index}", :role => "button"} Cancel Request
@@ -72,7 +72,7 @@
                     %p#request_cancel{:readonly => "true"}
                     = "Are you sure you want to cancel your request for access to #{k[:item].flat_short_name}?"
                   .modal-footer
-                    %a.btn.btn-secondary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Dismiss
+                    %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Cancel Request
   - unless done_some
     There are no licensed collections or collection lists visible in the system

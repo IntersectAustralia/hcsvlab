@@ -53,12 +53,12 @@ textarea{
 /////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 .label.licence {
-  padding: 3px 7px 3px 7px;
-  padding-right: 25px;
+  padding: 4px 8px 4px 8px;
+  padding-right: 27px;
   background: #FFD875;
   color: #444;
   font-weight: normal;
-  border: 1px solid #f6b717;
+  border: 0px solid #f6b717;
   display: inline-block;
   position: relative;
   text-shadow: none;
@@ -538,30 +538,6 @@ margin: 0 auto;
 
 /* LIGHTBOX ////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////*/
-
-
-.modal-body {
-  position: relative;
-  overflow-y: auto;
-  max-height: 400px;
-  padding: 15px;
-}
-
-.modal-header h3 {
-  margin: 0 20px 0 0;
-  line-height: 30px;
-  word-wrap:break-word;
-}
-
-#licence_terms_content p { word-wrap: break-word; }
-
-.modal button.close  {
-  display: block;
-}
-
-.modal.fade.in {
-  top: 10%;
-}
 
 
 .modal .modal-body ul, .modal .modal-body ol {
@@ -1076,6 +1052,72 @@ border: 1px solid #BCBCBC;
 }
 
 .btn-primary:hover { background-color: #00abff; }
+
+/* MODAL LIGHTBOX //////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+.modal {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  border: 0px solid #CCC;
+}
+
+.modal-header {
+  padding: 9px 15px;
+  border-bottom: 0px solid #eee;
+  -webkit-border-radius: 3px 3px 0 0;
+  -moz-border-radius: 3px 3px 0 0;
+  border-radius: 3px 3px 0 0;
+  color: #FFF;
+  background: #333;
+}
+
+.modal-header h3 {
+  margin: 0 20px 0 0;
+  line-height: 30px;
+  word-wrap:break-word;
+}
+
+.modal-body {
+  position: relative;
+  overflow-y: auto;
+  max-height: 400px;
+  padding: 15px;
+}
+
+.close {
+  float: right;
+  font-size: 20px;
+  font-weight: 100;
+  line-height: 23px;
+  color: #EEE;
+  text-shadow: 0 0px 0 white;
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
+
+.close:hover {
+  color: #EEE;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+}
+
+.modal button.close  {
+  display: block;
+}
+
+.modal.fade.in {
+  top: 10%;
+}
+
+#licence_terms_content p { word-wrap: break-word; }
+
+/* MEDIA QUERIES //////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 @media only screen and (max-width : 1200px) {
 #searchbar input { width: 140px; }

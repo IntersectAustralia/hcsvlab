@@ -78,24 +78,25 @@
 #new_collection_list.modal.hide.fade{ tabindex:"-1", role:"dialog", 'aria-labelledby'=>"myModalLabel", 'aria-hidden'=>"true"}
   = form_for(CollectionList.new) do |f|
     .modal-header
-      %h3#myModalLabel Create New Collection list
       %button.close{ type:"button", :"data-dismiss"=>"modal", "aria-hidden"=>"true"} ×
+      %h3#myModalLabel Create New Collection list
     #new_collection_list_dialog.modal-body{ title:"New Collection List"}
-      %p
-        #collection_list_error.create_collection_list_error
-        %br
+      %p#collection_list_error.create_collection_list_error
+      .control-group
         = f.label :name, {for:"name_for_add_collection_to_new_collection_list"}
-        = f.text_field :name, {value:"", id: "name_for_add_collection_to_new_collection_list"}
-        %br
-        = f.check_box :privacy_status, {:checked=>true}
-        = f.label :privacy_status, "This collection list is private"
-        = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_new_collection_list"}
-        = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_new_collection_list"}
-        = hidden_field_tag :hide, nil, {id: "hide_for_add_collection_to_new_collection_list"}
+        = f.text_field :name, {value:"", id: "name_for_add_collection_to_new_collection_list", class: "input-block-level"}
+      .control-group
+        .controls
+          %label.checkbox
+            = f.check_box :privacy_status, {:checked=>true}
+            = f.label :privacy_status, "This collection list is private"
+            = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_new_collection_list"}
+            = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_new_collection_list"}
+            = hidden_field_tag :hide, nil, {id: "hide_for_add_collection_to_new_collection_list"}
 
 
     .modal-footer
-      %a.btn{:"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
+      %a.btn.pull-left{:"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
         Close
       = f.submit "Create Collections List", class: "btn btn-primary", id:"new_collection_list_submit"
 
