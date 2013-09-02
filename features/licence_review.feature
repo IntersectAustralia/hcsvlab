@@ -59,7 +59,7 @@ Feature: Managing Subscriptions to Collections
       | austlit | N/A        | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
 
   @javascript
-  Scenario: Verifying that I can sign up to licence agreements (not finished)
+  Scenario: Verifying that I can sign up to licence agreements
     And I am logged in as "data_owner@intersect.org.au"
     And I have added a licence to Collection "austlit"
     And I have added a licence to Collection List "List_1"
