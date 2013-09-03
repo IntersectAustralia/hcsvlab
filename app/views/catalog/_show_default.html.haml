@@ -59,7 +59,13 @@
                  'date_group_tesim' => nil,
                  'all_metadata' => nil,
                  '_version_' => nil,
-                 'item_lists' => nil}
+                 'item_lists' => nil,
+                 'discover_access_group_ssim' => nil,
+                 'read_access_group_ssim' => nil,
+                 'edit_access_group_ssim' => nil,
+                 'discover_access_person_ssim' => nil,
+                 'read_access_person_ssim' => nil,
+                 'edit_access_person_ssim' => nil}
   - do_not_display = {} if Rails.env.development? # In development, display everything
   - do_not_display.merge!(document_show_fields(document))
   - document.keys.each do |k|
