@@ -14,7 +14,7 @@ class CatalogController < ApplicationController
   include Blacklight::BlacklightHelperBehavior
 
   # These before_filters apply the hydra access controls
-  before_filter :enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations]
+  before_filter :wrapped_enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations]
   # This applies appropriate access controls to all solr queries
   CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
   # This filters out objects that you want to exclude from search results, like FileAssets
@@ -348,6 +348,17 @@ class CatalogController < ApplicationController
                     redirect_to catalog_path() and return
                   }
       format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
+    end
+  end
+
+  def wrapped_enforce_show_permissions(opts={})
+    begin
+      enforce_show_permissions(opts)
+    rescue Hydra::AccessDenied => e
+      respond_to do |format|
+        format.html {raise e}
+        format.any { render :json => {:error => "access-denied"}.to_json, :status => 401 }
+      end
     end
   end
 

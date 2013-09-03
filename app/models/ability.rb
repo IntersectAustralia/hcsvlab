@@ -81,17 +81,18 @@ class Ability
     end
     # User can read a collection only if he/she is the owner or if he/she was granted
     # with read or edit access to that collection
-    can :read, Collection do |aCollection|
-      (user.email.eql? aCollection.flat_ownerEmail) or
-          ((user.groups & aCollection.read_groups).length > 0) or
-          ((user.groups & aCollection.edit_groups).length > 0)
-    end
+    #can :read, Collection do |aCollection|
+    #  (user.email.eql? aCollection.flat_ownerEmail) or
+    #      ((user.groups & aCollection.read_groups).length > 0) or
+    #      ((user.groups & aCollection.edit_groups).length > 0)
+    #end
+
     # User can edit a collection only if he/she is the owner or if he/she was granted
     # with edit access to that collection
-    can :edit, Collection do |aCollection|
-      (user.email.eql? aCollection.flat_ownerEmail) or
-          ((user.groups & aCollection.edit_groups).length > 0)
-    end
+    #can :edit, Collection do |aCollection|
+    #  (user.email.eql? aCollection.flat_ownerEmail) or
+    #      ((user.groups & aCollection.edit_groups).length > 0)
+    #end
 
     ############################################################
     ##          PERMISSIONS OVER COLLECTION LIST              ##
@@ -100,6 +101,30 @@ class Ability
     if user.is_data_owner?
       can :add_licence_to_collection, CollectionList, :ownerId => user.id
     end
+  end
+
+  ############################################################
+  ##       GENERIC METHODS FOR ACTIVE_FEDORA OBJECTS        ##
+  ############################################################
+
+  def read_groups(pid)
+    obj = ActiveFedora::Base.load_instance_from_solr(pid)
+    obj.read_groups.concat(obj.edit_groups)
+  end
+
+  def edit_groups(pid)
+    obj = ActiveFedora::Base.load_instance_from_solr(pid)
+    obj.edit_groups
+  end
+
+  def read_persons(pid)
+    obj = ActiveFedora::Base.load_instance_from_solr(pid)
+    obj.read_users.concat(obj.edit_users)
+  end
+
+  def edit_persons(pid)
+    obj = ActiveFedora::Base.load_instance_from_solr(pid)
+    obj.edit_users
   end
 
 end
