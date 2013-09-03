@@ -88,8 +88,8 @@
       .control-group
         .controls
           %label.checkbox
-            = f.check_box :privacy_status, {:checked=>true}
-            = f.label :privacy_status, "This collection list is private"
+            //= f.check_box :privacy_status, {:checked=>true}
+            //= f.label :privacy_status, "This collection list is private"
             = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_new_collection_list"}
             = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_new_collection_list"}
             = hidden_field_tag :hide, nil, {id: "hide_for_add_collection_to_new_collection_list"}

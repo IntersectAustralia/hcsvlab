@@ -125,7 +125,7 @@ class Collection < ActiveFedora::Base
   end
 
   # Setting of privacy status
-  def privacy_status(status)
+  def set_privacy_status(status)
     self[:privacy_status] = status
   end
 
