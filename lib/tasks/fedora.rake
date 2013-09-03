@@ -195,6 +195,28 @@ namespace :fedora do
     create_default_licences
   end
 
+  #
+  # Ingest and create default set of licenses
+  #
+  task :ingest_collection_metadata => :environment do
+    dir = ENV['dir'] unless ENV['dir'].nil?
+
+    if (dir.nil?) || (!Dir.exists?(dir))
+      if dir.nil?
+        puts "No directory specified."
+      else
+        puts "Directory #{dir} does not exist."
+      end
+      puts "Usage: rake fedora:ingest_collection_metadata dir=<folder>"
+      exit 1
+    end
+
+    Dir.glob(dir + '/**/*.n3') { |n3|
+      coll_name = File.basename(n3, ".n3")
+      create_collection_from_file(n3, coll_name)
+    }
+  end
+
 
   def ingest_corpus(corpus_dir, num_spec=:all, shuffle=false, annotations=true)
 
