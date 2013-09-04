@@ -124,19 +124,19 @@ Feature: Collection access control
 #----------- No Access
   Scenario: Get item details for an item I have not access
     When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 401 response code
+    Then I should get a 403 response code
 
   Scenario: Get annotations for item I have not access
     When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 401 response code
+    Then I should get a 403 response code
 
   Scenario: Get primary text for item I have not access
     When I make a JSON request for the catalog primary text page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 401 response code
+    Then I should get a 403 response code
 
   Scenario: Download document which exists but I have not access
     When I make a JSON request for the document content page for file "1-001-plain.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 401 response code
+    Then I should get a 403 response code
 
   Scenario: Access collection details for which I have not access
     When I make a JSON request for the collection page for "cooee" with the API token for "researcher1@intersect.org.au"
@@ -146,22 +146,22 @@ Feature: Collection access control
   Scenario: Get item details for an item I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
     When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 401 response code
+    Then I should get a 403 response code
 
   Scenario: Get annotations for item I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
     When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 401 response code
+    Then I should get a 403 response code
 
   Scenario: Get primary text for item I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
     When I make a JSON request for the catalog primary text page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 401 response code
+    Then I should get a 403 response code
 
   Scenario: Download document which exists but I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
     When I make a JSON request for the document content page for file "1-001-plain.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 401 response code
+    Then I should get a 403 response code
 
   Scenario: Access collection details for which I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"

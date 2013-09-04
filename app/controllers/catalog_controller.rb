@@ -357,7 +357,7 @@ class CatalogController < ApplicationController
     rescue Hydra::AccessDenied => e
       respond_to do |format|
         format.html {raise e}
-        format.any { render :json => {:error => "access-denied"}.to_json, :status => 401 }
+        format.any { render :json => {:error => "access-denied"}.to_json, :status => 403 }
       end
     end
   end
