@@ -36,7 +36,7 @@ Feature: Managing Subscriptions to Collections
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state | actions |
       | List_1  | 1          | data_owner@intersect.org.au | Owner |         |
-      | austlit | N/A        | data_owner@intersect.org.au | Owner |         |
+      | austlit | 1          | data_owner@intersect.org.au | Owner |         |
 
   @javascript
   Scenario: Verifying that other users' Collections and Collection Lists with no licence do not appear on the Licence Agreements page
@@ -56,7 +56,7 @@ Feature: Managing Subscriptions to Collections
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
-      | austlit | N/A        | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+      | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
 
   @javascript
   Scenario: Verifying that I can sign up to licence agreements
@@ -70,7 +70,7 @@ Feature: Managing Subscriptions to Collections
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
-      | austlit | N/A        | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+      | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
     When I click the button in the 1st row of the "collections" table
     And I wait 2 seconds
 #    And Save a screenshot with name "log/gg.png"
@@ -79,11 +79,11 @@ Feature: Managing Subscriptions to Collections
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
-      | austlit | N/A        | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+      | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
     When I click the button in the 2nd row of the "collections" table
     And I wait 2 seconds
     And I click "Accept" on the 2nd licence dialogue
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
-      | austlit | N/A        | data_owner@intersect.org.au | Accepted     | Review Licence Terms           |
+      | austlit | 1          | data_owner@intersect.org.au | Accepted     | Review Licence Terms           |
