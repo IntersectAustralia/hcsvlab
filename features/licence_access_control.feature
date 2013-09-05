@@ -140,7 +140,7 @@ Feature: Collection access control
 
   Scenario: Access collection details for which I have not access
     When I make a JSON request for the collection page for "cooee" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 403 response code
+    Then I should get a 200 response code
 
 #----------- Discover Access
   Scenario: Get item details for an item I have discover access
@@ -166,7 +166,7 @@ Feature: Collection access control
   Scenario: Access collection details for which I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
     When I make a JSON request for the collection page for "cooee" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 403 response code
+    Then I should get a 200 response code
 
 #----------- Read Access
   Scenario: Get item details for an item I have read access
