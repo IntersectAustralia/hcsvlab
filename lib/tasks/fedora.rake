@@ -76,6 +76,18 @@ namespace :fedora do
       coll.delete
     end
 
+    puts "Collection Lists"
+    CollectionList.find_each do |aCollectionList|
+      puts aCollectionList.pid.to_s
+      aCollectionList.delete
+    end
+
+    puts "Licences"
+    Licence.find_each do |aLicence|
+      puts aLicence.pid.to_s
+      aLicence.delete
+    end
+
   end
 
 
