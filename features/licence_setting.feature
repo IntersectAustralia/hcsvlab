@@ -21,6 +21,10 @@ Feature: Managing Collection Lists and Licences
       |collection |collection_list    | licence     | licence_terms |
       |austlit    |                   | Add Licence |               |
       |cooee      |                   | Add Licence |               |
+    And I click Add Licence for the 1st collection
+    Then I should see "Creative Commons v3.0 BY-NC"
+    And I should see "AusNC Terms of Use"
+
 
   @javascript
   Scenario: Creating an empty Collection List
@@ -97,6 +101,37 @@ Feature: Managing Collection Lists and Licences
       |collection |collection_list    | licence     | licence_terms |
       |austlit    |Collection List 1  |             |               |
       |cooee      |Collection List 2  |             |               |
+
+  @javascript
+  Scenario: Creating two collection lists with the same name
+    And I choose the 1st Collection in the list
+    And I follow "Add selected to Collection list"
+    And I follow "Create New Collection List"
+    And I wait 2 seconds
+    And I should see "Create New Collection list"
+    And I fill in "Name" with "Collection List 1"
+    And I press "Create Collections List"
+    And The Collection Lists table should have
+      |collection_list    | owner                       | licence     | licence_terms |
+      |Collection List 1  | data_owner@intersect.org.au | Add Licence |               |
+    Then I check "allnonecheckbox"
+    And I follow "Add selected to Collection list"
+    And I follow "Create New Collection List"
+    And I wait 2 seconds
+    And I should see "Create New Collection list"
+    And I fill in "Name" with "Collection List 1"
+    And I press "Create Collections List"
+    Then I should see "Create New Collection list"
+    And I should see "Collection list name already exists"
+    Then I click "Close"
+    And The Collection Lists table should have
+      |collection_list    | owner                       | licence     | licence_terms |
+      |Collection List 1  | data_owner@intersect.org.au | Add Licence |               |
+    And The Collection table should have
+      |collection |collection_list    | licence     | licence_terms |
+      |austlit    |Collection List 1  |             |               |
+      |cooee      |                   | Add Licence |               |
+
 
   @javascript
   Scenario: Assign licence to a Collection
