@@ -23,7 +23,7 @@
                 .modal-header
                   %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
                   %h3#myModalLabel= k[:item].flat_name
-                #collection_list_detail_dialog.modal-body{:title => "Licence Terms"}
+                #collection_list_detail_dialog.modal-body{:title => "Collection details"}
                   #collection_list_detail_content{:readonly => "true"}
                     %table
                       - k[:item].collections.each do |aCollection|
