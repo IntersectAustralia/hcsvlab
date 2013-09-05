@@ -74,18 +74,20 @@ class Ability
     # User can discover a collection only if he/she is the owner or if he/she was granted
     # with discover, read or edit access to that collection
     can :discover, Collection do |aCollection|
-      (user.email.eql? aCollection.flat_ownerEmail) or
-          ((user.groups & aCollection.discover_groups).length > 0) or
-          ((user.groups & aCollection.read_groups).length > 0) or
-          ((user.groups & aCollection.edit_groups).length > 0)
+      #(user.email.eql? aCollection.flat_ownerEmail) or
+      #    ((user.groups & aCollection.discover_groups).length > 0) or
+      #    ((user.groups & aCollection.read_groups).length > 0) or
+      #    ((user.groups & aCollection.edit_groups).length > 0)
+      true
     end
     # User can read a collection only if he/she is the owner or if he/she was granted
     # with read or edit access to that collection
-    #can :read, Collection do |aCollection|
-    #  (user.email.eql? aCollection.flat_ownerEmail) or
-    #      ((user.groups & aCollection.read_groups).length > 0) or
-    #      ((user.groups & aCollection.edit_groups).length > 0)
-    #end
+    can :read, Collection do |aCollection|
+      #(user.email.eql? aCollection.flat_ownerEmail) or
+      #    ((user.groups & aCollection.read_groups).length > 0) or
+      #    ((user.groups & aCollection.edit_groups).length > 0)
+      true
+    end
 
     # User can edit a collection only if he/she is the owner or if he/she was granted
     # with edit access to that collection
