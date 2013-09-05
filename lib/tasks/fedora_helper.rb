@@ -91,7 +91,7 @@ def create_collection_from_file(collection_file, collection_name)
 
   coll.save!
 
-  puts "Collection Metadata = " + coll.pid.to_s unless Rails.env.test?
+  puts "Collection '#{coll.flat_short_name}' Metadata = " + coll.pid.to_s unless Rails.env.test?
 end
 
 def look_for_documents(item, corpus_dir, rdf_file)
