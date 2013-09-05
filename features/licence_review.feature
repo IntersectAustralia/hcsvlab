@@ -59,6 +59,41 @@ Feature: Managing Subscriptions to Collections
       | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
 
   @javascript
+  Scenario: Verifying that one can click through to the details of a collection
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to Collection "austlit"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence_agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state        | actions                        |
+      | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+    When I click the link in the 1st column of the 1st row of the "collections" table
+    Then I should see "AustLit provides full-text access to hundreds of examples of out of copyright poetry, fiction and criticism ranging from 1795 to the 1930s"
+    And I should see "Collection Details"
+
+  @javascript
+  Scenario: Verifying that one can show which collections are in a collection list and then click through to their details
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to Collection List "List_1"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence_agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state        | actions                        |
+      | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+    When I click the button in the 1st column of the 1st row of the "collections" table
+    And I wait 2 seconds
+    And Save a screenshot with name "log/list.png"
+    And I click "cooee"
+    And I wait 2 seconds
+    And Save a screenshot with name "log/cooee.png"
+    Then I should see "Corpus of Oz Early English"
+    And I should see "Collection Details"
+
+  @javascript
   Scenario: Verifying that I can sign up to licence agreements
     And I am logged in as "data_owner@intersect.org.au"
     And I have added a licence to Collection "austlit"
@@ -71,16 +106,18 @@ Feature: Managing Subscriptions to Collections
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
       | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
-    When I click the button in the 1st row of the "collections" table
+    When I click the button in the 5th column of the 1st row of the "collections" table
     And I wait 2 seconds
 #    And Save a screenshot with name "log/gg.png"
 #    And Show Browser Inspector
     And I click "Close" on the 1st licence dialogue
+#    And I wait 2 seconds
+#    And Save a screenshot with name "log/gg2.png"
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
       | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
-    When I click the button in the 2nd row of the "collections" table
+    When I click the button in the 5th column of the 2nd row of the "collections" table
     And I wait 2 seconds
     And I click "Accept" on the 2nd licence dialogue
     Then the Review and Acceptance of Licence Terms table should have

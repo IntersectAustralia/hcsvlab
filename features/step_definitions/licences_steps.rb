@@ -110,8 +110,18 @@ And /^I have added a licence to Collection List "([^"]*)"$/ do |name|
   list.setLicence(Licence.first.id)
 end
 
-And /^I click the button in the (\d+)(?:|st|nd|rd|th) row of the "([^"]*)" table$/ do |position, table|
+And /^I click the action button in the (\d+)(?:|st|nd|rd|th) row of the "([^"]*)" table$/ do |position, table|
   button = page.find(:xpath, "//table[@id='#{table}']//tr[#{position}]//td[@class='actions']/a[@class='btn btn-mini']")
+  button.click
+end
+
+And /^I click the link in the (\d+)(?:|st|nd|rd|th) column of the (\d+)(?:|st|nd|rd|th) row of the "([^"]*)" table$/ do |column, row, table|
+  button = page.find(:xpath, "//table[@id='#{table}']//tr[#{row}]//td[#{column}]/a")
+  button.click
+end
+
+And /^I click the button in the (\d+)(?:|st|nd|rd|th) column of the (\d+)(?:|st|nd|rd|th) row of the "([^"]*)" table$/ do |column, row, table|
+  button = page.find(:xpath, "//table[@id='#{table}']//tr[#{row}]//td[#{column}]/a[@class='btn btn-mini']")
   button.click
 end
 
