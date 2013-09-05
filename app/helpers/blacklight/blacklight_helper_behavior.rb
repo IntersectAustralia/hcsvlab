@@ -899,7 +899,11 @@ module Blacklight::BlacklightHelperBehavior
   #end
 
   def render_language_code(iso639_3_code)
-    return "<a href=\"#{language_query_uri(iso639_3_code)}\">#{iso639_3_code}</a>"
+    if iso639_3_code != "unspecified"
+      "<a href=\"#{language_query_uri(iso639_3_code)}\">#{iso639_3_code}</a>"
+    else
+      iso639_3_code
+    end
   end
 
   def render_language_codes(list)

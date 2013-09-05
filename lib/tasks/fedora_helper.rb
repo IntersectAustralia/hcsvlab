@@ -20,6 +20,12 @@ def create_item_from_file(corpus_dir, rdf_file)
 
   collectionName = last_bit(result.collection.to_s)
 
+  # small hack to handle austalk for the time being, can be fixed up 
+  # when we look at getting some form of data uniformity
+  if query.execute(item.rdfMetadata.graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
+    collectionName = "austalk"
+  end
+
   if Collection.where(short_name: collectionName).count == 0
     create_collection(collectionName, corpus_dir)
   end

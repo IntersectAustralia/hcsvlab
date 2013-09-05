@@ -248,6 +248,23 @@ class CatalogController < ApplicationController
     config.spell_max = 5
   end
 
+  # override default index method
+  def index
+    super
+    if !current_user.nil?
+      @hasAccessToEveryCollection = true
+      @hasAccessToSomeCollections = false
+      Collection.all.each do |aCollection|
+        #I have access to a collection if I am the owner or if I accepted the licence for that collection
+        hasAccessToCollection = (aCollection.flat_ownerEmail.eql? current_user.email) ||
+                                (current_user.has_agreement_to_collection?(aCollection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE, false))
+
+        @hasAccessToSomeCollections = @hasAccessToSomeCollections || hasAccessToCollection
+        @hasAccessToEveryCollection = @hasAccessToEveryCollection && hasAccessToCollection
+      end
+    end
+  end
+
   # override default show method to allow for json response
   def show
     if Item.where(id: params[:id]).count != 0
