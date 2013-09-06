@@ -73,6 +73,10 @@ Feature: Managing Subscriptions to Collections
     Then I should see "AustLit provides full-text access to hundreds of examples of out of copyright poetry, fiction and criticism ranging from 1795 to the 1930s"
     And I should see "Back to Licence Agreements"
     And I should see "Collection Details"
+    When I click "Back to Licence Agreements"
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state        | actions                        |
+      | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
 
   @javascript
   Scenario: Verifying that one can show which collections are in a collection list and then click through to their details
@@ -94,6 +98,10 @@ Feature: Managing Subscriptions to Collections
     Then I should see "Corpus of Oz Early English"
     And I should see "Back to Licence Agreements"
     And I should see "Collection Details"
+    When I click "Back to Licence Agreements"
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state        | actions                        |
+      | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
 
   @javascript
   Scenario: Verifying that I can sign up to licence agreements
