@@ -1,5 +1,9 @@
 %content
   %h1= @collection.flat_short_name
+
+  - unless params[:state].nil?
+    = link_to "Back to Licence Agreements", "/account/licence_agreements", :class => "btn"
+
 .document
   %h3
     %span Collection Details
