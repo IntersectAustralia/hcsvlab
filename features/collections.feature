@@ -26,6 +26,7 @@ Feature: Collections
     And I follow "austlit"
     Then I should see "austlit"
     And I should see "Collection Details"
+    And I should not see "Back to Licence Agreements"
 
   @javascript
   Scenario: Access collection details from item details page
@@ -35,3 +36,4 @@ Feature: Collections
     Then I should be on the collection page for "cooee"
     And I should see "cooee"
     And I should see "Collection Details"
+    And I should not see "Back to Licence Agreements"

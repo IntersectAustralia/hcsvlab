@@ -71,6 +71,7 @@ Feature: Managing Subscriptions to Collections
       | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
     When I click the link in the 1st column of the 1st row of the "collections" table
     Then I should see "AustLit provides full-text access to hundreds of examples of out of copyright poetry, fiction and criticism ranging from 1795 to the 1930s"
+    And I should see "Back to Licence Agreements"
     And I should see "Collection Details"
 
   @javascript
@@ -91,6 +92,7 @@ Feature: Managing Subscriptions to Collections
     And I wait 2 seconds
     And Save a screenshot with name "log/cooee.png"
     Then I should see "Corpus of Oz Early English"
+    And I should see "Back to Licence Agreements"
     And I should see "Collection Details"
 
   @javascript
