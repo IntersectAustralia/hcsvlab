@@ -124,11 +124,6 @@ class Collection < ActiveFedora::Base
     self.save!
   end
 
-  # Setting of privacy status
-  def set_privacy_status(status)
-    self[:privacy_status] = status
-  end
-
   # Query of privacy status
   def private?
     self[:privacy_status]
