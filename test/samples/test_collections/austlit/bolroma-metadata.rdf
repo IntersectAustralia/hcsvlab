@@ -1,0 +1,45 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ns1: <http://ns.ausnc.org.au/schemas/austlit/> .
+@prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://ns.ausnc.org.au/corpora/austlit/items/bolroma.xml> a ausnc:AusNCObject ;
+    ausnc:collection "Primary Fiction and Poetry Texts" ;
+    ausnc:document <http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Original>,
+        <http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Raw>,
+        <http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Text> ;
+    ausnc:itemwordcount 89728 ;
+    ausnc:plaintextversion <http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Text> ;
+    ns1:location "Sydney, Australia" ;
+    dc:contributor "Rolf Boldrewood" ;
+    dc:created "1898" ;
+    dc:identifier "bolroma.xml" ;
+    dc:isPartOf corpus:austlit ;
+    dc:publisher "University of Sydney Library" ;
+    dc:title "A Romance of Canvas Town" ;
+    olac:language "eng" .
+
+<http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Original> a foaf:Document ;
+    dc:extent 546058 ;
+    dc:identifier "bolroma.xml" ;
+    dc:source <http://ic2-hcsvlab-data-vm.intersect.org.au/ausnc/AUSTLIT/bolroma.xml> ;
+    dc:title "bolroma#Original" ;
+    dc:type "Original" .
+
+<http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Raw> a foaf:Document ;
+    dc:extent 546058 ;
+    dc:identifier "bolroma-raw.txt" ;
+    dc:source <http://ic2-hcsvlab-data-vm.intersect.org.au/ausnc/AUSTLIT/bolroma-raw.txt> ;
+    dc:title "bolroma#Raw" ;
+    dc:type "Raw" .
+
+<http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Text> a foaf:Document ;
+    dc:extent 505682 ;
+    dc:identifier "bolroma-plain.txt" ;
+    dc:source <http://ic2-hcsvlab-data-vm.intersect.org.au/ausnc/AUSTLIT/bolroma-plain.txt> ;
+    dc:title "bolroma#Text" ;
+    dc:type "Text" .
+

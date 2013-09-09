@@ -1,3 +1,19 @@
+def ingest_test_collections
+  qa_collections_folder = "#{Rails.root}/test/samples/test_collections"
+  #puts "Ingesting collections in #{qa_collections_folder}"
+  Dir.glob(qa_collections_folder.to_s + "/*").each do |aFile|
+    if (Dir.exists?(aFile))
+      rdf_files = Dir.glob(aFile + "/*-metadata.rdf")
+
+      rdf_files.each do |rdf_file|
+        response = `RAILS_ENV=test bundle exec rake fedora:ingest_one #{rdf_file}`
+        pid = response[/(hcsvlab:\d+)/, 1]
+        Solr_Worker.new.on_message("index #{pid}")
+      end
+    end
+  end
+end
+
 def clear_jetty
   # clear Solr
   uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
@@ -52,8 +68,21 @@ at_exit do
   clear_jetty
 end
 
-Before do
-  clear_jetty
-  
+Before do |scenario|
+  if scenario.instance_of?(Cucumber::Ast::Scenario)
+    shouldCleanBeforeScenario = scenario.feature_tags.tags.select{|t| "@ingest_qa_collections".eql? t.name.to_s}.empty?
+
+    if (shouldCleanBeforeScenario)
+      clear_jetty
+    end
+  else
+    clear_jetty
+  end
 end
 
+Before('@ingest_qa_collections') do
+  if (!$alreadyIngested)
+    ingest_test_collections
+    $alreadyIngested = true
+  end
+end

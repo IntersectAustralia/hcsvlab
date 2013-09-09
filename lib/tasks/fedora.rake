@@ -174,7 +174,7 @@ namespace :fedora do
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     objects.each do |obj|
-      reindex_item(obj, stomp_client)
+      reindex_item_by_id(obj["id"], stomp_client)
     end
     stomp_client.close
 
@@ -366,7 +366,7 @@ namespace :fedora do
   end
 
   def find_corpus_items(corpus)
-    response = @solr.get 'select', :params => {:q => 'DC_is_part_of:' + corpus,
+    response = @solr.get 'select', :params => {:q => 'HCSvLab_collection:' + corpus,
                                                :rows => 2147483647}
     response['response']['docs']
   end
