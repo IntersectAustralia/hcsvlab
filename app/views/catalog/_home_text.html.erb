@@ -1,13 +1,14 @@
-<h2>Human Communication Science Virtual Laboratory</h2>
-<h4> Above and beyond speech, language and music: a Virtual Laboratory for Human Communication Science </h4>
-<br/>
+<header class="home">
+  <h2>Human Communication Science Virtual Laboratory</h2>
+  <h4> Above and beyond speech, language and music: a Virtual Laboratory for Human Communication Science </h4>
+</header>
 <% if !@hasAccessToEveryCollection and @hasAccessToSomeCollections %>
-  <div class="alert">
+  <div class="info">
     <a class="close" data-dismiss="alert" href="#">×</a>
     <p><strong>Welcome!</strong> To gain access to more Collections, visit the <a href="account/licence_agreements" class="alert-link">Licence Agreements</a> page.</p>
   </div>
 <% elsif !@hasAccessToEveryCollection %>
-  <div class="well well-lg">
+  <div class="info">
     <a class="close" data-dismiss="alert" href="#">×</a>
     <p><strong>Welcome!</strong> To gain access to Collections, visit the <a href="account/licence_agreements" class="alert-link">Licence Agreements</a> page.</p>
   </div>
