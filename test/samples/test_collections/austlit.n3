@@ -1,0 +1,46 @@
+@prefix AustLit: <http://ns.ausnc.org.au/corpus/AustLit/AustLit> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix cld: <http://purl.org/cld/terms/> .
+@prefix marcrel: <http://www.loc.gov/loc.terms/relators/> .
+
+AustLit:
+      a dcmitype:Collection ;
+      dc:title "AustLit" ;
+      dcterms:abstract "AustLit provides full-text access to hundreds of examples of out of copyright poetry, fiction and criticism ranging from 1795 to the 1930s. The collection includes literature intended for popular audiences as well as literature intended for audiences concerned with literary quality or the establishment of a national canon. The bibliographical information associated with these records enables researchers to investigate the relationships between texts and particular publishers or to track the first publication of each text in newspapers, magazines or journals. This provides indirect evidence of the original audience for each text and the evolution of reception over time if the texts were subsequently republished in other contexts. " ;
+      dcterms:extent "1200-1500 individual works of literature and criticism" ;
+      dcterms:language "eng" ;
+      dcterms:itemType "AustLit's data is encoded in XML (eXtensible Markup Language) which is translated to HTML pages using XSL (eXtensible Style sheet Language" ;
+      dcterms:itemFormat "Bibliographic and production information for works of fiction and poetry, writing for the theatre, biographical and travel writing, writing for film and television, criticism and reviews and the people and organisations who produce them." ;
+      dcterms:created "2000 to present" ;
+      dc:custodian "Kerry Kilner" ;
+      marcrel:OWN "University of Queensland." ;
+      dcterms:contributor "University of New South Wales, Australian Defence Force Academy, University of Sydney, Monash University, Queensland University of Technology, University of Wollongong, James Cook University, Flinders University, University of Western Australia, Uiversity of Canberra";
+      dc:rights "All rights reserved to the UNiversity of Queensland";
+      dcterms:accessRights "See AusNC Terms of Use" ;
+      dc:subject "200500 - Literary Studies" ;
+      cld:isLocatedAt "University of Queensland, Brisbane St Lucia, QLD, Australia" ;
+      dcterms:isPartOf "Australian National Corpus - http://www.ausnc.org.au";
+      dcterms:isReferencedBy "Jacklin, Michael. 'Multicultural Literature in Australian and the AustLit Database'. InCite Vol. 30., No. 4., April 2009.";
+      dcterms:isReferencedBy "Bode, Katherine. 'From British Domination to Multinational Conglomeration: A Revised History of Australian Novel publishing, 1950-2007'. Resourceful Reading: The New Empiricism, eResearch and Australian Literary Culture, Sydney: Sydney University Press, 2009. pp. 194-222.";
+      dcterms:isReferencedBy "Kilner, Kerry. 'AustLit: Creating a Collaborative Research Space for Australian Literary Studies'. Resourceful Reading: The New Empiricism, eResearch and Australian Literary Culture, Sydney: Sydney University Press, 2009. pp. 299-315.";
+      dcterms:isReferencedBy "Ensor, Jason. 'Still Waters Run Deep: Empirical Methods and the Migration Patterns of Regional Publishers, Authors and Titles within Australian Literature'. Antipodes, December 2009.";
+      .
+
+#      dc:identifier "" ;
+#      dcterms:provenance "" ;
+
+
+#Accrual Method [dcterms:accrualMethod]
+#Accrual Periodicity [dcterms:accrualPeriodicity]
+#Accrual Policy [dcterms:accrualPolicy]
+#Audience [dcterms:audience]
+#Spatial Coverage [dcterms:spatial]
+#Is Located At [cld:isLocatedAt]
+#Is Accessed Via [cld:isAccessedVia]
+#Sub-Collection [dcterms:hasPart]
+#Super-Collection [dcterms:isPartOf]
+#Catalogue or Index [cld:catalogueOrIndex]
+#Associated Collection [cld:associatedCollection]
+#Associated Publication [dcterms:isReferencedBy]
