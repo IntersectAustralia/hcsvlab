@@ -46,6 +46,7 @@ Feature: Displaying Items
       | pages                                     | 10-11                                 |
       | speaker                                   | 1-001addressee, 1-001author           |
       | date_group                                | 1790 - 1799                           |
+    And I should not see "Development Extras"
 
 
 #
