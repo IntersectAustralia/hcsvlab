@@ -7,9 +7,9 @@
         %ul.nav
           %li{ class: activepath?(root_path) }
             = link_to "Discover", root_path
-          %li{ class: activepath?(item_lists_path) }
+          %li{ class: activepath_fuzzy?(item_lists_path || catalog_path) }
             = link_to "Item Lists", item_lists_path
-          %li{class: activepath?(collections_path) }
+          %li{class: activepath_fuzzy?(collections_path) }
             = link_to "Collections", collections_path
         %ul.nav.pull-right
           = render :partial => '/user_util_links'

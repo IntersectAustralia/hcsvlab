@@ -1,61 +1,68 @@
-- title 'User Details'
-.well.clearfix
-  - if @user.pending_approval?
-    .pull-left
-      = link_to 'Back', access_requests_users_path, :class => "btn"
-    .user_details_menu.pull-right
-      - if can?(:approve, @user) then
-        = link_to "Approve", edit_approval_user_path(@user), :method => :get, :class => "btn btn-primary"
-        &nbsp;
-      - if can?(:reject, @user) then
-        = link_to "Reject", reject_user_path(@user), :method => :put, :class => "btn btn-danger"
-        &nbsp;
-        = link_to "Reject as Spam", reject_as_spam_user_path(@user), :method => :put, :class => "btn btn-warning"
-        &nbsp;
+= render 'admin/admin_menu'
+.span9
+  %h2
+    User:
+    = render_field_table('', @user.first_name)
+    = render_field_table('', @user.last_name)
+  - title 'User Details'
 
-  - if @user.approved?
-    .pull-left
-      = link_to 'Back', users_path, :class => "btn"
-    .user_details_menu.pull-right
-      - if can?(:update_role, User)
-        = link_to 'Edit role', edit_role_user_path(@user), :class => "btn btn-primary"
-        &nbsp;
-      - if can?(:deactivate, User)
-        - if @user == current_user
-          = link_to "Deactivate", deactivate_user_path(@user), :confirm => "This is the user you are currently logged is as. Are you sure you want to deactivate it?" , :method => :put, :class => "btn btn-warning"
-          &nbsp;
+  %table#userdetails.table.table-striped
+    = render_field_table('Email', @user.email)
+    = render_field_table('First Name', @user.first_name)
+    = render_field_table('Last Name', @user.last_name)
+    - if !@user.pending_approval?
+      = render_field_table_with_block "Last Logged In" do
+        - if @user.last_sign_in_at.nil?
+          = 'Never logged in'
         - else
-          = link_to "Deactivate", deactivate_user_path(@user), :method => :put, :class => "btn btn-warning"
+          = @user.last_sign_in_at.localtime.strftime("%d/%m/%Y %I:%M%p")
+    = render_field_table('Role', (@user.role ? @user.role.name : ''))
+    = render_field_table_with_block 'Status' do
+      - if @user.status == 'A'
+        Active
+      - elsif @user.status == 'D'
+        Deactivated
+      - elsif @user.status == 'U'
+        Pending Approval
+      - elsif @user.status == 'R'
+        Rejected
+        </table>
+
+  .well.clearfix
+    - if @user.pending_approval?
+      .pull-left
+        = link_to 'Back', access_requests_users_path, :class => "btn"
+      .user_details_menu.pull-right
+        - if can?(:approve, @user) then
+          = link_to "Approve", edit_approval_user_path(@user), :method => :get, :class => "btn btn-primary"
+          &nbsp;
+        - if can?(:reject, @user) then
+          = link_to "Reject", reject_user_path(@user), :method => :put, :class => "btn btn-danger"
+          &nbsp;
+          = link_to "Reject as Spam", reject_as_spam_user_path(@user), :method => :put, :class => "btn btn-warning"
           &nbsp;
 
-  - if @user.deactivated?
-    .user_details_menu
-      - if can?(:update_role, User)
-        = link_to 'Edit role', edit_role_user_path(@user), :class => "btn"
-        &nbsp;
-      - if can?(:activate, User)
-        = link_to "Activate", activate_user_path(@user), :method => :put, :class => "btn"
-        &nbsp;
-      = link_to 'Back', users_path, :class => "btn"
+    - if @user.approved?
+      .pull-left
+        = link_to 'Back', users_path, :class => "btn"
+      .user_details_menu.pull-right
+        - if can?(:update_role, User)
+          = link_to 'Edit role', edit_role_user_path(@user), :class => "btn btn-primary"
+          &nbsp;
+        - if can?(:deactivate, User)
+          - if @user == current_user
+            = link_to "Deactivate", deactivate_user_path(@user), :confirm => "This is the user you are currently logged is as. Are you sure you want to deactivate it?" , :method => :put, :class => "btn btn-warning"
+            &nbsp;
+          - else
+            = link_to "Deactivate", deactivate_user_path(@user), :method => :put, :class => "btn btn-warning"
+            &nbsp;
 
-%table#userdetails.table.table-striped
-  = render_field_table('Email', @user.email)
-  = render_field_table('First Name', @user.first_name)
-  = render_field_table('Last Name', @user.last_name)
-  - if !@user.pending_approval?
-    = render_field_table_with_block "Last Logged In" do
-      - if @user.last_sign_in_at.nil?
-        = 'Never logged in'
-      - else
-        = @user.last_sign_in_at.localtime.strftime("%d/%m/%Y %I:%M%p")
-  = render_field_table('Role', (@user.role ? @user.role.name : ''))
-  = render_field_table_with_block 'Status' do
-    - if @user.status == 'A'
-      Active
-    - elsif @user.status == 'D'
-      Deactivated
-    - elsif @user.status == 'U'
-      Pending Approval
-    - elsif @user.status == 'R'
-      Rejected
-      </table>
+    - if @user.deactivated?
+      .user_details_menu
+        - if can?(:update_role, User)
+          = link_to 'Edit role', edit_role_user_path(@user), :class => "btn"
+          &nbsp;
+        - if can?(:activate, User)
+          = link_to "Activate", activate_user_path(@user), :method => :put, :class => "btn"
+          &nbsp;
+        = link_to 'Back', users_path, :class => "btn"

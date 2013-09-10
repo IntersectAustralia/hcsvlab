@@ -1,8 +1,11 @@
-- title "Edit Role For #{@user.email}"
+= render 'admin/admin_menu'
+.span9
+  %h2
+    Edit role of #{@user.email}
 
-= simple_form_for(@user, :url => update_role_user_path(@user)) do |f|
-  = render "shared/error_messages", :target => @user
-  = f.input :role, :collection => @roles
-  .form-actions
-    = f.submit "Save", :class => "btn btn-primary"
-    = link_to 'Back', @user, :class => "btn"
+  = simple_form_for(@user, :url => update_role_user_path(@user)) do |f|
+    = render "shared/error_messages", :target => @user
+    = f.input :role, :collection => @roles
+    .form-actions
+      = link_to 'Back', @user, :class => "btn"
+      = f.submit "Save", :class => "btn btn-primary pull-right"
