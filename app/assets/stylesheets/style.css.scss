@@ -1,5 +1,11 @@
 * { text-rendering: optimizeLegibility; }
 
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-font-smoothing: antialiased;
+    -o-font-smoothing: antialiased;
+}
+
 em{ font-style: italic}
 a { color: rgb(0, 171, 255); }
 a:hover { color: #0D6B9F; }
@@ -16,6 +22,9 @@ display: inline-block;
 -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
 border-color: rgba(0, 0, 0, 0.25);
 }
+
+pre { background: #FFF; }
+.primary-text { margin: 0; }
 
 /* FORM ELEMENTS ///////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////*/
@@ -47,7 +56,6 @@ textarea{
   height: 200px;
 }
 
-.sidenav h4 { font-weight: 200; color: #FFF; background: #333; padding: 10px 14px; -webkit-border-radius: 4px 4px 0 0; -moz-border-radius: 4px 4px 0 0; border-radius: 4px 4px 0 0; }
 
 /* LAYOUT ELEMENTS /////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////*/
@@ -137,22 +145,57 @@ border-width: 0 0 0px;
 -webkit-border-radius: 3px 0 0 3px; -moz-border-radius: 3px 0 0 3px; border-radius: 3px 0 0 3px;
 }
 
-.info {
+.alert {
   padding: 10px 20px;
   margin-bottom: 20px;
   text-shadow: none;
-  background-color: #d9edf7;
+  background-color: #fcf8e3;
   border: 0px solid #fbeed5;
   -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px;
 }
 
-.alert .close, .info .close {
-  color: #333;
-  opacity: 0.5;
-  line-height: 18px;
+.alert, .alert h4 { color: #333; }
+
+.alert .close {
+  position: relative;
+  top: -2px;
+  right: 0px;
+  line-height: 20px;
 }
 
-.info .close:hover { color: #333; opacity: 1; }
+.info {
+  padding: 20px;
+  margin-bottom: 20px;
+  text-shadow: none;
+  background-color: rgba(217, 237, 247, 0.5);
+  border: 0px solid #fbeed5;
+  -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px;
+}
+
+.alert-info {
+  background-color: rgba(254, 216, 117, 0.5);
+  border: 0px solid #FBEED5;
+  color: #333;
+}
+
+.close {
+  float: right;
+  font-size: 20px;
+  font-weight: 100;
+  line-height: 18px;
+  color: #333;
+  text-shadow: none;
+  opacity: 0.50;
+  filter: alpha(opacity=50);
+}
+
+.close:hover {
+  color: #333;
+  opacity: 0.75;
+  filter: alpha(opacity=75);
+}
+
+.info .close:hover { color: #333; opacity: 0.75; }
 
 .info.alert-error {
 background-color: #f2dede;
@@ -177,14 +220,15 @@ color: #b94a48;
   padding-left: 50px;
   text-align: left;
   color: #FFF;
-  text-shadow: 0 0px 0 white;
+  text-shadow: none;
+  font-weight: 400;
 }
 
 
 .navbar .nav > li > a {
   float: none;
   padding: 15px 20px;
-  color: #9B5B00;
+  color: #333;
   text-decoration: none;
   text-shadow: none;
 }
@@ -283,6 +327,7 @@ li > .dropdown-menu {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.0);
 }
 
+.sidenav h4 { font-weight: 400; color: #FFF; background: #333; padding: 10px 14px; -webkit-border-radius: 4px 4px 0 0; -moz-border-radius: 4px 4px 0 0; border-radius: 4px 4px 0 0; }
 
 
 #facets ul {
@@ -399,11 +444,19 @@ background-color: #e6e6e6;
 opacity: .25;
 }
 
+.form-actions {
+  padding: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: whitesmoke;
+  border-top: 0px solid #e5e5e5;
+  -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px;
+}
 
 /* CATALOG /////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////*/
 
-header.home { margin: 0 0 60px 0; }
+header.home { margin: 0 0 40px 0; }
 
 .constraints-container {
   margin-bottom: 0; padding: 10px 0px; min-height: 20px;
@@ -1134,7 +1187,7 @@ border: 1px solid #BCBCBC;
   padding: 15px;
 }
 
-.close {
+.modal .close {
   float: right;
   font-size: 20px;
   font-weight: 100;
@@ -1145,7 +1198,7 @@ border: 1px solid #BCBCBC;
   filter: alpha(opacity=100);
 }
 
-.close:hover {
+.modal .close:hover {
   color: #EEE;
   opacity: 0.6;
   filter: alpha(opacity=60);
