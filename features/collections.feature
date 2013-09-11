@@ -26,6 +26,12 @@ Feature: Collections
     And I follow "austlit"
     Then I should see "austlit"
     And I should see "Collection Details"
+    And I should see "Title: AustLit "
+    And I should see "Access Rights: See AusNC Terms of Use "
+    And I should see "Created: 2000 to present "
+    And I should see "Is Part Of: Australian National Corpus - http://www.ausnc.org.au "
+    And I should see "Language: eng"
+    And I should see "Owner: University of Queensland. "
     And I should not see "Back to Licence Agreements"
 
   @javascript
@@ -36,4 +42,10 @@ Feature: Collections
     Then I should be on the collection page for "cooee"
     And I should see "cooee"
     And I should see "Collection Details"
+    And I should see "Title: Corpus of Oz Early English "
+    And I should see "Access Rights: See AusNC Terms of Use "
+    And I should see "Created: 2004 "
+    And I should see "Extent: 1353 text samples, 2,000,000 words "
+    And I should see "Language: eng"
+    And I should see "Owner: None. Individual owner is Clemens Fritz. "
     And I should not see "Back to Licence Agreements"
