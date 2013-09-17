@@ -45,7 +45,7 @@ def create_item_from_file(corpus_dir, rdf_file)
   end
 
   item.save!
-  puts "Item = " + item.pid.to_s
+  logger.info "Item = #{item.pid}"
   return item
 end
 
@@ -59,7 +59,7 @@ def create_collection(collection_name, corpus_dir)
   if Dir.entries(dir).include?(collection_name + ".n3")
     coll_metadata = dir + "/" + collection_name + ".n3"
   else
-    puts "No collection metadata file found - " + dir + "/" + collection_name + ".n3"
+    logger.warn "No collection metadata file found - #{dir}/#{collection_name}.n3"
     return
   end
 
@@ -73,6 +73,12 @@ def create_collection_from_file(collection_file, collection_name)
   coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s
   coll.uri = coll.label
   coll.short_name = collection_name
+
+  if Collection.find_by_uri(coll.uri).size != 0
+    # There is already such a collection in the system
+    logger.error "Collection #{collection_name} (#{coll.uri}) already exists in the system - skipping"
+    return
+  end
   coll.save
 
   set_data_owner(coll)
@@ -91,7 +97,7 @@ def create_collection_from_file(collection_file, collection_name)
 
   coll.save!
 
-  puts "Collection '#{coll.flat_short_name}' Metadata = " + coll.pid.to_s unless Rails.env.test?
+  logger.info "Collection '#{coll.flat_short_name}' Metadata = #{coll.pid}" unless Rails.env.test?
 end
 
 def look_for_documents(item, corpus_dir, rdf_file)
@@ -117,14 +123,15 @@ def look_for_documents(item, corpus_dir, rdf_file)
       doc.item = item
 
       # Add Groups to the created document
-      #puts "    Creating document groups (discover, read, edit)"
+      logger.debug "    Creating document groups (discover, read, edit)"
       doc.set_discover_groups(["#{item.collection.flat_short_name}-discover"], [])
       doc.set_read_groups(["#{item.collection.flat_short_name}-read"], [])
       doc.set_edit_groups(["#{item.collection.flat_short_name}-edit"], [])
+
       # Add complete permission for data_owner
       data_owner = item.collection.flat_private_data_owner
       if (!data_owner.nil?)
-        #puts "    Creating document users (discover, read, edit) with #{data_owner}"
+        logger.debug "    Creating document users (discover, read, edit) with #{data_owner}"
         doc.set_discover_users([data_owner], [])
         doc.set_read_users([data_owner], [])
         doc.set_edit_users([data_owner], [])
@@ -141,16 +148,16 @@ def look_for_documents(item, corpus_dir, rdf_file)
               when 'Text'
                 item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
               else
-                puts "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item" unless Rails.env.test?
+                logger.warn "Creating a #{result.type.to_s} document for #{path} but not adding it to its Item" unless Rails.env.test?
             end
           end
           doc.save
-          puts "#{result.type.to_s} Document = #{doc.pid.to_s}" unless Rails.env.test?
+          logger.info "#{result.type.to_s} Document = #{doc.pid.to_s}" unless Rails.env.test?
           break
         end
       end
     rescue Exception => e
-      Rails.logger.warn("Error creating document: #{e.message}")
+      logger.error("Error creating document: #{e.message}")
     end
   end
 end
@@ -161,7 +168,7 @@ def look_for_annotations(item, metadata_filename)
 
   if File.exists?(annotation_filename)
     item.add_named_datastream('annotation_set', :dsLocation => "file://" + annotation_filename, :mimeType => 'text/plain')
-    puts "Annotation datastream added for #{File.basename(annotation_filename)}" unless Rails.env.test?
+    logger.info "Annotation datastream added for #{File.basename(annotation_filename)}" unless Rails.env.test?
   end
 end
 
@@ -181,11 +188,11 @@ def set_data_owner(collection)
   data_owner = find_system_user(results)
   data_owner = find_default_owner() if data_owner.nil?
   if data_owner.nil?
-    logger.debug "Cannot determine data owner for collection #{collection.short_name}"
+    logger.warn "Cannot determine data owner for collection #{collection.short_name}"
   elsif data_owner.cannot_own_data?
-    logger.debug "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
+    logger.warn "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
-    logger.debug "Setting data owner to #{data_owner.email}"
+    logger.info "Setting data owner to #{data_owner.email}"
     collection.set_data_owner_and_save(data_owner)
   end
 end
@@ -234,12 +241,10 @@ def create_default_licences(rootPath = "config")
 
       l.save!
     rescue Exception => e
-      puts "Licence Name: #{l.name} not ingested."
-      puts "ERROR: #{l.errors.messages.inspect}"
-      puts ""
+      logger.error "Licence Name: #{l.name[0]} not ingested: #{l.errors.messages.inspect}"
       next
     else
-      puts "Licence '#{l.name[0].to_s}' = #{l.pid.to_s}" unless Rails.env.test?
+      logger.info "Licence '#{l.name[0]}' = #{l.pid}" unless Rails.env.test?
     end
 
   end

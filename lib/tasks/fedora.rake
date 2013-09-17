@@ -16,8 +16,9 @@ namespace :fedora do
       exit 1
     end
 
-    ingest_rdf_file(File.dirname(corpus_rdf), corpus_rdf, true)
-
+    logger.info "rake fedora:ingest_one #{corpus_rdf}"
+    pid = ingest_rdf_file(File.dirname(corpus_rdf), corpus_rdf, true)
+    puts "Ingested item #{pid}" if Rails.env.test?
   end
 
 
@@ -47,6 +48,7 @@ namespace :fedora do
       exit 1
     end
 
+    logger.info "rake fedora:ingest corpus=#{corpus_dir} amount=#{num_spec} random=#{random} annotations=#{annotations}"
     ingest_corpus(corpus_dir, num_spec, random, annotations)
   end
 
@@ -56,35 +58,31 @@ namespace :fedora do
   #
   task :clear => :environment do
 
-    puts "Emptying Fedora"
+    logger.info "rake fedora:clear"
+    logger.info "Emptying Fedora"
 
-    puts "Items..."
     Item.find_each do |item|
-      puts item.pid.to_s
+      logger.info "Item #{item.pid.to_s}"
       item.delete
     end
 
-    puts "Documents..."
     Document.find_each do |doc|
-      puts doc.pid.to_s
+      logger.info "Document #{doc.pid.to_s}"
       doc.delete
     end
 
-    puts "Collections..."
     Collection.find_each do |coll|
-      puts coll.pid.to_s
+      logger.info "Collection #{coll.pid.to_s}"
       coll.delete
     end
 
-    puts "Collection Lists"
     CollectionList.find_each do |aCollectionList|
-      puts aCollectionList.pid.to_s
+      logger.info "Collection List #{aCollectionList.pid.to_s}"
       aCollectionList.delete
     end
 
-    puts "Licences"
     Licence.find_each do |aLicence|
-      puts aLicence.pid.to_s
+      logger.info "Licence #{aLicence.pid.to_s}"
       aLicence.delete
     end
 
@@ -103,31 +101,31 @@ namespace :fedora do
       exit 1
     end
 
-    #objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
+    logger.info "rake fedora:clear_corpus corpus=#{corpus}"
+
     objects = find_corpus_items corpus
 
-    puts "Removing " + objects.count.to_s + " Items"
+    logger.info "Removing collection #{corpus}"
+    logger.info "Removing #{objects.count} Items"
 
     documents = []
 
     objects.each do |obj|
       id = obj["id"].to_s
-      puts "Removing Item: " + id.to_s
+      logger.info "Removing Item: #{id}"
       fobj=Item.find(id)
-      fobj.documents.each { |doc|
-        documents << doc
-      }
+      documents.concat(fobj.documents)
       fobj.delete
     end
 
-    puts "Removing " + documents.size.to_s + " Documents"
+    logger.info "Removing #{documents.size} Documents"
     documents.each { |doc|
-      puts "Removing Document: " + doc.pid
+      logger.info "Removing Document: #{doc.pid}"
       doc.delete
     }
 
     Collection.find_by_short_name(corpus).each { |collection|
-      puts "Removing collection object #{collection.pid}"
+      logger.info "Removing collection object #{collection.pid}"
       collection.delete
     }
   end
@@ -149,6 +147,8 @@ namespace :fedora do
       exit 1
     end
 
+    logger.info "rake fedora:reindex_one item=#{item_id}"
+
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     reindex_item_by_id(item_id, stomp_client)
     stomp_client.close
@@ -167,10 +167,11 @@ namespace :fedora do
       exit 1
     end
 
-    #objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
+    logger.info "rake fedora:reindex_corpus corpus=#{corpus}"
+
     objects = find_corpus_items corpus
 
-    puts "Reindexing " + objects.count.to_s + " objects"
+    logger.info "Reindexing #{objects.count} Items"
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     objects.each do |obj|
@@ -186,9 +187,11 @@ namespace :fedora do
   #
   task :reindex_all => :environment do
 
+    logger.info "rake fedora:reindex_all"
+
     items = Item.all
 
-    puts "Reindexing everything - " + items.size.to_s + " objects"
+    logger.info "Reindexing all #{items.size} Items"
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
 
@@ -204,6 +207,7 @@ namespace :fedora do
   # Ingest and create default set of licenses
   #
   task :ingest_licences => :environment do
+    logger.info "rake fedora:ingest_licences"
     create_default_licences
   end
 
@@ -222,6 +226,8 @@ namespace :fedora do
       puts "Usage: rake fedora:ingest_collection_metadata dir=<folder>"
       exit 1
     end
+
+    logger.info "rake fedora:ingest_collection_metadata dir=#{dir}"
 
     Dir.glob(dir + '/**/*.n3') { |n3|
       coll_name = File.basename(n3, ".n3")
@@ -264,7 +270,7 @@ namespace :fedora do
       end
     end
 
-    puts "Ingesting #{num} file#{(num==1) ? '' : 's'} of #{rdf_files.size}"
+    logger.info "Ingesting #{num} file#{(num==1) ? '' : 's'} of #{rdf_files.size}"
     errors = {}
     successes = {}
 
@@ -276,7 +282,7 @@ namespace :fedora do
         pid = ingest_rdf_file(corpus_dir, rdf_file, annotations)
         successes[rdf_file] = pid
       rescue => e
-        puts "Error! #{e.message}"
+        logger.error "Error! #{e.message}"
         errors[rdf_file] = e.message
       end
     end
@@ -289,8 +295,8 @@ namespace :fedora do
     unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
       raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
     end
-    puts "#{Time.new.to_s} - Ingesting item: " + rdf_file.to_s
-    STDOUT.flush
+    logger.info "Ingesting item: #{rdf_file}"
+
     item = create_item_from_file(corpus_dir, rdf_file)
     look_for_annotations(item, rdf_file) if annotations
     look_for_documents(item, corpus_dir, rdf_file)
@@ -306,14 +312,14 @@ namespace :fedora do
       client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
       client.close
     rescue Exception => msg 
-      puts "Error sending message via stomp: #{msg}"
+      logger.error "Error sending message via stomp: #{msg}"
     end
     return item.pid
   end
 
 
   def reindex_item(item, stomp_client)
-    puts "Reindexing item: " + item.id
+    logger.info "Reindexing item: #{item.id}"
     item.update_index
     stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item.id}")
   end
@@ -330,8 +336,8 @@ namespace :fedora do
 
     message = "Successfully ingested #{successes.size} Item#{successes.size==1 ? '' : 's'}"
     message += ", and rejected #{errors.size} Item#{errors.size==1 ? '' : 's'}" unless errors.empty?
-    puts message
-    puts "Writing summary to #{logfile}"
+    logger.info message
+    logger.info "Writing summary to #{logfile}"
 
     logstream << "#{label}" << "\n\n"
     logstream << message << "\n"
