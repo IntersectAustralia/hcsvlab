@@ -50,11 +50,11 @@ class Solr_Worker < ApplicationProcessor
     # and then do what the verb says to the object. Complain if the message is
     # badly formed, or we don't understand the command verb.
     
-    logger.debug "Solr_Worker received: " + message
+    info("Solr_Worker", "received: #{message}")
     parse = message.split(' ')
 
     if parse.size != 2
-       logger.debug "\tbadly formatted instruction, expecting 'command object'"
+       error("Solr_Worker", "badly formatted instruction, expecting 'command object'")
        return
     end
 
@@ -67,7 +67,7 @@ class Solr_Worker < ApplicationProcessor
     when "delete"
       delete(object)
     else
-      logger.debug "\tunknown instruction: #{command}"
+      error("Solr_Worker", "unknown instruction: #{command}")
       return
     end
 
@@ -140,7 +140,7 @@ private
           full_text = fed_item.primary_text.content
         end 
       rescue
-        logger.warning("Solr_Worker caught exception fetching full_text for: " + object.to_s)
+        warning("Solr_Worker", "caught exception fetching full_text for: #{object}")
         full_text = ""
       end
 
@@ -216,10 +216,10 @@ private
   #
   def add_field(result, field, value)
     if @@configured_fields.include?(field)
-      logger.debug "\tAdding configured field #{field} with value #{value}"
+      debug("Solr_Worker", "Adding configured field #{field} with value #{value}")
       ::Solrizer::Extractor.insert_solr_field_value(result, field, value)
     else
-      logger.debug "\tAdding dynamic field #{field} with value #{value}"
+      debug("Solr_Worker", "Adding dynamic field #{field} with value #{value}")
       Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
     end
   end
@@ -230,7 +230,7 @@ private
   def make_solr_document(object, results, full_text, extras)
     result = {}
     configured_fields_found = Set.new()
-    ident_parts = {}
+    ident_parts = {collection: "Unknown Collection", identifier: "Unknown Identifier"}
 
     results.each { |binding|
 
@@ -286,29 +286,29 @@ private
       ::Solrizer::Extractor.insert_solr_field_value(result, :full_text, full_text)
     end
     default_il = ['0']
-    logger.debug "\tAdding configured field #{:item_lists} with value #{default_il}"
+    debug("Solr_Worker", "Adding configured field #{:item_lists} with value #{default_il}")
     ::Solrizer::Extractor.insert_solr_field_value(result, :item_lists, default_il)
-    logger.debug "\tAdding configured field #{:id} with value #{object}"
+    debug("Solr_Worker", "Adding configured field #{:id} with value #{object}")
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
     ident = ident_parts[:collection] + ":" + ident_parts[:identifier]
-    logger.debug "\tAdding configured field #{:HCSvLab_ident} with value #{ident}"
+    debug("Solr_Worker", "Adding configured field #{:HCSvLab_ident} with value #{ident}")
     ::Solrizer::Extractor.insert_solr_field_value(result, :HCSvLab_ident, ident)
 
     #Create group permission fields
-    logger.debug "\tAdding discover Permission field for group with value #{ident_parts[:collection]}-discover"
+    debug("Solr_Worker", "Adding discover Permission field for group with value #{ident_parts[:collection]}-discover")
     ::Solrizer::Extractor.insert_solr_field_value(result, :'discover_access_group_ssim', "#{ident_parts[:collection]}-discover")
-    logger.debug "\tAdding read Permission field for group with value #{ident_parts[:collection]}-read"
+    debug("Solr_Worker", "Adding read Permission field for group with value #{ident_parts[:collection]}-read")
     ::Solrizer::Extractor.insert_solr_field_value(result, :'read_access_group_ssim', "#{ident_parts[:collection]}-read")
-    logger.debug "\tAdding edit Permission field for group with value #{ident_parts[:collection]}-edit"
+    debug("Solr_Worker", "Adding edit Permission field for group with value #{ident_parts[:collection]}-edit")
     ::Solrizer::Extractor.insert_solr_field_value(result, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
     #Create user permission fields
     data_owner = Collection.find_by_short_name(ident_parts[:collection]).first.flat_private_data_owner
     if (!data_owner.nil?)
-      logger.debug "\tAdding discover Permission field for user with value #{data_owner}-discover"
+      debug("Solr_Worker", "Adding discover Permission field for user with value #{data_owner}-discover")
       ::Solrizer::Extractor.insert_solr_field_value(result, :'discover_access_person_ssim', "#{data_owner}")
-      logger.debug "\tAdding read Permission field for user with value #{ident_parts[:collection]}-read"
+      debug("Solr_Worker", "Adding read Permission field for user with value #{ident_parts[:collection]}-read")
       ::Solrizer::Extractor.insert_solr_field_value(result, :'read_access_person_ssim', "#{data_owner}")
-      logger.debug "\tAdding edit Permission field for user with value #{ident_parts[:collection]}-edit"
+      debug("Solr_Worker", "Adding edit Permission field for user with value #{ident_parts[:collection]}-edit")
       ::Solrizer::Extractor.insert_solr_field_value(result, :'edit_access_person_ssim', "#{data_owner}")
     end
 
@@ -356,7 +356,7 @@ private
     
     xml_update << "</doc> </add>"
 
-    logger.debug "XML= " + xml_update
+    debug("Solr_Worker", "XML= " + xml_update)
     
     return xml_update
 
@@ -377,14 +377,14 @@ private
     get_solr_connection()
     document = make_solr_document(object, results, full_text, extras)
     if (object_exists_in_solr?(object))
-      logger.debug "Updating " + object.to_s
+      debug("Solr_Worker", "Updating " + object.to_s)
       xml_update = make_solr_update(document)
       response = @@solr.update :data => xml_update
-      logger.debug("Update response= #{response.to_s}")
+      debug("Solr_Worker", "Update response= #{response.to_s}")
       response = @@solr.commit
-      logger.debug("Commit response= #{response.to_s}")
+      debug("Solr_Worker", "Commit response= #{response.to_s}")
     else
-      logger.debug "Inserting " + object.to_s 
+      debug("Solr_Worker", "Inserting " + object.to_s )
       response = @@solr.add(document)
       response = @@solr.commit
     end 
@@ -583,12 +583,11 @@ private
   # Print out the results of an RDF query
   #
   def print_results(results, label)
-    logger.debug("Results #{label}, with #{results.count} solutions(s)")
+    debug("Solr_Worker", "Results #{label}, with #{results.count} solutions(s)")
     results.each { |result|
       result.each_binding { |name, value|
-        logger.debug("> #{name} -> #{value} (#{value.class})")
+        debug("Solr_Worker", "> #{name} -> #{value} (#{value.class})")
       }
-      logger.debug("")
     }
   end
 
