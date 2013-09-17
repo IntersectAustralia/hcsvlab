@@ -137,7 +137,7 @@ echo "Checking A13g pollers..."
 
 a13g_status=` ps auxw | grep [p]oller | wc -l `
 
-if [ "$a13g_status" == "3" ]
+if [ $a13g_status == 3 ]
 then
   echo "+ It looks like the A13g pollers are running (processes= $a13g_status)"
 else
