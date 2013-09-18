@@ -189,10 +189,11 @@ class ItemList < ActiveRecord::Base
             #patch_after_update(item_id)
         end
     }
+    bench_end = Time.now
+    Rails.logger.debug("Time for adding #{adding.size} items to an item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
+    profiler = ["Time for adding #{adding.size} items to an item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
-    Rails.logger.debug("Time for adding #{adding.size} docs to an item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
-
-    return adding
+    return {addedItems: adding, profiler: profiler}
   end
   
   #
@@ -302,13 +303,20 @@ class ItemList < ActiveRecord::Base
     #process the information
     highlighting = processAndHighlightManually(document_list, search_for)
 
-    Rails.logger.debug("Data processing time for '#{search_for}' in concordance search: (#{'%.1f' % ((Time.now.to_f - process_bench_start.to_f)*1000)}ms)")
+    process_bench_end = Time.now
+
+    Rails.logger.debug("Time for data processing for term '#{search_for}' in concordance search: (#{'%.1f' % ((process_bench_end.to_f - process_bench_start.to_f)*1000)}ms)")
 
     matchingDocs = document_list.size
+    profiling = []
+    profiling << "Time for data processing for term '#{search_for}' in concordance search: (#{'%.1f' % ((process_bench_end.to_f - process_bench_start.to_f)*1000)}ms)"
 
-    result = {:highlighting => highlighting, :matching_docs => matchingDocs}
+    result = {:highlighting => highlighting, :matching_docs => matchingDocs, :profiler => profiling}
 
-    Rails.logger.debug("Time for searching for '#{search_for}' in concordance search: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+    bench_end = Time.now
+
+    Rails.logger.debug("Time for searching for '#{search_for}' in concordance search: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
+    profiling << "Time for searching for '#{search_for}' in concordance search: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"
 
     result
   end

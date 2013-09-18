@@ -250,7 +250,12 @@ class CatalogController < ApplicationController
 
   # override default index method
   def index
+    bench_start = Time.now
     super
+    bench_end = Time.now
+    @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
+    Rails.logger.debug(@profiler.first)
+
     if !current_user.nil?
       @hasAccessToEveryCollection = true
       @hasAccessToSomeCollections = false
@@ -330,23 +335,21 @@ class CatalogController < ApplicationController
 
   def document
     begin
-        item = Item.find(params[:id])
-        if item.documents.present?
-            #is_cooee = item.collection == "cooee"
-            item.documents.each do |doc|
-                next unless doc.file_name[0] == params[:filename] 
+      docHash = Array(Document.find_with_conditions({:file_name=>params[:filename].to_s, is_member_of_ssim:"info:fedora/#{params[:id]}"}, {fl:"id"})).first
+      docId = docHash["id"]
+      doc = Document.load_instance_from_solr(docId)
 
-                params[:disposition] = 'Inline'
-                params[:disposition].capitalize!
+      if (!doc.nil?)
+        params[:disposition] = 'Inline'
+        params[:disposition].capitalize!
 
-                send_data doc.datastreams['CONTENT1'].content,
-                          :disposition => params[:disposition],
-                          :filename => doc.file_name[0].to_s,
-                          :type => doc.mime_type[0].to_s
-                return
-            end
-        end
-    rescue Exception => e    
+        send_data doc.datastreams['CONTENT1'].content,
+                  :disposition => params[:disposition],
+                  :filename => doc.file_name[0].to_s,
+                  :type => doc.mime_type[0].to_s
+        return
+      end
+    rescue Exception => e
         # Fall through to return Not Found
     end
     respond_to do |format|
