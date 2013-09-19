@@ -2,6 +2,8 @@ class Datastream::ItemMetadata < ActiveFedora::OmDatastream
 
   set_terminology do |t|
     t.root(path: "fields")
+    t.identifier(index_as: :stored_searchable)
+    t.collection_name(index_as: :stored_searchable)
   end
 
   def self.xml_template

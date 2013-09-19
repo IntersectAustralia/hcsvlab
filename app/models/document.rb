@@ -18,5 +18,6 @@ class Document < HcsvlabActiveFedora
   delegate :file_name, to: 'descMetadata'
   delegate :type,      to: 'descMetadata'
   delegate :mime_type, to: 'descMetadata'
+  delegate :item_id,   to: 'descMetadata'
 
 end
