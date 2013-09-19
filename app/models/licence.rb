@@ -1,4 +1,4 @@
-class Licence < ActiveFedora::Base
+class Licence < HcsvlabActiveFedora
 
   LICENCE_TYPE_PRIVATE = "PRIVATE"
   LICENCE_TYPE_PUBLIC = "PUBLIC"

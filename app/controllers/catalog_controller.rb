@@ -335,9 +335,7 @@ class CatalogController < ApplicationController
 
   def document
     begin
-      docHash = Array(Document.find_with_conditions({:file_name=>params[:filename].to_s, is_member_of_ssim:"info:fedora/#{params[:id]}"}, {fl:"id"})).first
-      docId = docHash["id"]
-      doc = Document.load_instance_from_solr(docId)
+      doc = Document.find_and_load_from_solr({:file_name=>params[:filename].to_s, item: params[:id]}).first
 
       if (!doc.nil?)
         params[:disposition] = 'Inline'
