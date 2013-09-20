@@ -181,6 +181,32 @@ namespace :fedora do
 
   end
 
+  #
+  # Consolidate cores by reindexing items found only in the ActiveFedora core
+  #
+  task :consolidate_cores => :environment do
+    solr = ActiveFedora::SolrService.instance.conn
+    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+
+    response = solr.get 'select', :params => {:q => 'active_fedora_model_ssi:Item'}
+    num = response["response"]["numFound"]
+    num = (num/20)+1
+    i = 0
+    num.times do |set|
+      logger.info "Investigating item set " + (set+1).to_s + " of " + num.to_s
+      response = solr.get 'select', :params => {:q => 'active_fedora_model_ssi:Item', :start => i, :rows => 20}
+      reindexed = 0
+      response["response"]["docs"].each do |doc|
+        res = @solr.get 'select',  :params => {:q => 'id:'+doc["id"], :rows => 5}
+        if res["response"]["numFound"].to_i == 0
+          reindex_item_by_id(doc["id"], stomp_client)
+          reindexed+=1
+        end
+      end
+      i+=(20-reindexed)
+    end
+    stomp_client.close
+  end
 
   #
   # Reindex the whole blinkin' lot
