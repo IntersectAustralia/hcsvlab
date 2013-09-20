@@ -3,6 +3,7 @@ require 'bundler/capistrano'
 require 'capistrano/ext/multistage'
 require 'capistrano_colors'
 require 'rvm/capistrano'
+require 'deploy/create_deployment_record'
 
 set :shared_file_dir, "files"
 set(:shared_file_path) { File.join(shared_path, shared_file_dir) }
@@ -114,7 +115,6 @@ end
 after 'deploy:update' do
   server_setup.logging.rotation
   server_setup.config.apache
-  deploy.create_deployment_record
   deploy.restart
   deploy.additional_symlinks
   deploy.write_tag
@@ -350,45 +350,6 @@ namespace :deploy do
   desc "Stop ActiveMQ"
   task :stop_activemq, :roles => :app do
     run "cd $ACTIVEMQ_HOME && bin/activemq stop", :env => {'RAILS_ENV' => stage}
-  end
-
-  task :create_deployment_record do
-    require 'net/http'
-    require 'socket'
-
-    branchName = branch.nil? ? "HEAD" : branch
-
-    availableTags = `git tag`.split( /\r?\n/ )
-    haveToShowHash = !availableTags.any? { |s| s.include?(branchName) }
-
-    current_deployed_version = branchName
-    if (haveToShowHash)
-      availableBranches = `git branch -a`.split( /\r?\n/ )
-      fullBranchName = (branchName.eql?("HEAD")) ? branchName : availableBranches.select { |s| s.include?(branchName) }.first.to_s.strip
-      fullBranchName.gsub!('*','').strip! if fullBranchName.include?('*')
-      current_deployed_version += " (sha1:" + `git rev-parse --short #{fullBranchName}`.strip + ")"
-    end
-
-    url = URI.parse('http://deployment-tracker.intersect.org.au/deployments/api_create')
-    post_args = {'app_name'=>application, 
-      'deployer_machine'=>"#{ENV['USER']}@#{Socket.gethostname}", 
-      'environment'=>rails_env, 
-      'server_url'=>find_servers[0].to_s,
-      'tag'=> current_deployed_version}
-    begin
-      print "Sending Post request with args: #{post_args}\n"
-      resp, data = Net::HTTP.post_form(url, post_args)
-
-      case resp
-      when Net::HTTPSuccess
-        puts "Deployment record saved"
-      else
-        puts data
-      end
-
-    rescue StandardError => e
-      puts e.message
-    end
   end
 
   # We need to define our own cleanup task since there is an issue on Capistrano deploy:cleanup task
