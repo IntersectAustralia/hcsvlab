@@ -291,8 +291,8 @@ private
     debug("Solr_Worker", "Adding configured field #{:id} with value #{object}")
     ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
     ident = ident_parts[:collection] + ":" + ident_parts[:identifier]
-    debug("Solr_Worker", "Adding configured field #{:HCSvLab_ident} with value #{ident}")
-    ::Solrizer::Extractor.insert_solr_field_value(result, :HCSvLab_ident, ident)
+    debug("Solr_Worker", "Adding configured field #{:handle} with value #{ident}")
+    ::Solrizer::Extractor.insert_solr_field_value(result, :handle, ident)
 
     #Create group permission fields
     debug("Solr_Worker", "Adding discover Permission field for group with value #{ident_parts[:collection]}-discover")
