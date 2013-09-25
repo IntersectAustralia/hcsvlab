@@ -105,7 +105,7 @@
         %tr
           - if values.has_key?(MetadataHelper::SOURCE)
             %td
-              %a{:href => "/catalog/#{document[:id]}/document/#{values[MetadataHelper::IDENTIFIER]}", :onclick => "showProgressAnimation();"}= values[MetadataHelper::IDENTIFIER]
+              %a{:href => "/catalog/#{document[:id]}/document/#{values[MetadataHelper::IDENTIFIER]}"}= values[MetadataHelper::IDENTIFIER]
           - else
             %td= values[MetadataHelper::IDENTIFIER]
           - if values.has_key?(MetadataHelper::TYPE)
@@ -126,6 +126,3 @@
           %td= field
   - if eopas_viewable? params[:id]
     = link_to('View in EOPAS', eopas_path, class: 'btn')
-
-:javascript
-
