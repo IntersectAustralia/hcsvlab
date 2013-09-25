@@ -348,6 +348,7 @@ class CatalogController < ApplicationController
         return
       end
     rescue Exception => e
+      Rails.logger.error(e.message)
         # Fall through to return Not Found
     end
     respond_to do |format|
