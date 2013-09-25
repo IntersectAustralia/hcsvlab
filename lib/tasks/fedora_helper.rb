@@ -128,6 +128,9 @@ def create_collection_from_file(collection_file, collection_name)
 end
 
 def look_for_documents(item, corpus_dir)
+
+  doc_ids = []
+
   query = RDF::Query.new({
                              :document => {
                                  RDF::URI("http://purl.org/dc/terms/type") => :type,
@@ -165,6 +168,7 @@ def look_for_documents(item, corpus_dir)
         end
 
         doc.save
+        doc_ids << doc.id
 
         # Create a primary text datastream in the fedora Item for primary text documents
         Find.find(corpus_dir) do |path|
@@ -188,8 +192,10 @@ def look_for_documents(item, corpus_dir)
       end
     else
       update_document(existing_doc.first, item, file_name, result, corpus_dir)
+      doc_ids << existing_doc.id
     end
   end
+  return doc_ids
 end
 
 def update_document(document, item, file_name, result, corpus_dir)
