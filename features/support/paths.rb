@@ -90,6 +90,12 @@ module NavigationHelpers
       when /^the document content page for file "(.*)" for item "(.*)"$/
         catalog_document_path($2, $1, options)
 
+      when /^the admin page$/
+        admin_index_path(options)
+
+      when /^the search history page$/
+        search_history_path(options)
+
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:
 #

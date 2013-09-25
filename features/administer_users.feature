@@ -115,3 +115,9 @@ Feature: Administer users
     And I have 3 active users with role "hcsvlab-admin"
     When I am on the list users page
     Then I should see "There are 4 registered users with role 'researcher'."
+
+  Scenario: I must be logged in to administer users
+    Given I follow "georgina@intersect.org.au"
+    And I follow "Logout"
+    And I am on the admin page
+    Then I should see "Please enter your email and password to log in"

@@ -25,3 +25,9 @@ Feature: Searching for items
       | Identifier          | Type(s)             |
       | austlit:adaessa.xml | Original, Raw, Text |
       | austlit:bolroma.xml | Original, Raw, Text |
+
+  Scenario: Must be logged in to see search history
+    Given I follow "researcher@intersect.org.au"
+    And I follow "Logout"
+    And I am on the search history page
+    Then I should see "Please enter your email and password to log in"
