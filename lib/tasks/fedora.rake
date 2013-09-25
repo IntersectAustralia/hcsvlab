@@ -386,6 +386,8 @@ namespace :fedora do
         logstream << "\nItem #{item}:" << "\n\n"
         logstream << "#{message}" << "\n"
       }
+
+      puts "Error ingesting #{File.basename(corpus_dir)} collection. See #{logfile} for details."
     end
     logstream.close
   end

@@ -29,9 +29,10 @@ def create_item_from_file(corpus_dir, rdf_file)
 
   existing = Item.where(:handle => handle).to_a
   if !existing[0].nil? && File.mtime(rdf_file).utc < Time.parse(existing[0].modified_date) && !existing.empty?
-    logger.info "Item " + existing[0].id + " already up to date"
+    logger.info "Item = #{existing[0].id} already up to date"
     return existing[0], false
   elsif !existing.empty?
+    logger.info "Item = #{existing[0].id} updated"
     return update_item_from_file(existing[0], graph, result), true
   else
     item = Item.new
@@ -55,7 +56,7 @@ def create_item_from_file(corpus_dir, rdf_file)
     end
 
     item.save!
-    logger.info "Item = #{item.pid}"
+    logger.info "Item = #{item.pid} created"
     return item, true
   end
 end
