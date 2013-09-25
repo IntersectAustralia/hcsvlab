@@ -262,6 +262,28 @@ namespace :fedora do
   end
 
 
+  #
+  # Check a corpus directory, given as an argument
+  #
+  task :check => :environment do
+
+    corpus_dir = ENV['corpus'] unless ENV['corpus'].nil?
+
+    if (corpus_dir.nil?) || (!Dir.exists?(corpus_dir))
+      if corpus_dir.nil?
+        puts "No corpus directory specified."
+      else
+        puts "Corpus directory #{corpus_dir} does not exist."
+      end
+      puts "Usage: rake fedora:check corpus=<corpus folder>"
+      exit 1
+    end
+
+    logger.info "rake fedora:check corpus=#{corpus_dir}"
+    check_corpus(corpus_dir)
+  end
+
+
   def ingest_corpus(corpus_dir, num_spec=:all, shuffle=false, annotations=true)
 
     label = "Ingesting...\n"
@@ -325,7 +347,7 @@ namespace :fedora do
     item, update = create_item_from_file(corpus_dir, rdf_file)
     if update
       look_for_annotations(item, rdf_file) if annotations
-      look_for_documents(item, corpus_dir)
+      doc_ids = look_for_documents(item, corpus_dir)
       item.save!
     end
 
@@ -337,6 +359,9 @@ namespace :fedora do
     begin
       client = Stomp::Client.open "stomp://localhost:61613"
       client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
+      doc_ids.each { |doc_id|
+        client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
+      }
       client.close
     rescue Exception => msg 
       logger.error "Error sending message via stomp: #{msg}"
@@ -354,6 +379,68 @@ namespace :fedora do
 
   def reindex_item_by_id(item_id, stomp_client)
     reindex_item(Item.find(item_id), stomp_client)
+  end
+
+
+  def check_corpus(corpus_dir)
+
+    puts "Checking #{corpus_dir}..."
+
+    rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
+
+    errors = {}
+    handles = {}
+
+    index = 0
+
+    rdf_files.each do |rdf_file|
+      begin
+        index = index + 1
+        handle = check_rdf_file(corpus_dir, rdf_file, index, rdf_files.size)
+        handles[handle] = Set.new unless handles.has_key?(handle)
+        handles[handle].add(rdf_file)
+        if handles[handle].size > 1
+          puts "Duplicate handle #{handle} found in:"
+          handles[handle].each { |filename|
+            puts "\t#{filename}"
+          }
+        end
+      rescue => e
+        logger.error "File: #{rdf_file}: #{e.message}"
+        errors[rdf_file] = e.message
+      end
+    end
+
+    handles.keep_if { |key, value| value.size > 1 }
+    report_check_results(rdf_files.size, corpus_dir, errors, handles)
+  end
+
+
+  def check_rdf_file(corpus_dir, rdf_file, index, limit)
+    unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
+      raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
+    end
+    logger.info "Checking file #{index} of #{limit}: #{rdf_file}"
+    graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
+    query = RDF::Query.new({
+                               :item => {
+                                   RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
+                                   RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                               }
+                           })
+    result = query.execute(graph)[0]
+    identifier = result.identifier.to_s
+    collection_name = last_bit(result.collection.to_s)
+
+    # small hack to handle austalk for the time being, can be fixed up
+    # when we look at getting some form of data uniformity
+    if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
+      collection_name = "austalk"
+    end
+
+    handle = "#{collection_name}:#{identifier}"
+    logger.info "Handle is #{handle}"
+    return handle
   end
 
 
@@ -385,6 +472,44 @@ namespace :fedora do
       errors.each { |item, message|
         logstream << "\nItem #{item}:" << "\n\n"
         logstream << "#{message}" << "\n"
+      }
+    end
+    logstream.close
+  end
+
+
+  def report_check_results(size, corpus_dir, errors, handles)
+    logfile = "log/check_#{File.basename(corpus_dir)}.log"
+    logstream = File.open(logfile, "w")
+
+    message = "Checked #{size} metadata file#{size==1 ? '' : 's'}"
+    message += ", finding #{errors.size} syntax error#{errors.size==1 ? '' : 's'}"
+    message += ", and #{handles.size} duplicate handle#{handles.size==1 ? '' : 's'}"
+    logger.info message
+    logger.info "Writing summary to #{logfile}"
+
+    logstream << "Checking #{corpus_dir}" << "\n\n"
+    logstream << message << "\n"
+
+    unless errors.empty?
+      logstream << "\n"
+      logstream << "Error Summary" << "\n"
+      logstream << "=============" << "\n"
+      errors.each { |item, message|
+        logstream << "\nItem #{item}:" << "\n\n"
+        logstream << "#{message}" << "\n"
+      }
+    end
+
+    unless handles.empty?
+      logstream << "\n"
+      logstream << "Duplicate Handles" << "\n"
+      logstream << "=================" << "\n"
+      handles.each { |handle, list|
+        logstream << "\nHandle #{handle}:" << "\n"
+        list.each { |filename|
+          logstream << "\t#{filename}" << "\n"
+        }
       }
     end
     logstream.close

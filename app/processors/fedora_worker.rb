@@ -25,6 +25,10 @@ class XMLHelper
     return title == "finishedWork"
   end
 
+  def is_document
+    return title == "isDocument"
+  end
+
 private
 
   def genRE(tag)
@@ -54,12 +58,14 @@ class FedoraWorker < ApplicationProcessor
     info("Fedora_Worker", "received message, title: #{x.title}, content: #{x.content}, summary: #{x.summary}")
 
     case x.title
-    when "addDatastream"
-      index(x)
-    when "finishedWork"
-      index(x)
-    when "purgeObject"
-      send_solr_message("delete", x.summary)
+      when "addDatastream"
+        index(x)
+      when "finishedWork"
+        index(x)
+      when "isDocument"
+        remove_from_cache(x)
+      when "purgeObject"
+        send_solr_message("delete", x.summary)
     end
   end
 
@@ -73,24 +79,39 @@ class FedoraWorker < ApplicationProcessor
     else
       symbol = nil
     end
-      
+
     if !symbol.nil?
       if ! @@cache.has_key?(xmlHelper.summary)
         @@cache[xmlHelper.summary] = {}
       end
 
       @@cache[xmlHelper.summary][symbol] = true
-      
+
+      if symbol == :finishedWork && @@cache[xmlHelper.summary].size < 3
+        debug("Fedora_Worker", "WHOOPS! - #{symbol} #{xmlHelper.summary} arrived before its two chums")
+      end
+
       if @@cache[xmlHelper.summary].size == 3
-        send_solr_message("index", xmlHelper.summary) 
+        send_solr_message("index", xmlHelper.summary)
         @@cache.delete(xmlHelper.summary)
       end
+    end
+  end
+
+  def remove_from_cache(xmlHelper)
+    if @@cache.has_key?(xmlHelper.summary)
+      @@cache.delete(xmlHelper.summary)
+      debug("Fedora_Worker", "Forgetting all about Document #{xmlHelper.summary}")
     end
   end
 
   def send_solr_message(command, objectID)
     info("Fedora_Worker", "sending instruction to Solr_Worker: #{command} #{objectID}")
     publish :solr_worker, "#{command} #{objectID}"
+    debug("Fedora_Worker", "Cache size: #{@@cache.size}")
+    @@cache.each_pair { |key, value|
+      debug("Fedora_Worker", "   @cache[#{key}] = #{value}")
+    }
   end
 
 end
