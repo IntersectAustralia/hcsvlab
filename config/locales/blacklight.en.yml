@@ -2,7 +2,10 @@ en:
 
   blacklight:
     application_name: 'HCS vLab'
+    search_history:
+      need_login: 'Please log in to view your search history'
 
     search:
       form:
         q: 'Search Text Containing...'
+
