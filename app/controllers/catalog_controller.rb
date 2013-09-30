@@ -332,11 +332,10 @@ class CatalogController < ApplicationController
     begin
         item = Item.find(params[:id])
         if item.documents.present?
-            #is_cooee = item.collection == "cooee"
             item.documents.each do |doc|
                 next unless doc.file_name[0] == params[:filename] 
 
-                params[:disposition] = 'Inline'
+                params[:disposition] = 'Attachment'
                 params[:disposition].capitalize!
 
                 send_data doc.datastreams['CONTENT1'].content,
