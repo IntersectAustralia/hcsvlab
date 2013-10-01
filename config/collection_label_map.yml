@@ -1,4 +1,5 @@
 labels:
+  RDF_type: 'RDF Type:'
   DC_creator: 'Creator:'
   DC_rights: 'Rights:'
   http_purl_org_cld_terms_isLocatedAt: 'Is Located At:'
