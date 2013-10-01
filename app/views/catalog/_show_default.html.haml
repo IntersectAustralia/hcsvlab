@@ -18,9 +18,8 @@
     - elsif type == "Video"
     - elsif type == "Audio"
       %audio{:controls => "", :style => "width:450px"}
-        %source{:src => doc[MetadataHelper::SOURCE], :type => "audio/wav"}
-          %source{:src => doc[MetadataHelper::SOURCE], :type => "audio/mpeg"}
-            %embed{:height => "50", :src => doc[MetadataHelper::SOURCE], :width => "100"}
+        %source{:src => "/catalog/#{document[:id]}/document/#{doc[MetadataHelper::IDENTIFIER]}"}
+        %embed{:height => "50", :src => doc[MetadataHelper::SOURCE], :width => "100"}
     - else
       = raw render_no_primary_document
   - elsif has_only_text_documents?(document)
