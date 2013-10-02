@@ -6,3 +6,6 @@ en:
   blacklight:
     header_links:
       logout: "Logout"
+
+  unauthorized:
+    default: "You are not authorised to access this page."

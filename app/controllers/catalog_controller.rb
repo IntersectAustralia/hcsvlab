@@ -335,20 +335,43 @@ class CatalogController < ApplicationController
 
   def document
     begin
-      doc = Document.find_and_load_from_solr({:file_name=>params[:filename].to_s, item: params[:id]}).first
+        item = Item.find(params[:id])
+        if item.documents.present?
+            item.documents.each do |doc|
+                next unless doc.file_name[0] == params[:filename] 
 
-      if (!doc.nil?)
-        params[:disposition] = 'Inline'
-        params[:disposition].capitalize!
+                params[:disposition] = 'Inline'
+                params[:disposition].capitalize!
 
-        send_data doc.datastreams['CONTENT1'].content,
-                  :disposition => params[:disposition],
-                  :filename => doc.file_name[0].to_s,
-                  :type => doc.mime_type[0].to_s
-        return
-      end
+                # If HTTP_RANGE variable is set, we need to send partial content and tell the browser
+                # what fragment of the file we are sending by using the variables Content-Range and
+                # Content-Length
+                if(request.headers["HTTP_RANGE"])
+                  size = doc.datastreams['CONTENT1'].content.size
+                  bytes = Rack::Utils.byte_ranges(request.headers, size)[0]
+                  offset = bytes.begin
+                  length = bytes.end  - bytes.begin
+
+                  response.header["Accept-Ranges"] =  "bytes" # Tells the browser that we accept partial content
+                  response.header["Content-Range"] = "bytes #{bytes.begin}-#{bytes.end}/#{size}"
+                  response.header["Content-Length"] = (length+1).to_s
+                  response.status = :partial_content
+
+                  content = doc.datastreams['CONTENT1'].content[offset, length+1]
+                else
+                  content = doc.datastreams['CONTENT1'].content
+                end
+
+                send_data content,
+                          :disposition => params[:disposition],
+                          :filename => doc.file_name[0].to_s,
+                          :type => doc.datastreams['CONTENT1'].mimeType.to_s
+
+                return
+            end
+        end
     rescue Exception => e
-      Rails.logger.error(e.message)
+      Rails.logger.error(e.backtrace)
         # Fall through to return Not Found
     end
     respond_to do |format|

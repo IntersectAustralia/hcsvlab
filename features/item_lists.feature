@@ -80,7 +80,7 @@ Feature: Managing Item Lists
       | name   |
       | Test 1 |
     And I am on the item list page for "Test 1"
-    And I should see "You are not authorized to access this page"
+    And I should see "You are not authorised to access this page"
 
   Scenario: Clearing an Item List
     And "researcher@intersect.org.au" has item lists

@@ -40,7 +40,7 @@ module MediaItemsHelper
       :type        => 'text/html',
       :width       => '320',
       :height      => '240',
-      :src         => item_url
+      :src         => request.host_with_port + item_url
     }.merge(options)
 
     if block_given?

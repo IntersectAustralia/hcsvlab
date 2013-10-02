@@ -7,5 +7,6 @@
     - if can?(:access_requests, User)
       %li{ :class => activepath?(access_requests_users_path) }
         = link_to "View Access Requests", access_requests_users_path
-    %li{ :class => activepath?(licences_path) }
-      = link_to "Manage Licences", licences_path
+    - if can?(:read, Licence)
+      %li{ :class => activepath?(licences_path) }
+        = link_to "Manage Licences", licences_path

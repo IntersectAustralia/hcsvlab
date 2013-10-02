@@ -33,3 +33,4 @@
             = link_to 'Edit role', edit_role_user_path(user), :id => "edit_role_#{user.id}", :class => "btn btn-primary btn-mini"
 
   = "There are #{@approved_researcher_count} registered users with role '#{Role::RESEARCHER_ROLE}'."
+= render 'shared/nectar_attribution'

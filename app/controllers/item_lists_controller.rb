@@ -117,7 +117,7 @@ class ItemListsController < ApplicationController
     file = Tempfile.new("newfile")
     file.write(current_user.authentication_token)
     file.close
-    send_file file.path, :filename => "hcsvlab.config", :disposition => "attachment", :type => "text/plain"
+    send_file file.path, :filename => "hcsvlab.config", :disposition => "attachment"
   end
 
   private

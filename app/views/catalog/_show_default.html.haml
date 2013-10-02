@@ -18,9 +18,8 @@
     - elsif type == "Video"
     - elsif type == "Audio"
       %audio{:controls => "", :style => "width:450px"}
-        %source{:src => doc[MetadataHelper::SOURCE], :type => "audio/wav"}
-          %source{:src => doc[MetadataHelper::SOURCE], :type => "audio/mpeg"}
-            %embed{:height => "50", :src => doc[MetadataHelper::SOURCE], :width => "100"}
+        %source{:src => "/catalog/#{document[:id]}/document/#{doc[MetadataHelper::IDENTIFIER]}"}
+        %embed{:height => "50", :src => doc[MetadataHelper::SOURCE], :width => "100"}
     - else
       = raw render_no_primary_document
   - elsif has_only_text_documents?(document)
@@ -105,7 +104,7 @@
         %tr
           - if values.has_key?(MetadataHelper::SOURCE)
             %td
-              %a{:href => "/catalog/#{document[:id]}/document/#{values[MetadataHelper::IDENTIFIER]}", :onclick => "showProgressAnimation();"}= values[MetadataHelper::IDENTIFIER]
+              %a{:href => "/catalog/#{document[:id]}/document/#{values[MetadataHelper::IDENTIFIER]}"}= values[MetadataHelper::IDENTIFIER]
           - else
             %td= values[MetadataHelper::IDENTIFIER]
           - if values.has_key?(MetadataHelper::TYPE)
@@ -126,6 +125,4 @@
           %td= field
   - if eopas_viewable? params[:id]
     = link_to('View in EOPAS', eopas_path, class: 'btn')
-
-:javascript
-
+= render 'shared/nectar_attribution'

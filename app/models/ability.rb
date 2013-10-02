@@ -53,8 +53,14 @@ class Ability
 
     if user.is_superuser?
       can :manage, Blacklight::Catalog
+      can :manage, Licence
+      can :manage, AdminController
+    elsif user.is_data_owner?
+      can :manage, Licence
+      can :manage, AdminController
     elsif user.is_researcher?
       can :read, Blacklight::Catalog
+      cannot :manage, Licence
     end
 
 
