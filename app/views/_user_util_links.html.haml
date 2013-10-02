@@ -1,4 +1,6 @@
-%li.dropdown{ class: (activepath_fuzzy?(admin_index_path) || activepath_fuzzy?(account_path)) }
+
+-  liClass = activepath_fuzzy?([admin_index_path, account_path, saved_searches_path, search_history_path, issue_reports_path])
+%li.dropdown{ class: liClass }
   - if current_user
     %a.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
       = current_user.email

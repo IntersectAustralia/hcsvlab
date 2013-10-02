@@ -33,11 +33,16 @@ module ApplicationHelper
 
   # helper class for tabs, adds 'active' class when on the input path
   def activepath?(test_path)
-    return 'active' if request.path == test_path
+    return 'active' if (request.path == test_path and !current_user.nil?)
   end
 
   def activepath_fuzzy?(test_path)
-    return 'active' if request.path.include?(test_path) == true
+    isActive = false
+    Array(test_path).each do |param|
+      isActive = isActive || request.path.include?(param) == true
+    end
+
+    return 'active' if isActive
   end
 
   private
