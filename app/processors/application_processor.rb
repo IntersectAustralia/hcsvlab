@@ -1,5 +1,5 @@
 class ApplicationProcessor < ActiveMessaging::Processor
-
+  
   # Default on_error implementation - logs standard errors but keeps processing. Other exceptions are raised.
   # Have on_error throw ActiveMessaging::AbortMessageException when you want a message to be aborted/rolled back,
   # meaning that it can and should be retried (idempotency matters here).
@@ -15,24 +15,4 @@ class ApplicationProcessor < ActiveMessaging::Processor
     end
   end
 
-
-  def debug(from, message)
-    logger.debug("[#{DateTime.now}], [#{from}], [debug] #{message}")
-  end
-
-  def info(from, message)
-    logger.info("[#{DateTime.now}], [#{from}], [Info] #{message}")
-  end
-
-  def warn(from, message)
-    logger.warn("[#{DateTime.now}], [#{from}], [Warning] #{message}")
-  end
-
-  def warning(from, message)
-    warn(from, message)
-  end
-
-  def error(from, message)
-    logger.error("[#{DateTime.now}], [#{from}], [ERROR] #{message}")
-  end
 end

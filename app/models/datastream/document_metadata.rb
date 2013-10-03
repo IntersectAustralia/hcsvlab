@@ -5,7 +5,6 @@ class Datastream::DocumentMetadata < ActiveFedora::OmDatastream
     t.file_name(index_as: :stored_searchable)
     t.type(index_as: :stored_searchable)
     t.mime_type(index_as: :stored_searchable)
-    t.item_id(index_as: :stored_searchable)
   end
 
   def self.xml_template

@@ -55,9 +55,6 @@ group :development do
   gem 'pry-rails'
   gem 'zeus'
   gem 'newrelic_rpm'
-
-  # Deployment tracker
-  gem "create_deployment_record", git: 'https://github.com/IntersectAustralia/create_deployment_record.git'
 end
 
 group :test do

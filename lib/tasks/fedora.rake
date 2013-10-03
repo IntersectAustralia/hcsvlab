@@ -16,9 +16,8 @@ namespace :fedora do
       exit 1
     end
 
-    logger.info "rake fedora:ingest_one #{corpus_rdf}"
-    pid = ingest_rdf_file(File.dirname(corpus_rdf), corpus_rdf, true)
-    puts "Ingested item #{pid}" if Rails.env.test?
+    ingest_rdf_file(File.dirname(corpus_rdf), corpus_rdf, true)
+
   end
 
 
@@ -48,7 +47,6 @@ namespace :fedora do
       exit 1
     end
 
-    logger.info "rake fedora:ingest corpus=#{corpus_dir} amount=#{num_spec} random=#{random} annotations=#{annotations}"
     ingest_corpus(corpus_dir, num_spec, random, annotations)
   end
 
@@ -58,31 +56,35 @@ namespace :fedora do
   #
   task :clear => :environment do
 
-    logger.info "rake fedora:clear"
-    logger.info "Emptying Fedora"
+    puts "Emptying Fedora"
 
+    puts "Items..."
     Item.find_each do |item|
-      logger.info "Item #{item.pid.to_s}"
+      puts item.pid.to_s
       item.delete
     end
 
+    puts "Documents..."
     Document.find_each do |doc|
-      logger.info "Document #{doc.pid.to_s}"
+      puts doc.pid.to_s
       doc.delete
     end
 
+    puts "Collections..."
     Collection.find_each do |coll|
-      logger.info "Collection #{coll.pid.to_s}"
+      puts coll.pid.to_s
       coll.delete
     end
 
+    puts "Collection Lists"
     CollectionList.find_each do |aCollectionList|
-      logger.info "Collection List #{aCollectionList.pid.to_s}"
+      puts aCollectionList.pid.to_s
       aCollectionList.delete
     end
 
+    puts "Licences"
     Licence.find_each do |aLicence|
-      logger.info "Licence #{aLicence.pid.to_s}"
+      puts aLicence.pid.to_s
       aLicence.delete
     end
 
@@ -101,31 +103,31 @@ namespace :fedora do
       exit 1
     end
 
-    logger.info "rake fedora:clear_corpus corpus=#{corpus}"
-
+    #objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
     objects = find_corpus_items corpus
 
-    logger.info "Removing collection #{corpus}"
-    logger.info "Removing #{objects.count} Items"
+    puts "Removing " + objects.count.to_s + " Items"
 
     documents = []
 
     objects.each do |obj|
       id = obj["id"].to_s
-      logger.info "Removing Item: #{id}"
+      puts "Removing Item: " + id.to_s
       fobj=Item.find(id)
-      documents.concat(fobj.documents)
+      fobj.documents.each { |doc|
+        documents << doc
+      }
       fobj.delete
     end
 
-    logger.info "Removing #{documents.size} Documents"
+    puts "Removing " + documents.size.to_s + " Documents"
     documents.each { |doc|
-      logger.info "Removing Document: #{doc.pid}"
+      puts "Removing Document: " + doc.pid
       doc.delete
     }
 
     Collection.find_by_short_name(corpus).each { |collection|
-      logger.info "Removing collection object #{collection.pid}"
+      puts "Removing collection object #{collection.pid}"
       collection.delete
     }
   end
@@ -147,8 +149,6 @@ namespace :fedora do
       exit 1
     end
 
-    logger.info "rake fedora:reindex_one item=#{item_id}"
-
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     reindex_item_by_id(item_id, stomp_client)
     stomp_client.close
@@ -167,11 +167,10 @@ namespace :fedora do
       exit 1
     end
 
-    logger.info "rake fedora:reindex_corpus corpus=#{corpus}"
-
+    #objects = ActiveFedora::Base.find_with_conditions( {'DC_is_part_of' => corpus }, :rows => 1000000 )
     objects = find_corpus_items corpus
 
-    logger.info "Reindexing #{objects.count} Items"
+    puts "Reindexing " + objects.count.to_s + " objects"
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     objects.each do |obj|
@@ -181,43 +180,15 @@ namespace :fedora do
 
   end
 
-  #
-  # Consolidate cores by reindexing items found only in the ActiveFedora core
-  #
-  task :consolidate_cores => :environment do
-    solr = ActiveFedora::SolrService.instance.conn
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
-
-    response = solr.get 'select', :params => {:q => 'active_fedora_model_ssi:Item'}
-    num = response["response"]["numFound"]
-    num = (num/20)+1
-    i = 0
-    num.times do |set|
-      logger.info "Investigating item set " + (set+1).to_s + " of " + num.to_s
-      response = solr.get 'select', :params => {:q => 'active_fedora_model_ssi:Item', :start => i, :rows => 20}
-      reindexed = 0
-      response["response"]["docs"].each do |doc|
-        res = @solr.get 'select',  :params => {:q => 'id:'+doc["id"], :rows => 5}
-        if res["response"]["numFound"].to_i == 0
-          reindex_item_by_id(doc["id"], stomp_client)
-          reindexed+=1
-        end
-      end
-      i+=(20-reindexed)
-    end
-    stomp_client.close
-  end
 
   #
   # Reindex the whole blinkin' lot
   #
   task :reindex_all => :environment do
 
-    logger.info "rake fedora:reindex_all"
-
     items = Item.all
 
-    logger.info "Reindexing all #{items.size} Items"
+    puts "Reindexing everything - " + items.size.to_s + " objects"
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
 
@@ -233,7 +204,6 @@ namespace :fedora do
   # Ingest and create default set of licenses
   #
   task :ingest_licences => :environment do
-    logger.info "rake fedora:ingest_licences"
     create_default_licences
   end
 
@@ -253,34 +223,10 @@ namespace :fedora do
       exit 1
     end
 
-    logger.info "rake fedora:ingest_collection_metadata dir=#{dir}"
-
     Dir.glob(dir + '/**/*.n3') { |n3|
       coll_name = File.basename(n3, ".n3")
       create_collection_from_file(n3, coll_name)
     }
-  end
-
-
-  #
-  # Check a corpus directory, given as an argument
-  #
-  task :check => :environment do
-
-    corpus_dir = ENV['corpus'] unless ENV['corpus'].nil?
-
-    if (corpus_dir.nil?) || (!Dir.exists?(corpus_dir))
-      if corpus_dir.nil?
-        puts "No corpus directory specified."
-      else
-        puts "Corpus directory #{corpus_dir} does not exist."
-      end
-      puts "Usage: rake fedora:check corpus=<corpus folder>"
-      exit 1
-    end
-
-    logger.info "rake fedora:check corpus=#{corpus_dir}"
-    check_corpus(corpus_dir)
   end
 
 
@@ -318,7 +264,7 @@ namespace :fedora do
       end
     end
 
-    logger.info "Ingesting #{num} file#{(num==1) ? '' : 's'} of #{rdf_files.size}"
+    puts "Ingesting #{num} file#{(num==1) ? '' : 's'} of #{rdf_files.size}"
     errors = {}
     successes = {}
 
@@ -330,7 +276,7 @@ namespace :fedora do
         pid = ingest_rdf_file(corpus_dir, rdf_file, annotations)
         successes[rdf_file] = pid
       rescue => e
-        logger.error "Error! #{e.message}"
+        puts "Error! #{e.message}"
         errors[rdf_file] = e.message
       end
     end
@@ -343,13 +289,12 @@ namespace :fedora do
     unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
       raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
     end
-    logger.info "Ingesting item: #{rdf_file}"
-    item, update = create_item_from_file(corpus_dir, rdf_file)
-    if update
-      look_for_annotations(item, rdf_file) if annotations
-      doc_ids = look_for_documents(item, corpus_dir)
-      item.save!
-    end
+    puts "#{Time.new.to_s} - Ingesting item: " + rdf_file.to_s
+    STDOUT.flush
+    item = create_item_from_file(corpus_dir, rdf_file)
+    look_for_annotations(item, rdf_file) if annotations
+    look_for_documents(item, corpus_dir, rdf_file)
+    item.save!
 
 #    if Collection.where(short_name: item.collection).count == 0
 #      create_collection(item.collection.first, corpus_dir)
@@ -359,19 +304,16 @@ namespace :fedora do
     begin
       client = Stomp::Client.open "stomp://localhost:61613"
       client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
-      doc_ids.each { |doc_id|
-        client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
-      }
       client.close
     rescue Exception => msg 
-      logger.error "Error sending message via stomp: #{msg}"
+      puts "Error sending message via stomp: #{msg}"
     end
     return item.pid
   end
 
 
   def reindex_item(item, stomp_client)
-    logger.info "Reindexing item: #{item.id}"
+    puts "Reindexing item: " + item.id
     item.update_index
     stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item.id}")
   end
@@ -382,76 +324,14 @@ namespace :fedora do
   end
 
 
-  def check_corpus(corpus_dir)
-
-    puts "Checking #{corpus_dir}..."
-
-    rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
-
-    errors = {}
-    handles = {}
-
-    index = 0
-
-    rdf_files.each do |rdf_file|
-      begin
-        index = index + 1
-        handle = check_rdf_file(corpus_dir, rdf_file, index, rdf_files.size)
-        handles[handle] = Set.new unless handles.has_key?(handle)
-        handles[handle].add(rdf_file)
-        if handles[handle].size > 1
-          puts "Duplicate handle #{handle} found in:"
-          handles[handle].each { |filename|
-            puts "\t#{filename}"
-          }
-        end
-      rescue => e
-        logger.error "File: #{rdf_file}: #{e.message}"
-        errors[rdf_file] = e.message
-      end
-    end
-
-    handles.keep_if { |key, value| value.size > 1 }
-    report_check_results(rdf_files.size, corpus_dir, errors, handles)
-  end
-
-
-  def check_rdf_file(corpus_dir, rdf_file, index, limit)
-    unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
-      raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
-    end
-    logger.info "Checking file #{index} of #{limit}: #{rdf_file}"
-    graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
-    query = RDF::Query.new({
-                               :item => {
-                                   RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
-                                   RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
-                               }
-                           })
-    result = query.execute(graph)[0]
-    identifier = result.identifier.to_s
-    collection_name = last_bit(result.collection.to_s)
-
-    # small hack to handle austalk for the time being, can be fixed up
-    # when we look at getting some form of data uniformity
-    if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
-      collection_name = "austalk"
-    end
-
-    handle = "#{collection_name}:#{identifier}"
-    logger.info "Handle is #{handle}"
-    return handle
-  end
-
-
   def report_results(label, corpus_dir, successes, errors)
     logfile = "log/ingest_#{File.basename(corpus_dir)}.log"
     logstream = File.open(logfile, "w")
 
     message = "Successfully ingested #{successes.size} Item#{successes.size==1 ? '' : 's'}"
     message += ", and rejected #{errors.size} Item#{errors.size==1 ? '' : 's'}" unless errors.empty?
-    logger.info message
-    logger.info "Writing summary to #{logfile}"
+    puts message
+    puts "Writing summary to #{logfile}"
 
     logstream << "#{label}" << "\n\n"
     logstream << message << "\n"
@@ -472,46 +352,6 @@ namespace :fedora do
       errors.each { |item, message|
         logstream << "\nItem #{item}:" << "\n\n"
         logstream << "#{message}" << "\n"
-      }
-
-      puts "Error ingesting #{File.basename(corpus_dir)} collection. See #{logfile} for details."
-    end
-    logstream.close
-  end
-
-
-  def report_check_results(size, corpus_dir, errors, handles)
-    logfile = "log/check_#{File.basename(corpus_dir)}.log"
-    logstream = File.open(logfile, "w")
-
-    message = "Checked #{size} metadata file#{size==1 ? '' : 's'}"
-    message += ", finding #{errors.size} syntax error#{errors.size==1 ? '' : 's'}"
-    message += ", and #{handles.size} duplicate handle#{handles.size==1 ? '' : 's'}"
-    logger.info message
-    logger.info "Writing summary to #{logfile}"
-
-    logstream << "Checking #{corpus_dir}" << "\n\n"
-    logstream << message << "\n"
-
-    unless errors.empty?
-      logstream << "\n"
-      logstream << "Error Summary" << "\n"
-      logstream << "=============" << "\n"
-      errors.each { |item, message|
-        logstream << "\nItem #{item}:" << "\n\n"
-        logstream << "#{message}" << "\n"
-      }
-    end
-
-    unless handles.empty?
-      logstream << "\n"
-      logstream << "Duplicate Handles" << "\n"
-      logstream << "=================" << "\n"
-      handles.each { |handle, list|
-        logstream << "\nHandle #{handle}:" << "\n"
-        list.each { |filename|
-          logstream << "\t#{filename}" << "\n"
-        }
       }
     end
     logstream.close

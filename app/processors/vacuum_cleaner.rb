@@ -10,7 +10,7 @@ class VacuumCleaner < ApplicationProcessor
  
   def on_message(message)
     @@count = @@count + 1
-    debug("Vacuum_Cleaner", "cleaned #{@@count} messages") if @@count % 100000 == 0
+    logger.debug "Vacuum_Cleaner cleaned #{@@count} messages" if @@count % 100000 == 0
   end
 
 end

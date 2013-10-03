@@ -49,7 +49,7 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   end
 
   look_for_annotations(item, rdf_file)
-  look_for_documents(item, "#{SAMPLE_FOLDER}/#{corpus}")
+  look_for_documents(item, "#{SAMPLE_FOLDER}/#{corpus}", rdf_file)
 
   item.save!
 

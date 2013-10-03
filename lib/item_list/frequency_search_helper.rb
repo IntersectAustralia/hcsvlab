@@ -247,7 +247,7 @@ module FrequencySearchHelper
       #process the information
       result = processComplexFrequencySearchResults(all_facet_fields, all_facet_wcs, facet_fields, document_list, highlighting, facet)
 
-      Rails.logger.debug("Time for data processing for query '#{query}' in Complex frequency search: (#{'%.1f' % ((Time.now.to_f - process_bench_start.to_f)*1000)}ms)")
+      Rails.logger.debug("Data processing time for '#{query}' in Complex frequency search: (#{'%.1f' % ((Time.now.to_f - process_bench_start.to_f)*1000)}ms)")
 
       Rails.logger.debug("Time for searching for '#{query}' in Complex frequency search: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
 

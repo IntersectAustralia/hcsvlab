@@ -1,6 +1,6 @@
 include ActiveFedora::DatastreamCollections
 
-class Item < HcsvlabActiveFedora
+class Item < ActiveFedora::Base
 
   # Adds useful methods form managing Item groups
   include Hydra::ModelMixins::RightsMetadata
@@ -18,11 +18,6 @@ class Item < HcsvlabActiveFedora
   has_many :documents, :property => :is_member_of
   belongs_to :collection, :property => :is_member_of_collection
 
-  delegate :handle, to: 'descMetadata'
-
-  def flat_handle
-    return handle[0]
-  end
 
   #
   # Find an item using its collection name and id

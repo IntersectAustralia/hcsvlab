@@ -1,6 +1,6 @@
 include ActiveFedora::DatastreamCollections
 
-class CollectionList < HcsvlabActiveFedora
+class CollectionList < ActiveFedora::Base
   has_metadata 'descMetadata', type: Datastream::CollectionListMetadata
 
   has_many :collections, :property => :is_part_of

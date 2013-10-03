@@ -250,12 +250,7 @@ class CatalogController < ApplicationController
 
   # override default index method
   def index
-    bench_start = Time.now
     super
-    bench_end = Time.now
-    @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
-    Rails.logger.debug(@profiler.first)
-
     if !current_user.nil?
       @hasAccessToEveryCollection = true
       @hasAccessToSomeCollections = false

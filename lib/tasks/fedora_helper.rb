@@ -4,76 +4,49 @@ STORE_DOCUMENT_TYPES = ['Text']
 
 
 def create_item_from_file(corpus_dir, rdf_file)
-  graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
+  item = Item.new
+
+  item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
+  item.label = item.rdfMetadata.graph.statements.first.subject
+
   query = RDF::Query.new({
                              :item => {
                                  RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
                                  RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
                              }
                          })
-  result = query.execute(graph)[0]
-  identifier = result.identifier.to_s
-  collection_name = last_bit(result.collection.to_s)
+
+  result = query.execute(item.rdfMetadata.graph)[0]
+
+  collectionName = last_bit(result.collection.to_s)
 
   # small hack to handle austalk for the time being, can be fixed up 
   # when we look at getting some form of data uniformity
-  if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
-    collection_name = "austalk"
+  if query.execute(item.rdfMetadata.graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
+    collectionName = "austalk"
   end
 
-  handle = "#{collection_name}:#{identifier}"
-
-  if Collection.where(short_name: collection_name).count == 0
-    create_collection(collection_name, corpus_dir)
+  if Collection.where(short_name: collectionName).count == 0
+    create_collection(collectionName, corpus_dir)
   end
 
-  existing = Item.where(:handle => handle).to_a
-  if !existing[0].nil? && File.mtime(rdf_file).utc < Time.parse(existing[0].modified_date) && !existing.empty?
-    logger.info "Item = #{existing[0].id} already up to date"
-    return existing[0], false
-  elsif !existing.empty?
-    logger.info "Item = #{existing[0].id} updated"
-    return update_item_from_file(existing[0], graph, result), true
-  else
-    item = Item.new
+  item.collection = Collection.find_by_short_name(collectionName).first
 
-    item.rdfMetadata.graph.insert(graph)
-    item.label = item.rdfMetadata.graph.statements.first.subject
-
-    item.handle = handle
-    item.collection = Collection.find_by_short_name(collection_name).first
-
-    # Add Groups to the created item
-    item.set_discover_groups(["#{collection_name}-discover"], [])
-    item.set_read_groups(["#{collection_name}-read"], [])
-    item.set_edit_groups(["#{collection_name}-edit"], [])
-    # Add complete permission for data_owner
-    data_owner = item.collection.flat_private_data_owner
-    if (!data_owner.nil?)
-      item.set_discover_users([data_owner], [])
-      item.set_read_users([data_owner], [])
-      item.set_edit_users([data_owner], [])
-    end
-
-    item.save!
-    logger.info "Item = #{item.pid} created"
-    return item, true
+  # Add Groups to the created item
+  item.set_discover_groups(["#{collectionName}-discover"], [])
+  item.set_read_groups(["#{collectionName}-read"], [])
+  item.set_edit_groups(["#{collectionName}-edit"], [])
+  # Add complete permission for data_owner
+  data_owner = item.collection.flat_private_data_owner
+  if (!data_owner.nil?)
+    item.set_discover_users([data_owner], [])
+    item.set_read_users([data_owner], [])
+    item.set_edit_users([data_owner], [])
   end
-end
-
-def update_item_from_file(item, graph, result)
-  item.rdfMetadata.graph.clear
-  item.rdfMetadata.graph.insert(graph)
-  item.label = item.rdfMetadata.graph.statements.first.subject
-
-  collection_name = last_bit(result.collection.to_s)
-  item.collection = Collection.find_by_short_name(collection_name).first
 
   item.save!
-  logger.info "Updated item = " + item.pid.to_s
-  stomp_client = Stomp::Client.open "stomp://localhost:61613"
-  reindex_item(item, stomp_client)
-  item
+  puts "Item = " + item.pid.to_s
+  return item
 end
 
 def create_collection(collection_name, corpus_dir)
@@ -86,7 +59,7 @@ def create_collection(collection_name, corpus_dir)
   if Dir.entries(dir).include?(collection_name + ".n3")
     coll_metadata = dir + "/" + collection_name + ".n3"
   else
-    logger.warn "No collection metadata file found - #{dir}/#{collection_name}.n3"
+    puts "No collection metadata file found - " + dir + "/" + collection_name + ".n3"
     return
   end
 
@@ -100,12 +73,6 @@ def create_collection_from_file(collection_file, collection_name)
   coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s
   coll.uri = coll.label
   coll.short_name = collection_name
-
-  if Collection.find_by_uri(coll.uri).size != 0
-    # There is already such a collection in the system
-    logger.error "Collection #{collection_name} (#{coll.uri}) already exists in the system - skipping"
-    return
-  end
   coll.save
 
   set_data_owner(coll)
@@ -124,13 +91,11 @@ def create_collection_from_file(collection_file, collection_name)
 
   coll.save!
 
-  logger.info "Collection '#{coll.flat_short_name}' Metadata = #{coll.pid}" unless Rails.env.test?
+  puts "Collection '#{coll.flat_short_name}' Metadata = " + coll.pid.to_s unless Rails.env.test?
 end
 
-def look_for_documents(item, corpus_dir)
-
-  doc_ids = []
-
+def look_for_documents(item, corpus_dir, rdf_file)
+  #Text
   query = RDF::Query.new({
                              :document => {
                                  RDF::URI("http://purl.org/dc/terms/type") => :type,
@@ -138,96 +103,55 @@ def look_for_documents(item, corpus_dir)
                                  RDF::URI("http://purl.org/dc/terms/source") => :source
                              }
                          })
+
   query.execute(item.rdfMetadata.graph).each do |result|
-    file_name = last_bit(result.source.to_s)
-    existing_doc = Document.where(:file_name => file_name, :item_id => item.id).to_a
-    if existing_doc.empty?
-      # Create a document in fedora
-      begin
-        doc = Document.new
-        doc.file_name = file_name
-        doc.type      = result.type.to_s
-        doc.mime_type = mime_type_lookup(doc.file_name[0])
-        doc.label     = result.source.to_s
-        doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => result.source.to_s)
-        doc.item = item
-        doc.item_id = item.id
 
-        # Add Groups to the created document
-        logger.debug "Creating document groups (discover, read, edit)"
-        doc.set_discover_groups(["#{item.collection.flat_short_name}-discover"], [])
-        doc.set_read_groups(["#{item.collection.flat_short_name}-read"], [])
-        doc.set_edit_groups(["#{item.collection.flat_short_name}-edit"], [])
-        # Add complete permission for data_owner
-        data_owner = item.collection.flat_private_data_owner
-        if (!data_owner.nil?)
-          logger.debug "Creating document users (discover, read, edit) with #{data_owner}"
-          doc.set_discover_users([data_owner], [])
-          doc.set_read_users([data_owner], [])
-          doc.set_edit_users([data_owner], [])
-        end
+    # Create a document in fedora
+    begin
+      doc = Document.new
+      doc.file_name = last_bit(result.source.to_s)
+      doc.type      = result.type.to_s
+      doc.mime_type = mime_type_lookup(doc.file_name[0])
+      doc.label     = result.source.to_s
+      doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => result.source.to_s)
+      doc.item = item
 
-        doc.save
-        doc_ids << doc.id
+      # Add Groups to the created document
+      #puts "    Creating document groups (discover, read, edit)"
+      doc.set_discover_groups(["#{item.collection.flat_short_name}-discover"], [])
+      doc.set_read_groups(["#{item.collection.flat_short_name}-read"], [])
+      doc.set_edit_groups(["#{item.collection.flat_short_name}-edit"], [])
+      # Add complete permission for data_owner
+      data_owner = item.collection.flat_private_data_owner
+      if (!data_owner.nil?)
+        #puts "    Creating document users (discover, read, edit) with #{data_owner}"
+        doc.set_discover_users([data_owner], [])
+        doc.set_read_users([data_owner], [])
+        doc.set_edit_users([data_owner], [])
+      end
 
-        # Create a primary text datastream in the fedora Item for primary text documents
-        Find.find(corpus_dir) do |path|
-          if File.basename(path).eql? result.identifier.to_s and File.file? path
-            # Only create a datastream for certain file types
-            if STORE_DOCUMENT_TYPES.include? result.type.to_s
-              case result.type.to_s
-                when 'Text'
-                  item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
-                else
-                  logger.warn "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item" unless Rails.env.test?
-              end
+      doc.save
+
+      # Create a primary text datastream in the fedora Item for primary text documents
+      Find.find(corpus_dir) do |path|
+        if File.basename(path).eql? result.identifier.to_s and File.file? path
+          # Only create a datastream for certain file types
+          if STORE_DOCUMENT_TYPES.include? result.type.to_s
+            case result.type.to_s
+              when 'Text'
+                item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
+              else
+                puts "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item" unless Rails.env.test?
             end
-            doc.save
-            logger.info "#{result.type.to_s} Document = #{doc.pid.to_s}" unless Rails.env.test?
-            break
           end
+          doc.save
+          puts "#{result.type.to_s} Document = #{doc.pid.to_s}" unless Rails.env.test?
+          break
         end
-      rescue Exception => e
-        logger.error("Error creating document: #{e.message}")
       end
-    else
-      update_document(existing_doc.first, item, file_name, result, corpus_dir)
-      doc_ids << existing_doc.id
+    rescue Exception => e
+      Rails.logger.warn("Error creating document: #{e.message}")
     end
-  end
-  return doc_ids
-end
-
-def update_document(document, item, file_name, result, corpus_dir)
-  begin
-    document.file_name = file_name
-    document.type      = result.type.to_s
-    document.mime_type = mime_type_lookup(document.file_name[0])
-    document.label     = result.source.to_s
-    document.update_named_datastream('content', :mimeType => document.mime_type[0], :dsid => "CONTENT1", :dsLocation => result.source.to_s)
-    document.item = item
-    document.item_id = item.id
-    document.save
-
-    # Update primary text datastream in the fedora Item for primary text documents
-    Find.find(corpus_dir) do |path|
-      if File.basename(path).eql? result.identifier.to_s and File.file? path
-        # Only create a datastream for certain file types
-        if STORE_DOCUMENT_TYPES.include? result.type.to_s
-          case result.type.to_s
-            when 'Text'
-              item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
-              item.primary_text.save
-            else
-              logger.warn "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item" unless Rails.env.test?
-          end
-        end
-        logger.info "Updated #{result.type.to_s} Document = #{document.pid.to_s}" unless Rails.env.test?
-        break
-      end
-    end
-  rescue Exception => e
-    logger.error("Error creating document: #{e.message}")
   end
 end
 
@@ -236,14 +160,8 @@ def look_for_annotations(item, metadata_filename)
   return if annotation_filename == metadata_filename # HCSVLAB-441
 
   if File.exists?(annotation_filename)
-    if(item.named_datastreams["annotation_set"].empty?)
-      item.add_named_datastream('annotation_set', :dsLocation => "file://" + annotation_filename, :mimeType => 'text/plain')
-      logger.info "Annotation datastream added for #{File.basename(annotation_filename)}" unless Rails.env.test?
-    else
-      item.update_named_datastream('annotation_set', :dsid => "annotationSet1", :dsLocation => "file://" + annotation_filename,
-       :mimeType => 'text/plain')
-      logger.info "Annotation datastream updated for #{File.basename(annotation_filename)}" unless Rails.env.test?
-    end
+    item.add_named_datastream('annotation_set', :dsLocation => "file://" + annotation_filename, :mimeType => 'text/plain')
+    puts "Annotation datastream added for #{File.basename(annotation_filename)}" unless Rails.env.test?
   end
 end
 
@@ -263,11 +181,11 @@ def set_data_owner(collection)
   data_owner = find_system_user(results)
   data_owner = find_default_owner() if data_owner.nil?
   if data_owner.nil?
-    logger.warn "Cannot determine data owner for collection #{collection.short_name}"
+    logger.debug "Cannot determine data owner for collection #{collection.short_name}"
   elsif data_owner.cannot_own_data?
-    logger.warn "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
+    logger.debug "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
-    logger.info "Setting data owner to #{data_owner.email}"
+    logger.debug "Setting data owner to #{data_owner.email}"
     collection.set_data_owner_and_save(data_owner)
   end
 end
@@ -316,10 +234,12 @@ def create_default_licences(rootPath = "config")
 
       l.save!
     rescue Exception => e
-      logger.error "Licence Name: #{l.name[0]} not ingested: #{l.errors.messages.inspect}"
+      puts "Licence Name: #{l.name} not ingested."
+      puts "ERROR: #{l.errors.messages.inspect}"
+      puts ""
       next
     else
-      logger.info "Licence '#{l.name[0]}' = #{l.pid}" unless Rails.env.test?
+      puts "Licence '#{l.name[0].to_s}' = #{l.pid.to_s}" unless Rails.env.test?
     end
 
   end

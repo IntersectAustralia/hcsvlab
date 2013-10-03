@@ -114,4 +114,4 @@ Feature: Reset forgotten password
   Scenario: Can't go to get new password page without the token in the email
     Given I have a user "georgina@intersect.org.au"
     When I go to the reset password page
-    Then I should see "You cannot access this page without coming from a password reset email. If you do come from a password reset email, please make sure you used the full URL provided."
+    Then I should see "You canoot access this page without coming from a password reset email. If you do come from a password reset email, please make sure you used the full URL provided."

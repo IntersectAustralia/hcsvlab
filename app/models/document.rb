@@ -1,6 +1,6 @@
 include ActiveFedora::DatastreamCollections
 
-class Document < HcsvlabActiveFedora
+class Document < ActiveFedora::Base
 
   # Adds useful methods form managing Item groups
   include Hydra::ModelMixins::RightsMetadata
@@ -18,6 +18,5 @@ class Document < HcsvlabActiveFedora
   delegate :file_name, to: 'descMetadata'
   delegate :type,      to: 'descMetadata'
   delegate :mime_type, to: 'descMetadata'
-  delegate :item_id,   to: 'descMetadata'
 
 end
