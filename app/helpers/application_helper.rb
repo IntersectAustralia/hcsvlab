@@ -39,7 +39,7 @@ module ApplicationHelper
   def activepath_fuzzy?(test_path)
     isActive = false
     Array(test_path).each do |param|
-      isActive = isActive || request.path.include?(param) == true
+      isActive = isActive || request.path.include?(param)
     end
 
     return 'active' if isActive

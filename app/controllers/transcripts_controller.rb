@@ -25,7 +25,6 @@ class TranscriptsController < ApplicationController
   end
 
   def load_transcript(attributes)
-    puts "Trans: #{attributes['transcription']}"
     doc = attributes['transcription']
     #data = open(attributes['transcription']).read.force_encoding('UTF-8')
     data = doc.datastreams['CONTENT1'].content
