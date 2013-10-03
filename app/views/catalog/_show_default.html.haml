@@ -33,7 +33,7 @@
   - document_show_fields(document).each do |solr_fname, field|
     - if should_render_show_field? document, field
       %dt{:class => "blacklight-#{solr_fname.parameterize}"}
-        = render_document_show_field_label document, :field => solr_fname
+        = render_document_show_field_label(document, :field => solr_fname) + ":"
       - if solr_fname == 'OLAC_language'
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
           = raw render_language_codes document[solr_fname]
@@ -67,7 +67,7 @@
   - document.keys.each do |k|
     - v = document[k]
     - unless do_not_display.has_key?(k)
-      %dt.blacklight= format_key(k)
+      %dt.blacklight= format_key(k) + ":"
       - if k == 'DC_type'
         %dd.blacklight= format_duplicates(v)
       - else
@@ -80,7 +80,7 @@
     - development_only.keys.each do |k|
       - v = document[k]
       - v = "<none>" if v.nil?
-      %dt.blacklight= format_key(k)
+      %dt.blacklight= format_key(k) + ":"
       %dd.blacklight= format_value(v)
 
 

@@ -10,7 +10,7 @@
   %dl.dl-horizontal.dl-invert
     - collection_show_fields(@collection.id).each do |field|
       %dt
-        = field.first[0]
+        = field.first[0] + ":"
       %dd
         - if field.first[0] == "RDF Type:"
           = File.basename(field.first[1])
