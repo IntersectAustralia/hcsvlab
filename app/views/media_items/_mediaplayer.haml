@@ -7,3 +7,10 @@
     = media_item_video_tag @media_item, {:preload => 'auto'}
   - else
     = media_item_audio_tag @media_item, {:preload => 'auto'}
+  - mybrowser = request.env['HTTP_USER_AGENT']
+  - if (mybrowser.include?("Safari") and !mybrowser.include?("Chrome"))
+    %div{:class=>"eopas_message"}
+      Media may not play in Safari. Please try another browser or download the media from the Item details page.
+  - if (mybrowser.include?("MSIE"))
+    %div{:class=>"eopas_message"}
+      Media may not play in Internet Explorer. Please try another browser or download the media from the Item details page.
