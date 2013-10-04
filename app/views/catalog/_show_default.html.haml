@@ -20,6 +20,9 @@
       %audio{:controls => "", :style => "width:450px"}
         %source{:src => "/catalog/#{document[:id]}/document/#{doc[MetadataHelper::IDENTIFIER]}"}
         %embed{:height => "50", :src => doc[MetadataHelper::SOURCE], :width => "100"}
+
+      %div{class:"eopas_message"}
+        = showMessageIfCannotPlayFile(doc[MetadataHelper::IDENTIFIER])
     - else
       = raw render_no_primary_document
   - elsif has_only_text_documents?(document)

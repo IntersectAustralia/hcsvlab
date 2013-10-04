@@ -74,4 +74,40 @@ module EopasHelper
     result
   end
 
+  #
+  # Return a message when the browser cannot play the Audio or video file
+  #
+  def showMessageIfCannotPlayFile(file)
+    message = ""
+    myBrowser = (request.env['HTTP_USER_AGENT'].nil?)?"":request.env['HTTP_USER_AGENT']
+
+    if (myBrowser.include?("Safari") and !myBrowser.include?("Chrome"))
+      if (file.to_s.downcase.end_with?(".ogg"))
+        message = "OGG media files may not play in Safari. Please try another browser or download the media."
+      elsif (file.to_s.downcase.end_with?(".webm"))
+        message = "WebM media files may not play in Safari. Please try another browser or download the media."
+      end
+    elsif (myBrowser.include?("Firefox"))
+      if (file.to_s.downcase.end_with?(".mp3"))
+        message = "MP3 media files may not play in Firefox. Please try another browser or download the media."
+      elsif (file.to_s.downcase.end_with?(".mp4"))
+        message = "MP4 media files may not play in Firefox. Please try another browser or download the media."
+      end
+    elsif (myBrowser.include?("MSIE"))
+      if (file.to_s.downcase.end_with?(".ogg"))
+        message = "OGG media files may not play in Internet Explorer. Please try another browser or download the media."
+      elsif (file.to_s.downcase.end_with?(".wav"))
+          message = "WAV media files may not play in Internet Explorer. Please try another browser or download the media."
+      elsif (file.to_s.downcase.end_with?(".webm"))
+        message = "WebM media files may not play in Internet Explorer. Please try another browser or download the media."
+      end
+    elsif (myBrowser.include?("Opera"))
+      if (file.to_s.downcase.end_with?(".mp3"))
+        message = "MP3 media files may not play in Opera. Please try another browser or download the media."
+      elsif (file.to_s.downcase.end_with?(".mp3"))
+        message = "MP4 media files may not play in Opera. Please try another browser or download the media."
+      end
+    end
+    message
+  end
 end
