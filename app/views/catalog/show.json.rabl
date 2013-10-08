@@ -19,19 +19,25 @@ else
        end 
     end    
     do_not_display = {'id' => nil,
-               'timestamp' => nil,
-               MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
-               MetadataHelper::short_form(MetadataHelper::IDENT) => nil,
-        'date_group_tesim' => nil,
-            'all_metadata' => nil,
-               '_version_' => nil,
-              'item_lists' => nil} 
-    do_not_display = {} if Rails.env.development? # In development, display everything  
+                      'timestamp' => nil,
+                      MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
+                      MetadataHelper::short_form(MetadataHelper::IDENT) => nil,
+                      'date_group_tesim' => nil,
+                      'all_metadata' => nil,
+                      '_version_' => nil,
+                      'item_lists' => nil,
+                      'discover_access_group_ssim' => nil,
+                      'read_access_group_ssim' => nil,
+                      'edit_access_group_ssim' => nil,
+                      'discover_access_person_ssim' => nil,
+                      'read_access_person_ssim' => nil,
+                      'edit_access_person_ssim' => nil
+                     }
+    do_not_display = {} if Rails.env.development? # In development, display everything
     do_not_display.merge!(document_show_fields(@document)) 
-
-    @document.keys.each do |k| 
-      v = @document[k] 
-      unless do_not_display.has_key?(k) 
+    @document.keys.each do |k|
+      v = @document[k]
+      unless do_not_display.has_key?(k)
         if k == 'DC_type' 
           hash[format_key(k)] = format_duplicates(v) 
         else 
