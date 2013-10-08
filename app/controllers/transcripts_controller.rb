@@ -19,9 +19,15 @@ class TranscriptsController < ApplicationController
   FEDORA_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env] unless const_defined?(:FEDORA_CONFIG)
   
   def show
-    attributes = document_to_attribues params['id']
-    @transcript = load_transcript attributes
-    @media_item = load_media attributes
+    begin
+      attributes = document_to_attribues params['id']
+      @transcript = load_transcript attributes
+      @media_item = load_media attributes
+    rescue Exception => e
+      Rails.logger.error(e.backtrace)
+      flash[:error] = "Sorry, you have requested a record that doesn't exist."
+      redirect_to root_url and return
+    end
   end
 
   def load_transcript(attributes)
