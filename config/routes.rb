@@ -39,6 +39,8 @@ HcsvlabWeb::Application.routes.draw do
   # resources :media_items, :transcripts
   match '/eopas/:id' => 'transcripts#show', :as => 'eopas'
 
+  match 'schema/json-ld' => 'catalog#annotation_context', :as => 'annotation_context'
+
   resources :issue_reports, :only => [:new, :create] do
   end
 

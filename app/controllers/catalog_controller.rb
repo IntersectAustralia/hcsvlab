@@ -315,6 +315,11 @@ class CatalogController < ApplicationController
     end
   end
 
+  def annotation_context
+    request.format = 'json'
+    respond_to 'json'
+  end
+
   def primary_text
     begin
         item = Item.find(params[:id])

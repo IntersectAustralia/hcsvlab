@@ -161,7 +161,17 @@ Feature: Browsing via API
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text.json","annotations_found":2,"annotations":[{"type":"pageno","label":"11","start":2460.0,"end":2460.0},{"type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
+    {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"pageno","label":"11","start":2460.0,"end":2460.0},{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1","type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
+    """
+
+  Scenario: Get annotation context
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    When I make a JSON request for the annotation context page with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"@context":{"@base":"http://purl.org/dada/schema/0.2/","annotations":{"@id":"http://purl.org/dada/schema/0.2/annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2/commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2/type"},"start":{"@id":"http://purl.org/dada/schema/0.2/start"},"end":{"@id":"http://purl.org/dada/schema/0.2/end"},"label":{"@id":"http://purl.org/dada/schema/0.2/label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2/annotates"}}}
     """
 
   Scenario: Request annotations for item that doesn't have annotations
@@ -186,7 +196,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text.json","annotations_found":1,"annotations":[{"type":"pageno","label":"11","start":2460.0,"end":2460.0}]}
+    {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"pageno","label":"11"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"pageno","label":"11","start":2460.0,"end":2460.0}]}
     """
 
   Scenario: Get specific annotations for item by type
@@ -200,7 +210,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"item_id":"hcsvlab:1","utterance":"http://example.org/catalog/hcsvlab:1/primary_text.json","annotations_found":1,"annotations":[{"type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
+    {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"ellipsis"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1","type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
     """
 
   Scenario: Download primary_text from item
