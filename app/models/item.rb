@@ -1,6 +1,6 @@
 include ActiveFedora::DatastreamCollections
 
-class Item < ActiveFedora::Base
+class Item < HcsvlabActiveFedora
 
   # Adds useful methods form managing Item groups
   include Hydra::ModelMixins::RightsMetadata

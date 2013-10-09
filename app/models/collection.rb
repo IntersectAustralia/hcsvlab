@@ -1,7 +1,7 @@
 include ActiveFedora::DatastreamCollections
 require "#{Rails.root}/lib/solr/solr_helper.rb"
 
-class Collection < ActiveFedora::Base
+class Collection < HcsvlabActiveFedora
   include SolrHelper
 
   # Adds useful methods form managing Item groups
