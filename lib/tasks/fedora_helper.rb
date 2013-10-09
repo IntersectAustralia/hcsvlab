@@ -88,7 +88,7 @@ def create_collection(collection_name, corpus_dir)
   if Dir.entries(dir).include?(collection_name + ".n3")
     coll_metadata = dir + "/" + collection_name + ".n3"
   else
-    puts "No collection metadata file found - " + dir + "/" + collection_name + ".n3"
+    logger.warn "No collection metadata file found - #{dir}/#{collection_name}.n3"
     return
   end
 
@@ -102,6 +102,12 @@ def create_collection_from_file(collection_file, collection_name)
   coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s
   coll.uri = coll.label
   coll.short_name = collection_name
+
+  if Collection.find_by_uri(coll.uri).size != 0
+    # There is already such a collection in the system
+    logger.error "Collection #{collection_name} (#{coll.uri}) already exists in the system - skipping"
+    return
+  end
   coll.save
 
   set_data_owner(coll)
@@ -120,7 +126,7 @@ def create_collection_from_file(collection_file, collection_name)
 
   coll.save!
 
-  puts "Collection '#{coll.flat_short_name}' Metadata = " + coll.pid.to_s unless Rails.env.test?
+  logger.info "Collection '#{coll.flat_short_name}' Metadata = #{coll.pid}" unless Rails.env.test?
 end
 
 def look_for_documents(item, corpus_dir)
@@ -252,11 +258,11 @@ def set_data_owner(collection)
   data_owner = find_system_user(results)
   data_owner = find_default_owner() if data_owner.nil?
   if data_owner.nil?
-    logger.debug "Cannot determine data owner for collection #{collection.short_name}"
+    logger.warn "Cannot determine data owner for collection #{collection.short_name}"
   elsif data_owner.cannot_own_data?
-    logger.debug "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
+    logger.warn "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
-    logger.debug "Setting data owner to #{data_owner.email}"
+    logger.info "Setting data owner to #{data_owner.email}"
     collection.set_data_owner_and_save(data_owner)
   end
 end
@@ -305,12 +311,10 @@ def create_default_licences(rootPath = "config")
 
       l.save!
     rescue Exception => e
-      puts "Licence Name: #{l.name} not ingested."
-      puts "ERROR: #{l.errors.messages.inspect}"
-      puts ""
+      logger.error "Licence Name: #{l.name[0]} not ingested: #{l.errors.messages.inspect}"
       next
     else
-      puts "Licence '#{l.name[0].to_s}' = #{l.pid.to_s}" unless Rails.env.test?
+      logger.info "Licence '#{l.name[0]}' = #{l.pid}" unless Rails.env.test?
     end
 
   end
