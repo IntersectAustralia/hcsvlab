@@ -50,8 +50,7 @@ class FedoraWorker < ApplicationProcessor
  
   def on_message(message)
     x = XMLHelper.new(message)
-    logger.debug "Fedora_Worker received message, title: #{x.title}, content: #{x.content}, summary: #{x.summary}"
-#    logger.debug message.gsub(/^/, "\t")
+    info("Fedora_Worker", "received message, title: #{x.title}, content: #{x.content}, summary: #{x.summary}")
 
     case x.title
     when "addDatastream"
@@ -89,7 +88,7 @@ class FedoraWorker < ApplicationProcessor
   end
 
   def send_solr_message(command, objectID)
-    logger.debug "Fedora_Worker sending instruction to Solr_Worker: #{command} #{objectID}"
+    info("Fedora_Worker", "sending instruction to Solr_Worker: #{command} #{objectID}")
     publish :solr_worker, "#{command} #{objectID}"
   end
 
