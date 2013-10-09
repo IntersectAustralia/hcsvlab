@@ -18,6 +18,8 @@ class Item < ActiveFedora::Base
   has_many :documents, :property => :is_member_of
   belongs_to :collection, :property => :is_member_of_collection
 
+  delegate :identifier, to: 'descMetadata'
+  delegate :collection_name, to: 'descMetadata'
 
   #
   # Find an item using its collection name and id

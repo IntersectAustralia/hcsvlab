@@ -291,10 +291,13 @@ namespace :fedora do
     end
     puts "#{Time.new.to_s} - Ingesting item: " + rdf_file.to_s
     STDOUT.flush
-    item = create_item_from_file(corpus_dir, rdf_file)
-    look_for_annotations(item, rdf_file) if annotations
-    look_for_documents(item, corpus_dir, rdf_file)
-    item.save!
+    
+    item, update = create_item_from_file(corpus_dir, rdf_file)
+    if update
+      look_for_annotations(item, rdf_file) if annotations
+      look_for_documents(item, corpus_dir)
+      item.save!
+    end
 
 #    if Collection.where(short_name: item.collection).count == 0
 #      create_collection(item.collection.first, corpus_dir)
