@@ -12,7 +12,7 @@ else
       key = render_document_show_field_label(@document, :field => solr_fname)
        if solr_fname == 'OLAC_language_tesim' 
           hash[key] = raw(render_language_codes(@document[solr_fname]))
-       elsif solr_fname == 'DC_type' 
+       elsif solr_fname == 'DC_type_facet'
           hash[key] = format_duplicates(@document[solr_fname]) 
        else 
           hash[key] = render_document_show_field_value(@document, :field => solr_fname)
@@ -26,6 +26,7 @@ else
                       'all_metadata' => nil,
                       '_version_' => nil,
                       'item_lists' => nil,
+                      'all_metadata' => nil,
                       'discover_access_group_ssim' => nil,
                       'read_access_group_ssim' => nil,
                       'edit_access_group_ssim' => nil,
@@ -38,7 +39,7 @@ else
     @document.keys.each do |k|
       v = @document[k]
       unless do_not_display.has_key?(k)
-        if k == 'DC_type' 
+        if k == 'DC_type_facet'
           hash[format_key(k)] = format_duplicates(v) 
         else 
           hash[format_key(k)] = format_value(v) 

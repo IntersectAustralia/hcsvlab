@@ -120,7 +120,7 @@ private
       # Now we have the basic results, we have a guddle about for any
       # extra information in which we're interested. Start by creating 
       # the Hash into which we will accumulate this extra data.
-      extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group" => []}
+      extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
       full_text = nil
 
       # Look for any fields which we're going to group in the indexing.
@@ -130,7 +130,7 @@ private
       results.each { |result|
         date = result[:date]
         group = date_group(date)
-        extras["date_group"] << group unless group.nil?
+        extras["date_group_facet"] << group unless group.nil?
       }
 
       # Get the full text, if there is any
@@ -253,6 +253,8 @@ private
         end
       elsif binding[:predicate] == MetadataHelper::IDENTIFIER
         ident_parts[:identifier] = value
+      elsif @@configured_fields.include?(MetadataHelper::short_form(field)+"_facet")
+        field = MetadataHelper::short_form(field)+"_facet"
       end
 
 

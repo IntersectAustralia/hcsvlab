@@ -10,20 +10,20 @@
   <field name="http_ns_ausnc_org_au_schemas_localityName_tesim">New_South_Wales</field>
   <field name="DC_created_tesim">1898</field>
   <field name="DC_identifier_tesim">bolroma.xml</field>
-  <field name="HCSvLab_collection">auslit</field>
+  <field name="HCSvLab_collection_facet">auslit</field>
   <field name="HCSvLab_ident">auslit:bolroma.xml</field>
   <field name="DC_source_tesim">Niall, 1998</field>
   <field name="PURL_BIBO_pages_tesim">10-11</field>
-  <field name="OLAC_language">eng</field>
+  <field name="OLAC_language_facet">eng</field>
   <field name="OLAC_speaker_tesim">bolromaaddressee</field>
   <field name="OLAC_speaker_tesim">bolromaauthor</field>
-  <field name="DC_type">Original</field>
-  <field name="DC_type">Raw</field>
-  <field name="DC_type">Text</field>
+  <field name="DC_type_facet">Original</field>
+  <field name="DC_type_facet">Raw</field>
+  <field name="DC_type_facet">Text</field>
   <field name="DC_extent_tesim">546058</field>
   <field name="DC_extent_tesim">546058</field>
   <field name="DC_extent_tesim">505682</field>
-  <field name="date_group">1890 - 1899</field>
+  <field name="date_group_facet">1890 - 1899</field>
   <field name="full_text">
     "
 

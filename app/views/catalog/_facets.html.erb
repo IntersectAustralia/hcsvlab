@@ -9,14 +9,14 @@
     <%= t('blacklight.search.facets.title') %>
   </h4>
 
+  <div class="facets-collapse">
+    <% if user_signed_in? %>
+      <ul class="clearfix" id="searchbar">
+        <%= render_search_bar %>
+      </ul>
+    <% end %>
+  </div>
   <% if has_facet_values? %>
-    <div class="facets-collapse">
-      <% if user_signed_in? %>
-        <ul class="clearfix" id="searchbar">
-          <%= render_search_bar %>
-        </ul>
-      <% end %>
-    </div>
     <div class="facets-collapse">
       <%= render_facet_partials %>
     </div>

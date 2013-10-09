@@ -1,71 +1,71 @@
 :facets:
   -
-    :name: HCSvLab_collection
+    :name: HCSvLab_collection_facet
     :label: Collection
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: date_group
+    :name: date_group_facet
     :label: Created
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_mode
+    :name: AUSNC_mode_facet
     :label: Mode
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_speech_style
+    :name: AUSNC_speech_style_facet
     :label: Speech Style
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_publication_status
+    :name: AUSNC_publication_status_facet
     :label: Publication Status
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_written_mode
+    :name: AUSNC_written_mode_facet
     :label: Written Mode
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_interactivity
+    :name: AUSNC_interactivity_facet
     :label: Interactivity
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_communication_context
+    :name: AUSNC_communication_context_facet
     :label: Communication Context
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_communication_medium
+    :name: AUSNC_communication_medium_facet
     :label: Communication Medium
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_communication_setting
+    :name: AUSNC_communication_setting_facet
     :label: Communication Setting
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: AUSNC_audience
+    :name: AUSNC_audience_facet
     :label: Audience
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: OLAC_discourse_type
+    :name: OLAC_discourse_type_facet
     :label: Discourse Type
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: OLAC_language
+    :name: OLAC_language_facet
     :label: Language (ISO 639-3 Code)
     :limit: 2000
     :partial: 'catalog/sorted_facet'
   -
-    :name: DC_type
+    :name: DC_type_facet
     :label: Type
     :limit: 2000
     :partial: 'catalog/sorted_facet'

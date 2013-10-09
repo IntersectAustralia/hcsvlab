@@ -15,6 +15,7 @@ Feature: Searching for items
       | collectionName  | accessType  |
       | cooee           | read        |
       | austlit         | read        |
+      | ice             | read        |
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
     And I am on the home page
@@ -31,3 +32,55 @@ Feature: Searching for items
     And I follow "Logout"
     And I am on the search history page
     Then I should see "Please enter your email and password to log in"
+
+  @javascript
+  Scenario: Search for simple term in all metadata
+    When I fill in "Metadata" with "monologue"
+    And I press "search_metadata"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Title                         | Created Date | Type(s)             |
+      | ice:S2B-035 	    | The Money or the Gun 	        | 3/5/94 	   | Text                |
+
+  @javascript
+  Scenario: Search for two simple term in all metadata joined with AND
+    When I fill in "Metadata" with "University AND Romance"
+    And I press "search_metadata"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Title                         | Created Date | Type(s)             |
+      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
+
+  @javascript
+  Scenario: Search for two simple term in all metadata joined with OR
+    When I fill in "Metadata" with "University OR Romance"
+    And I press "search_metadata"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Title                         | Created Date | Type(s)             |
+      | austlit:adaessa.xml | Australian Essays 	        | 1886 	       | Original, Raw, Text |
+      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
+
+  @javascript
+  Scenario: Search for term with tilde in all metadata
+    When I fill in "Metadata" with "Univarsoty~"
+    And I press "search_metadata"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Title                         | Created Date | Type(s)             |
+      | austlit:adaessa.xml | Australian Essays 	        | 1886 	       | Original, Raw, Text |
+      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
+
+  @javascript
+  Scenario: Search for term with asterisk in all metadata
+    When I fill in "Metadata" with "Correspon*"
+    And I press "search_metadata"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Created Date | Type(s)             |
+      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-002         | 10/11/1791   | Text                |
+
+  @javascript
+  Scenario: Search for term with asterisk in all metadata and simple term in full_text
+    When I fill in "q" with "can"
+    When I fill in "Metadata" with "Correspon*"
+    And I press "search_metadata"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Created Date | Type(s)             |
+      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |

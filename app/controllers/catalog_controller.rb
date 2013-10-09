@@ -124,33 +124,35 @@ class CatalogController < ApplicationController
     config.add_show_field solr_name('DC_title', :stored_searchable, type: :string), :label => 'Title'
     config.add_show_field solr_name('DC_created', :stored_searchable, type: :string), :label => 'Created'
     config.add_show_field solr_name('DC_identifier', :stored_searchable, type: :string), :label => 'Identifier'
-    config.add_show_field 'HCSvLab_collection', :label => 'Collection'
+    config.add_show_field 'HCSvLab_collection_facet', :label => 'Collection'
     config.add_show_field solr_name('DC_Source', :stored_searchable, type: :string), :label => 'Source'
     config.add_show_field solr_name('AUSNC_itemwordcount', :stored_searchable, type: :string), :label => 'Word Count'
 
-    config.add_show_field 'AUSNC_mode', :label => 'Mode'
-    config.add_show_field 'AUSNC_speech_style', :label => 'Speech Style'
-    config.add_show_field 'AUSNC_interactivity', :label => 'Interactivity'
-    config.add_show_field 'AUSNC_communication_context', :label => 'Communication Context'
+    config.add_show_field 'AUSNC_mode_facet', :label => 'Mode'
+    config.add_show_field 'AUSNC_speech_style_facet', :label => 'Speech Style'
+    config.add_show_field 'AUSNC_interactivity_facet', :label => 'Interactivity'
+    config.add_show_field 'AUSNC_communication_context_facet', :label => 'Communication Context'
     config.add_show_field solr_name('AUSNC_discourse_type', :stored_searchable), :label => 'Discourse Type'
-    config.add_show_field 'OLAC_discourse_type', :label => 'Discourse Type'
-    config.add_show_field 'OLAC_language', :label => 'Language (ISO 639-3 Code)'
+    config.add_show_field 'OLAC_discourse_type_facet', :label => 'Discourse Type'
+    config.add_show_field 'OLAC_language_facet', :label => 'Language (ISO 639-3 Code)'
 
     config.add_show_field solr_name('ACE_genre', :stored_searchable, type: :string), :label => 'Genre'
-    config.add_show_field 'AUSNC_audience', :label => 'Audience'
-    config.add_show_field 'AUSNC_communication_setting', :label => 'Communication Setting'
-    config.add_show_field 'AUSNC_communication_medium', :label => 'Communication Medium'
+    config.add_show_field 'AUSNC_audience_facet', :label => 'Audience'
+    config.add_show_field 'AUSNC_communication_setting_facet', :label => 'Communication Setting'
+    config.add_show_field 'AUSNC_communication_medium_facet', :label => 'Communication Medium'
     config.add_show_field solr_name('AUSNC_plaintextversion', :stored_searchable, type: :string), :label => 'Plain Text'
-    config.add_show_field 'AUSNC_publication_status', :label => 'Publication Status'
+    config.add_show_field 'AUSNC_publication_status_facet', :label => 'Publication Status'
     config.add_show_field solr_name('AUSNC_source', :stored_searchable, type: :string), :label => 'Source'
-    config.add_show_field 'AUSNC_written_mode', :label => 'Written Mode'
+    config.add_show_field 'AUSNC_written_mode_facet', :label => 'Written Mode'
     config.add_show_field solr_name('DC_contributor', :stored_searchable, type: :string), :label => 'Contributor'
     config.add_show_field solr_name('DC_publisher', :stored_searchable, type: :string), :label => 'Publisher'
 
     config.add_show_field solr_name('AUSNC_document', :stored_searchable, type: :string), :label => 'Documents'
-    config.add_show_field 'DC_type', :label => 'Type'
+    config.add_show_field 'DC_type_facet', :label => 'Type'
     config.add_show_field solr_name('DC_extent', :stored_searchable, type: :string), :label => 'Extent'
     config.add_show_field solr_name('Item', :stored_searchable, type: :string), :label => 'Item'
+
+    config.add_show_field 'date_group_facet', :label => 'Date Group'
 
     # solr fields to be displayed in the show (single result) view
     # "fielded" search configuration. Used by pulldown among other places.
@@ -250,6 +252,16 @@ class CatalogController < ApplicationController
 
   # override default index method
   def index
+    metadataSearchParam = params[:metadata]
+    if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
+      if (metadataSearchParam.include?(":"))
+        params[:fq] = metadataSearchParam
+      else
+        params[:fq] = "all_metadata:(#{metadataSearchParam})"
+      end
+      self.solr_search_params_logic += [:add_metadata_extra_filters]
+    end
+
     super
     if !current_user.nil?
       @hasAccessToEveryCollection = true
@@ -386,6 +398,15 @@ class CatalogController < ApplicationController
                   }
       format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
+  end
+
+  private
+
+  #
+  # Add filter query when searching on metadata fields.
+  #
+  def add_metadata_extra_filters(solr_parameters, user_params)
+    solr_parameters[:fq] << user_params[:fq]
   end
 
   def wrapped_enforce_show_permissions(opts={})

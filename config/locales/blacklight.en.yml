@@ -8,4 +8,4 @@ en:
     search:
       form:
         q: 'Search Text Containing...'
-
+        all_metadata: 'Search Metadata...'

@@ -1,0 +1,46 @@
+@prefix ICE: <http://ns.ausnc.org.au/corpus/ICE/ICE> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix cld: <http://purl.org/cld/terms/> .
+@prefix marcrel: <http://www.loc.gov/loc.terms/relators/> .
+
+ICE:
+      a dcmitype:Collection ;
+      dc:title "International Corpus of English (Australia contribution is ICE-AUS)" ;
+      dcterms:alternative "ICE" ;
+      dcterms:abstract "The ICE-AUS corpus is a 1 m.word corpus of transcribed spoken and written Australian English from 1992-1995. Its internal structure with 500 samples (60% speech, 40%writing) matches that of other ICE corpora (associated with the International corpus of English." ;
+      dcterms:extent "1,000,000 words" ;
+      dcterms:language "eng" ;
+      dcterms:itemType "In line text" ;
+      dcterms:itemFormat "Spoken conversation, f2f and distanced; monologues; broadcast dialogues; scripted speech; unpublished letters (personal and professional); student essays; newspaper writing; popular nonfiction; academic writing; fiction" ;
+      dcterms:created  "1992-1995" ;
+      dc:creator "Pam Peters" ;
+      marcrel:OWN "Macquarie University" ;
+      dc:rights "All rights reserved to Macquarie UNiversity";
+      dcterms:accessRights "See AusNC Terms of Use" ;
+      dc:subject "200302 - English Language spoken and written registers" ;
+      cld:isLocatedAt "Macquarie University, NSW, Australia";
+      dcterms:isPartOf "International Corpus of English - http://ice-corpora.net/ice/, Australian National Corpus -http://www.ausnc.org.au" ;
+      dcterms:isReferencedBy "Sidney Greenbaum & Gerald Nelson (2009) An Introduction to English Grammar. 3rd edition. London: Pearson." ;
+      dcterms:isReferencedBy "Special issue of World Englishes on the ICE project, Volume 23 Number 2, May 2004.";
+      dcterms:isReferencedBy "Nelson, Gerald, Sean Wallis, & Bas Aarts (2002) Exploring Natural Language: Working with the British component of the International Corpus of English. Amsterdam: Benjamins.";
+      dcterms:isReferencedBy "Greenbaum, Sidney (ed.) (1996) Comparing English Worldwide: The International Corpus of English. Oxford: Clarendon Press.";
+      .
+
+#      dc:identifier "" ;
+#      dcterms:provenance "" ;
+
+
+#Accrual Method [dcterms:accrualMethod]
+#Accrual Periodicity [dcterms:accrualPeriodicity]
+#Accrual Policy [dcterms:accrualPolicy]
+#Audience [dcterms:audience]
+#Spatial Coverage [dcterms:spatial]
+#Is Located At [cld:isLocatedAt]
+#Is Accessed Via [cld:isAccessedVia]
+#Sub-Collection [dcterms:hasPart]
+#Super-Collection [dcterms:isPartOf]
+#Catalogue or Index [cld:catalogueOrIndex]
+#Associated Collection [cld:associatedCollection]
+#Associated Publication [dcterms:isReferencedBy]

@@ -3,9 +3,6 @@ Feature: Displaying Items
   I want to display item details
 
   Background:
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "cooee:1-001" with id "hcsvlab:2"
-    Given I ingest "cooee:1-001" with id "hcsvlab:3"
     Given I have the usual roles and permissions
     Given I have users
       | email                       | first_name | last_name |
@@ -13,12 +10,14 @@ Feature: Displaying Items
     Given I have user "researcher@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
+      | custom          | read        |
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the catalog page for "hcsvlab:1"
 
-  Scenario: HCSVLAB-272 - Clicking through to an COOEE Item's details
-    And I should see "cooee:1-001"
+  Scenario: HCSVLAB-272 - Clicking through to a COOEE Item's details
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I am on the catalog page for "hcsvlab:1"
+    Then I should see "cooee:1-001"
     And I should see "Primary Document"
     And I should see "Documents"
     And I should see link "eng" to "http://www-01.sil.org/iso639-3/documentation.asp?id=eng"
@@ -45,14 +44,30 @@ Feature: Displaying Items
       | source                                    | Niall, 1998                           |
       | pages                                     | 10-11                                 |
       | speaker                                   | 1-001addressee, 1-001author           |
-      | date_group                                | 1790 - 1799                           |
+      | Date Group                                | 1790 - 1799                           |
     And I should not see "Development Extras"
 
-
-#
-# Preserve format of Primary Document (HCSVLAB-433)
-# And I should see "Dear Sir,\n"
-# And show me the page
-# And I follow "1-001-plain.txt"
-# Then I should get a 200 response code
-# Then I should get the primary text for "cooee:1-001"
+  Scenario: Verify presence of every faceted field
+    Given I ingest "custom:custom1" with id "hcsvlab:2"
+    Given I am on the catalog page for "hcsvlab:2"
+    Then I should see "custom:custom1"
+    And I should see "Primary Document"
+    And I should see "Documents"
+    And I should see link "eng" to "http://www-01.sil.org/iso639-3/documentation.asp?id=eng"
+    And I should see fields displayed
+      | field                                     | value                                 |
+      | Collection                                | custom                                |
+      | Date Group                                | 1880 - 1889                           |
+      | Mode                                      | spoken                                |
+      | Speech Style                              | spontaneous                           |
+      | Publication Status                        | published                             |
+      | Written Mode                              | print                                 |
+      | Interactivity                             | interview                             |
+      | Communication Context                     | face_to_face                          |
+      | Communication Medium                      | radio                                 |
+      | Communication Setting                     | educational                           |
+      | Audience                                  | massed                                |
+      | Discourse Type                            | letter                                |
+      | Discourse Type                            | singing                               |
+      | Language (ISO 639-3 Code)                 | eng                                   |
+      | Type                                      | Original, Raw, Text                   |

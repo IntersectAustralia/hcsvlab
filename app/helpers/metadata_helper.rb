@@ -63,13 +63,13 @@ public
   MODE                  = RDF::URI(AUSNC_BASE_URI + 'mode') unless const_defined?(:MODE)
   SPEECH_STYLE          = RDF::URI(AUSNC_BASE_URI + 'speech_style') unless const_defined?(:SPEECH_STYLE)
 
-  @@lookup[AUDIENCE.to_s]              = prefixes[AUSNC_BASE_URI] + "_audience"
-  @@lookup[COMMUNICATION_CONTEXT.to_s] = prefixes[AUSNC_BASE_URI] + "_communication_context"
+  @@lookup[AUDIENCE.to_s]              = prefixes[AUSNC_BASE_URI] + "_audience_facet"
+  @@lookup[COMMUNICATION_CONTEXT.to_s] = prefixes[AUSNC_BASE_URI] + "_communication_context_facet"
   @@lookup[DOCUMENT.to_s]              = prefixes[AUSNC_BASE_URI] + "_document"
-  @@lookup[INTERACTIVITY.to_s]         = prefixes[AUSNC_BASE_URI] + "_interactivity"
+  @@lookup[INTERACTIVITY.to_s]         = prefixes[AUSNC_BASE_URI] + "_interactivity_facet"
   @@lookup[LOCALITY_NAME.to_s]         = prefixes[AUSNC_BASE_URI] + "_locality_name"
-  @@lookup[MODE.to_s]                  = prefixes[AUSNC_BASE_URI] + "_mode"
-  @@lookup[SPEECH_STYLE.to_s]          = prefixes[AUSNC_BASE_URI] + "_speech_style"
+  @@lookup[MODE.to_s]                  = prefixes[AUSNC_BASE_URI] + "_mode_facet"
+  @@lookup[SPEECH_STYLE.to_s]          = prefixes[AUSNC_BASE_URI] + "_speech_style_facet"
 
   #
   # AUSTLIT
@@ -98,8 +98,8 @@ public
   DISCOURSE_TYPE = RDF::URI(OLAC_BASE_URI + 'discourse_type') unless const_defined?(:DISCOURSE_TYPE)
   LANGUAGE       = RDF::URI(OLAC_BASE_URI + 'language') unless const_defined?(:LANGUAGE)
 
-  @@lookup[DISCOURSE_TYPE.to_s] = prefixes[OLAC_BASE_URI] + "_discourse_type"
-  @@lookup[LANGUAGE.to_s]       = prefixes[OLAC_BASE_URI] + "_language"
+  @@lookup[DISCOURSE_TYPE.to_s] = prefixes[OLAC_BASE_URI] + "_discourse_type_facet"
+  @@lookup[LANGUAGE.to_s]       = prefixes[OLAC_BASE_URI] + "_language_facet"
 
   #
   # PURL
@@ -114,13 +114,12 @@ public
   TYPE       = RDF::URI(DC_TERMS_BASE_URI + 'type') unless const_defined?(:TYPE)
 
   @@lookup[IS_PART_OF.to_s] = prefixes[DC_TERMS_BASE_URI] + "_is_part_of"
-  @@lookup[TYPE.to_s]       = prefixes[DC_TERMS_BASE_URI] + "_type"
   @@lookup[EXTENT.to_s]     = prefixes[DC_TERMS_BASE_URI] + "_extent"
   @@lookup[CREATED.to_s]    = prefixes[DC_TERMS_BASE_URI] + "_created"
   @@lookup[IDENTIFIER.to_s] = prefixes[DC_TERMS_BASE_URI] + "_identifier"
   @@lookup[SOURCE.to_s]     = prefixes[DC_TERMS_BASE_URI] + "_source"
   @@lookup[TITLE.to_s]      = prefixes[DC_TERMS_BASE_URI] + "_title"
-  @@lookup[TYPE.to_s]       = prefixes[DC_TERMS_BASE_URI] + "_type"
+  @@lookup[TYPE.to_s]       = prefixes[DC_TERMS_BASE_URI] + "_type_facet"
 
   #
   # RDF
@@ -151,7 +150,7 @@ public
   #
   # HCSVLAB
   #
-  COLLECTION = RDF::URI(HCSVLAB_BASE_URI + 'collection') unless const_defined?(:COLLECTION)
+  COLLECTION = RDF::URI(HCSVLAB_BASE_URI + 'collection_facet') unless const_defined?(:COLLECTION)
   IDENT      = RDF::URI(HCSVLAB_BASE_URI + 'ident') unless const_defined?(:IDENT)
   HAS_LICENCE= RDF::URI(HCSVLAB_BASE_URI + 'has_licence') unless const_defined?(:HAS_LICENCE)
 

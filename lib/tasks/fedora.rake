@@ -366,7 +366,7 @@ namespace :fedora do
   end
 
   def find_corpus_items(corpus)
-    response = @solr.get 'select', :params => {:q => 'HCSvLab_collection:' + corpus,
+    response = @solr.get 'select', :params => {:q => 'HCSvLab_collection_facet:' + corpus,
                                                :rows => 2147483647}
     response['response']['docs']
   end

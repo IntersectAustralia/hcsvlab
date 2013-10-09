@@ -8,20 +8,20 @@
   
   <fields>
 
-    <field name="HCSvLab_collection"          type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="date_group"                  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="AUSNC_mode"                  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="AUSNC_speech_style"          type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="AUSNC_interactivity"         type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="AUSNC_communication_context" type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="AUSNC_audience"              type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="OLAC_discourse_type"         type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="OLAC_language"               type="string" stored="true" indexed="true" multiValued="true" required="false"/>
-    <field name="DC_type"                     type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
-    <field name="AUSNC_written_mode"          type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
-    <field name="AUSNC_communication_setting" type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
-    <field name="AUSNC_publication_status"    type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
-    <field name="AUSNC_communication_medium"  type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="HCSvLab_collection_facet"          type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="date_group_facet"                  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="DC_type_facet"                     type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="OLAC_discourse_type_facet"         type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="OLAC_language_facet"               type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_mode_facet"                  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_speech_style_facet"          type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_interactivity_facet"         type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_communication_context_facet" type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_audience_facet"              type="string" stored="true" indexed="true" multiValued="true" required="false"/>
+    <field name="AUSNC_written_mode_facet"          type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="AUSNC_communication_setting_facet" type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="AUSNC_publication_status_facet"    type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
+    <field name="AUSNC_communication_medium_facet"  type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
 
     <field name="HCSvLab_ident" type="string" stored="true" indexed="true" multiValued="false" required="false"/>
     <field name="id"            type="string" stored="true" indexed="true" multiValued="false" required="true"/>
@@ -344,9 +344,10 @@
   <copyField source="some_field" dest="all_text_timv" />
 -->
 
-    <!-- To enable search of all the indexed metadata fields, create an all_metadata field into which everything is copied 
-    <copyField source="*_tesim" dest="all_metadata" />
-     End of comment-out --> 
+    <!-- To enable search of all the indexed metadata fields, create an all_metadata field into which everything is copied -->
+    <copyField source="*_tesim"   dest="all_metadata" />
+    <copyField source="*_facet"  dest="all_metadata" />
+    <!-- End of comment-out -->
 
   <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" />

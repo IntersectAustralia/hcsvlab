@@ -16,5 +16,13 @@
     </button>
 
   </div>
+  <div class="input-append pull-left">
+    <label for="metadata" class="hide-text"><%= t('blacklight.search.form.all_metadata') %></label>
+    <%= text_field_tag :metadata, params[:metadata], :placeholder => t('blacklight.search.form.all_metadata'), :class => "search_q q", :id => "metadata" %>
+    <button type="submit" class="btn search-btn" id="search_metadata">
+      <i class="icon-search"></i>
+    </button>
+
+  </div>
 
 <% end %>
