@@ -7,9 +7,17 @@ class ItemListsController < ApplicationController
   set_tab :itemList
 
   def index
+    if (session[:profiler])
+      @profiler = session[:profiler]
+      session.delete(:profiler)
+    end
   end
 
   def show
+    if (session[:profiler])
+      @profiler = session[:profiler]
+      session.delete(:profiler)
+    end
     @response = @item_list.get_items(params[:page], params[:per_page])
     @document_list = @response["response"]["docs"]
     respond_to do |format|
@@ -27,7 +35,8 @@ class ItemListsController < ApplicationController
     end
     if @item_list.save
       flash[:notice] = 'Item list created successfully'
-      add_item_to_item_list(@item_list, documents)
+      addItemsResult = add_item_to_item_list(@item_list, documents)
+      session[:profiler] = addItemsResult[:profiler]
       redirect_to @item_list
     end
   end
@@ -39,17 +48,22 @@ class ItemListsController < ApplicationController
       documents = params[:document_ids].split(",")
     end
 
-    added_set = add_item_to_item_list(@item_list, documents)
+    addItemsResult = add_item_to_item_list(@item_list, documents)
+    added_set = addItemsResult[:addedItems]
+
+    session[:profiler] = addItemsResult[:profiler]
+
     flash[:notice] = "#{view_context.pluralize(added_set.size, "")} added to item list #{@item_list.name}"
     redirect_to @item_list
   end
 
   def clear
     bench_start = Time.now
-
     removed_set = @item_list.clear
+    bench_end = Time.now
 
-    Rails.logger.debug("Time for clear item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+    Rails.logger.debug("Time for clear item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
+    session[:profiler] = ["Time for clear item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
     flash[:notice] = "#{view_context.pluralize(removed_set.size, "")} cleared from item list #{@item_list.name}"
     redirect_to @item_list
@@ -59,10 +73,13 @@ class ItemListsController < ApplicationController
     bench_start = Time.now
 
     name = @item_list.name
-    @item_list.clear
+    removed_set = @item_list.clear
     @item_list.delete
 
-    Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+    bench_end = Time.now
+
+    Rails.logger.debug("Time for deleting an Item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
+    session[:profiler] = ["Time for deleting an Item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
     flash[:notice] = "Item list #{name} deleted successfully"
     redirect_to item_lists_path
@@ -74,10 +91,12 @@ class ItemListsController < ApplicationController
     if (result[:error].nil? or result[:error].empty?)
       @highlighting = result[:highlighting]
       @matchingDocs = result[:matching_docs]
+      @profiler = result[:profiler]
       flash[:error] = nil
     else
       flash[:error] = result[:error]
     end
+
   end
 
   def frequency_search
