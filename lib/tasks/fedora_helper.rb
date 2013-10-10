@@ -65,6 +65,7 @@ def update_item_from_file(item, graph, result)
   item.rdfMetadata.graph.insert(graph)
   item.label = item.rdfMetadata.graph.statements.first.subject
 
+  collection_name = last_bit(result.collection.to_s)
   item.collection = Collection.find_by_short_name(collection_name).first
 
   item.save!
