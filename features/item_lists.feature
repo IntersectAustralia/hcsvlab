@@ -87,6 +87,7 @@ Feature: Managing Item Lists
       | name       |
       | Clear Test |
     And the item list "Clear Test" has items hcsvlab:1, hcsvlab:2, hcsvlab:3
+    And I wait 5 seconds
     And I am on the item list page for "Clear Test"
     And the item list "Clear Test" should have 3 items
     And I follow "Clear Item List"
@@ -97,6 +98,7 @@ Feature: Managing Item Lists
       | name        |
       | Delete Test |
     And the item list "Delete Test" has items hcsvlab:1, hcsvlab:2, hcsvlab:3
+    And I wait 5 seconds
     And I am on the item list page for "Delete Test"
     And the item list "Delete Test" should have 3 items
     And I follow the delete icon for item list "Delete Test"
