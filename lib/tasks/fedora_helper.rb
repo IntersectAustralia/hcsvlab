@@ -54,6 +54,7 @@ def create_item_from_file(corpus_dir, rdf_file)
       item.set_read_users([data_owner], [])
       item.set_edit_users([data_owner], [])
     end
+
     item.save!
     logger.info "Item = #{item.pid}"
     return item, true
@@ -165,6 +166,7 @@ def look_for_documents(item, corpus_dir)
           doc.set_read_users([data_owner], [])
           doc.set_edit_users([data_owner], [])
         end
+
         doc.save
 
         # Create a primary text datastream in the fedora Item for primary text documents
@@ -222,7 +224,7 @@ def update_document(document, item, file_name, result, corpus_dir)
       end
     end
   rescue Exception => e
-    Rails.logger.warn("Error creating document: #{e.message}")
+    logger.error("Error creating document: #{e.message}")
   end
 end
 
