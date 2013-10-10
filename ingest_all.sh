@@ -10,10 +10,20 @@ if [ -z $CORPUS_PATH ]
     CORPUS_PATH=$DEFAULT_CORPUS_PATH
 fi
 
-CORPUS_PATHS=$(find "$CORPUS_PATH" -maxdepth 1 -type d)
-if [ "$CORPUS_PATHS" ]
+declare corpora
+
+for f in `find ${CORPUS_PATH} -type d`
+do
+   if test -n "$(find ${f} -maxdepth 1 -name '*-metadata.rdf' -print -quit)"
+   then
+      echo "... queuing $f for ingest"
+      corpora+=" $f"
+   fi
+done
+
+if [ "${corpora}" != "" ]
   then
-    nohup ./nohup_ingest_all_bg.sh $CORPUS_PATHS &
+    nohup ./nohup_ingest_all_bg.sh ${corpora} &
   else
-    echo "Error looking for subddirectories in: $CORPUS_PATH" 
+    echo "Error looking for collections in: $CORPUS_PATH"
 fi
