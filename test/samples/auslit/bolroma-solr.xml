@@ -11,7 +11,7 @@
   <field name="DC_created_tesim">1898</field>
   <field name="DC_identifier_tesim">bolroma.xml</field>
   <field name="HCSvLab_collection_facet">auslit</field>
-  <field name="HCSvLab_ident">auslit:bolroma.xml</field>
+  <field name="handle">auslit:bolroma.xml</field>
   <field name="DC_source_tesim">Niall, 1998</field>
   <field name="PURL_BIBO_pages_tesim">10-11</field>
   <field name="OLAC_language_facet">eng</field>

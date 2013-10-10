@@ -23,12 +23,12 @@
     <field name="AUSNC_publication_status_facet"    type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
     <field name="AUSNC_communication_medium_facet"  type="string" stored="true" indexed="true" multiValued="true"  required="false"/>
 
-    <field name="HCSvLab_ident" type="string" stored="true" indexed="true" multiValued="false" required="false"/>
-    <field name="id"            type="string" stored="true" indexed="true" multiValued="false" required="true"/>
-    <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
-    <field name="full_text" type="text" indexed="true" stored="true" multiValued="false" termVectors="true" termPositions="true" termOffsets="true"/>
-    <field name="all_metadata" type="text_ws" indexed="true" stored="true" multiValued="true"/>   
-    <field name="item_lists" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="handle"       type="string"  stored="true" indexed="true" multiValued="false" required="false"/>
+    <field name="id"           type="string"  stored="true" indexed="true" multiValued="false" required="true"/>
+    <field name="timestamp"    type="date"    stored="true" indexed="true" default="NOW" multiValued="false"/>
+    <field name="full_text"    type="text"    stored="true" indexed="true" multiValued="false" termVectors="true" termPositions="true" termOffsets="true"/>
+    <field name="all_metadata" type="text_ws" stored="true" indexed="true" multiValued="true"/>
+    <field name="item_lists"   type="string"  stored="true" indexed="true" multiValued="true"/>
 
     <field name="HCSvLab_has_licence" type="string" stored="true" indexed="true" multiValued="false" required="false"/>
 

@@ -206,14 +206,14 @@ module Blacklight::BlacklightHelperBehavior
   def document_heading document=nil
     document ||= @document
     begin
-      document[MetadataHelper.short_form(MetadataHelper::IDENT)]
+      document[:handle]
     rescue
       document[blacklight_config.show.heading] || document.id
     end
   end
 
   def main_link_label(document)
-    document[MetadataHelper.short_form(MetadataHelper::IDENT)]
+    document[:handle]
   end
 
   ##

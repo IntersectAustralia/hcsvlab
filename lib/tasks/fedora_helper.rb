@@ -11,11 +11,9 @@ def create_item_from_file(corpus_dir, rdf_file)
                                  RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
                              }
                          })
-
   result = query.execute(graph)[0]
   identifier = result.identifier.to_s
   collection_name = last_bit(result.collection.to_s)
-
 
   # small hack to handle austalk for the time being, can be fixed up 
   # when we look at getting some form of data uniformity
@@ -23,11 +21,13 @@ def create_item_from_file(corpus_dir, rdf_file)
     collection_name = "austalk"
   end
 
+  handle = "#{collection_name}:#{identifier}"
+
   if Collection.where(short_name: collection_name).count == 0
     create_collection(collection_name, corpus_dir)
   end
 
-  existing = Item.where(:collection_name => collection_name, :identifier => result.identifier.to_s).to_a
+  existing = Item.where(:handle => handle).to_a
   if !existing[0].nil? && File.mtime(rdf_file).utc < Time.parse(existing[0].modified_date) && !existing.empty?
     logger.info "Item " + existing[0].id + " already up to date"
     return existing[0], false
@@ -39,8 +39,7 @@ def create_item_from_file(corpus_dir, rdf_file)
     item.rdfMetadata.graph.insert(graph)
     item.label = item.rdfMetadata.graph.statements.first.subject
 
-    item.identifier = result.identifier.to_s
-    item.collection_name = collection_name
+    item.handle = handle
     item.collection = Collection.find_by_short_name(collection_name).first
 
     # Add Groups to the created item

@@ -18,8 +18,11 @@ class Item < HcsvlabActiveFedora
   has_many :documents, :property => :is_member_of
   belongs_to :collection, :property => :is_member_of_collection
 
-  delegate :identifier, to: 'descMetadata'
-  delegate :collection_name, to: 'descMetadata'
+  delegate :handle, to: 'descMetadata'
+
+  def flat_handle
+    return handle[0]
+  end
 
   #
   # Find an item using its collection name and id
