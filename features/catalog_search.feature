@@ -74,7 +74,7 @@ Feature: Searching for items
   Scenario: Search for term with asterisk in all metadata
     When I fill in "Metadata" with "Correspon*"
     And I press "search_metadata"
-    Then I should see "blacklight_results" table with
+    Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
       | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
       | cooee:1-002         | 10/11/1791   | Text                |

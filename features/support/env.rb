@@ -66,6 +66,9 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 
 require 'capybara/poltergeist'
 
+# for spreewald's table comparison steps
+require 'spreewald/table_steps'
+
 Capybara.register_driver :poltergeist do |app|
     Capybara::Poltergeist::Driver.new(app, {debug: false})
 end
