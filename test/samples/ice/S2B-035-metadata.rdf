@@ -1,0 +1,42 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ns1: <http://ns.ausnc.org.au/schemas/ice/> .
+@prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://ns.ausnc.org.au/corpora/ice/items/S2B-035> a ausnc:AusNCObject ;
+    ausnc:audience ausnc:massed ;
+    ausnc:channel "ABCTV" ;
+    ausnc:communication_context ausnc:distance ;
+    ausnc:communication_medium ausnc:television ;
+    ausnc:document <http://ns.ausnc.org.au/corpora/ice/source/S2B-035#Text> ;
+    ausnc:interactivity ausnc:monologue ;
+    ausnc:itemwordcount 2078 ;
+    ausnc:mode ausnc:spoken ;
+    ausnc:plaintextversion <http://ns.ausnc.org.au/corpora/ice/source/S2B-035#Text> ;
+    ausnc:source_type "broadcast" ;
+    ausnc:speechStyle ausnc:scripted ;
+    ns1:recordingplace "Corpus office" ;
+    dc:created "3/5/94" ;
+    dc:identifier "S2B-035" ;
+    dc:isPartOf corpus:ice ;
+    dc:subject "Antarctica" ;
+    dc:title "The Money or the Gun" ;
+    olac:language "eng" ;
+    olac:speaker <http://ns.ausnc.org.au/corpora/ice/person/S2B-035#A> .
+
+<http://ns.ausnc.org.au/corpora/ice/person/S2B-035#A> a foaf:Person ;
+    ausnc:role "speaker" ;
+    foaf:firstName "Andrew" ;
+    foaf:gender "male" ;
+    foaf:lastName "Denton" .
+
+<http://ns.ausnc.org.au/corpora/ice/source/S2B-035#Text> a foaf:Document ;
+    dc:extent 10858 ;
+    dc:identifier "S2B-035-plain.txt" ;
+    dc:source <file:///data/ausnc/ICE/S2B-035-plain.txt> ;
+    dc:title "S2B-035#Text" ;
+    dc:type "Text" .
+

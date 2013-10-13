@@ -1,6 +1,7 @@
 HcsvlabWeb::Application.routes.draw do
   root :to => "catalog#index"
 
+  get "catalog/search", :to => 'catalog#search', :as => 'catalog_search'
   Blacklight.add_routes(self)
   get "catalog/:id/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text'
   get "catalog/:id/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/
