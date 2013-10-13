@@ -169,6 +169,7 @@ class ItemList < ActiveRecord::Base
 
     # The variable adding now contains only the new ids
 
+    verifiedIds = []
     adding.each { |item_id|
         # Get the specified Item's Solr Document
         params = {:q=>"id:#{RSolr.escape(item_id.to_s)}"}
@@ -185,10 +186,14 @@ class ItemList < ActiveRecord::Base
             Rails.logger.warn "Multiple documents for Item #{item_id} in Solr"
         else
             #... and if we did, update it
-            update_solr_field(item_id, :item_lists, id)
+            #update_solr_field(item_id, :item_lists, id)
+            verifiedIds << item_id
             #patch_after_update(item_id)
         end
     }
+
+    update_solr_field_array(verifiedIds, :item_lists, id)
+
     bench_end = Time.now
     Rails.logger.debug("Time for adding #{adding.size} items to an item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
     profiler = ["Time for adding #{adding.size} items to an item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
@@ -382,6 +387,22 @@ class ItemList < ActiveRecord::Base
 
     @@solr.update :data => xml_update
   end
+
+  def update_solr_field_array(item_ids, field_id, field_value, mode='add')
+    docs = []
+    item_ids.each do |item_id|
+      doc1 = {:id => item_id, field_id => field_value}
+      docs << doc1
+    end
+      add_attributes = {:allowDups => false, :commitWithin => 10}
+
+      xml_update = @@solr.xml.add(docs, add_attributes) do |doc2|
+        doc2.field_by_name(field_id).attrs[:update] = mode
+      end
+
+    @@solr.update :data => xml_update
+  end
+
 
   def clear_solr_field(item_id, field_id)
     # TODO: ermm, this, properly (see http://wiki.apache.org/solr/UpdateXmlMessages#Optional_attributes_for_.22field.22

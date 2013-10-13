@@ -268,6 +268,8 @@ class CatalogController < ApplicationController
     @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
     Rails.logger.debug(@profiler.first)
 
+    params.delete(:fq)
+
     if !current_user.nil?
       @hasAccessToEveryCollection = true
       @hasAccessToSomeCollections = false
@@ -311,11 +313,13 @@ class CatalogController < ApplicationController
   end
 
   def annotations
+    bench_start = Time.now
     if Item.where(id: params[:id]).count != 0
       @response, @document = get_solr_response_for_doc_id
     end
     begin
-      @item = Item.find(params[:id])
+      @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
+
       if ( ! @item.datastreams["annotationSet1"].nil? )
         @type = params[:type]
         @label = params[:label]
@@ -326,10 +330,12 @@ class CatalogController < ApplicationController
       end
     rescue Exception => e
         # Fall through to return Not Found
-    end 
+    end
     respond_to do |format|
         format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
+    bench_end = Time.now
+    Rails.logger.debug("Time for retrieving annotations for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
   end
 
   def annotation_context
@@ -338,15 +344,21 @@ class CatalogController < ApplicationController
   end
 
   def primary_text
+    bench_start = Time.now
     begin
-        item = Item.find(params[:id])
-        send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
+      item = Item.find_and_load_from_solr({id: params[:id]}).first
+
+      response.header["Content-Length"] = item.primary_text.content.length.to_s
+      send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
+
+      bench_end = Time.now
+      Rails.logger.debug("Time for retrieving primary text for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
     rescue Exception => e
-        respond_to do |format|
-            format.html { flash[:error] = "Sorry, you have requested a document for an item that doesn't exist." 
-                          redirect_to root_path and return }
-            format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
-        end
+      respond_to do |format|
+        format.html { flash[:error] = "Sorry, you have requested a document for an item that doesn't exist."
+                      redirect_to root_path and return }
+        format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      end
     end
   end
 
@@ -375,6 +387,8 @@ class CatalogController < ApplicationController
           content = doc.datastreams['CONTENT1'].content[offset, length+1]
         else
           content = doc.datastreams['CONTENT1'].content
+          response.header["Content-Length"] = content.length.to_s
+
         end
 
         send_data content,
