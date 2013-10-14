@@ -1,9 +1,18 @@
-<% if query_has_constraints? %>
+<% if query_has_constraints? or !(params[:metadata].blank?)%>
   <div id="appliedParams" class="constraints-container">
     <div><span class="constraints-label"><%= t('blacklight.search.filters.title') %></span></div>
 
     <%= link_to t('blacklight.search.start_over'), url_for(:action => 'index'), :class => "catalog_startOverLink btn", :id => "startOverLink" %>
     <%= render_constraints(params) %>
 
+    <% if (!params[:metadata].blank?) %>
+      <%=
+          render_constraint_element("Metadata",
+                                    params[:metadata],
+                                    :classes => ["query"],
+                                    :remove => url_for(params.merge(:metadata=>nil, :action=>'index')))
+
+      %>
+    <% end %>
   </div>
 <% end %>

@@ -11,9 +11,7 @@
 
   <div class="facets-collapse">
     <% if user_signed_in? %>
-      <ul class="clearfix" id="searchbar">
-        <%= render_search_bar %>
-      </ul>
+      <%= render_search_bar %>
     <% end %>
   </div>
   <% if has_facet_values? %>
