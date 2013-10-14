@@ -25,6 +25,6 @@ staging2:
 production:
   user: fedoraAdmin
   password: fedoraAdmin
-  url: http://ic2-hcsvlab-v1-webapp-vm.intersect.org.au:8080/fedora
+  url: http://ic2-hcsvlab-prod-webapp-vm.intersect.org.au:8080/fedora
 cucumber:
   <<: *TEST
