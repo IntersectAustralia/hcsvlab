@@ -11,6 +11,18 @@ class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound, :with => :resource_not_found
   rescue_from ActiveFedora::ObjectNotFoundError, :with => :resource_not_found
 
+  #
+  # Returns application version
+  #
+  def version
+    respond_to do |format|
+      format.html {redirect_to root_path and return}
+
+      content = render_to_string(partial: 'shared/tag', :formats => [:html], :layout => false)
+      format.json { render :json => {:"API version" => content.strip}.to_json, :status => 200 }
+    end
+  end
+
   private
   def get_api_key
     params.delete(:api_key)
@@ -27,7 +39,7 @@ class ApplicationController < ActionController::Base
 
   def default_format_json
     if request.headers["HTTP_ACCEPT"].to_s.empty? && 
-       params[:format].to_s.empty?
+      params[:format].to_s.empty?
       request.format = "json"
     end
   end
