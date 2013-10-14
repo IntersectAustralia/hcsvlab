@@ -42,23 +42,23 @@ class ItemListsController < ApplicationController
   end
 
   def add_items
-    # if request.format == 'json'
-    #   name = request.query_parameters[:item_list]
-    #   if (!name.nil? and !name.blank?) and !request.request_parameters[:items].nil?
-    #     item_lists = current_user.item_lists.where(:name => name)
-    #     if item_lists.empty?
-    #       @item_list = ItemList.new(:name => name, :user_id => current_user.id)
-    #       @item_list.save!
-    #     else
-    #       @item_list = item_lists[0]
-    #     end
-    #     ids = request.request_parameters[:items].collect { |x| File.basename(x) }
-    #     addItemsResult = add_item_to_item_list(@item_list, ids)
-    #     @added_set = addItemsResult[:addedItems]
-    #   else
-    #     params[:error] = "List of items to add or item list name not given"
-    #   end
-    # else
+    if request.format == 'json'
+      name = request.query_parameters[:item_list]
+      if (!name.nil? and !name.blank?) and !request.request_parameters[:items].nil?
+        item_lists = current_user.item_lists.where(:name => name)
+        if item_lists.empty?
+          @item_list = ItemList.new(:name => name, :user_id => current_user.id)
+          @item_list.save!
+        else
+          @item_list = item_lists[0]
+        end
+        ids = request.request_parameters[:items].collect { |x| File.basename(x) }
+        addItemsResult = add_item_to_item_list(@item_list, ids)
+        @added_set = addItemsResult[:addedItems]
+      else
+        params[:error] = "List of items to add or item list name not given"
+      end
+    else
       if params[:add_all_items] == "true"
         documents = @item_list.getAllItemsFromSearch(params[:query_params])
       else
@@ -72,7 +72,7 @@ class ItemListsController < ApplicationController
 
       flash[:notice] = "#{view_context.pluralize(added_set.size, "")} added to item list #{@item_list.name}"
       redirect_to @item_list
-    # end
+    end
   end
 
   def clear
