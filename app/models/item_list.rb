@@ -192,7 +192,9 @@ class ItemList < ActiveRecord::Base
         end
     }
 
-    update_solr_field_array(verifiedIds, :item_lists, id)
+    if (!verifiedIds.empty?)
+      update_solr_field_array(verifiedIds, :item_lists, id)
+    end
 
     bench_end = Time.now
     Rails.logger.debug("Time for adding #{adding.size} items to an item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
