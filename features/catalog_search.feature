@@ -38,7 +38,8 @@ Feature: Searching for items
 
   @javascript
   Scenario: Search for simple term in all metadata
-    When I fill in "Metadata" with "monologue"
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with "monologue"
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
@@ -46,7 +47,8 @@ Feature: Searching for items
 
   @javascript
   Scenario: Search for two simple term in all metadata joined with AND
-    When I fill in "Metadata" with "University AND Romance"
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with "University AND Romance"
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
@@ -54,7 +56,8 @@ Feature: Searching for items
 
   @javascript
   Scenario: Search for two simple term in all metadata joined with OR
-    When I fill in "Metadata" with "University OR Romance"
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with "University OR Romance"
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
@@ -63,7 +66,8 @@ Feature: Searching for items
 
   @javascript
   Scenario: Search for term with tilde in all metadata
-    When I fill in "Metadata" with "Univarsoty~"
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with "Univarsoty~"
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
@@ -72,7 +76,8 @@ Feature: Searching for items
 
   @javascript
   Scenario: Search for term with asterisk in all metadata
-    When I fill in "Metadata" with "Correspon*"
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with "Correspon*"
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
@@ -82,7 +87,8 @@ Feature: Searching for items
   @javascript
   Scenario: Search for term with asterisk in all metadata and simple term in full_text
     When I fill in "q" with "can"
-    When I fill in "Metadata" with "Correspon*"
+    And I expand the facet Search Metadata
+    And I fill in "Metadata" with "Correspon*"
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Created Date | Type(s)             |

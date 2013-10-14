@@ -252,23 +252,29 @@ class CatalogController < ApplicationController
 
   # override default index method
   def index
-    metadataSearchParam = params[:metadata]
-    if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
-      if (metadataSearchParam.include?(":"))
-        params[:fq] = metadataSearchParam
-      else
-        params[:fq] = "all_metadata:(#{metadataSearchParam})"
+    begin
+      metadataSearchParam = params[:metadata]
+      if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
+        if (metadataSearchParam.include?(":"))
+          params[:fq] = metadataSearchParam
+        else
+          params[:fq] = "all_metadata:(#{metadataSearchParam})"
+        end
+        self.solr_search_params_logic += [:add_metadata_extra_filters]
       end
-      self.solr_search_params_logic += [:add_metadata_extra_filters]
+
+      bench_start = Time.now
+      super
+      bench_end = Time.now
+      @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
+      Rails.logger.debug(@profiler.first)
+
+      params.delete(:fq)
+    rescue RSolr::Error::Http => e
+      flash[:error] = "Sorry, error in search parameters."
+      redirect_to root_url and return
+
     end
-
-    bench_start = Time.now
-    super
-    bench_end = Time.now
-    @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
-    Rails.logger.debug(@profiler.first)
-
-    params.delete(:fq)
 
     if !current_user.nil?
       @hasAccessToEveryCollection = true
