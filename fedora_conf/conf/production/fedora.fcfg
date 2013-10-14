@@ -14,7 +14,7 @@
     <comment>Number of seconds Fedora http client will wait for data coming across an 
     established http connection.</comment>
   </param>
-  <param name="fedoraServerHost" value="hcsvlab-prod-webapp.intersect.org.au">
+  <param name="fedoraServerHost"  value="hcsvlab-prod-webapp.intersect.org.au">
     <comment>Defines the host name for the Fedora server, as seen from the 
     outside world.</comment>
   </param>
