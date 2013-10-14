@@ -318,6 +318,42 @@ class CatalogController < ApplicationController
     end
   end
 
+  def search
+    request.format = 'json'
+    metadataSearchParam = params[:metadata]
+    if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
+      if (metadataSearchParam.include?(":"))
+        params[:fq] = metadataSearchParam
+      else
+        params[:fq] = "all_metadata:(#{metadataSearchParam})"
+      end
+      self.solr_search_params_logic += [:add_metadata_extra_filters]
+    end
+
+    @@solr = RSolr.connect(Blacklight.solr_config)
+    params['rows'] = 1000
+    begin
+      @response = @@solr.get('select', params: params)
+    rescue Exception => e
+      respond_to do |format|
+        format.any { render :json => {:error => "bad-query"}.to_json, :status => 404 }
+      end
+      return
+    end
+
+    # If there are more rows in Solr than we asked for, increase the number we're
+    # asking for and ask for them all this time. Sadly, there doesn't appear to be
+    # a "give me everything" value for the rows parameter.
+    if @response["response"]["numFound"] > params['rows']
+      params['rows'] = @response["response"]["numFound"]
+      @response = @@solr.get('select', params: params)
+    end
+
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
   def annotations
     bench_start = Time.now
     if Item.where(id: params[:id]).count != 0

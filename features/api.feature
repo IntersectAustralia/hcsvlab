@@ -299,3 +299,58 @@ Feature: Browsing via API
       | json_path           | text                                                   |
       | $..annotations_url  | http://example.org/catalog/hcsvlab:1/annotations.json  |
       | $..primary_text_url | http://example.org/catalog/hcsvlab:1/primary_text.json |
+
+  Scenario: Search for simple term in all metadata
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "ice:S2B-035" with id "hcsvlab:3"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata   |
+      | monologue  |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:3"]}
+    """
+
+  Scenario: Search for two simple term in all metadata joined with AND via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "ice:S2B-035" with id "hcsvlab:2"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
+    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata               |
+      | University AND Romance |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:4"]}
+    """
+
+  Scenario: Search for two simple term in all metadata joined with OR via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "ice:S2B-035" with id "hcsvlab:2"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
+    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata              |
+      | University OR Romance |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":2,"items":["http://example.org/catalog/hcsvlab:3","http://example.org/catalog/hcsvlab:4"]}
+    """
+
+  Scenario: Search for term with asterisk in all metadata via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-002" with id "hcsvlab:2"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
+    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata   |
+      | Correspon* |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":2,"items":["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:2"]}
+    """
