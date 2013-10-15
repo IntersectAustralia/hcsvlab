@@ -381,6 +381,16 @@ Feature: Browsing via API
     {"success":"1 items added to existing item list cooee"}
     """
 
+  Scenario: Add items to an item list via the API without specifying a name
+    Given I make a JSON post request for the add items item lists page with the API token for "researcher1@intersect.org.au" with JSON params
+      | items                                    |
+      | ["http://example.org/catalog/hcsvlab:1"] |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"name parameter not found"}
+    """
+
   Scenario: Add items to an item list via the API without specifying a name or items to add
     Given I make a JSON post request for the add items item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | name |
@@ -388,5 +398,5 @@ Feature: Browsing via API
     Then I should get a 400 response code
     And the JSON response should be:
     """
-    {"error":"List of items to add or item list name not given"}
+    {"error":"name and items parameters not found"}
     """

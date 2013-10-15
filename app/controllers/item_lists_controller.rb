@@ -63,8 +63,12 @@ class ItemListsController < ApplicationController
           @success_message = "#{added_set.count} items added to existing item list #{@item_list.name}"
         end
       else
+        err_message = "name parameter" if name.nil? or name.blank?
+        err_message = "items parameter" if params[:items].nil?
+        err_message = "name and items parameters" if (name.nil? or name.blank?) and params[:items].nil?
+        err_message << " not found"
         respond_to do |format|
-          format.any { render :json => {:error => "List of items to add or item list name not given"}.to_json, :status => 400 }
+          format.any { render :json => {:error => err_message}.to_json, :status => 400 }
         end
       end
     else
