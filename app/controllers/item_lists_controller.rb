@@ -43,20 +43,29 @@ class ItemListsController < ApplicationController
 
   def add_items
     if request.format == 'json'
-      name = request.query_parameters[:item_list]
-      if (!name.nil? and !name.blank?) and !request.request_parameters[:items].nil?
+      name = params[:name]
+      if (!name.nil? and !name.blank?) and !params[:items].nil?
         item_lists = current_user.item_lists.where(:name => name)
         if item_lists.empty?
           @item_list = ItemList.new(:name => name, :user_id => current_user.id)
           @item_list.save!
+          new_item_list = true
         else
           @item_list = item_lists[0]
+          new_item_list = false
         end
-        ids = request.request_parameters[:items].collect { |x| File.basename(x) }
+        ids = params[:items].collect { |x| File.basename(x) }
         addItemsResult = add_item_to_item_list(@item_list, ids)
-        @added_set = addItemsResult[:addedItems]
+        added_set = addItemsResult[:addedItems]
+        if new_item_list
+          @success_message = "#{added_set.count} items added to new item list #{@item_list.name}"
+        else
+          @success_message = "#{added_set.count} items added to existing item list #{@item_list.name}"
+        end
       else
-        params[:error] = "List of items to add or item list name not given"
+        respond_to do |format|
+          format.any { render :json => {:error => "List of items to add or item list name not given"}.to_json, :status => 400 }
+        end
       end
     else
       if params[:add_all_items] == "true"

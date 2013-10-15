@@ -25,6 +25,19 @@ When /^I make a (JSON )?request for (.*) with the API token for "(.*)" with para
   end
 end
 
+When /^I make a JSON post request for (.*) with the API token for "(.*)" with JSON params$/ do |page_name, email, table|
+  user = User.find_by_email!(email)
+  hash = table.hashes.first
+  hash.each do |k, v|
+    begin
+      hash[k] = JSON.parse(v)
+    rescue
+      # not a json parameter, ignore
+    end
+  end
+  post path_to(page_name), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
+end
+
 When /^I make a (JSON )?request for (.*) with the API token for "(.*)" outside the header$/ do |json, page_name, email|
   user = User.find_by_email!(email)
   if json.present?
