@@ -1,0 +1,253 @@
+#!/usr/bin/env ruby
+
+require 'net/http'
+require 'json'
+require 'action_view'
+include ActionView::Helpers::NumberHelper
+
+##### HELPER METHODS
+
+#def calcSizeInkb(res)
+#  (res.body.size.to_f/1024).round(2)
+#end
+
+def millisecondsToReadableFormat(milliseconds)
+  mm, ss = (milliseconds/1000).divmod(60)
+  hh, mm = mm.divmod(60)
+  dd, hh = hh.divmod(24)
+  [dd, hh, mm, ss]
+end
+
+#######################
+
+if (ARGV.length != 3)
+  puts "Error: "
+  puts "Usage: ruby api_benchmark <HOST>:<PORT> <ITEM_LIST_ID> <API_KEY>"
+  abort
+end
+#HOST = "http://localhost:3000"
+#KEY = "zneSSswB4eHLo8Wnjqr6"
+#HOST = "http://ic2-hcsvlab-staging2-vm.intersect.org.au/"
+#KEY = "sU6iXn9zfvVc3HxM5mLX"
+
+ITEM_LISTS = "/item_lists"
+HOST = ARGV[0].to_s
+ITEM_LIST_ID = ARGV[1].to_s
+KEY = ARGV[2].to_s
+
+
+totalItems = 0
+totalItemsTime = 0
+
+totalDocuments = 0
+totalDocumentsSize = 0
+totalDocumentsTime = 0
+infoPerDocType = {}
+
+date = Time.new.strftime("%Y%m%d_%H%M%S")
+logFile = "log/benchmark/api_benchmark_#{date}.log"
+
+
+
+begin
+  whole_bench_start = Time.now
+
+  if (ITEM_LIST_ID.empty?)
+
+    # GETTING ITEM LISTS
+
+    itemListUri = URI(HOST + ITEM_LISTS)
+    req = Net::HTTP::Get.new(itemListUri)
+    req['X-API-KEY'] = KEY
+    req['Accept'] = "application/json"
+
+    res = Net::HTTP.start(itemListUri.hostname, itemListUri.port) {|http|
+      http.request(req)
+    }
+  end
+
+  # GETTING ONE ITEM LIST
+  if (ITEM_LIST_ID.empty?)
+    aItemListResponse = JSON.parse(res.body)
+    aItemListUri = URI(aItemListResponse[0]["item_list_url"])
+  else
+    aItemListUri = URI(HOST + ITEM_LISTS + "/" + ITEM_LIST_ID)
+  end
+
+  req = Net::HTTP::Get.new(aItemListUri)
+  req['X-API-KEY'] = KEY
+  req['Accept'] = "application/json"
+
+  res = Net::HTTP.start(aItemListUri.hostname, aItemListUri.port) {|http|
+    http.request(req)
+  }
+
+  # GETTING ONE ITEM ON A ITEM LIST
+  aItemResponse = JSON.parse(res.body)
+  if (aItemResponse["items"].nil?)
+    puts "ERROR: Item list #{ITEM_LIST_ID} not found or API_KEY is wrong"
+    abort
+  end
+  puts "Benchmarking an item list with #{aItemResponse["items"].length} items"
+  aItemResponse["items"].each do |aItem|
+    print "."
+    totalItems = totalItems + 1
+    STDOUT.flush
+
+    aItemUri = URI(aItem)
+
+    req = Net::HTTP::Get.new(aItemUri)
+    req['X-API-KEY'] = KEY
+    req['Accept'] = "application/json"
+
+    bench_start = Time.now
+    res = Net::HTTP.start(aItemUri.hostname, aItemUri.port) {|http|
+      http.request(req)
+    }
+    totalItemsTime = totalItemsTime + (Time.now.to_f - bench_start.to_f)
+
+    aItemJsonResponse = JSON.parse(res.body)
+
+    # GETTING PRIMARY TEXT
+    #primary_text_uri = URI(aItemJsonResponse['primary_text_url'])
+    #
+    #req = Net::HTTP::Get.new(primary_text_uri)
+    #req['X-API-KEY'] = "zneSSswB4eHLo8Wnjqr6"
+    #req['Accept'] = "application/json"
+    #
+    #res = Net::HTTP.start(primary_text_uri.hostname, primary_text_uri.port) {|http|
+    #  http.request(req)
+    #}
+
+    # GETTING ALL DOCUMENTS
+    aItemJsonResponse['documents'].each do |aDocument|
+
+      doc_uri = URI(aDocument['url'])
+
+      req = Net::HTTP::Get.new(doc_uri)
+      req['X-API-KEY'] = KEY
+      req['Accept'] = "application/json"
+
+      bench_start = Time.now
+      res = Net::HTTP.start(doc_uri.hostname, doc_uri.port) {|http|
+        http.request(req)
+      }
+      bench_end = Time.now
+
+      totalDocuments = totalDocuments + 1
+      totalDocumentsSize = totalDocumentsSize + res.body.size.to_f
+      totalDocumentsTime = totalDocumentsTime + ((bench_end.to_f - bench_start.to_f)*1000)
+
+      if (!infoPerDocType.has_key?(aDocument['type']))
+        infoPerDocType[aDocument['type']] = {amount: 0, totalFileSize: 0, timeDownloading: 0}
+      end
+      infoPerDocType[aDocument['type']][:amount] = infoPerDocType[aDocument['type']][:amount] + 1
+      infoPerDocType[aDocument['type']][:totalFileSize] = infoPerDocType[aDocument['type']][:totalFileSize] + res.body.size.to_f
+      infoPerDocType[aDocument['type']][:timeDownloading] = infoPerDocType[aDocument['type']][:timeDownloading] + (bench_end.to_f - bench_start.to_f)
+
+    end
+  end
+  puts ""
+  puts "*****************************************************************************************************"
+  puts "******                              SUMMARY                                                     *****"
+  puts "*****************************************************************************************************"
+
+  File.open(logFile, 'a') {|f|
+    f.write "*****************************************************************************************************"
+    f.write "******                              SUMMARY                                                     *****"
+    f.write "*****************************************************************************************************"
+  }
+rescue SystemExit, Interrupt
+  puts ""
+  puts "*****************************************************************************************************"
+  puts "******                              PROCESS ABORTED - SUMMARY                                   *****"
+  puts "*****************************************************************************************************"
+
+  File.open(logFile, 'a') {|f|
+    f.puts "*****************************************************************************************************"
+    f.puts "******                              PROCESS ABORTED - SUMMARY                                   *****"
+    f.puts "*****************************************************************************************************"
+  }
+rescue Exception => e
+  puts e.inspect
+  puts e.backtrace
+  puts ""
+  puts ""
+  puts "*****************************************************************************************************"
+  puts "******                       PROCESS ABORTED WITH ERROR - SUMMARY                               *****"
+  puts "*****************************************************************************************************"
+
+  File.open(logFile, 'a') {|f|
+    f.puts "*****************************************************************************************************"
+    f.puts "******                       PROCESS ABORTED WITH ERROR - SUMMARY                               *****"
+    f.puts "*****************************************************************************************************"
+  }
+end
+
+begin
+  File.open(logFile, 'a') {|f|
+    f.puts "Total Items: #{totalItems}"
+    f.puts "Each Item average time: #{((totalItemsTime*1000)/totalItems).round(0)} ms"
+
+    f.puts ""
+    f.puts ""
+
+    f.puts "Total documents: #{totalDocuments}"
+    f.puts "Total documents size: #{number_to_human_size(totalDocumentsSize, :precision => 2)}"
+    f.puts "Total documents time: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(totalDocumentsTime)
+    f.puts "Transfer average: #{number_to_human_size((totalDocumentsSize/(totalDocumentsTime/1000)), :precision => 2)}/s"
+
+    f.puts ""
+    f.puts ""
+
+    f.puts "Info per document type"
+    infoPerDocType.each_pair do |key, value|
+      f.puts "      #{key.to_s}:"
+      f.puts "          Amount: #{value[:amount]}"
+      f.puts "          Total size: #{number_to_human_size(value[:totalFileSize], :precision => 2)}"
+      f.puts "          Time for download: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(value[:timeDownloading]*1000)
+      f.puts "          Transfer average: #{number_to_human_size((value[:totalFileSize]/value[:timeDownloading]), :precision => 2)}/s"
+    end
+
+    f.puts ""
+    f.puts ""
+
+    f.puts "Whole process time: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(((Time.now.to_f - whole_bench_start.to_f)*1000))
+    f.puts "*****************************************************************************************************"
+    f.puts ""
+    f.puts ""
+  }
+rescue Exception
+  #do nothing
+end
+
+puts "Total Items: #{totalItems}"
+puts "Each Item average time: #{((totalItemsTime*1000)/totalItems).round(0)} ms"
+
+puts ""
+puts ""
+
+puts "Total documents: #{totalDocuments}"
+puts "Total documents size: #{number_to_human_size(totalDocumentsSize, :precision => 2)}"
+puts "Total documents time: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(totalDocumentsTime)
+puts "Transfer average: #{number_to_human_size((totalDocumentsSize/(totalDocumentsTime/1000)), :precision => 2)}/s"
+
+puts ""
+puts ""
+
+puts "Info per document type"
+infoPerDocType.each_pair do |key, value|
+  puts "      #{key.to_s}:"
+  puts "          Amount: #{value[:amount]}"
+  puts "          Total size: #{number_to_human_size(value[:totalFileSize], :precision => 2)}"
+  puts "          Time for download: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(value[:timeDownloading]*1000)
+  puts "          Transfer average: #{number_to_human_size((value[:totalFileSize]/value[:timeDownloading]), :precision => 2)}/s"
+end
+
+puts ""
+puts ""
+
+puts "Whole process time: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(((Time.now.to_f - whole_bench_start.to_f)*1000))
+puts "*****************************************************************************************************"
+puts ""
+puts ""
