@@ -355,6 +355,16 @@ Feature: Browsing via API
     {"num_results":2,"items":["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:2"]}
     """
 
+  Scenario: Search metadata via the API using a badly formed query
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata |
+      | :        |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"bad-query"}
+    """
+
   Scenario: Add items to a new item list via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "cooee:1-002" with id "hcsvlab:2"

@@ -336,7 +336,7 @@ class CatalogController < ApplicationController
       @response = @@solr.get('select', params: params)
     rescue Exception => e
       respond_to do |format|
-        format.any { render :json => {:error => "bad-query"}.to_json, :status => 404 }
+        format.any { render :json => {:error => "bad-query"}.to_json, :status => 400 }
       end
       return
     end
