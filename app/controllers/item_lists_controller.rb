@@ -28,21 +28,7 @@ class ItemListsController < ApplicationController
   end
   
   def create
-    if params[:all_items] == 'true'
-      documents = @item_list.getAllItemsFromSearch(params[:query_all_params])
-    else
-      documents = params[:sel_document_ids].split(",")
-    end
-    if @item_list.save
-      flash[:notice] = 'Item list created successfully'
-      addItemsResult = add_item_to_item_list(@item_list, documents)
-      session[:profiler] = addItemsResult[:profiler]
-      redirect_to @item_list
-    end
-  end
-
-  def add_items
-    if request.format == 'json'
+    if request.format == 'json' and request.post?
       name = params[:name]
       if (!name.nil? and !name.blank?) and !params[:items].nil?
         item_lists = current_user.item_lists.where(:name => name)
@@ -72,20 +58,34 @@ class ItemListsController < ApplicationController
         end
       end
     else
-      if params[:add_all_items] == "true"
-        documents = @item_list.getAllItemsFromSearch(params[:query_params])
+      if params[:all_items] == 'true'
+        documents = @item_list.getAllItemsFromSearch(params[:query_all_params])
       else
-        documents = params[:document_ids].split(",")
+        documents = params[:sel_document_ids].split(",")
       end
-
-      addItemsResult = add_item_to_item_list(@item_list, documents)
-      added_set = addItemsResult[:addedItems]
-
-      session[:profiler] = addItemsResult[:profiler]
-
-      flash[:notice] = "#{view_context.pluralize(added_set.size, "")} added to item list #{@item_list.name}"
-      redirect_to @item_list
+      if @item_list.save
+        flash[:notice] = 'Item list created successfully'
+        addItemsResult = add_item_to_item_list(@item_list, documents)
+        session[:profiler] = addItemsResult[:profiler]
+        redirect_to @item_list
+      end
     end
+  end
+
+  def add_items
+    if params[:add_all_items] == "true"
+      documents = @item_list.getAllItemsFromSearch(params[:query_params])
+    else
+      documents = params[:document_ids].split(",")
+    end
+
+    addItemsResult = add_item_to_item_list(@item_list, documents)
+    added_set = addItemsResult[:addedItems]
+
+    session[:profiler] = addItemsResult[:profiler]
+
+    flash[:notice] = "#{view_context.pluralize(added_set.size, "")} added to item list #{@item_list.name}"
+    redirect_to @item_list
   end
 
   def clear
