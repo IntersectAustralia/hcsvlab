@@ -142,6 +142,21 @@ Feature: Browsing via API
       | $..annotations_url  | http://example.org/catalog/hcsvlab:1/annotations.json  |
       | $..primary_text_url | http://example.org/catalog/hcsvlab:1/primary_text.json |
 
+  Scenario: Get item details should not return fields used for authorization
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should not have "$..discover_access_group_ssim"
+    And the JSON response should not have "$..read_access_group_ssim"
+    And the JSON response should not have "$..edit_access_group_ssim"
+    And the JSON response should not have "$..discover_access_person_ssim"
+    And the JSON response should not have "$..read_access_person_ssim"
+    And the JSON response should not have "$..edit_access_person_ssim"
+
+
 
   Scenario: Get item details for non-existent item (TODO: should return 404, probably?)
     Given I have user "researcher1@intersect.org.au" with the following groups

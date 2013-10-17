@@ -111,6 +111,27 @@ Then /^the JSON response should (not)?\s?have "([^"]*)" with the text "([^"]*)"$
   end
 end
 
+Then /^the JSON response should (not)?\s?have "([^"]*)"$/ do |negative, json_path|
+  json    = JSON.parse(last_response.body)
+  results = JsonPath.new(json_path).on(json).to_a.map(&:to_s)
+
+  if self.respond_to?(:should)
+    if negative.present?
+      results.should be_empty
+    else
+      results.should_not be_empty
+    end
+  else
+    if negative.present?
+      assert results.empty?
+    else
+      assert !results.empty?
+    end
+  end
+
+end
+
+
 Then /^the JSON response should (not)?\s?have$/ do |negative, table|
   table.hashes.each do |hash|
     json    = JSON.parse(last_response.body)

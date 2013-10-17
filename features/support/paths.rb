@@ -96,6 +96,10 @@ module NavigationHelpers
       when /^the search history page$/
         search_history_path(options)
 
+      when /^the eopas page for item "(.*)"$/
+        eopas_path($1, options)
+
+
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:
 #

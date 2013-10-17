@@ -76,3 +76,8 @@ Feature: Displaying Items in EOPAS
     And I follow "Back to Item Details"
     And I follow "Video_Eopas_transcript.xml"
     And I should see "Ipitlak nai iskei ito Ertap"
+
+
+  Scenario: Requesting an EOPAS item that doesn't exists
+    Given I am on the eopas page for item "hcsvlab:1"
+    Then I should see "Sorry, you have requested a record that doesn't exist."
