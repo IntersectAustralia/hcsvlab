@@ -125,3 +125,26 @@ Feature: Searching for items
       | Identifier          | Title                         | Created Date | Type(s)             |
       | austlit:adaessa.xml | Australian Essays             | 1886         | Original, Raw, Text |
       | austlit:bolroma.xml | A Romance of Canvas Town      | 1898         | Original, Raw, Text |
+
+  @javascript
+  Scenario: The metadata search should not search the full text
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with:
+    """
+    "Francis Adams"
+    """
+    And I press "search_metadata"
+    #And pause
+    Then I should see "blacklight_results" table with
+      | Identifier          | Title                         | Created Date | Type(s)             |
+      | austlit:adaessa.xml | Australian Essays             | 1886         | Original, Raw, Text |
+    Then I expand the facet Search Metadata
+    And I fill in "Metadata" with ""
+    And I fill in "q" with:
+    """
+    "Francis Adams"
+    """
+    And I press "search_metadata"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Title                         | Created Date | Type(s)             |
+
