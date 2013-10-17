@@ -93,3 +93,25 @@ Feature: Searching for items
     Then I should see "blacklight_results" table with
       | Identifier          | Created Date | Type(s)             |
       | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+
+  @javascript
+  Scenario: Search for term with field:value in all metadata
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with "AUSNC_discourse_type_tesim:letter"
+    And I press "search_metadata"
+    Then I should see a table with the following rows in any order:
+      | Identifier          | Created Date | Type(s)             |
+      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-002         | 10/11/1791   | Text                |
+
+  @javascript
+  Scenario: Search for term using ranges in all metadata
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with:
+    """
+    date_group_facet:"1880 - 1889"
+    """
+    And I press "search_metadata"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Created Date | Type(s)             |
+      | austlit:adaessa.xml | 1886         | Original, Raw, Text |

@@ -355,6 +355,30 @@ Feature: Browsing via API
     {"num_results":2,"items":["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:2"]}
     """
 
+  Scenario: Search metadata with field:value via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata                          |
+      | AUSNC_discourse_type_tesim:letter |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    """
+
+  Scenario: Search metadata with ranges via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata                       |
+      | date_group_facet:"1880 - 1889" |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:2"]}
+    """
+
   Scenario: Search metadata via the API using a badly formed query
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata |
