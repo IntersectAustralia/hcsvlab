@@ -370,10 +370,56 @@ Feature: Browsing via API
     {"num_results":2,"items":["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:2"]}
     """
 
+  Scenario: Search metadata with field:value via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata                          |
+      | AUSNC_discourse_type_tesim:letter |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    """
+
+  Scenario: Search metadata with quotes via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata                       |
+      | date_group_facet:"1880 - 1889" |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:2"]}
+    """
+
+  Scenario: Search metadata with ranges via the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata       |
+      | [1810 TO 1899] |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:2"]}
+    """
+
+  Scenario: Search metadata via the API using a badly formed query
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata |
+      | :        |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"bad-query"}
+    """
+
   Scenario: Add items to a new item list via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "cooee:1-002" with id "hcsvlab:2"
-    Given I make a JSON post request for the add items item lists page with the API token for "researcher1@intersect.org.au" with JSON params
+    Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | name  | items                                                                           |
       | cooee | ["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:2"] |
     Then I should get a 200 response code
@@ -387,7 +433,7 @@ Feature: Browsing via API
       | name  |
       | cooee |
     Given I ingest "cooee:1-002" with id "hcsvlab:1"
-    Given I make a JSON post request for the add items item lists page with the API token for "researcher1@intersect.org.au" with JSON params
+    Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | name  | items                                    |
       | cooee | ["http://example.org/catalog/hcsvlab:1"] |
     Then I should get a 200 response code
@@ -397,7 +443,7 @@ Feature: Browsing via API
     """
 
   Scenario: Add items to an item list via the API without specifying a name
-    Given I make a JSON post request for the add items item lists page with the API token for "researcher1@intersect.org.au" with JSON params
+    Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | items                                    |
       | ["http://example.org/catalog/hcsvlab:1"] |
     Then I should get a 400 response code
@@ -407,7 +453,7 @@ Feature: Browsing via API
     """
 
   Scenario: Add items to an item list via the API without specifying a name or items to add
-    Given I make a JSON post request for the add items item lists page with the API token for "researcher1@intersect.org.au" with JSON params
+    Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | name |
       |      |
     Then I should get a 400 response code

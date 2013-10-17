@@ -12,7 +12,4 @@
       %dt
         = field.first[0] + ":"
       %dd
-        - if field.first[0] == "RDF Type"
-          = File.basename(field.first[1])
-        - else
-          = field.first[1]
+        = field.first[1]
