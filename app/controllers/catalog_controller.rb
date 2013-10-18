@@ -362,9 +362,9 @@ class CatalogController < ApplicationController
     begin
       @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
 
-      if ( ! @item.datastreams["annotationSet1"].nil? )
-        @type = params[:type]
-        @label = params[:label]
+      if !@item.datastreams["annotationSet1"].nil?
+        @anns, @annotates_document = query_annotations(@item, @document, params[:type], params[:label])
+
         respond_to do |format|
             format.json {}
         end
@@ -483,4 +483,54 @@ class CatalogController < ApplicationController
     end
   end
 
-end 
+  #
+  # query the annotations for an item and return them along with the "primary" document
+  #
+  def query_annotations(item, solr_document, type, label)
+    uri = buildURI(item.id, 'annotationSet1')
+    repo = RDF::Repository.load(uri)
+    corpus = solr_document[MetadataHelper::short_form(MetadataHelper::COLLECTION)].first
+    queryConfig = YAML.load_file(Rails.root.join("config", "sparql.yml"))
+
+    q = "
+      PREFIX dada:<http://purl.org/dada/schema/0.2#>
+      PREFIX cp:<" + (queryConfig[corpus]['corpus_prefix'] unless queryConfig[corpus].nil?).to_s + ">
+      select * where
+      {
+        ?anno a dada:Annotation .
+        OPTIONAL { ?anno cp:val ?label . }
+        OPTIONAL { ?anno dada:type ?type . }
+        OPTIONAL {
+          ?anno dada:targets ?loc .
+          OPTIONAL { ?loc a ?region . }
+          OPTIONAL { ?loc dada:start ?start . }
+          OPTIONAL { ?loc dada:end ?end . }
+        }
+    "
+    if type.present?
+      q << "?anno dada:type '" + CGI.escape(type).to_s.strip + "' ."
+    end
+    if label.present?
+      q << "?anno cp:val '" + CGI.escape(label).to_s.strip + "' ."
+    end
+    q << "}"
+
+    query = SPARQL.parse(q)
+
+    # hacky way to find the "primary" document, need to make this standard in RDF
+    if !@item.primary_text.content.nil?
+      annotates_document = "#{catalog_primary_text_url(@item.id, format: :json)}"
+    else
+      uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
+      documents = item_documents(@document, uris)
+      if(documents.present?)
+        annotates_document = "#{catalog_document_url(@document.id, documents.first[MetadataHelper::IDENTIFIER])}"
+      else
+        annotates_document = "#{catalog_url(@item)}"
+      end
+    end
+
+    return query.execute(repo), annotates_document
+  end
+
+end

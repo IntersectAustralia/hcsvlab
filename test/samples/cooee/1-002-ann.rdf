@@ -1,0 +1,32 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix bio: <http://purl.org/vocab/bio/0.1/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dada: <http://purl.org/dada/schema/0.2#> .
+@prefix dbpedia: <http://dbpedia.org/resource/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geonam: <http://sws.geonames.org/> .
+@prefix geopol: <http://aims.fao.org/aos/geopolitical.owl#> .
+@prefix ns1: <http://ns.ausnc.org.au/schemas/cooee/> .
+@prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://ns.ausnc.org.au/schemas/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://ns.ausnc.org.au/corpora/cooee/annotation/0> a dada:Annotation ;
+    ns1:val "ai" ;
+    dada:partof <http://ns.ausnc.org.au/corpora/cooee/annotation/47b2599c-32b4-404d-8234-3d73923c77bd> ;
+    dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/0L> ;
+    dada:type "phonetic" .
+
+<http://ns.ausnc.org.au/corpora/cooee/annotation/0L> a dada:MillisecondRegion ;
+    dada:end 1.1548 ;
+    dada:start 1.1348 .
+
+<http://ns.ausnc.org.au/corpora/cooee/annotation/47b2599c-32b4-404d-8234-3d73923c77bd> a dada:AnnotationCollection ;
+    dada:annotates <http://ns.ausnc.org.au/corpora/cooee/items/1-002> .
+

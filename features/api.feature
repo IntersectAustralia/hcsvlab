@@ -179,6 +179,16 @@ Feature: Browsing via API
     {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"pageno","label":"11","start":2460.0,"end":2460.0},{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1","type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
     """
 
+  Scenario: Get annotations for item with different @type
+    Given I ingest "cooee:1-002" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    Then the JSON response should be:
+    """
+    {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"phonetic","label":"ai"},"annotations":[{"@type":"SecondAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"phonetic","label":"ai","start":1.1348,"end":1.1548}]}
+    """
+
   Scenario: Get annotation context
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     And "researcher1@intersect.org.au" has "read" access to collection "cooee"
@@ -190,8 +200,8 @@ Feature: Browsing via API
     """
 
   Scenario: Request annotations for item that doesn't have annotations
-    Given I ingest "cooee:1-002" with id "hcsvlab:2"
-    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
     When I make a JSON request for the catalog annotations page for "hcsvlab:2" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
