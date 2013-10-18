@@ -482,3 +482,13 @@ Feature: Browsing via API
     """
     {"success":"1 items added to new item list cooee"}
     """
+
+  Scenario: Add items to an item list via the API sending in items as string
+    Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
+      | name  | items                                |
+      | cooee | http://example.org/catalog/hcsvlab:1 |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"items parameter not an array"}
+    """

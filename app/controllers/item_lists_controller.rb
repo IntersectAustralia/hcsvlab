@@ -30,7 +30,7 @@ class ItemListsController < ApplicationController
   def create
     if request.format == 'json' and request.post?
       name = params[:name]
-      if (!name.nil? and !name.blank?) and !params[:items].nil?
+      if (!name.nil? and !name.blank?) and (!params[:items].nil? and params[:items].is_a? Array)
         item_lists = current_user.item_lists.where(:name => name)
         if item_lists.empty?
           @item_list = ItemList.new(:name => name, :user_id => current_user.id)
@@ -52,7 +52,8 @@ class ItemListsController < ApplicationController
         err_message = "name parameter" if name.nil? or name.blank?
         err_message = "items parameter" if params[:items].nil?
         err_message = "name and items parameters" if (name.nil? or name.blank?) and params[:items].nil?
-        err_message << " not found"
+        err_message << " not found" if !err_message.nil?
+        err_message = "items parameter not an array" if !params[:items].is_a? Array and err_message.nil?
         respond_to do |format|
           format.any { render :json => {:error => err_message}.to_json, :status => 400 }
         end

@@ -15,6 +15,11 @@ class TimestampingLogger
     @logger.tagged(DateTime.now, "Info") { @logger.info(message) }
   end
 
+  # required for request_exception_handler gem
+  def info?
+    return true
+  end
+
   def warn(message)
     @logger.tagged(DateTime.now, "Warning") { @logger.warn(message) }
   end
