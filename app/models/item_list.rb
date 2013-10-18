@@ -182,6 +182,7 @@ class ItemList < ActiveRecord::Base
             Rails.logger.warn "Badly formed response from Solr when searching for Item #{item_id}"
         elsif response["response"]["numFound"] == 0
             Rails.logger.warn "Cannot find Item #{item_id} in Solr"
+            adding.delete(item_id)
         elsif response["response"]["numFound"] > 1
             Rails.logger.warn "Multiple documents for Item #{item_id} in Solr"
         else
