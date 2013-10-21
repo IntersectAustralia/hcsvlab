@@ -78,7 +78,7 @@
                     = k[:item].licence.flat_text.html_safe
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
-                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Request Access
+                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal", onClick: "request_access_to('#{k[:type]}', '#{k[:item].id}');"} Request Access
               - if action == :cancel
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#request_cancel#{index}", :role => "button"} Cancel Request
                 .modal.hide.fade.in{:id => "request_cancel#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
@@ -87,7 +87,7 @@
                     %h3#myModalLabel= "Cancel access request to #{k[:item].flat_name}"
                   .modal-body{:title => "Cancel Request"}
                     %p#request_cancel{:readonly => "true"}
-                    = "Are you sure you want to cancel your request for access to #{k[:item].flat_short_name}?"
+                    = "Are you sure you want to cancel your request for access to #{k[:item].flat_name}?"
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Cancel Request
@@ -99,6 +99,11 @@
   = hidden_field_tag :type, nil,  {id: "type_for_accept_licence_terms"}
   = hidden_field_tag :coll_id, nil, {id: "coll_id_for_accept_licence_terms"}
 
+= form_tag({:controller => "users", :action => "send_licence_request"}, :id => "send_licence_request_form", :onSubmit => "showProgressAnimation();") do
+  = hidden_field_tag :type, nil,  {id: "type_for_send_licence_request"}
+  = hidden_field_tag :coll_id, nil, {id: "coll_id_for_send_licence_request"}
+
+
 :javascript
 
   function accept_licence_terms(coll_type, collection_id) {
@@ -107,7 +112,10 @@
     $("#accept_licence_terms_form").submit();
   };
 
-  function request_access_to(type, collection_id) {
+  function request_access_to(coll_type, collection_id) {
+    $("#type_for_send_licence_request").val(coll_type);
+    $("#coll_id_for_send_licence_request").val(collection_id);
+    $("#send_licence_request_form").submit();
   };
 
   function cancel_request_to(type, collection_id) {

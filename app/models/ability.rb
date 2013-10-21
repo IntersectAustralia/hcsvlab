@@ -46,6 +46,7 @@ class Ability
       can :approve, User
     end
     can :accept_licence_terms, User
+    can :send_licence_request, User
 
     ############################################################
     ##          PERMISSIONS OVER BLACKLIGHT CATALOG           ##

@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   belongs_to :role
   has_many :item_lists
   has_many :user_licence_agreements
-
+  has_many :user_licence_requests
 
   # Setup accessible attributes (status/approved flags should NEVER be accessible by mass assignment)
   attr_accessible :email, :password, :password_confirmation, :first_name, :last_name
@@ -200,6 +200,11 @@ class User < ActiveRecord::Base
     return false
   end
 
+  def has_requested_collection?(id)
+    return true if user_licence_requests.where(:request_id => id).count != 0
+    return false
+  end
+
   #
   # Removes the permission level defined by 'accessType' to the given 'collection'
   #
@@ -244,6 +249,12 @@ class User < ActiveRecord::Base
     if list.flat_ownerId == id.to_s
       # I am the owner of this collection.
       state = :owner
+    elsif self.has_requested_collection?(list.id)
+      state = :waiting
+    elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.privacy_status[0] == 'true'
+      state = :unapproved
+    elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.privacy_status[0] == 'false'
+      state = :not_accepted
     elsif self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
       state = :accepted
     else

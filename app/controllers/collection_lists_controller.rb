@@ -37,7 +37,7 @@ class CollectionListsController < ApplicationController
         collectionList.name = params[:collection_list][:name]
         collectionList.ownerEmail = current_user.email
         collectionList.ownerId = current_user.id.to_s
-        if (params[:collection_list][:privacy_status] == 1)
+        if (params[:collection_list][:privacy_status] == "1")
           collectionList.privacy_status = 'true'
         else 
           collectionList.privacy_status = 'false'

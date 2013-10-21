@@ -37,13 +37,14 @@ class Notifier < ActionMailer::Base
   end
 
     # notifications for super users
-  def notify_data_owners_of_license_request(user_license_request)
-    @request = user_license_request
-    owner_email = @request.user.email
+  def notify_data_owner_of_user_licence_request(user_licence_request)
+    @request = user_licence_request
+    @coll = @request.request
+    owner_email = @request.owner_email
     mail( :to => owner_email,
-          :from => APP_CONFIG['license_access_request_notification_sender'],
+          :from => APP_CONFIG['licence_access_request_notification_sender'],
           :reply_to => @request.user_email,
-          :subject => PREFIX + "There has been a new license access request for a collection")
+          :subject => PREFIX + "There has been a new licence access request for a collection")
   end
 
   def notify_user_that_they_cant_reset_their_password(user)

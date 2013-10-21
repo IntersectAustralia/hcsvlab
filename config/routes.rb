@@ -26,7 +26,6 @@ HcsvlabWeb::Application.routes.draw do
     delete "/account/delete_token", :to => "user_registers#delete_token" #allow users to delete their API token
   end
 
-
   resources :item_lists, :only => [:index, :show, :create, :destroy] do
       collection do
         post 'add_items'
@@ -60,6 +59,7 @@ HcsvlabWeb::Application.routes.draw do
           get :index
           get :admin
           post :accept_licence_terms
+          post :send_licence_request
         end
         member do
           put :reject
