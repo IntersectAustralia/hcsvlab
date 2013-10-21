@@ -271,6 +271,12 @@ class User < ActiveRecord::Base
     if coll.data_owner == self
       # I, like, totally data own this collection.
       state = :owner
+    elsif self.has_requested_collection?(coll.id)
+      state = :waiting
+    elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and coll.privacy_status[0] == 'true'
+      state = :unapproved
+    elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
+      state = :not_accepted
     elsif self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
       state = :accepted
     else

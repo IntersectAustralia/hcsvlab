@@ -96,6 +96,9 @@ HcsvlabWeb::Application.routes.draw do
         #end
       end
 
+      resources :user_licence_requests, :only => [:index], :path => "/collection_requests" do
+      end
+
     end
   end
 end
