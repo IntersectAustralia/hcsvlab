@@ -13,6 +13,8 @@
           %li
             %a{"data-toggle" => "modal", :href => "#get_r_script", :role => "button"} Use Item List in Emu/R
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
+          %li
+            = link_to("Download as ZIP", {:controller => "item_lists", :action => "download_as_zip"}, :method => 'GET', :id => params[:id].to_i)
       - if (@document_list.empty?)
       - else
         = render 'catalog/paginate_compact'

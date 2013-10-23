@@ -59,6 +59,9 @@ GEM
       multi_json (~> 1.0)
     addressable (2.3.5)
     arel (3.0.2)
+    bagit (0.3.2)
+      docopt (~> 0.5.0)
+      validatable (~> 1.6)
     bcrypt-ruby (3.0.1)
     blacklight (4.2.1)
       bootstrap-sass (>= 2.2.0, < 2.4)
@@ -131,6 +134,7 @@ GEM
       railties (~> 3.1)
       warden (~> 1.2.1)
     diff-lcs (1.2.4)
+    docopt (0.5.0)
     ebnf (0.3.0)
       rdf
       sxp
@@ -448,6 +452,7 @@ GEM
     uglifier (2.1.1)
       execjs (>= 0.3.0)
       multi_json (~> 1.0, >= 1.0.2)
+    validatable (1.6.7)
     warden (1.2.1)
       rack (>= 1.0)
     websocket (1.0.7)
@@ -470,6 +475,7 @@ PLATFORMS
 DEPENDENCIES
   activemessaging
   activerecord-tableless
+  bagit
   blacklight
   bootstrap-sass
   brakeman
@@ -509,6 +515,7 @@ DEPENDENCIES
   request_exception_handler
   rsolr
   rspec-rails
+  rubyzip
   rvm-capistrano
   sass-rails (~> 3.2.3)
   selenium-webdriver
