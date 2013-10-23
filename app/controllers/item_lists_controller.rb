@@ -2,7 +2,6 @@ class ItemListsController < ApplicationController
   include Blacklight::BlacklightHelperBehavior
   include Blacklight::Configurable
   include Blacklight::SolrHelper
-  include ItemMetadataHelper
 
   before_filter :authenticate_user!
   load_and_authorize_resource
@@ -293,10 +292,6 @@ class ItemListsController < ApplicationController
         handle = aDoc['handle'].gsub(":", "_")
         itemId = aDoc['id']
         fileNamesByItem[itemId][:handle] = handle
-
-
-        #json = get_item_metadata_in_json_format(aDoc)
-        #itemMetadata = json.to_json
 
         @document = aDoc
         renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
