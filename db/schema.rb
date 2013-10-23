@@ -56,8 +56,8 @@ ActiveRecord::Schema.define(:version => 20131021005313) do
   add_index "user_licence_agreements", ["user_id"], :name => "index_user_licence_agreements_on_user_id"
 
   create_table "user_licence_requests", :force => true do |t|
-    t.string   "request_type"
     t.string   "request_id"
+    t.string   "request_type"
     t.string   "owner_email"
     t.integer  "user_id"
     t.datetime "created_at",   :null => false

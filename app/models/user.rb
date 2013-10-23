@@ -205,6 +205,10 @@ class User < ActiveRecord::Base
     return false
   end
 
+  def requested_collection(id)
+    return user_licence_requests.where(:request_id => id)[0]
+  end
+
   #
   # Removes the permission level defined by 'accessType' to the given 'collection'
   #
@@ -251,6 +255,7 @@ class User < ActiveRecord::Base
       state = :owner
     elsif self.has_requested_collection?(list.id)
       state = :waiting
+      request = self.requested_collection(list.id)
     elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.privacy_status[0] == 'true'
       state = :unapproved
     elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.privacy_status[0] == 'false'
@@ -264,7 +269,8 @@ class User < ActiveRecord::Base
             :type => :collection_list,
             :state => state,
             :state_label => get_name_for_state(state),
-            :actions => get_actions_for_state(state)}
+            :actions => get_actions_for_state(state), 
+            :request => request}
   end
 
   def get_collection_licence_info(coll)
@@ -273,6 +279,7 @@ class User < ActiveRecord::Base
       state = :owner
     elsif self.has_requested_collection?(coll.id)
       state = :waiting
+      request = self.requested_collection(coll.id)
     elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and coll.privacy_status[0] == 'true'
       state = :unapproved
     elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
@@ -286,7 +293,8 @@ class User < ActiveRecord::Base
             :type => :collection,
             :state => state,
             :state_label => get_name_for_state(state),
-            :actions => get_actions_for_state(state)}
+            :actions => get_actions_for_state(state),
+            :request => request}
   end
 
   def get_name_for_state(state)

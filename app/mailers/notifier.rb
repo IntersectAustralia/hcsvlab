@@ -47,11 +47,30 @@ class Notifier < ActionMailer::Base
           :subject => PREFIX + "There has been a new licence access request for a collection")
   end
 
+  def notify_user_of_approved_collection_request(recipient, collection)
+    @user = recipient
+    @collection = collection
+    mail( :to => @user.email,
+          :from => APP_CONFIG['licence_access_request_response_sender'],
+          :reply_to => APP_CONFIG['licence_access_request_response_sender'],
+          :subject => PREFIX + "Your access request has been approved")
+  end
+
+  def notify_user_of_rejected_collection_request(recipient, collection, reason)
+    @user = recipient
+    @collection = collection
+    @reason = reason
+    mail( :to => @user.email,
+          :from => APP_CONFIG['licence_access_request_response_sender'],
+          :reply_to => APP_CONFIG['licence_access_request_response_sender'],
+          :subject => PREFIX + "Your access request has been rejected")
+  end
+
   def notify_user_that_they_cant_reset_their_password(user)
     @user = user
     mail( :to => @user.email,
-          :from => APP_CONFIG['password_reset_email_sender'],
-          :reply_to => APP_CONFIG['password_reset_email_sender'],
+          :from => APP_CONFIG['licence_access_request_response_sender'],
+          :reply_to => APP_CONFIG['licence_access_request_response_sender'],
           :subject => PREFIX + "Reset password instructions")
   end
 

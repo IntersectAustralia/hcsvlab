@@ -24,6 +24,7 @@ HcsvlabWeb::Application.routes.draw do
     put "/account/generate_token", :to => "user_registers#generate_token" #allow users to generate an API token
     get "/account/download_token", :to => "user_registers#download_token"
     delete "/account/delete_token", :to => "user_registers#delete_token" #allow users to delete their API token
+    delete "/account/licence_agreements/:id/cancel_request", :to => "user_licence_requests#cancel_request", :as => 'cancel_request'
   end
 
   resources :item_lists, :only => [:index, :show, :create, :destroy] do
@@ -97,6 +98,10 @@ HcsvlabWeb::Application.routes.draw do
       end
 
       resources :user_licence_requests, :only => [:index], :path => "/collection_requests" do
+        member do
+          put :approve_request
+          put :reject_request
+        end
       end
 
     end

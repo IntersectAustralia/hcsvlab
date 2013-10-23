@@ -15,4 +15,15 @@ class UserLicenceRequest < ActiveRecord::Base
     return CollectionList.find(self.request_id) if self.request_type == "collection_list"
   end
 
+  def approve
+  	if request.is_a? CollectionList
+      request.each do |coll|
+        self.user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
+      end
+    else
+      self.user.add_agreement_to_collection(request, UserLicenceAgreement::READ_ACCESS_TYPE)
+    end
+    self.destroy
+  end
+
 end

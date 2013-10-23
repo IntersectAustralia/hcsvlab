@@ -100,14 +100,24 @@ Then /^the Review and Acceptance of Licence Terms table should have$/ do |table|
 
 end
 
-And /^I have added a licence to Collection "([^"]*)"$/ do |name|
+And /^I have added a licence to (private )?Collection "([^"]*)"$/ do |priv, name|
   coll = Collection.find_by_short_name(name).to_a.first
   coll.setLicence(Licence.first.id)
+  if priv
+    coll.setPrivacy('true')
+  else
+    coll.setPrivacy('false')
+  end
 end
 
-And /^I have added a licence to Collection List "([^"]*)"$/ do |name|
+And /^I have added a licence to (private )?Collection List "([^"]*)"$/ do |priv, name|
   list = CollectionList.find_by_name(name)[0]
   list.setLicence(Licence.first.id)
+  if priv
+    list.setPrivacy('true')
+  else
+    list.setPrivacy('false')
+  end
 end
 
 And /^I click the action button in the (\d+)(?:|st|nd|rd|th) row of the "([^"]*)" table$/ do |position, table|

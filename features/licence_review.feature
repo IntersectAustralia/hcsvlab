@@ -59,6 +59,20 @@ Feature: Managing Subscriptions to Collections
       | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
 
   @javascript
+  Scenario: Verifying that other users; Private Collections and Private Collection Lists with a licence do appear on the Licence Agreements page
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection "austlit"
+    And I have added a licence to private Collection List "List_1"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence_agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state        | actions        |
+      | List_1  | 1          | data_owner@intersect.org.au | Unapproved   | Request Access |
+      | austlit | 1          | data_owner@intersect.org.au | Unapproved   | Request Access |
+
+  @javascript
   Scenario: Verifying that one can click through to the details of a collection
     And I am logged in as "data_owner@intersect.org.au"
     And I have added a licence to Collection "austlit"

@@ -47,6 +47,11 @@ class CollectionList < HcsvlabActiveFedora
     return CollectionList.where(name: name).all
   end
 
+  def setPrivacy(status)
+    self.privacy_status = status
+    self.save!
+  end
+
   # Query of privacy status
   def private?
     self[:privacy_status].first

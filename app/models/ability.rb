@@ -109,6 +109,8 @@ class Ability
 
     if user.is_data_owner?
       can :add_licence_to_collection, CollectionList, :ownerId => user.id
+      can :approve_request, UserLicenceRequest, :owner_email => user.email
+      can :reject_request, UserLicenceRequest, :owner_email => user.email
     end
   end
 

@@ -90,7 +90,8 @@
                     = "Are you sure you want to cancel your request for access to #{k[:item].flat_name}?"
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
-                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Cancel Request
+                    - unless k[:request].nil?
+                      %a= link_to "Cancel Request", cancel_request_path(k[:request]), { :method => :delete, :class => "btn btn-primary"}
   - unless done_some
     There are no licensed collections or collection lists visible in the system
 

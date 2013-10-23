@@ -30,9 +30,19 @@
       - else
         %td= link_to request.request.flat_name, collection_path(request.request)
       %td
-      /   - if can?(:approve, user) then
-      /     = link_to "Approve", edit_approval_user_path(user), :id => "approve_#{user.id}", :class => "btn btn-primary btn-mini"
-      /   - if can?(:reject, user) then
-      /     = link_to "Reject", reject_user_path(user), :method => :put, :id => "reject_#{user.id}", :class => "btn btn-danger btn-mini"
-      /     = link_to "Reject as Spam", reject_as_spam_user_path(user), :method => :put, :id => "reject_as_spam_#{user.id}", :class => "btn btn-warning btn-mini"
-      /   = link_to "View Details", user, :id => "view_#{user.id}", :class => "btn btn-mini"
+        = link_to "Approve", approve_request_user_licence_request_path(request), :method => :put, :id => "approve_#{request.id}", :class => "btn btn-primary btn-mini"
+
+        %a.btn.btn-danger.btn-mini{"data-toggle" => "modal", :href => "#reject_request#{index}", :role => "button"} Reject
+        .modal.hide.fade.in{:id => "reject_request#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+          .modal-header
+            %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+            %h3#myModalLabel= "Reject access request"
+          .modal-body{:title => "Reject Request"}
+            %p#reject_request{:readonly => "true"}
+            = form_tag reject_request_user_licence_request_path(request), {:method => :put, :id => "reject_form_#{request.id}"} do
+              = label_tag("reason", "Reason")
+              = text_field_tag "reason", nil
+              = submit_tag "Reject", :hidden => "true"
+          .modal-footer
+            %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+            %a.btn.btn-primary{:onclick => "$('#reject_form_#{request.id}').submit()"} Reject
