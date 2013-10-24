@@ -35,4 +35,11 @@ class Item < HcsvlabActiveFedora
       Rails.logger.warn "Multiple items for collection= #{collection} id= #{id}" if results.count > 1
       return Item.find(results[0])
   end
+
+  #
+  #
+  #
+  def hasPrimaryText?
+    !self.primary_text.size.nil?
+  end
 end

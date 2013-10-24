@@ -167,6 +167,8 @@ class ItemListsController < ApplicationController
   #
   def download_as_zip
     begin
+      cookies.delete("download_finished")
+
       bench_start = Time.now
 
       # Get the items of the item list
@@ -182,7 +184,7 @@ class ItemListsController < ApplicationController
                 :filename => file_name
 
       Rails.logger.debug("Time for downloading metadata and documents for #{itemsId.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
-
+      cookies["download_finished"] = {value:"true", expires: 1.minute.from_now}
       return
 
     rescue Exception => e
