@@ -68,9 +68,74 @@ Feature: Managing Subscriptions to Collections
     And I am logged in as "researcher@intersect.org.au"
     And I am on the licence_agreements page
     Then the Review and Acceptance of Licence Terms table should have
-      | title   | collection | owner                       | state        | actions        |
-      | List_1  | 1          | data_owner@intersect.org.au | Unapproved   | Request Access |
-      | austlit | 1          | data_owner@intersect.org.au | Unapproved   | Request Access |
+      | title   | collection | owner                       | state        |
+      | List_1  | 1          | data_owner@intersect.org.au | Unapproved   |
+      | austlit | 1          | data_owner@intersect.org.au | Unapproved   |
+
+  @javascript
+  Scenario: Requesting access to a private collection list
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection List "List_1"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence_agreements page
+    And I follow "Request Access"
+    And I follow element with id "request_access0"
+    Then the Review and Acceptance of Licence Terms table should have
+      | title  | collection | owner                       | state             |
+      | List_1 | 1          | data_owner@intersect.org.au | Awaiting Approval |
+
+  @javascript
+  Scenario: Requesting access to a private collection
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection "austlit"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence_agreements page
+    And I follow "Request Access"
+    And I follow element with id "request_access0"
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state             |
+      | austlit | 1          | data_owner@intersect.org.au | Awaiting Approval |
+
+  @javascript
+  Scenario: Viewing an access request as a data owner
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection "austlit"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence_agreements page
+    And I follow "Request Access"
+    And I follow element with id "request_access0"
+    And I follow "researcher@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "data_owner@intersect.org.au"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Admin"
+    And I follow "Manage Access To Collections"
+    Then I should be on the licence requests page
+    And I should see "access_requests" table with
+      | First name | Last name | Email                       | Collection/Collection List |
+      | Edmund     | Muir      | researcher@intersect.org.au | austlit                    |
+
+  @javascript
+  Scenario: Cancelling an access request to a collection
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection "austlit"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence_agreements page
+    And I follow "Request Access"
+    And I follow element with id "request_access0"
+    And I follow "Cancel Request"
+    And I follow element with id "request_cancel0"
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state      |
+      | austlit | 1          | data_owner@intersect.org.au | Unapproved |
 
   @javascript
   Scenario: Verifying that one can click through to the details of a collection

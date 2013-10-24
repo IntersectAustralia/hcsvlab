@@ -1,7 +1,7 @@
 class UserLicenceRequest < ActiveRecord::Base
 
   belongs_to :user
-  attr_accessible :request_type, :request_id, :owner_email
+  attr_accessible :request_type, :request_id, :owner_email, :approved
 
   validates_presence_of :request_type, :request_id, :owner_email
 
@@ -16,14 +16,8 @@ class UserLicenceRequest < ActiveRecord::Base
   end
 
   def approve
-  	if request.is_a? CollectionList
-      request.each do |coll|
-        self.user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
-      end
-    else
-      self.user.add_agreement_to_collection(request, UserLicenceAgreement::READ_ACCESS_TYPE)
-    end
-    self.destroy
+    self.approved = true
+    self.save!
   end
 
 end

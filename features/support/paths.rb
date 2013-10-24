@@ -99,6 +99,9 @@ module NavigationHelpers
       when /^the eopas page for item "(.*)"$/
         eopas_path($1, options)
 
+      when /^the licence requests page$/
+        user_licence_requests_path(options)
+
 
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:

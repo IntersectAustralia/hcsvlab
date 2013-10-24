@@ -102,6 +102,7 @@ class UsersController < ApplicationController
       @request.request_id = list.id
       @request.owner_email = list.collections.first.flat_ownerEmail
     end
+    @request.approved = false
     @request.save!
 
     Notifier.notify_data_owner_of_user_licence_request(@request).deliver
@@ -126,6 +127,8 @@ class UsersController < ApplicationController
       }
       name = list.flat_name
     end
+
+    current_user.accept_licence_request(coll_id)
 
     flash[:notice] = "Licence terms to #{type} #{name} accepted."
     redirect_to account_licence_agreements_path

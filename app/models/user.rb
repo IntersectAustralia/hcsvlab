@@ -219,6 +219,12 @@ class User < ActiveRecord::Base
     ula.delete if !ula.nil?
   end
 
+  def accept_licence_request(id)
+    if has_requested_collection?(id)
+      requested_collection(id).destroy
+    end
+  end
+
   # ===========================================================================
   # Licence management
   # ===========================================================================
@@ -253,8 +259,11 @@ class User < ActiveRecord::Base
     if list.flat_ownerId == id.to_s
       # I am the owner of this collection.
       state = :owner
-    elsif self.has_requested_collection?(list.id)
+    elsif self.has_requested_collection?(list.id) and !self.requested_collection(list.id).approved
       state = :waiting
+      request = self.requested_collection(list.id)
+    elsif self.has_requested_collection?(list.id) and self.requested_collection(list.id).approved
+      state = :approved
       request = self.requested_collection(list.id)
     elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.privacy_status[0] == 'true'
       state = :unapproved
@@ -277,9 +286,12 @@ class User < ActiveRecord::Base
     if coll.data_owner == self
       # I, like, totally data own this collection.
       state = :owner
-    elsif self.has_requested_collection?(coll.id)
+    elsif self.has_requested_collection?(coll.id) and !self.requested_collection(coll.id).approved
       state = :waiting
       request = self.requested_collection(coll.id)
+    elsif self.has_requested_collection?(coll.id) and self.requested_collection(coll.id).approved
+      state = :approved
+      request = self.requested_collection(coll.id) 
     elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and coll.privacy_status[0] == 'true'
       state = :unapproved
     elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
@@ -321,7 +333,7 @@ class User < ActiveRecord::Base
   def get_actions_for_state(state)
     case state
       when :unapproved
-        return %i(viewForRequest)
+        return %i(view viewForRequest)
       when :waiting
         return %i(view cancel)
       when :rejected

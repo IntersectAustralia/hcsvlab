@@ -4,6 +4,7 @@ class CreateUserLicenceRequest < ActiveRecord::Migration
       t.string :request_id
       t.string :request_type
       t.string :owner_email
+      t.boolean :approved
       t.references :user
 
       t.timestamps

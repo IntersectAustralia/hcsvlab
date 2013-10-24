@@ -40,9 +40,11 @@
           .modal-body{:title => "Reject Request"}
             %p#reject_request{:readonly => "true"}
             = form_tag reject_request_user_licence_request_path(request), {:method => :put, :id => "reject_form_#{request.id}"} do
-              = label_tag("reason", "Reason")
+              = label_tag("reason", "Please enter a reason for rejecting the access request. An email will be sent to #{request.user_email} notifying them that their request has been rejected, along with the reason for rejection.")
               = text_field_tag "reason", nil
               = submit_tag "Reject", :hidden => "true"
           .modal-footer
             %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
             %a.btn.btn-primary{:onclick => "$('#reject_form_#{request.id}').submit()"} Reject
+- if @requests.empty?
+  %p No requests to display

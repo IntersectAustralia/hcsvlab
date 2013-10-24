@@ -59,6 +59,7 @@ ActiveRecord::Schema.define(:version => 20131021005313) do
     t.string   "request_id"
     t.string   "request_type"
     t.string   "owner_email"
+    t.boolean  "approved"
     t.integer  "user_id"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false

@@ -67,21 +67,19 @@
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               - if action == :viewForRequest
-                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#request_access#{index}", :role => "button"} Request Access
-                .modal.hide.fade.in{:id => "request_access#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#request_access_modal#{index}", :role => "button"} Request Access
+                .modal.hide.fade.in{:id => "request_access_modal#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                    %h3#myModalLabel= "Licence terms for #{k[:item].flat_name}"
-                  .modal-body{:title => "Licence Terms"}
-                    %h4#myModalLabel= k[:item].licence.flat_name
-                    %p#request_access{:readonly => "true"}
-                    = k[:item].licence.flat_text.html_safe
+                    %h3#myModalLabel= "Request licence for #{k[:item].flat_name}"
+                  .modal-body{:title => "Request message"}
+                    %p#request_access{:readonly => "true"}= "Are you sure you want to request access to #{k[:item].flat_name}?"
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
-                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal", onClick: "request_access_to('#{k[:type]}', '#{k[:item].id}');"} Request Access
+                    %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal", :id => "request_access#{index}", onClick: "request_access_to('#{k[:type]}', '#{k[:item].id}');"} Request Access
               - if action == :cancel
-                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#request_cancel#{index}", :role => "button"} Cancel Request
-                .modal.hide.fade.in{:id => "request_cancel#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#request_cancel_modal#{index}", :role => "button"} Cancel Request
+                .modal.hide.fade.in{:id => "request_cancel_modal#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
                     %h3#myModalLabel= "Cancel access request to #{k[:item].flat_name}"
@@ -91,7 +89,7 @@
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     - unless k[:request].nil?
-                      %a= link_to "Cancel Request", cancel_request_path(k[:request]), { :method => :delete, :class => "btn btn-primary"}
+                      %a= link_to "Cancel Request", cancel_request_path(k[:request]), { :method => :delete, :class => "btn btn-primary", :id => "request_cancel#{index}"}
   - unless done_some
     There are no licensed collections or collection lists visible in the system
 
