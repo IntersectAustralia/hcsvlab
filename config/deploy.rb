@@ -115,6 +115,7 @@ end
 after 'deploy:update' do
   server_setup.logging.rotation
   server_setup.config.apache
+  deploy.new_secret
   deploy.restart
   deploy.additional_symlinks
   deploy.write_tag
@@ -250,6 +251,11 @@ namespace :deploy do
     backup.db.trim
     migrate
     restart
+  end
+
+  desc "Generates new Secret Token"
+  task :new_secret, :roles => :app do
+    run("cd #{current_path} && rake app:generate_secret", :env => {'RAILS_ENV' => "#{stage}"})
   end
 
   desc "Start ActiveMQ, Jetty, the A13g workers"

@@ -50,10 +50,10 @@ else
   end
 
   node(:primary_text_url) do
-    if Item.find(@document.id).primary_text.content.nil?
-      "No primary text found"
-    else
+    if Item.find_and_load_from_solr({id: @document.id}).first.hasPrimaryText?
       catalog_primary_text_url(@document.id, format: :json)
+    else
+      "No primary text found"
     end
   end
 
