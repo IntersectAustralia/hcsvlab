@@ -1,6 +1,7 @@
 # -*- encoding : utf-8 -*-
 require 'blacklight/catalog'
 require 'yaml'
+require "#{Rails.root}/lib/item/download_items_helper.rb"
 
 class CatalogController < ApplicationController
   # Set catalog tab as current selected
@@ -12,6 +13,9 @@ class CatalogController < ApplicationController
   include Blacklight::Catalog
   include Hydra::Controller::ControllerBehavior
   include Blacklight::BlacklightHelperBehavior
+
+  include Item::DownloadItemsHelper
+  include ERB::Util
 
   # These before_filters apply the hydra access controls
   before_filter :wrapped_enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations]
@@ -463,7 +467,79 @@ class CatalogController < ApplicationController
     end
   end
 
+
+  #
+  # This is an API method for downloading items' documents and metadata
+  #
+  def download_items
+    if (params[:items].present?)
+      itemsId = params[:items].collect { |x| File.basename(x) }
+
+      fileFormat = (params[:format].present?)? params[:format].to_s : "zip"
+
+
+      if ("zip" == fileFormat.downcase)
+        download_as_zip(itemsId, "items.zip")
+      elsif ("warc" == fileFormat.downcase)
+
+        #download_as_warc(itemsId)clear
+
+      end
+
+      return
+
+
+
+      return
+    end
+    respond_to do |format|
+      format.any { render :json => {:error => "Bad Request"}.to_json, :status => 400 }
+    end
+
+  end
+
   private
+
+  #
+  #
+  #
+  def download_as_zip(itemsId, file_name)
+    begin
+      bench_start = Time.now
+
+      # Creates a ZIP file containing the documents and item's metadata
+      zip_path = DownloadItemsInZipFormat.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
+        @document = aDoc
+        renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
+        itemMetadata = renderer.render
+        itemMetadata
+      end
+
+      # Sends the zipped file
+      send_data IO.read(zip_path), :type => 'application/zip',
+                :disposition => 'attachment',
+                :filename => file_name
+
+      Rails.logger.debug("Time for downloading metadata and documents for #{itemsId.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+      return
+
+    rescue Exception => e
+      Rails.logger.error(e.message + "\n " + e.backtrace.join("\n "))
+    ensure
+      # Ensure zipped file is removed
+      FileUtils.rm zip_path if !zip_path.nil?
+    end
+    respond_to do |format|
+      format.html {
+        flash[:error] = "Sorry, an unexpected error occur."
+        redirect_to @item_list and return
+      }
+      format.any { render :json => {:error => "Internal Server Error"}.to_json, :status => 500 }
+    end
+  end
+
+
+
 
   #
   # Add filter query when searching on metadata fields.
