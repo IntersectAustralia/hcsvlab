@@ -11,6 +11,8 @@ HcsvlabWeb::Application.routes.draw do
   get "catalog/:id/document/", :to => 'catalog#document', :as => 'catalog_document_api'
   get "catalog/:id/annotations", :to => 'catalog#annotations', :as => 'catalog_annotations'
 
+  post 'catalog/download_items', :to => 'catalog#download_items', :as => 'catalog_download_items_api'
+
   HydraHead.add_routes(self)
   
   devise_for :users, controllers: {registrations: "user_registers", passwords: "user_passwords"}
@@ -37,7 +39,7 @@ HcsvlabWeb::Application.routes.draw do
         get 'concordance_search'
         get 'frequency_search'
         get 'download_config_file'
-        get 'download_as_zip'
+        get 'download_item_list'
       end
   end
 

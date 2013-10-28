@@ -25,15 +25,25 @@ class ItemListsController < ApplicationController
       session.delete(:profiler)
     end
 
-    if ('zip' == request.format)
-      download_as_zip
-    else
-      @response = @item_list.get_items(params[:page], params[:per_page])
-      @document_list = @response["response"]["docs"]
-      respond_to do |format|
-        format.html { render :index }
-        format.json
+    if (params[:format].present?)
+      # Get the items of the item list
+      itemsId = @item_list.get_item_ids
+
+      if ("zip" == params[:format].to_s.downcase)
+        download_as_zip(itemsId, "#{@item_list.name}.zip")
+      elsif ("warc" == params[:format].to_s.downcase)
+
+        #download_as_warc(itemsId)clear
+
       end
+
+      return
+    end
+    @response = @item_list.get_items(params[:page], params[:per_page])
+    @document_list = @response["response"]["docs"]
+    respond_to do |format|
+      format.html { render :index }
+      format.json
     end
   end
   
@@ -162,20 +172,19 @@ class ItemListsController < ApplicationController
     send_file file.path, :filename => "hcsvlab.config", :disposition => "attachment"
   end
 
+  private
+
   #
   #
   #
-  def download_as_zip
+  def download_as_zip(itemsId, file_name)
     begin
       cookies.delete("download_finished")
 
       bench_start = Time.now
 
-      # Get the items of the item list
-      itemsId = @item_list.get_item_ids
-
       # Creates a ZIP file containing the documents and item's metadata
-      zip_path = DownloadItemsInZipFormat.new.createAndRetrieveZipPath(itemsId) do |aDoc|
+      zip_path = DownloadItemsInZipFormat.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
           @document = aDoc
           renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
           itemMetadata = renderer.render
@@ -183,7 +192,6 @@ class ItemListsController < ApplicationController
       end
 
       # Sends the zipped file
-      file_name = "#{@item_list.name}.zip"
       send_data IO.read(zip_path), :type => 'application/zip',
                 :disposition => 'attachment',
                 :filename => file_name
@@ -206,8 +214,6 @@ class ItemListsController < ApplicationController
       format.any { render :json => {:error => "Internal Server Error"}.to_json, :status => 500 }
     end
   end
-
-  private
 
   def add_item_to_item_list(item_list, documents_ids)
     item_list.add_items(documents_ids) unless item_list.nil?

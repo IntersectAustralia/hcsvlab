@@ -2,6 +2,8 @@ module Item::DownloadItemsHelper
   class DownloadItemsInZipFormat
     include Blacklight::Configurable
     include Blacklight::SolrHelper
+    include ActiveSupport::Rescuable
+    include Hydra::Controller::ControllerBehavior
 
     FIXNUM_MAX = 2147483647
     #
@@ -10,6 +12,21 @@ module Item::DownloadItemsHelper
     @@solr_config = nil
     @@solr = nil
 
+    # Indicate Hydra to add access control to the SOLR requests
+    self.solr_search_params_logic += [:add_access_controls_to_solr_params]
+    self.solr_search_params_logic += [:exclude_unwanted_models]
+
+    #
+    #
+    #
+    def initialize (current_user = nil, current_ability = nil)
+      @current_user = current_user
+      @current_ability = current_ability
+    end
+
+    #
+    #
+    #
     def createAndRetrieveZipPath(itemsId, &block)
       get_zip_with_documents_and_metadata(itemsId, &block)
     end
@@ -23,9 +40,15 @@ module Item::DownloadItemsHelper
     def get_zip_with_documents_and_metadata(itemsId, &block)
       if (!itemsId.nil? and !itemsId.empty?)
         begin
-          fileNamesByItem = get_documents_path(itemsId)
 
-          digest_filename = Digest::MD5.hexdigest(itemsId.inspect.to_s)
+          validatedIds = verifyItemsPermissions(itemsId)
+
+          valids = validatedIds[:valids]
+          invalids = validatedIds[:invalids]
+
+          fileNamesByItem = get_documents_path(valids)
+
+          digest_filename = Digest::MD5.hexdigest(valids.inspect.to_s)
           bagit_path = "#{Rails.root.join("tmp", "#{digest_filename}_tmp")}"
           Dir.mkdir bagit_path
 
@@ -37,6 +60,17 @@ module Item::DownloadItemsHelper
 
           # add items documents to the bag
           add_items_documents_to_the_bag(fileNamesByItem, bag)
+
+          # Add Log File
+          bag.add_file("log.json") do |io|
+            io.puts("Successful: #{valids.length} items.")
+            io.puts("")
+            io.puts("Unsuccessful: #{invalids.length} items.")
+
+            invalids.each do |invalidItemId|
+              io.puts("       #{invalidItemId.to_s}")
+            end
+          end
 
           # generate the manifest and tagmanifest files
           bag.manifest!
@@ -51,6 +85,35 @@ module Item::DownloadItemsHelper
           FileUtils.rm_rf bagit_path if !bagit_path.nil?
         end
       end
+    end
+
+    def verifyItemsPermissions(itemsId, batch_group=50)
+      valids = []
+      invalids = []
+
+      itemsId.in_groups_of(batch_group, false) do |groupOfItemsId|
+        # create disjunction condition with the items Ids
+        condition = groupOfItemsId.map{|itemId| "id:\"#{itemId.gsub(":", "\:")}\""}.join(" OR ")
+
+        params = {}
+        params[:q] = condition
+        params[:rows] = FIXNUM_MAX
+
+        (response, document_list) = get_search_results params
+        valids += document_list.map{|aDoc| aDoc.id}.flatten
+        invalids += groupOfItemsId - valids
+
+      end
+
+      {valids: valids, invalids: invalids}
+    end
+
+    def current_user
+      @current_user
+    end
+
+    def current_ability
+      @current_ability
     end
 
     #
@@ -104,18 +167,12 @@ module Item::DownloadItemsHelper
           itemId = aDoc['id']
           fileNamesByItem[itemId][:handle] = handle
 
-          #@document = aDoc
-          #renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => controller })
-          #itemMetadata = renderer.render
-
+          # Render the view as JSON
           itemMetadata = block.call aDoc
 
           bag.add_file("#{handle}/#{handle}-metadata.json") do |io|
             io.puts itemMetadata
           end
-
-          #puts "### Stat: " + GC.stat.inspect
-
         end
       end
     end
