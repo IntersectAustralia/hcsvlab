@@ -84,7 +84,7 @@ module NavigationHelpers
       when /^the collections page$/
         collections_path(options)
 
-      when /^the licence_agreements page$/
+      when /^the licence agreements page$/
         account_licence_agreements_path(options)
 
       when /^the document content page for file "(.*)" for item "(.*)"$/

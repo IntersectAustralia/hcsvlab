@@ -32,8 +32,8 @@
       %td
         = link_to "Approve", approve_request_user_licence_request_path(request), :method => :put, :id => "approve_#{request.id}", :class => "btn btn-primary btn-mini"
 
-        %a.btn.btn-danger.btn-mini{"data-toggle" => "modal", :href => "#reject_request#{index}", :role => "button"} Reject
-        .modal.hide.fade.in{:id => "reject_request#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+        %a.btn.btn-danger.btn-mini{"data-toggle" => "modal", :href => "#reject_request_modal#{index}", :role => "button"} Reject
+        .modal.hide.fade.in{:id => "reject_request_modal#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
           .modal-header
             %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
             %h3#myModalLabel= "Reject access request"
@@ -45,6 +45,6 @@
               = submit_tag "Reject", :hidden => "true"
           .modal-footer
             %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
-            %a.btn.btn-primary{:onclick => "$('#reject_form_#{request.id}').submit()"} Reject
+            %a.btn.btn-primary{:onclick => "$('#reject_form_#{request.id}').submit()", :id => "reject_request#{index}"} Reject
 - if @requests.empty?
   %p No requests to display

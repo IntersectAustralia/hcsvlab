@@ -24,7 +24,7 @@ Feature: Managing Subscriptions to Collections
   @javascript
   Scenario: Verifying that my Collections and Collection Lists with no licence do not appear on the Licence Agreements page
     Given I am logged in as "data_owner@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     Then I should see "There are no licensed collections or collection lists visible in the system"
 
   @javascript
@@ -32,7 +32,7 @@ Feature: Managing Subscriptions to Collections
     And I am logged in as "data_owner@intersect.org.au"
     And I have added a licence to Collection "austlit"
     And I have added a licence to Collection List "List_1"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state | actions |
       | List_1  | 1          | data_owner@intersect.org.au | Owner |         |
@@ -41,7 +41,7 @@ Feature: Managing Subscriptions to Collections
   @javascript
   Scenario: Verifying that other users' Collections and Collection Lists with no licence do not appear on the Licence Agreements page
     Given I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     Then I should see "There are no licensed collections or collection lists visible in the system"
 
   @javascript
@@ -52,7 +52,7 @@ Feature: Managing Subscriptions to Collections
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
@@ -66,7 +66,7 @@ Feature: Managing Subscriptions to Collections
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        |
       | List_1  | 1          | data_owner@intersect.org.au | Unapproved   |
@@ -79,7 +79,7 @@ Feature: Managing Subscriptions to Collections
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     And I follow "Request Access"
     And I follow element with id "request_access0"
     Then the Review and Acceptance of Licence Terms table should have
@@ -93,7 +93,7 @@ Feature: Managing Subscriptions to Collections
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     And I follow "Request Access"
     And I follow element with id "request_access0"
     Then the Review and Acceptance of Licence Terms table should have
@@ -107,7 +107,7 @@ Feature: Managing Subscriptions to Collections
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     And I follow "Request Access"
     And I follow element with id "request_access0"
     And I follow "researcher@intersect.org.au"
@@ -121,6 +121,11 @@ Feature: Managing Subscriptions to Collections
       | First name | Last name | Email                       | Collection/Collection List |
       | Edmund     | Muir      | researcher@intersect.org.au | austlit                    |
 
+  Scenario: Viewing an empty list of licence requests
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the licence requests page
+    Then I should see "No requests to display"
+
   @javascript
   Scenario: Cancelling an access request to a collection
     And I am logged in as "data_owner@intersect.org.au"
@@ -128,7 +133,7 @@ Feature: Managing Subscriptions to Collections
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     And I follow "Request Access"
     And I follow element with id "request_access0"
     And I follow "Cancel Request"
@@ -138,13 +143,125 @@ Feature: Managing Subscriptions to Collections
       | austlit | 1          | data_owner@intersect.org.au | Unapproved |
 
   @javascript
+  Scenario: Email to alert data owner of licence request
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection List "List_1"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence agreements page
+    And I follow "Request Access"
+    And I follow element with id "request_access0"
+    Then "data_owner@intersect.org.au" should receive an email
+    When I open the email
+    Then I should see "An access request to a collection has been made with the following details" in the email body
+
+  @javascript
+  Scenario: Approving a collection request
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection "austlit"
+    And there is a licence request for collection "austlit" by "researcher@intersect.org.au"
+    And I am on the licence requests page
+    And I follow "Approve"
+    Then "researcher@intersect.org.au" should receive an email
+    When I open the email
+    Then I should see "You made a request for access to austlit. Your request has been approved." in the email body
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state    |
+      | austlit | 1          | data_owner@intersect.org.au | Approved |
+
+  @javascript
+  Scenario: Approving a collection list request
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection List "List_1"
+    And there is a licence request for collection list "List_1" by "researcher@intersect.org.au"
+    And I am on the licence requests page
+    And I follow "Approve"
+    Then "researcher@intersect.org.au" should receive an email
+    When I open the email
+    Then I should see "You made a request for access to List_1. Your request has been approved." in the email body
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title  | collection | owner                       | state    |
+      | List_1 | 1          | data_owner@intersect.org.au | Approved |
+
+  @javascript
+  Scenario: Rejecting a collection request
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection "austlit"
+    And there is a licence request for collection "austlit" by "researcher@intersect.org.au"
+    And I am on the licence requests page
+    And I follow "Reject"
+    And I fill in "reason" with "rejected for unknown user"
+    And I follow element with id "reject_request0"
+    Then "researcher@intersect.org.au" should receive an email
+    When I open the email
+    Then I should see "You made a request for access to austlit. Your request has been rejected." in the email body
+    And I should see "rejected for unknown user" in the email body
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state      |
+      | austlit | 1          | data_owner@intersect.org.au | Unapproved |
+
+  @javascript
+  Scenario: Rejecting a collection list request
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection List "List_1"
+    And there is a licence request for collection list "List_1" by "researcher@intersect.org.au"
+    And I am on the licence requests page
+    And I follow "Reject"
+    And I fill in "reason" with "rejected for unknown user"
+    And I follow element with id "reject_request0"
+    Then "researcher@intersect.org.au" should receive an email
+    When I open the email
+    Then I should see "You made a request for access to List_1. Your request has been rejected." in the email body
+    And I should see "rejected for unknown user" in the email body
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title  | collection | owner                       | state      |
+      | List_1 | 1          | data_owner@intersect.org.au | Unapproved |
+
+  @javascript
+  Scenario: Accepting terms to private collection after successful request
+    And I am logged in as "data_owner@intersect.org.au"
+    And I have added a licence to private Collection "austlit"
+    And there is a licence request for collection "austlit" by "researcher@intersect.org.au"
+    And I am on the licence requests page
+    And I follow "Approve"
+    Then "researcher@intersect.org.au" should receive an email
+    When I open the email
+    Then I should see "You made a request for access to austlit. Your request has been approved." in the email body
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence agreements page
+    And I follow "Preview & Accept Licence Terms"
+    And I click "Accept" on the 1st licence dialogue
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state    |
+      | austlit | 1          | data_owner@intersect.org.au | Accepted |
+
+  @javascript
   Scenario: Verifying that one can click through to the details of a collection
     And I am logged in as "data_owner@intersect.org.au"
     And I have added a licence to Collection "austlit"
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | austlit | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
@@ -164,7 +281,7 @@ Feature: Managing Subscriptions to Collections
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
@@ -190,7 +307,7 @@ Feature: Managing Subscriptions to Collections
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
     And I am logged in as "researcher@intersect.org.au"
-    And I am on the licence_agreements page
+    And I am on the licence agreements page
     Then the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
