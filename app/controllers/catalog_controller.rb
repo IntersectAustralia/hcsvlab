@@ -474,7 +474,22 @@ class CatalogController < ApplicationController
   def download_items
     if (params[:items].present?)
       itemsId = params[:items].collect { |x| File.basename(x) }
-      download_as_zip(itemsId, "items.zip")
+
+      fileFormat = (params[:format].present?)? params[:format].to_s : "zip"
+
+
+      if ("zip" == fileFormat.downcase)
+        download_as_zip(itemsId, "items.zip")
+      elsif ("warc" == fileFormat.downcase)
+
+        #download_as_warc(itemsId)clear
+
+      end
+
+      return
+
+
+
       return
     end
     respond_to do |format|

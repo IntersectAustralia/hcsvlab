@@ -132,10 +132,12 @@ module Item::DownloadItemsHelper
         handle = (info[:handle].nil?)? itemId.gsub(":", "_") : info[:handle]
 
         filenames.each do |file|
-          title = file.split('/').last
-          # make a new file
-          bag.add_file("#{handle}/#{title}") do |io|
-            io.puts IO.read(file)
+          if (File.exist?(file))
+            title = file.split('/').last
+            # make a new file
+            bag.add_file("#{handle}/#{title}") do |io|
+              io.puts IO.read(file)
+            end
           end
         end
       end
