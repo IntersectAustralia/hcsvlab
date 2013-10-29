@@ -139,3 +139,19 @@ And /^I click "([^"]*)" on the (\d+)(?:|st|nd|rd|th) licence dialogue$/ do |name
   button = page.find(:xpath, "//div[@id='licence_preview#{position.to_i-1}']//a", :text => name)
   button.click
 end
+
+Given(/^there is a licence request for collection "(.*?)" by "(.*?)"$/) do |collection_name, email|
+  coll = Collection.find_by_short_name(collection_name)[0]
+  user = User.find_by_user_key(email)
+  req = UserLicenceRequest.new(:request_id => coll.id, :request_type => "collection", :owner_email => coll.flat_ownerEmail, :approved => false)
+  req.user = user
+  req.save!
+end
+
+Given(/^there is a licence request for collection list "(.*?)" by "(.*?)"$/) do |collection_name, email|
+  coll = CollectionList.find_by_name(collection_name)[0]
+  user = User.find_by_user_key(email)
+  req = UserLicenceRequest.new(:request_id => coll.id, :request_type => "collection_list", :owner_email => coll.flat_ownerEmail, :approved => false)
+  req.user = user
+  req.save!
+end
