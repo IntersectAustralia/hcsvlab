@@ -467,33 +467,27 @@ class CatalogController < ApplicationController
     end
   end
 
-
   #
   # This is an API method for downloading items' documents and metadata
   #
   def download_items
     if (params[:items].present?)
+
       itemsId = params[:items].collect { |x| File.basename(x) }
 
-      fileFormat = (params[:format].present?)? params[:format].to_s : "zip"
-
-
-      if ("zip" == fileFormat.downcase)
-        download_as_zip(itemsId, "items.zip")
-      elsif ("warc" == fileFormat.downcase)
-
-        #download_as_warc(itemsId)clear
-
+      respond_to do |format|
+        format.warc {
+          render :json => {:error => "Not Implemented"}.to_json, :status => 501
+          #download_as_warc(itemsId)clear
+        }
+        format.any {
+          download_as_zip(itemsId, "items.zip")
+        }
       end
-
-      return
-
-
-
-      return
-    end
-    respond_to do |format|
-      format.any { render :json => {:error => "Bad Request"}.to_json, :status => 400 }
+    else
+      respond_to do |format|
+        format.any { render :json => {:error => "Bad Request"}.to_json, :status => 400 }
+      end
     end
 
   end

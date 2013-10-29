@@ -25,25 +25,29 @@ class ItemListsController < ApplicationController
       session.delete(:profiler)
     end
 
-    if (params[:format].present?)
-      # Get the items of the item list
-      itemsId = @item_list.get_item_ids
-
-      if ("zip" == params[:format].to_s.downcase)
-        download_as_zip(itemsId, "#{@item_list.name}.zip")
-      elsif ("warc" == params[:format].to_s.downcase)
-
-        #download_as_warc(itemsId)clear
-
-      end
-
-      return
-    end
-    @response = @item_list.get_items(params[:page], params[:per_page])
-    @document_list = @response["response"]["docs"]
     respond_to do |format|
-      format.html { render :index }
-      format.json
+      format.html {
+        @response = @item_list.get_items(params[:page], params[:per_page])
+        @document_list = @response["response"]["docs"]
+
+        render :index
+      }
+      format.json {
+        @response = @item_list.get_items(params[:page], params[:per_page])
+        @document_list = @response["response"]["docs"]
+      }
+      format.zip {
+        # Get the items of the item list
+        itemsId = @item_list.get_item_ids
+
+        download_as_zip(itemsId, "#{@item_list.name}.zip")
+      }
+      format.warc {
+        # Get the items of the item list
+        itemsId = @item_list.get_item_ids
+
+        #download_as_warc(itemsId)
+      }
     end
   end
   
