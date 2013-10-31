@@ -24,6 +24,7 @@
               %span.btn
                 %input#allnonecheckbox{:onclick => "toggleCollection(this)", :type => "checkbox"}/
           %th.name Collection
+          %th.privacy Licence Type
           %th.collection Collection List
           %th.licence Licence
           %th.terms Licence Terms
@@ -35,6 +36,19 @@
                 %input.toggle_collection{:name => "#{aCollection.id}", :type => "checkbox", :id => "checkbox_collection_#{index}"}/
             %td.name
               = aCollection.flat_name
+            %td.privacy
+              -if aCollection.collectionList.nil?
+                .label.privacy_status
+                  -if aCollection.private?
+                    %span
+                      Personal Approval
+                    = link_to("", change_collection_privacy_collections_path(:id => aCollection.id, :privacy => "false"), :method => :put, :class=>"remove")
+                  -else
+                    %span
+                      Public
+                    = link_to("", change_collection_privacy_collections_path(:id => aCollection.id, :privacy => "true"), :method => :put, :class=>"remove")
+              -else
+                = (aCollection.collectionList.private?) ? "Personal Approval" : "Public"
             %td.collection
               -if !(aCollection.collectionList.nil?)
                 .label.licence

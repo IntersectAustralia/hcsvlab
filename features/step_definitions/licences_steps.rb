@@ -60,6 +60,16 @@ And /^I click on the remove icon for the (\d+)(?:|st|nd|rd|th) collection list$/
   link.click
 end
 
+And /^I click on the privacy remove icon for the (\d+)(?:|st|nd|rd|th) collection list$/ do |position|
+  link = page.find(:xpath,"//table[@id='collection_lists']//tr[#{position}]//td[@class='privacy']//a")
+  link.click
+end
+
+And /^I click on the privacy remove icon for the (\d+)(?:|st|nd|rd|th) collection$/ do |position|
+  link = page.find(:xpath,"//table[@id='collections']//tr[#{position}]//td[@class='privacy']//a")
+  link.click
+end
+
 And /^I click View Licence Terms for the (\d+)(?:|st|nd|rd|th) collection$/ do |position|
   link = page.find(:xpath,"//table[@id='collections']//tr[#{position}]//td[@class='terms']//a")
 

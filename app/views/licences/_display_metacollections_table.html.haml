@@ -11,6 +11,7 @@
         %thead
           %tr
             %th.name Collection List
+            %th.privacy Licence Type
             %th.owner Owner
             %th.licence Licence
             %th.status Licence Terms
@@ -33,7 +34,16 @@
                               =aCollection.flat_name
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
-
+              %td.privacy
+                .label.privacy_status
+                  -if coll_list.private?
+                    %span
+                      Personal Approval
+                    = link_to("", change_collection_list_privacy_collection_lists_path(:id => coll_list.id, :privacy => "false"), :method => :put, :class=>"remove")
+                  -else
+                    %span
+                      Public
+                    = link_to("", change_collection_list_privacy_collection_lists_path(:id => coll_list.id, :privacy => "true"), :method => :put, :class=>"remove")
               %td.owner= coll_list.flat_ownerEmail
               %td.licence
                 .css-dropdown

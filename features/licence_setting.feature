@@ -279,3 +279,51 @@ Feature: Managing Collection Lists and Licences
     And I fill in tiny_mce editor with ""
     And I press "Create"
     Then I should see "Licence Text can not be blank"
+
+  @javascript
+  Scenario: Change a collection list's privacy status
+    When I check "allnonecheckbox"
+    And I follow "Add selected to Collection list"
+    And I follow "Create New Collection List"
+    And I wait 2 seconds
+    And I fill in "Name" with "Collection List 1"
+    And I press "Create Collections List"
+    Then I click on the privacy remove icon for the 1st collection list
+    Then I should see "Collection List 1 has been successfully marked as public"
+
+  @javascript
+  Scenario: Change a collection's privacy status
+    Then I click on the privacy remove icon for the 1st collection
+    Then I should see "austlit has been successfully marked as requiring personal approval"
+
+  @javascript
+  Scenario: Change a collection's privacy status with pending licence requests
+    When I have users
+      | email                       | first_name   | last_name |
+      | researcher@intersect.org.au | researcher   | One       |
+    And "researcher@intersect.org.au" has role "researcher"
+    Then I click on the privacy remove icon for the 1st collection
+    And I should see "austlit has been successfully marked as requiring personal approval"
+    And there is a licence request for collection "austlit" by "researcher@intersect.org.au"
+    Then I click on the privacy remove icon for the 1st collection
+    And I should see "austlit has been successfully marked as public"
+    And I am on the licence requests page
+    Then I should see "No requests to display"
+
+  @javascript
+  Scenario: Change a collection list's privacy status with pending licence requests
+    When I have users
+      | email                       | first_name   | last_name |
+      | researcher@intersect.org.au | researcher   | One       |
+    And "researcher@intersect.org.au" has role "researcher"
+    When I check "allnonecheckbox"
+    And I follow "Add selected to Collection list"
+    And I follow "Create New Collection List"
+    And I wait 2 seconds
+    And I fill in "Name" with "Collection List 1"
+    And I press "Create Collections List"
+    And there is a licence request for collection list "Collection List 1" by "researcher@intersect.org.au"
+    Then I click on the privacy remove icon for the 1st collection list
+    And I should see "Collection List 1 has been successfully marked as public"
+    And I am on the licence requests page
+    Then I should see "No requests to display"

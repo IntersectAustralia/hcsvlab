@@ -100,6 +100,7 @@ def create_collection_from_file(collection_file, collection_name)
   coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s
   coll.uri = coll.label
   coll.short_name = collection_name
+  coll.privacy_status = "false"
 
   if Collection.find_by_uri(coll.uri).size != 0
     # There is already such a collection in the system

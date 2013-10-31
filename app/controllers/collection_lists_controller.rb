@@ -122,6 +122,18 @@ class CollectionListsController < ApplicationController
 
   end
 
+  def change_collection_list_privacy
+    collection_list = CollectionList.find(params[:id])
+    private = params[:privacy]
+    collection_list.setPrivacy(private)
+    if private=="false"
+      UserLicenceRequest.where(:request_id => collection_list.id).destroy_all
+    end
+    private=="true" ? state="requiring personal approval" : state="public"
+    flash[:notice] = "#{collection_list.flat_name} has been successfully marked as #{state}"
+    redirect_to licences_path
+  end
+
   private
 
   def add_collections_to_collection_list(collection_list, collections_ids)

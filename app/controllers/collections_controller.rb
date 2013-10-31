@@ -48,6 +48,18 @@ class CollectionsController < ApplicationController
     redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
   end
 
+  def change_collection_privacy
+    collection = Collection.find(params[:id])
+    private = params[:privacy]
+    collection.setPrivacy(private)
+    if private=="false"
+      UserLicenceRequest.where(:request_id => collection.id).destroy_all
+    end
+    private=="true" ? state="requiring personal approval" : state="public"
+    flash[:notice] = "#{collection.flat_name} has been successfully marked as #{state}"
+    redirect_to licences_path
+  end
+
   private
 
   #

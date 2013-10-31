@@ -80,6 +80,7 @@ HcsvlabWeb::Application.routes.draw do
       resources :collections, :only => [:new, :create], :path => "/collections" do
         collection do
           post 'add_licence_to_collection'
+          put 'change_collection_privacy'
         end
       end
 
@@ -88,6 +89,7 @@ HcsvlabWeb::Application.routes.draw do
           post 'add_collections'
           post 'add_licence_to_collection_list'
           get 'remove_collection'
+          put 'change_collection_list_privacy'
         end
       end
 

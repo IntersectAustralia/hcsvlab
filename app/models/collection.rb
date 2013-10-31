@@ -131,12 +131,12 @@ class Collection < HcsvlabActiveFedora
 
   # Query of privacy status
   def private?
-    self[:privacy_status]
+    self[:privacy_status].first == "true"
   end
 
   # Query of privacy status
   def public?
-    !self[:privacy_status]
+    self[:privacy_status].first == "false"
   end
 
   #
