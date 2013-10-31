@@ -289,7 +289,7 @@ Feature: Managing Collection Lists and Licences
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
     Then I click on the privacy remove icon for the 1st collection list
-    Then I should see "Collection List 1 has been successfully marked as public"
+    Then I should see "Collection List 1 has been successfully marked as requiring personal approval"
 
   @javascript
   Scenario: Change a collection's privacy status
@@ -321,6 +321,7 @@ Feature: Managing Collection Lists and Licences
     And I follow "Create New Collection List"
     And I wait 2 seconds
     And I fill in "Name" with "Collection List 1"
+    And I check "collection_list_privacy_status"
     And I press "Create Collections List"
     And there is a licence request for collection list "Collection List 1" by "researcher@intersect.org.au"
     Then I click on the privacy remove icon for the 1st collection list
