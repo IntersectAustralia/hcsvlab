@@ -62,14 +62,12 @@ module Item::DownloadItemsHelper
           add_items_documents_to_the_bag(fileNamesByItem, bag)
 
           # Add Log File
+          logJsonText = {}
+          logJsonText[:successful] = valids.length
+          logJsonText[:unsuccessful] = invalids.length
+          logJsonText[:unsuccessful_items] = invalids
           bag.add_file("log.json") do |io|
-            io.puts("Successful: #{valids.length} items.")
-            io.puts("")
-            io.puts("Unsuccessful: #{invalids.length} items.")
-
-            invalids.each do |invalidItemId|
-              io.puts("       #{invalidItemId.to_s}")
-            end
+            io.puts logJsonText.to_json
           end
 
           # generate the manifest and tagmanifest files

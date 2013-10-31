@@ -1261,13 +1261,13 @@ border: 1px solid #BCBCBC;
 /////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 @media only screen and (max-width : 1200px) {
-#searchbar input { width: 140px; }
+#searchbar input, .metadata-input-container input { width: 140px; }
 #item-list-search { width: 60px; }
 }
 
 
 @media only screen and (max-width : 980px) {
-#searchbar input { width: 85px; }
+#searchbar input, .metadata-input-container input { width: 85px; }
 }
 
 .mce-container-body.mce-fullscreen {
