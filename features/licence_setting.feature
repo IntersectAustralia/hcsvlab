@@ -324,7 +324,26 @@ Feature: Managing Collection Lists and Licences
     And I check "collection_list_privacy_status"
     And I press "Create Collections List"
     And there is a licence request for collection list "Collection List 1" by "researcher@intersect.org.au"
-    Then I click on the privacy remove icon for the 1st collection list
+    And I click on the privacy remove icon for the 1st collection list
     And I should see "Collection List 1 has been successfully marked as public"
+    And I am on the licence requests page
+    Then I should see "No requests to display"
+
+  @javascript
+  Scenario: Delete a collection list with pending licence requests
+    When I have users
+      | email                       | first_name   | last_name |
+      | researcher@intersect.org.au | researcher   | One       |
+    And "researcher@intersect.org.au" has role "researcher"
+    When I check "allnonecheckbox"
+    And I follow "Add selected to Collection list"
+    And I follow "Create New Collection List"
+    And I wait 2 seconds
+    And I fill in "Name" with "Collection List 1"
+    And I check "collection_list_privacy_status"
+    And I press "Create Collections List"
+    And there is a licence request for collection list "Collection List 1" by "researcher@intersect.org.au"
+    And I click on the remove icon for the 1st collection list
+    And I should see "Collection list Collection List 1 deleted successfully"
     And I am on the licence requests page
     Then I should see "No requests to display"

@@ -105,6 +105,7 @@ class CollectionListsController < ApplicationController
     collectionList = CollectionList.find(params[:id])
 
     name = collectionList.flat_name
+    UserLicenceRequest.where(:request_id => collectionList.id).destroy_all
     collectionList.delete
 
     Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
