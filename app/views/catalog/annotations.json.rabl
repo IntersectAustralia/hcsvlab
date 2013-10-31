@@ -1,6 +1,6 @@
 object @anns
 object @annotates_document
-node(:@vocab) { annotation_context_url }
+node(:@context) { annotation_context_url }
 data = []
 common = { :annotates => @annotates_document }
 common[:type] = @anns.first[:type].to_s if @anns.count > 0 and @anns.dup.filter(:type => @anns.first[:type].to_s).count == @anns.count

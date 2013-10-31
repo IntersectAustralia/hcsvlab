@@ -176,7 +176,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"pageno","label":"11","start":2460.0,"end":2460.0},{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1","type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
+    {"@context":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"pageno","label":"11","start":2460.0,"end":2460.0},{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1","type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
     """
 
   Scenario: Get annotations for item with different @type
@@ -186,7 +186,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"phonetic","label":"ai"},"annotations":[{"@type":"SecondAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"phonetic","label":"ai","start":1.1348,"end":1.1548}]}
+    {"@context":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"phonetic","label":"ai"},"annotations":[{"@type":"SecondAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"phonetic","label":"ai","start":1.1348,"end":1.1548}]}
     """
 
   Scenario: Get annotation context
@@ -221,7 +221,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"pageno","label":"11"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"pageno","label":"11","start":2460.0,"end":2460.0}]}
+    {"@context":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"pageno","label":"11"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/0","type":"pageno","label":"11","start":2460.0,"end":2460.0}]}
     """
 
   Scenario: Get specific annotations for item by type
@@ -235,7 +235,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     Then the JSON response should be:
     """
-    {"@vocab":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"ellipsis"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1","type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
+    {"@context":"http://example.org/schema/json-ld","commonProperties":{"annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json","type":"ellipsis"},"annotations":[{"@type":"TextAnnotation","@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1","type":"ellipsis","label":"","start":2460.0,"end":2460.0}]}
     """
 
   Scenario: Download primary_text from item
