@@ -23,7 +23,7 @@
     dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/0L> ;
     dada:type "phonetic" .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/0L> a dada:MillisecondRegion ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/0L> a dada:SecondRegion ;
     dada:end 1.1548 ;
     dada:start 1.1348 .
 
