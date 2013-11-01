@@ -60,6 +60,7 @@ Feature: Managing Item Lists
     And I toggle the select all checkbox
     And I follow "Add Selected to list"
     And I follow "Add Selected Test"
+    And I wait 2 seconds
     And I should be on the item list page for "Add Selected Test"
     And I should see "3 added to item list Add Selected Test"
     And the item list "Add Selected Test" should have 3 items

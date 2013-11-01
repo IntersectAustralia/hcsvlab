@@ -7,7 +7,7 @@ common[:type] = @anns.first[:type].to_s if @anns.count > 0 and @anns.dup.filter(
 common[:label] = @anns.first[:label].to_s if @anns.count > 0 and @anns.dup.filter(:label => @anns.first[:label].to_s).count == @anns.count
 node(:commonProperties) { common }
 
-type_lookup = {"http://purl.org/dada/schema/0.2#MillisecondRegion" => "SecondAnnotation", "http://purl.org/dada/schema/0.2#UTF8Region" => "TextAnnotation"}
+type_lookup = {"http://purl.org/dada/schema/0.2#SecondRegion" => "SecondAnnotation", "http://purl.org/dada/schema/0.2#UTF8Region" => "TextAnnotation"}
 
 node(:annotations) do
   hash = {}
