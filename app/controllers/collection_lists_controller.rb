@@ -135,6 +135,16 @@ class CollectionListsController < ApplicationController
     redirect_to licences_path
   end
 
+  def revoke_access
+    coll_list = CollectionList.find(params[:id])
+    UserLicenceRequest.where(:request_id => coll_list.id).destroy_all if coll_list.private?
+    coll_list.collections.each do |collection|
+      UserLicenceAgreement.where(:groupName => collection.flat_name + "-read").destroy_all
+    end
+    flash[:notice] = "All access to #{coll_list.flat_name} has been successfully revoked"
+    redirect_to licences_path
+  end
+
   private
 
   def add_collections_to_collection_list(collection_list, collections_ids)

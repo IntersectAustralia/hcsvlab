@@ -60,6 +60,14 @@ class CollectionsController < ApplicationController
     redirect_to licences_path
   end
 
+  def revoke_access
+    collection = Collection.find(params[:id])
+    UserLicenceRequest.where(:request_id => collection.id).destroy_all if collection.private?
+    UserLicenceAgreement.where(:groupName => collection.flat_name + "-read").destroy_all
+    flash[:notice] = "All access to #{collection.flat_name} has been successfully revoked"
+    redirect_to licences_path
+  end
+
   private
 
   #

@@ -27,6 +27,7 @@
           %th.privacy Licence Type
           %th.collection Collection List
           %th.licence Licence
+          %th.revoke_access Revoke Access
           %th.terms Licence Terms
       %tbody
         - @collections.each_with_index do |aCollection, index|
@@ -75,6 +76,19 @@
               -else
                 %span
                   =(aCollection.collectionList.licence.nil?)? "" :aCollection.collectionList.licence.flat_name
+            %td.revoke_access
+              -if aCollection.collectionList.nil? and !aCollection.licence.nil?
+                %a.btn.btn-danger.btn-mini{"data-toggle" => "modal", :href => "#revoke_access_modal#{index}", :role => "button"} Revoke Access
+                .modal.hide.fade.in{:id => "revoke_access_modal#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+                  .modal-header
+                    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+                    %h3#myModalLabel= "Revoke Access to Collection"
+                  .modal-body{:title => "Revoke Access"}
+                    %p#revoke_access{:readonly => "true"}
+                      = "Are you sure you want to revoke access to #{aCollection.flat_name} for all users?"
+                  .modal-footer
+                    %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+                    = link_to "Revoke Access", {:controller => :collections, :action => :revoke_access, :id => aCollection.id}, { :method => :put, :class => "btn btn-primary", :id => "revoke_access#{index}"}
             %td.terms
               -if (aCollection.licence.present?)
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms_collection#{index}", :role => "button"} View Licence Terms

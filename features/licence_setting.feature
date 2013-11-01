@@ -347,3 +347,53 @@ Feature: Managing Collection Lists and Licences
     And I should see "Collection list Collection List 1 deleted successfully"
     And I am on the licence requests page
     Then I should see "No requests to display"
+
+  @javascript
+  Scenario: Revoke access to a collection
+    When I have users
+      | email                        | first_name   | last_name |
+      | researcher1@intersect.org.au | researcher   | One       |
+      | researcher2@intersect.org.au | researcher   | Two       |
+    And "researcher1@intersect.org.au" has role "researcher"
+    And "researcher2@intersect.org.au" has role "researcher"
+    And I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | austlit        | read       |
+    And I click Add Licence for the 1st collection
+    And I follow "Creative Commons v3.0 BY-NC"
+    And I click on the privacy remove icon for the 1st collection
+    And I should see "austlit has been successfully marked as requiring personal approval"
+    And there is a licence request for collection "austlit" by "researcher2@intersect.org.au"
+    And I follow "Revoke Access"
+    And I follow element with id "revoke_access0"
+    Then I should see "All access to austlit has been successfully revoked"
+    And I am on the licence requests page
+    Then I should see "No requests to display"
+
+  @javascript
+  Scenario: Revoke access to a collection list
+    When I have users
+      | email                        | first_name   | last_name |
+      | researcher1@intersect.org.au | researcher   | One       |
+      | researcher2@intersect.org.au | researcher   | Two       |
+    And "researcher1@intersect.org.au" has role "researcher"
+    And "researcher2@intersect.org.au" has role "researcher"
+    And I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | austlit        | read       |
+    And I choose the 1st Collection in the list
+    And I follow "Add selected to Collection list"
+    And I follow "Create New Collection List"
+    And I wait 2 seconds
+    And I should see "Create New Collection list"
+    And I fill in "Name" with "Collection List 1"
+    And I check "collection_list_privacy_status"
+    And I press "Create Collections List"
+    And I click Add Licence for the 1st collection list
+    And I follow "Creative Commons v3.0 BY-NC"
+    And there is a licence request for collection list "Collection List 1" by "researcher2@intersect.org.au"
+    And I follow "Revoke Access"
+    And I follow element with id "revoke_list_access0"
+    Then I should see "All access to Collection List 1 has been successfully revoked"
+    And I am on the licence requests page
+    Then I should see "No requests to display"

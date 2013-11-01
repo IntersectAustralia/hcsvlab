@@ -81,6 +81,7 @@ HcsvlabWeb::Application.routes.draw do
         collection do
           post 'add_licence_to_collection'
           put 'change_collection_privacy'
+          put 'revoke_access'
         end
       end
 
@@ -90,6 +91,7 @@ HcsvlabWeb::Application.routes.draw do
           post 'add_licence_to_collection_list'
           get 'remove_collection'
           put 'change_collection_list_privacy'
+          put 'revoke_access'
         end
       end
 

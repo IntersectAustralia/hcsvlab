@@ -82,6 +82,10 @@ class Ability
       (user.email.eql? aCollection.flat_ownerEmail)
     end
 
+    can :revoke_access, Collection do |aCollection|
+      (user.email.eql? aCollection.flat_ownerEmail)
+    end
+
     # User can discover a collection only if he/she is the owner or if he/she was granted
     # with discover, read or edit access to that collection
     can :discover, Collection do |aCollection|
@@ -116,6 +120,7 @@ class Ability
       can :approve_request, UserLicenceRequest, :owner_email => user.email
       can :reject_request, UserLicenceRequest, :owner_email => user.email
       can :change_collection_list_privacy, CollectionList, :owner_email => user.email
+      can :revoke_access, CollectionList, :owner_email => user.email
     end
   end
 
