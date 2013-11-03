@@ -31,6 +31,7 @@ Feature: Managing Item Lists
     And I should see "Create New Item List"
     And I fill in "Name" with "Add All Test"
     And I press "Create List"
+    And I wait 5 seconds
     And I should be on the item list page for "Add All Test"
     And I should see "Item list created successfully"
     And the item list "Add All Test" should have 3 items
