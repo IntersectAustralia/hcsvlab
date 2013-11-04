@@ -358,6 +358,23 @@ namespace :deploy do
     run "cd $ACTIVEMQ_HOME && bin/activemq stop", :env => {'RAILS_ENV' => stage}
   end
 
+  desc "Start Galaxy"
+  task :start_galaxy, :role => :app do
+    run "cd $GALAXY_HOME && ./galaxy start", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Stop Galaxy"
+  task :stop_galaxy, :role => :app do
+    run "cd $GALAXY_HOME && ./galaxy stop", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Configure Galaxy"
+  task :configure_galaxy, :role => :app do
+    run "cp -p #{current_path}/galaxy_conf/universe_wsgi.ini $GALAXY_HOME/", :env => {'RAILS_ENV' => stage}
+    run "sed -i 's+__HCSVLAB_APP_URL__+#{server_url}+g' $GALAXY_HOME/universe_wsgi.ini"
+    run "sed -i 's+__GALAXY_PORT__+#{galaxy_port}+g' $GALAXY_HOME/universe_wsgi.ini"
+  end
+
   # We need to define our own cleanup task since there is an issue on Capistrano deploy:cleanup task
   #https://github.com/capistrano/capistrano/issues/474
   task :customcleanup, :except => {:no_release => true} do
