@@ -4,7 +4,7 @@ class UserLicenceAgreement < ActiveRecord::Base
   EDIT_ACCESS_TYPE = "edit"
 
   belongs_to :user
-  attr_accessible :groupName, :licenceId
+  attr_accessible :group_name, :licence_id
 
   def self.type_or_higher(access_type)
     case access_type

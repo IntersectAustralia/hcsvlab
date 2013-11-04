@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131021005313) do
+ActiveRecord::Schema.define(:version => 20131104014327) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -46,8 +46,8 @@ ActiveRecord::Schema.define(:version => 20131021005313) do
   add_index "searches", ["user_id"], :name => "index_searches_on_user_id"
 
   create_table "user_licence_agreements", :force => true do |t|
-    t.string   "groupName"
-    t.string   "licenceId"
+    t.string   "group_name"
+    t.string   "licence_id"
     t.integer  "user_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false

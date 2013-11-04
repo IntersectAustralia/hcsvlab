@@ -163,7 +163,7 @@ class User < ActiveRecord::Base
   end
 
   def groups
-    return self.user_licence_agreements.map{|a| a.groupName}
+    return self.user_licence_agreements.map{|a| a.group_name}
   end
 
   #
@@ -171,8 +171,8 @@ class User < ActiveRecord::Base
   #
   def add_agreement_to_collection(collection, accessType)
     ula = UserLicenceAgreement.new
-    ula.groupName = "#{collection.flat_short_name}-#{accessType}"
-    ula.licenceId = collection.licence.id if !collection.licence.nil?
+    ula.group_name = "#{collection.flat_short_name}-#{accessType}"
+    ula.licence_id = collection.licence.id if !collection.licence.nil?
     ula.user = self
     ula.save
   end
@@ -193,7 +193,7 @@ class User < ActiveRecord::Base
 
     user_licence_agreements.each { |ula|
       group_names.each { |gn|
-        return true if ula.groupName == gn
+        return true if ula.group_name == gn
       }
     }
 
@@ -213,8 +213,8 @@ class User < ActiveRecord::Base
   # Removes the permission level defined by 'accessType' to the given 'collection'
   #
   def remove_agreement_to_collection(collection, accessType)
-    groupName = "#{collection.flat_short_name}-#{accessType}"
-    ula = UserLicenceAgreement.where(:groupName=>groupName, :user_id=>self.id).first
+    group_name = "#{collection.flat_short_name}-#{accessType}"
+    ula = UserLicenceAgreement.where(:group_name=>group_name, :user_id=>self.id).first
 
     ula.delete if !ula.nil?
   end
