@@ -39,12 +39,13 @@
               = aCollection.flat_name
             %td.privacy
               -if aCollection.collectionList.nil?
-                .label.privacy_status
-                  -if aCollection.private?
+                -if aCollection.private?
+                  .label.privacy.personal
                     %span
                       Personal Approval
                     = link_to("", change_collection_privacy_collections_path(:id => aCollection.id, :privacy => "false"), :method => :put, :class=>"remove")
-                  -else
+                -else
+                  .label.privacy
                     %span
                       Public
                     = link_to("", change_collection_privacy_collections_path(:id => aCollection.id, :privacy => "true"), :method => :put, :class=>"remove")

@@ -36,12 +36,13 @@
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               %td.privacy
-                .label.privacy_status
-                  -if coll_list.private?
+                -if coll_list.private?
+                  .label.privacy.personal
                     %span
                       Personal Approval
                     = link_to("", change_collection_list_privacy_collection_lists_path(:id => coll_list.id, :privacy => "false"), :method => :put, :class=>"remove")
-                  -else
+                -else
+                  .label.privacy
                     %span
                       Public
                     = link_to("", change_collection_list_privacy_collection_lists_path(:id => coll_list.id, :privacy => "true"), :method => :put, :class=>"remove")

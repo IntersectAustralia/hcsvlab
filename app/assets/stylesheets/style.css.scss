@@ -78,10 +78,10 @@ textarea{
   z-index: 0;
 }
 
-.label.privacy_status {
+.label.privacy {
   padding: 4px 8px 4px 8px;
   padding-right: 27px;
-  background: #FFD875;
+  background: #EFEFEF;
   color: #444;
   font-weight: normal;
   border: 0px solid #f6b717;
@@ -94,6 +94,19 @@ textarea{
   overflow: hidden;
   text-overflow: ellipsis;
   z-index: 0;
+}
+
+.label.privacy .remove {
+  border-left: 1px solid #BBB;
+}
+
+.label.privacy.personal {
+  background: #00abff;
+  color: #FFF;
+}
+
+.label.privacy.personal .remove {
+  border-left: 1px solid #DDD;
 }
 
 .label .remove {
