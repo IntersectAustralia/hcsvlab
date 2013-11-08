@@ -1,5 +1,5 @@
 module Item::DownloadItemsHelper
-  class DownloadItemsInZipFormat
+  class DownloadItemsAsArchive
     include Blacklight::Configurable
     include Blacklight::SolrHelper
     include ActiveSupport::Rescuable
@@ -29,6 +29,13 @@ module Item::DownloadItemsHelper
     #
     def createAndRetrieveZipPath(itemsId, &block)
       get_zip_with_documents_and_metadata(itemsId, &block)
+    end
+
+    #
+    #
+    #
+    def createAndRetrieveWarcPath(itemsId, url, &block)
+      get_warc_with_documents_and_metadata(itemsId, url, &block)
     end
 
     private
@@ -85,6 +92,49 @@ module Item::DownloadItemsHelper
       end
     end
 
+    #
+    # Creates a WARC file containing all the documents and metadata for the items listed in 'itemsId'.
+    #
+    def get_warc_with_documents_and_metadata(itemsId, url, &block)
+      if (!itemsId.nil? and !itemsId.empty?)
+        begin
+          validatedIds = verifyItemsPermissions(itemsId)
+
+          valids = validatedIds[:valids]
+          invalids = validatedIds[:invalids]
+
+          fileNamesByItem = get_documents_path(valids)
+
+          digest_filename = Digest::MD5.hexdigest(valids.inspect.to_s)
+          archive_path = "#{Rails.root.join("tmp", "#{digest_filename}.warc")}"
+          logger.debug "WARC path is #{archive_path}"
+          warc = WARCWriter.new(archive_path)
+
+          warc.add_warcinfo(url, url)
+
+
+          base_url = url.sub(/item_lists.*/, "")
+          # add items metadata to the archive
+          add_items_metadata_to_the_warc(fileNamesByItem, warc, base_url, &block)
+
+          # add items documents to the archive
+          add_items_documents_to_the_warc(fileNamesByItem, warc, base_url)
+
+          # Add Log File
+          logJsonText = {}
+          logJsonText[:successful] = valids.length
+          logJsonText[:unsuccessful] = invalids.length
+          logJsonText[:unsuccessful_items] = invalids
+          warc.add_record_from_string({}, logJsonText.to_json)
+
+          archive_path
+        ensure
+          warc.close
+        end
+
+      end
+    end
+
     def verifyItemsPermissions(itemsId, batch_group=50)
       valids = []
       invalids = []
@@ -113,6 +163,14 @@ module Item::DownloadItemsHelper
     def current_ability
       @current_ability
     end
+
+
+
+    #
+    # =========================================================================
+    # Constructing a 'BagIt' format bag
+    # =========================================================================
+    #
 
     #
     # This method will add all the documents listed in 'fileNamesByItem' to the 'bag'
@@ -176,6 +234,83 @@ module Item::DownloadItemsHelper
         end
       end
     end
+    #
+    # End of Constructing a 'BagIt' format bag
+    # -------------------------------------------------------------------------
+    #
+
+
+
+    #
+    # =========================================================================
+    # Constructing a WARC file
+    # =========================================================================
+    #
+
+    #
+    # This method will add all the documents listed in 'fileNamesByItem' to the WARC
+    #
+    # fileNamesByItem = Hash structure containing the items id as key and the list of files as value
+    #                   Example:
+    #                           {"hcsvlab:1003"=>{handle: "handle1", files:["full_path1, full_path2, .."]} ,
+    #                            "hcsvlab:1034"=>{handle: "handle2", files:["full_path4, full_path5, .."]}}
+    # warc = A WARCWriter which has been opened for write.
+    #
+    def add_items_documents_to_the_warc(fileNamesByItem, warc, base_url)
+
+      fileNamesByItem.each_pair do |itemId, info|
+        filenames = info[:files]
+        handle = (info[:handle].nil?)? itemId.gsub(":", "_") : info[:handle]
+
+        filenames.each do |file|
+          if (File.exist?(file))
+            title = file.split('/').last
+            # make a new file
+            warc.add_record_from_file({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}/document/#{title}"}, file)
+          else
+            logger.warn("Document file #{file} does not exist (part of Item #{itemId}")
+          end
+        end
+      end
+    end
+
+    #
+    # This method will add each item metadata for the items listed in 'fileNamesByItem' to the WARC
+    # It will also modify the parameter 'fileNamesByItem' to set the item handle
+    #
+    # fileNamesByItem = Hash structure containing the items id as key and the list of files as value
+    #                   Example:
+    #                           {"hcsvlab:1003"=>{handle: "handle1", files:["full_path1, full_path2, .."]} ,
+    #                            "hcsvlab:1034"=>{handle: "handle2", files:["full_path4, full_path5, .."]}}
+    # warc = A WARCWriter which has been opened for write.
+    #
+    def add_items_metadata_to_the_warc(fileNamesByItem, warc, base_url, batch_group = 50, &block)
+      itemsId = fileNamesByItem.keys
+      itemsId.in_groups_of(batch_group, false) do |groupOfItemsId|
+        # create disjunction condition with the items Ids
+        condition = groupOfItemsId.map{|itemId| "id:\"#{itemId.gsub(":", "\:")}\""}.join(" OR ")
+
+        params = {}
+        params[:q] = condition
+        params[:rows] = FIXNUM_MAX
+
+        (response, document_list) = get_search_results params
+        document_list.each do |aDoc|
+          handle = aDoc['handle'].gsub(":", "_")
+          itemId = aDoc['id']
+          fileNamesByItem[itemId][:handle] = handle
+
+          # Render the view as JSON
+          itemMetadata = block.call aDoc
+          warc.add_record_from_string({"WARC-Type" => "metadata", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}.json"}, itemMetadata)
+        end
+      end
+    end
+
+    #
+    # End of Constructing a WARC file
+    # -------------------------------------------------------------------------
+    #
 
     #
     # Retrieves the path for the documents which belong to the items listed in 'itemsId'

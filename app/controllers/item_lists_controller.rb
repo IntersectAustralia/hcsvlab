@@ -46,7 +46,7 @@ class ItemListsController < ApplicationController
         # Get the items of the item list
         itemsId = @item_list.get_item_ids
 
-        #download_as_warc(itemsId)
+        download_as_warc(itemsId, "#{@item_list.name}.warc")
       }
     end
   end
@@ -188,11 +188,11 @@ class ItemListsController < ApplicationController
       bench_start = Time.now
 
       # Creates a ZIP file containing the documents and item's metadata
-      zip_path = DownloadItemsInZipFormat.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
-          @document = aDoc
-          renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
-          itemMetadata = renderer.render
-          itemMetadata
+      zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
+        @document = aDoc
+        renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
+        itemMetadata = renderer.render
+        itemMetadata
       end
 
       # Sends the zipped file
@@ -209,6 +209,47 @@ class ItemListsController < ApplicationController
     ensure
       # Ensure zipped file is removed
       FileUtils.rm zip_path if !zip_path.nil?
+    end
+    respond_to do |format|
+      format.html {
+        flash[:error] = "Sorry, an unexpected error occur."
+        redirect_to @item_list and return
+      }
+      format.any { render :json => {:error => "Internal Server Error"}.to_json, :status => 500 }
+    end
+  end
+
+  #
+  #
+  #
+  def download_as_warc(itemsId, file_name)
+    begin
+      cookies.delete("download_finished")
+
+      bench_start = Time.now
+
+      # Creates a WARC file containing the documents and item's metadata
+      archive_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveWarcPath(itemsId, request.original_url) do |aDoc|
+        @document = aDoc
+        renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
+        itemMetadata = renderer.render
+        itemMetadata
+      end
+
+      # Sends the archive file
+      send_data IO.read(archive_path), :type => 'application/warc',
+                :disposition => 'attachment',
+                :filename => file_name
+
+      Rails.logger.debug("Time for downloading metadata and documents for #{itemsId.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+      cookies["download_finished"] = {value:"true", expires: 1.minute.from_now}
+      return
+
+    rescue Exception => e
+      Rails.logger.error(e.message + "\n " + e.backtrace.join("\n "))
+    ensure
+      # Ensure archive file is removed
+      FileUtils.rm archive_path if !archive_path.nil?
     end
     respond_to do |format|
       format.html {
