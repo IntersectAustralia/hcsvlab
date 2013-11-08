@@ -36,6 +36,7 @@ def create_item_from_file(corpus_dir, rdf_file)
     return update_item_from_file(existing[0], graph, result), true
   else
     item = Item.new
+    item.save!
 
     item.rdfMetadata.graph.insert(graph)
     item.label = item.rdfMetadata.graph.statements.first.subject
@@ -55,7 +56,6 @@ def create_item_from_file(corpus_dir, rdf_file)
       item.set_edit_users([data_owner], [])
     end
 
-    item.save!
     logger.info "Item = #{item.pid} created"
     return item, true
   end
