@@ -72,3 +72,14 @@ Given /^"([^"]*)" has an api token$/ do |email|
   user = User.where(:email => email).first
   user.reset_authentication_token!
 end
+
+Given(/^"(.*?)" has the following past sessions$/) do |email, table|
+  user = User.find_by_email(email)
+  table.hashes.each do |row|
+    days_ago = row[:sign_in_time].scan(/\d/).join('')
+    s = UserSession.new(:sign_in_time => days_ago.to_i.days.ago)
+    s.sign_out_time = s.sign_in_time + row[:duration_in_minutes].to_i.minutes
+    s.user = user
+    s.save
+  end
+end

@@ -121,3 +121,39 @@ Feature: Administer users
     And I follow "Logout"
     And I am on the admin page
     Then I should see "Please enter your email and password to log in"
+
+  Scenario: Count of total researcher visits and weekly frequency is shown on user list page
+    Given I have users
+      | email                        | first_name | last_name |
+      | researcher1@intersect.org.au | Researcher | One       |
+      | researcher2@intersect.org.au | Researcher | Two       |
+    And "researcher1@intersect.org.au" has role "researcher"
+    And "researcher2@intersect.org.au" has role "researcher"
+    And "researcher1@intersect.org.au" has the following past sessions
+      | sign_in_time | duration_in_minutes |
+      | 3_DAYS_AGO   | 10                  |
+      | 4_DAYS_AGO   | 30                  |
+      | 8_DAYS_AGO   | 60                  |
+      | 10_DAYS_AGO  | 5                   |
+      | 15_DAYS_AGO  | 40                  |
+      | 16_DAYS_AGO  | 20                  |
+    And "researcher2@intersect.org.au" has the following past sessions
+      | sign_in_time | duration_in_minutes |
+      | 2_DAYS_AGO   | 30                  |
+      | 3_DAYS_AGO   | 10                  |
+      | 4_DAYS_AGO   | 30                  |
+      | 5_DAYS_AGO   | 120                 |
+      | 6_DAYS_AGO   | 60                  |
+    And I am on the list users page
+    Then I should see "Total number of visits by users with role 'researcher' in the last week is 7."
+    And I should see "Total duration of use by users with role 'researcher' in the last week is 4.83 hours"
+    And I should see "Average frequency of use per week by users with role 'researcher' is 4 total number of visits."
+    And I should see "Average duration of use per week by users with role 'researcher' is 2.31 hours per user"
+
+  Scenario: Counts when there are no researchers/visits is shown on the user list page
+    Given I am on the list users page
+    Then I should see "There are 0 registered users with role 'researcher'."
+    And I should see "Total number of visits by users with role 'researcher' in the last week is 0."
+    And I should see "Total duration of use by users with role 'researcher' in the last week is 0 hours"
+    And I should see "Average frequency of use per week by users with role 'researcher' is 0 total number of visits."
+    And I should see "Average duration of use per week by users with role 'researcher' is 0 hours per user"

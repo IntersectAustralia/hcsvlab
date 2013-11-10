@@ -70,7 +70,8 @@ module HcsvlabWeb
     # Default SASS Configuration, check out https://github.com/rails/sass-rails for details
     config.assets.compress = !Rails.env.development?
 
-
+    # Default time in minutes for measuring duration of user sessions when logout not used explicitly
+    config.default_session_time = 30
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'

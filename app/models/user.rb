@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable, :lockable, :recoverable, :trackable, :validatable, :timeoutable, :token_authenticatable
 
   belongs_to :role
+  has_many :user_sessions
   has_many :item_lists
   has_many :user_licence_agreements
   has_many :user_licence_requests
@@ -86,7 +87,6 @@ class User < ActiveRecord::Base
     end
     save
   end
-
 
   def approved?
     self.status == 'A'
