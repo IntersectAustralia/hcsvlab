@@ -260,7 +260,11 @@ class CatalogController < ApplicationController
       metadataSearchParam = params[:metadata]
       if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
         if (metadataSearchParam.include?(":"))
-          params[:fq] = metadataSearchParam
+          metadataSearchParam.gsub!(/\sor\s/, " OR ")
+          metadataSearchParam.gsub!(/\sand\s/, " AND ")
+
+          params[:fq] = processMetadataParameters(metadataSearchParam.clone)
+          Rails.logger.debug("Sending metadata search with parametes #{params[:fq]}")
         else
           params[:fq] = "all_metadata:(#{metadataSearchParam})"
         end
@@ -493,6 +497,40 @@ class CatalogController < ApplicationController
   end
 
   private
+
+  #
+  #
+  #
+  def processMetadataParameters(metadataSearchParam)
+    # this regular expression should extract text like this
+    #         word:word
+    #         word:"word word"
+    #         word:word~
+    #
+    searchPattern = /(\w+)\s*:\s*([^\s")]+(\s\S+")*|"[^"]*")/i
+    matchingData = metadataSearchParam.to_enum(:scan, searchPattern).map {Regexp.last_match}
+
+    matchingData.each { |m|
+      key = m[1].to_s
+      value = m[2].to_s
+
+      queryFragments = []
+      fieldsMappings = ItemMetadataFieldNameMapping.find_text_in_any_column(key)
+      fieldsMappings.each do |anItemFieldMapping|
+        solr_field_name = anItemFieldMapping.solr_name
+
+        queryFragments << "#{solr_field_name}:#{value}"
+      end
+
+      if (!queryFragments.empty?)
+        newQuery = "(#{queryFragments.join(" OR ")})"
+
+        metadataSearchParam.sub!(m[0], newQuery)
+      end
+
+    }
+    metadataSearchParam
+  end
 
   #
   #

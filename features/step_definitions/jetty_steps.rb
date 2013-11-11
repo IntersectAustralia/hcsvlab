@@ -58,6 +58,17 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
 
 end
 
+And /^I reindex all$/ do
+    Item.all.each do |anItem|
+      begin
+          Solr_Worker.new.on_message("index #{anItem.pid}")
+      rescue Exception=>e
+        # Do nothing
+      end
+    end
+end
+
+
 And /^I ingest licences$/ do
   create_default_licences(SAMPLE_FOLDER)
 end

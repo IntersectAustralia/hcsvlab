@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131104014327) do
+ActiveRecord::Schema.define(:version => 20131107002123) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -28,6 +28,17 @@ ActiveRecord::Schema.define(:version => 20131104014327) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
+
+  create_table "item_metadata_field_name_mappings", :force => true do |t|
+    t.string   "solr_name"
+    t.string   "rdf_name"
+    t.string   "user_friendly_name"
+    t.string   "display_name"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  add_index "item_metadata_field_name_mappings", ["solr_name"], :name => "index_item_metadata_field_name_mappings_on_solr_name", :unique => true
 
   create_table "roles", :force => true do |t|
     t.string   "name"
