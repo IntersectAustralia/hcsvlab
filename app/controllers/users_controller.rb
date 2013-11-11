@@ -6,6 +6,10 @@ class UsersController < ApplicationController
   def index
     @users = User.deactivated_or_approved
     @approved_researcher_count = User.approved_researchers.count
+    @total_weekly_visits_count = UserHelper::get_total_weekly_visits
+    @total_weekly_duration_count = UserHelper::get_total_weekly_duration
+    @average_weekly_visits_count = UserHelper::get_average_frequency_visits
+    @average_weekly_duration_count = UserHelper::get_average_weekly_duration
   end
 
   def show

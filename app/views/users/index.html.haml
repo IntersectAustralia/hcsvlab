@@ -33,4 +33,12 @@
             = link_to 'Edit role', edit_role_user_path(user), :id => "edit_role_#{user.id}", :class => "btn btn-primary btn-mini"
 
   = "There are #{@approved_researcher_count} registered users with role '#{Role::RESEARCHER_ROLE}'."
+  %br
+  = "Total number of visits by users with role '#{Role::RESEARCHER_ROLE}' in the last week is #{@total_weekly_visits_count}."
+  %br
+  = "Total duration of use by users with role '#{Role::RESEARCHER_ROLE}' in the last week is #{@total_weekly_duration_count} hours (using a default time of #{HcsvlabWeb::Application.config.default_session_time} minutes when users did not log out)."
+  %br
+  = "Average frequency of use per week by users with role '#{Role::RESEARCHER_ROLE}' is #{@average_weekly_visits_count} total number of visits."
+  %br
+  = "Average duration of use per week by users with role '#{Role::RESEARCHER_ROLE}' is #{@average_weekly_duration_count} hours per user (using a default time of #{HcsvlabWeb::Application.config.default_session_time} minutes when users did not log out)."
 = render 'shared/nectar_attribution'

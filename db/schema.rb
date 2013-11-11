@@ -78,6 +78,16 @@ ActiveRecord::Schema.define(:version => 20131107002123) do
 
   add_index "user_licence_requests", ["user_id"], :name => "index_user_licence_requests_on_user_id"
 
+  create_table "user_sessions", :force => true do |t|
+    t.datetime "sign_in_time"
+    t.datetime "sign_out_time"
+    t.integer  "user_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "user_sessions", ["user_id"], :name => "index_user_sessions_on_user_id"
+
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "", :null => false
     t.string   "encrypted_password",     :default => "", :null => false
