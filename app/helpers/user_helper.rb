@@ -23,7 +23,7 @@ module UserHelper
       week1 = (researchers.collect {|u| (u.user_sessions.select {|session| session.third_last_week?}).count}).inject(:+)
       week2 = (researchers.collect {|u| (u.user_sessions.select {|session| session.second_last_week?}).count}).inject(:+)
       week3 = (researchers.collect {|u| (u.user_sessions.select {|session| session.last_week?}).count}).inject(:+)
-      ((week1+week2+week3).to_f/3.to_f).round
+      ((week1+week2+week3).to_f/3.to_f).round(2)
     end
   end
 
