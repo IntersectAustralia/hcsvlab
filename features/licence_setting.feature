@@ -7,7 +7,9 @@ Feature: Managing Collection Lists and Licences
     Given I have users
       | email                       | first_name   | last_name |
       | data_owner@intersect.org.au | dataOwner    | One       |
+      | research@intersect.org.au   | research     | student   |
     Given "data_owner@intersect.org.au" has role "data owner"
+    Given "research@intersect.org.au" has role "researcher"
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given I ingest licences
@@ -295,6 +297,17 @@ Feature: Managing Collection Lists and Licences
   Scenario: Change a collection's privacy status
     Then I click on the privacy remove icon for the 1st collection
     Then I should see "austlit has been successfully marked as requiring personal approval"
+    And I have added a licence to private Collection "austlit"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "research@intersect.org.au"
+    And I am on the licence agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title   | collection | owner                       | state        |
+      | austlit | 1          | data_owner@intersect.org.au | Unapproved   |
+    And I should see "Review Licence Terms"
+    And I should see "Request Access"
+    And I should not see "Preview & Accept Licence Terms"
 
   @javascript
   Scenario: Change a collection's privacy status with pending licence requests
@@ -328,6 +341,17 @@ Feature: Managing Collection Lists and Licences
     And I should see "Collection List 1 has been successfully marked as public"
     And I am on the licence requests page
     Then I should see "No requests to display"
+    And I have added a licence to Collection List "Collection List 1"
+    And I follow "data_owner@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "research@intersect.org.au"
+    And I am on the licence agreements page
+    Then the Review and Acceptance of Licence Terms table should have
+      | title             | collection | owner                       | state        |
+      | Collection List 1 | 2          | data_owner@intersect.org.au | Not Accepted |
+    And I should see "Preview & Accept Licence Terms"
+    And I should not see "Review Licence Terms"
+    And I should not see "Request Access"
 
   @javascript
   Scenario: Delete a collection list with pending licence requests
