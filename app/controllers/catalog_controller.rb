@@ -7,7 +7,7 @@ class CatalogController < ApplicationController
   # Set catalog tab as current selected
   set_tab :catalog
 
-  before_filter :authenticate_user!, :except => [:index]
+  before_filter :authenticate_user!, :except => [:index, :annotation_context]
   #load_and_authorize_resource
 
   include Blacklight::Catalog

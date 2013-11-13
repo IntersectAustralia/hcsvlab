@@ -199,6 +199,14 @@ Feature: Browsing via API
     {"@context":{"@base":"http://purl.org/dada/schema/0.2/","annotations":{"@id":"http://purl.org/dada/schema/0.2/annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2/commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2/type"},"start":{"@id":"http://purl.org/dada/schema/0.2/start"},"end":{"@id":"http://purl.org/dada/schema/0.2/end"},"label":{"@id":"http://purl.org/dada/schema/0.2/label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2/annotates"}}}
     """
 
+  Scenario: Get annotation context without API token
+    Given I make a JSON request for the annotation context page without an API token
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"@context":{"@base":"http://purl.org/dada/schema/0.2/","annotations":{"@id":"http://purl.org/dada/schema/0.2/annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2/commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2/type"},"start":{"@id":"http://purl.org/dada/schema/0.2/start"},"end":{"@id":"http://purl.org/dada/schema/0.2/end"},"label":{"@id":"http://purl.org/dada/schema/0.2/label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2/annotates"}}}
+    """
+
   Scenario: Request annotations for item that doesn't have annotations
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
