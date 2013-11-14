@@ -389,6 +389,7 @@ Feature: Managing Collection Lists and Licences
     And I should see "austlit has been successfully marked as requiring personal approval"
     And there is a licence request for collection "austlit" by "researcher2@intersect.org.au"
     And I follow "Revoke Access"
+    Then I should see "Are you sure you want to revoke access to austlit for all users?"
     And I follow element with id "revoke_access0"
     Then I should see "All access to austlit has been successfully revoked"
     And I am on the licence requests page
@@ -417,6 +418,7 @@ Feature: Managing Collection Lists and Licences
     And I follow "Creative Commons v3.0 BY-NC"
     And there is a licence request for collection list "Collection List 1" by "researcher2@intersect.org.au"
     And I follow "Revoke Access"
+    Then I should see "Are you sure you want to revoke access to Collection List 1 for all users?"
     And I follow element with id "revoke_list_access0"
     Then I should see "All access to Collection List 1 has been successfully revoked"
     And I am on the licence requests page

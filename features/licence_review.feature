@@ -152,9 +152,15 @@ Feature: Managing Subscriptions to Collections
     And I am on the licence agreements page
     And I follow "Request Access"
     And I follow element with id "request_access0"
+    And I follow "researcher@intersect.org.au"
+    And I follow "Logout"
+    And I am logged in as "data_owner@intersect.org.au"
     Then "data_owner@intersect.org.au" should receive an email
     When I open the email
     Then I should see "An access request to a collection has been made with the following details" in the email body
+    And I click the first link in the email
+    Then I should be on the licence requests page
+
 
   @javascript
   Scenario: Approving a collection request
