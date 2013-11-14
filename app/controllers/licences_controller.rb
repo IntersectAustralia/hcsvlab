@@ -8,13 +8,13 @@ class LicencesController < ApplicationController
 
   def index
     # gets PUBLIC licences and the user licences.
-    @licences = Licence.find(type: Licence::LICENCE_TYPE_PUBLIC).to_a.concat(Licence.where(ownerId: current_user.id.to_s).to_a)
+    @licences = Licence.find_and_load_from_solr(type: Licence::LICENCE_TYPE_PUBLIC).to_a.concat(Licence.find_and_load_from_solr(ownerId: current_user.id.to_s).to_a)
 
     # gets the Collections list of the logged user.
-    @collection_lists = CollectionList.find(ownerId: current_user.id.to_s).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
+    @collection_lists = CollectionList.find_and_load_from_solr(ownerId: current_user.id.to_s).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
 
     # gets the Collections of the logged user.
-    @collections = Collection.find(private_data_owner: current_user.email).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
+    @collections = Collection.find_and_load_from_solr(private_data_owner: current_user.email).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
 
 
     create_pagination_structure(params)
