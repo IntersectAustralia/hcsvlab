@@ -375,6 +375,19 @@ namespace :deploy do
     run "sed -i 's+__GALAXY_PORT__+#{galaxy_port}+g' $GALAXY_HOME/universe_wsgi.ini"
   end
 
+  desc "Update galaxy"
+  task :update_galaxy, :role => :app do
+    run "cd $GALAXY_HOME && git reset --hard HEAD && git pull origin master", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Redeploy Galaxy, stops, updates, configures and starts galaxy"
+  task :redeploy_galaxy, :role => :app do
+    stop_galaxy
+    update_galaxy
+    configure_galaxy
+    start_galaxy
+  end
+
   # We need to define our own cleanup task since there is an issue on Capistrano deploy:cleanup task
   #https://github.com/capistrano/capistrano/issues/474
   task :customcleanup, :except => {:no_release => true} do
