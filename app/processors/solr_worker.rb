@@ -214,7 +214,7 @@ private
   # Add a field to the solr document we're building. Knows about the
   # difference between dynamic and non-dynamic fields.
   #
-  def add_field(result, field, value)
+  def add_field(result, field, value, binding)
     if @@configured_fields.include?(field)
       debug("Solr_Worker", "Adding configured field #{field} with value #{value}")
       ::Solrizer::Extractor.insert_solr_field_value(result, field, value)
@@ -222,6 +222,8 @@ private
       debug("Solr_Worker", "Adding dynamic field #{field} with value #{value}")
       Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
     end
+
+    create_field_mapping(field, binding)
   end
 
   #
@@ -271,7 +273,8 @@ private
       # Map the field name to it's short form
       field = MetadataHelper::short_form(field)
       configured_fields_found.add(field) if @@configured_fields.include?(field)
-      add_field(result, field, value_encoded)
+      add_field(result, field, value_encoded, binding)
+
     }
     unless extras.nil?
       extras.keys.each { |key|
@@ -279,7 +282,7 @@ private
         values = extras[key]
         configured_fields_found.add(field) if @@configured_fields.include?(field) && (values.size > 0)
         values.each { |value|
-          add_field(result, field, value)
+          add_field(result, field, value, nil)
         }
       }
     end
@@ -316,10 +319,48 @@ private
 
     # Add in defaults for the configured fields we haven't found so far
     @@configured_fields.each { |field|
-      add_field(result, field, "unspecified") unless configured_fields_found.include?(field)
+      add_field(result, field, "unspecified", nil) unless configured_fields_found.include?(field)
     }
     return result
   end
+
+
+  #---------------------------------------------------------------------------------------------------
+  def create_field_mapping(field, binding)
+    rdf_field_name = nil
+    if (!binding.nil? and !binding[:predicate].qname.nil?)
+      rdf_field_name = binding[:predicate].qname.join(':')
+      debug('GGGGG', binding[:predicate].qname.to_s)
+    end
+
+    if (@@configured_fields.include?(field))
+      solr_name = field
+    else
+      solr_name = "#{field}_tesim"
+    end
+
+    item_fields_mapping = ItemMetadataFieldNameMapping.where({solr_name:solr_name}).to_a.first
+    item_fields_mapping = ItemMetadataFieldNameMapping.new if item_fields_mapping.nil?
+    item_fields_mapping.solr_name = solr_name
+    item_fields_mapping.rdf_name = rdf_field_name
+    item_fields_mapping.user_friendly_name = format_key(field)
+
+    debug("Solr_Worker", "Creating new mapping for field #{field}") if (item_fields_mapping.id.nil?)
+    debug("Solr_Worker", "Updating mapping for field: #{field}")  if (!item_fields_mapping.id.nil?)
+
+    item_fields_mapping.save
+
+  end
+
+  def format_key(uri)
+    uri = last_bit(uri).sub(/_tesim$/, '')
+    uri = uri.sub(/_facet/, '')
+    uri = uri.sub(/^([A-Z]+_)+/, '') unless uri.starts_with?('RDF')
+
+    return uri
+  end
+
+  #---------------------------------------------------------------------------------------------------
 
   #
   # Make a Solr update document from information extracted from the Item

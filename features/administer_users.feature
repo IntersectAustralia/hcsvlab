@@ -147,7 +147,7 @@ Feature: Administer users
     And I am on the list users page
     Then I should see "Total number of visits by users with role 'researcher' in the last week is 7."
     And I should see "Total duration of use by users with role 'researcher' in the last week is 4.83 hours"
-    And I should see "Average frequency of use per week by users with role 'researcher' is 4 total number of visits."
+    And I should see "Average frequency of use per week by users with role 'researcher' is 3.67 total number of visits."
     And I should see "Average duration of use per week by users with role 'researcher' is 2.31 hours per user"
 
   Scenario: Counts when there are no researchers/visits is shown on the user list page
