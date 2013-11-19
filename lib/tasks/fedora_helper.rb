@@ -193,7 +193,7 @@ def look_for_documents(item, corpus_dir)
       end
     else
       update_document(existing_doc.first, item, file_name, result, corpus_dir)
-      doc_ids << existing_doc.id
+      doc_ids << existing_doc.first.id
     end
   end
   return doc_ids

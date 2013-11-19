@@ -138,9 +138,20 @@ Feature: Browsing via API
     When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
-      | json_path           | text                                                   |
-      | $..annotations_url  | http://example.org/catalog/hcsvlab:1/annotations.json  |
-      | $..primary_text_url | http://example.org/catalog/hcsvlab:1/primary_text.json |
+      | json_path                     | text                                                   |
+      | $..['dc:created']             | 10/11/1791                                             |
+      | $..['dc:identifier']          | 1-001                                                  |
+      | $..['dc:isPartOf']            | cooee                                                  |
+      | $..['dc:type']                | Original, Raw, Text                                    |
+      | $..['ausnc:itemwordcount']    | 924                                                    |
+      | $..['ausnc:discourse_type']   | letter                                                 |
+      | $..['olac:language']          | eng                                                    |
+      | $..['olac:speaker']           | 1-001addressee, 1-001author                            |
+      | $..['cooee:register']         | Private Written                                        |
+      | $..['cooee:texttype']         | Private Correspondence                                 |
+      | $..['bibo:pages']             | 10-11                                                  |
+      | $..annotations_url            | http://example.org/catalog/hcsvlab:1/annotations.json  |
+      | $..primary_text_url           | http://example.org/catalog/hcsvlab:1/primary_text.json |
 
   Scenario: Get item details should not return fields used for authorization
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
@@ -196,7 +207,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"@context":{"@base":"http://purl.org/dada/schema/0.2/","annotations":{"@id":"http://purl.org/dada/schema/0.2/annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2/commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2/type"},"start":{"@id":"http://purl.org/dada/schema/0.2/start"},"end":{"@id":"http://purl.org/dada/schema/0.2/end"},"label":{"@id":"http://purl.org/dada/schema/0.2/label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2/annotates"}}}
+    {"@context":{"@base":"http://purl.org/dada/schema/0.2/","annotations":{"@id":"http://purl.org/dada/schema/0.2/annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2/commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2/type"},"start":{"@id":"http://purl.org/dada/schema/0.2/start"},"end":{"@id":"http://purl.org/dada/schema/0.2/end"},"label":{"@id":"http://purl.org/dada/schema/0.2/label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2/annotates"},"rdf": {"@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"xsd": {"@id": "http://www.w3.org/2001/XMLSchema#"},"schema": {"@id": "http://schema.org/"},"ace": {"@id": "http://ns.ausnc.org.au/schemas/ace/"},"ausnc": {"@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austlit": {"@id": "http://ns.ausnc.org.au/schemas/austlit/"},"bibo": {"@id": "http://purl.org/ontology/bibo/"},"cooee": {"@id": "http://ns.ausnc.org.au/schemas/cooee/"},"gcsause": {"@id": "http://ns.ausnc.org.au/schemas/gcsause/"},"ice": {"@id": "http://ns.ausnc.org.au/schemas/ice/"},"olac": {"@id": "http://www.language-archives.org/OLAC/1.1/"},"dc": {"@id": "http://purl.org/dc/terms/"},"foaf": {"@id": "http://xmlns.com/foaf/0.1/"}}}
     """
 
   Scenario: Get annotation context without API token
@@ -204,7 +215,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"@context":{"@base":"http://purl.org/dada/schema/0.2/","annotations":{"@id":"http://purl.org/dada/schema/0.2/annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2/commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2/type"},"start":{"@id":"http://purl.org/dada/schema/0.2/start"},"end":{"@id":"http://purl.org/dada/schema/0.2/end"},"label":{"@id":"http://purl.org/dada/schema/0.2/label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2/annotates"}}}
+    {"@context":{"@base":"http://purl.org/dada/schema/0.2/","annotations":{"@id":"http://purl.org/dada/schema/0.2/annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2/commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2/type"},"start":{"@id":"http://purl.org/dada/schema/0.2/start"},"end":{"@id":"http://purl.org/dada/schema/0.2/end"},"label":{"@id":"http://purl.org/dada/schema/0.2/label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2/annotates"},"rdf": {"@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"xsd": {"@id": "http://www.w3.org/2001/XMLSchema#"},"schema": {"@id": "http://schema.org/"},"ace": {"@id": "http://ns.ausnc.org.au/schemas/ace/"},"ausnc": {"@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austlit": {"@id": "http://ns.ausnc.org.au/schemas/austlit/"},"bibo": {"@id": "http://purl.org/ontology/bibo/"},"cooee": {"@id": "http://ns.ausnc.org.au/schemas/cooee/"},"gcsause": {"@id": "http://ns.ausnc.org.au/schemas/gcsause/"},"ice": {"@id": "http://ns.ausnc.org.au/schemas/ice/"},"olac": {"@id": "http://www.language-archives.org/OLAC/1.1/"},"dc": {"@id": "http://purl.org/dc/terms/"},"foaf": {"@id": "http://xmlns.com/foaf/0.1/"}}}
     """
 
   Scenario: Request annotations for item that doesn't have annotations
@@ -388,12 +399,24 @@ Feature: Browsing via API
     {"num_results":2,"items":["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:2"]}
     """
 
-  Scenario: Search metadata with field:value via the API
+  Scenario: Search metadata with field:value via the API usign solr field name
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata                          |
       | AUSNC_discourse_type_tesim:letter |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    """
+
+  Scenario: Search metadata with field:value via the API using user friendly field name
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata                          |
+      | discourse_type:letter |
     Then I should get a 200 response code
     And the JSON response should be:
     """

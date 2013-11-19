@@ -11,8 +11,9 @@ end
 
 module HcsvlabWeb
   class Application < Rails::Application
-      config.autoload_paths += %W(#{config.root}/app/processors)
+    config.autoload_paths += %W(#{config.root}/app/processors)
     config.autoload_paths += %W( #{config.root}/lib )
+    config.autoload_paths += Dir["#{config.root}/lib/rdf/**/"]
     config.generators do |g|  
       g.stylesheets false
       g.test_framework :rspec

@@ -1,0 +1,83 @@
+#!/usr/bin/env ruby
+
+require 'linkeddata'
+require 'xmlsimple'
+require 'colorize'
+
+# I need to load the predefined vocabularies
+hcsvlab_home = "#{File.dirname(__FILE__)}/../"
+Dir["#{hcsvlab_home}/lib/rdf/**/*.rb"].each {|f| require f}
+
+#
+# Formats milliseconds to day, hours, minute and seconds
+#
+def millisecondsToReadableFormat(milliseconds)
+  mm, ss = (milliseconds/1000).divmod(60)
+  hh, mm = mm.divmod(60)
+  dd, hh = hh.divmod(24)
+  [dd, hh, mm, ss]
+end
+
+
+if (ARGV.length != 1)
+  puts "Error: "
+  puts "Usage: ruby extract_rdf_prefixes <root_folder>"
+  abort
+end
+
+startTime = Time.now
+
+root_path = ARGV[0].to_s
+files = Dir["#{root_path}/**/*-metadata.rdf"]
+prefixes = {}
+
+puts "Extracting prefixes from #{files.length} RDF files".green
+puts ""
+
+files.each do |rdf_file|
+  begin
+
+    print "."
+    graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
+
+    # Find the identity of the Item
+    query = RDF::Query.new({:item => {RDF::URI("http://purl.org/dc/terms/isPartOf") => :corpus}})
+    results = query.execute(graph)
+
+    unless results.size == 0
+      # Now find all the triplets which have the Item as the subject
+      # and add them all to the index
+      item = results[0][:item]
+      query = RDF::Query.new({item => {:predicate => :object}})
+      results2 = query.execute(graph)
+      results2.each { |binding|
+        if (!binding.nil? and !binding[:predicate].qname.nil?)
+          rdf_field_prefix = binding[:predicate].qname.first
+          uri = binding[:predicate].to_uri.to_s
+
+          prefixes[rdf_field_prefix] = uri
+        end
+      }
+    end
+  rescue Exception => e
+    print "F".red
+  end
+
+end
+puts ""
+puts ""
+puts ""
+puts "RESULT over #{files.length} RDF files".colorize(:green).underline
+
+prefixes.each_pair do |key, value|
+  #puts "#{key} = #{value}"
+  puts "%-20s = %10s".green % [key, value]
+end
+puts ""
+endTime = Time.now
+
+puts "Whole process time: %d days, %d hours, %d minutes and %d seconds".red % millisecondsToReadableFormat(((endTime.to_f - startTime.to_f)*1000))
+
+puts ""
+puts ""
+

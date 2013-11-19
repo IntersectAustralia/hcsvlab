@@ -13,6 +13,7 @@ class CatalogController < ApplicationController
   include Blacklight::Catalog
   include Hydra::Controller::ControllerBehavior
   include Blacklight::BlacklightHelperBehavior
+  include Blacklight::CatalogHelperBehavior
 
   include Item::DownloadItemsHelper
   include ERB::Util
@@ -317,6 +318,9 @@ class CatalogController < ApplicationController
       # Add all dynamically added (such as by document extensions)
       # export formats.
       if !@document.nil?
+
+        @itemInfo = create_display_info_hash(@document)
+
         @document.export_formats.each_key do |format_name|
           # It's important that the argument to send be a symbol;
           # if it's a string, it makes Rails unhappy for unclear reasons. 
@@ -331,7 +335,10 @@ class CatalogController < ApplicationController
     metadataSearchParam = params[:metadata]
     if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
       if (metadataSearchParam.include?(":"))
-        params[:fq] = metadataSearchParam
+        metadataSearchParam.gsub!(/\sor\s/, " OR ")
+        metadataSearchParam.gsub!(/\sand\s/, " AND ")
+
+        params[:fq] = processMetadataParameters(metadataSearchParam.clone)
       else
         params[:fq] = "all_metadata:(#{metadataSearchParam})"
       end
@@ -389,8 +396,20 @@ class CatalogController < ApplicationController
   end
 
   def annotation_context
+
+    avoid_context = collect_restricted_predefined_vocabulary
+
+    @vocab_hash = {}
+    RDF::Vocabulary.each {|vocab|
+      if (!avoid_context.include?(vocab.to_uri) and vocab.to_uri.qname.present?)
+        prefix = vocab.to_uri.qname.first.to_s
+        uri = vocab.to_uri.to_s
+        @vocab_hash[prefix] = {:@id => uri}
+      end
+    }
     request.format = 'json'
     respond_to 'json'
+
   end
 
   def primary_text
@@ -541,8 +560,9 @@ class CatalogController < ApplicationController
 
       # Creates a ZIP file containing the documents and item's metadata
       zip_path = DownloadItemsInZipFormat.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
-        @document = aDoc
-        renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
+        @itemInfo = create_display_info_hash(aDoc)
+
+        renderer = Rabl::Renderer.new('catalog/show', @itemInfo, { :format => 'json', :view_path => 'app/views', :scope => self })
         itemMetadata = renderer.render
         itemMetadata
       end
@@ -569,9 +589,6 @@ class CatalogController < ApplicationController
       format.any { render :json => {:error => "Internal Server Error"}.to_json, :status => 500 }
     end
   end
-
-
-
 
   #
   # Add filter query when searching on metadata fields.
@@ -639,6 +656,42 @@ class CatalogController < ApplicationController
     end
 
     return query.execute(repo), annotates_document
+  end
+
+  #
+  # Returns an array of predefined vocabularies that should no be shown
+  # in the json ld schema.
+  #
+  def collect_restricted_predefined_vocabulary
+    avoid_context = []
+    avoid_context << RDF::CC.to_uri
+    avoid_context << RDF::CERT.to_uri
+    avoid_context << RDF::DC11.to_uri
+    avoid_context << RDF::DOAP.to_uri
+    avoid_context << RDF::EXIF.to_uri
+    avoid_context << RDF::GEO.to_uri
+    avoid_context << RDF::HCalendar.to_uri
+    avoid_context << RDF::HCard.to_uri
+    avoid_context << RDF::HTTP.to_uri
+    avoid_context << RDF::LOG.to_uri
+    avoid_context << RDF::MA.to_uri
+    avoid_context << RDF::MD.to_uri
+    avoid_context << RDF::OWL.to_uri
+    avoid_context << RDF::PTR.to_uri
+    avoid_context << RDF::RDFA.to_uri
+    avoid_context << RDF::RDFS.to_uri
+    avoid_context << RDF::REI.to_uri
+    avoid_context << RDF::RSA.to_uri
+    avoid_context << RDF::RSS.to_uri
+    avoid_context << RDF::SIOC.to_uri
+    avoid_context << RDF::SKOS.to_uri
+    avoid_context << SPARQL::Grammar::SPARQL_GRAMMAR.to_uri
+    avoid_context << RDF::WOT.to_uri
+    avoid_context << RDF::XHTML.to_uri
+    avoid_context << RDF::XHV.to_uri
+
+    avoid_context << "http://rdfs.org/sioc/types#"
+    avoid_context
   end
 
 end

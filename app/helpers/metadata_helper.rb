@@ -111,7 +111,6 @@ public
   IDENTIFIER = RDF::URI(DC_TERMS_BASE_URI + 'identifier') unless const_defined?(:IDENTIFIER)
   SOURCE     = RDF::URI(DC_TERMS_BASE_URI + 'source') unless const_defined?(:SOURCE)
   TITLE      = RDF::URI(DC_TERMS_BASE_URI + 'title') unless const_defined?(:TITLE)
-  TYPE       = RDF::URI(DC_TERMS_BASE_URI + 'type') unless const_defined?(:TYPE)
 
   @@lookup[IS_PART_OF.to_s] = prefixes[DC_TERMS_BASE_URI] + "_is_part_of"
   @@lookup[EXTENT.to_s]     = prefixes[DC_TERMS_BASE_URI] + "_extent"

@@ -1,6 +1,8 @@
 require 'linkeddata'
 require 'xmlsimple'
 
+Dir["#{Rails.root}/lib/rdf/**/*.rb"].each {|f| require f}
+
 #
 # Solr_Worker
 #
@@ -223,7 +225,7 @@ private
       Solrizer.insert_field(result, field, value, :facetable, :stored_searchable)
     end
 
-    create_field_mapping(field, binding)
+    process_field_mapping(field, binding)
   end
 
   #
@@ -283,6 +285,17 @@ private
         configured_fields_found.add(field) if @@configured_fields.include?(field) && (values.size > 0)
         values.each { |value|
           add_field(result, field, value, nil)
+
+          # creates the field mapping
+          uri = RDF::URI.new(key)
+          rdf_field_name = (uri.qname.present?)? uri.qname.join(':') : nil
+          solr_name = (@@configured_fields.include?(field)) ? field : "#{field}_tesim"
+
+          isNew = ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field), nil)
+
+          debug("Solr_Worker", "Creating new mapping for field #{field}") if (isNew)
+          debug("Solr_Worker", "Updating mapping for field: #{field}")  if (!isNew)
+
         }
       }
     end
@@ -326,29 +339,20 @@ private
 
 
   #---------------------------------------------------------------------------------------------------
-  def create_field_mapping(field, binding)
+  def process_field_mapping(field, binding)
     rdf_field_name = nil
     if (!binding.nil? and !binding[:predicate].qname.nil?)
       rdf_field_name = binding[:predicate].qname.join(':')
-      debug('GGGGG', binding[:predicate].qname.to_s)
+    elsif (!binding.nil?)
+      debug("Solr_Worker", "WARNING: Vocab not defined for field #{field} (#{binding[:predicate].to_s}). Please update it in /lib/rdf/vocab.")
     end
 
-    if (@@configured_fields.include?(field))
-      solr_name = field
-    else
-      solr_name = "#{field}_tesim"
-    end
+    solr_name = (@@configured_fields.include?(field)) ? field : "#{field}_tesim"
 
-    item_fields_mapping = ItemMetadataFieldNameMapping.where({solr_name:solr_name}).to_a.first
-    item_fields_mapping = ItemMetadataFieldNameMapping.new if item_fields_mapping.nil?
-    item_fields_mapping.solr_name = solr_name
-    item_fields_mapping.rdf_name = rdf_field_name
-    item_fields_mapping.user_friendly_name = format_key(field)
+    isNew = ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field), nil)
 
-    debug("Solr_Worker", "Creating new mapping for field #{field}") if (item_fields_mapping.id.nil?)
-    debug("Solr_Worker", "Updating mapping for field: #{field}")  if (!item_fields_mapping.id.nil?)
-
-    item_fields_mapping.save
+    debug("Solr_Worker", "Creating new mapping for field #{solr_name}") if (isNew)
+    debug("Solr_Worker", "Updating mapping for field: #{solr_name}")  if (!isNew)
 
   end
 

@@ -107,4 +107,153 @@ module Blacklight::CatalogHelperBehavior
     response.total > 1
   end
 
+
+  #
+  # Internal class used to render the item information in Json format
+  #
+  class ItemInfo
+    attr_accessor :catalog_url, :metadata, :primary_text_url, :annotations_url, :documents
+  end
+
+  #
+  # Creates an instance of ItemInfo class with all the information (Metadata, PrimaryText, Documents, etc.)
+  # of the given document.
+  #
+  def create_display_info_hash(document)
+    fieldDisplayName = create_display_field_name_mapping(document)
+
+    # Prepare document METADATA information
+    metadataHash = {}
+    values = document_show_fields(document).select { |solr_fname, field|
+      should_render_show_field? document, field
+    }
+    values = values.collect do |solr_fname, field|
+      #key = render_document_show_field_label(@document, :field => solr_fname)
+      key = (fieldDisplayName[solr_fname].nil?)? solr_fname : fieldDisplayName[solr_fname]
+      if solr_fname == 'OLAC_language_tesim'
+        metadataHash[key] = raw(render_language_codes(document[solr_fname]))
+      elsif solr_fname == 'DC_type_facet'
+        metadataHash[key] = format_duplicates(document[solr_fname])
+      else
+        metadataHash[key] = render_document_show_field_value(document, :field => solr_fname)
+      end
+    end
+    do_not_display = {'id' => nil,
+                      'timestamp' => nil,
+                      MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
+                      MetadataHelper::short_form(MetadataHelper::IDENT) => nil,
+                      'date_group_tesim' => nil,
+                      'all_metadata' => nil,
+                      '_version_' => nil,
+                      'item_lists' => nil,
+                      'all_metadata' => nil,
+                      'discover_access_group_ssim' => nil,
+                      'read_access_group_ssim' => nil,
+                      'edit_access_group_ssim' => nil,
+                      'discover_access_person_ssim' => nil,
+                      'read_access_person_ssim' => nil,
+                      'edit_access_person_ssim' => nil
+    }
+    #do_not_display = {} if Rails.env.development? # In development, display everything
+    do_not_display.merge!(document_show_fields(document))
+    document.keys.each do |k|
+      v = document[k]
+      unless do_not_display.has_key?(k)
+        key = (fieldDisplayName[k].nil?)? k : fieldDisplayName[k]
+        if k == 'DC_type_facet'
+          metadataHash[key] = format_duplicates(v)
+        else
+          metadataHash[key] = format_value(v)
+        end
+      end
+    end
+
+    # Prepare document PRIMARY_TEXT_URL information
+    if Item.find_and_load_from_solr({id: document.id}).first.hasPrimaryText?
+      primary_text = catalog_primary_text_url(document.id, format: :json)
+    else
+      primary_text = "No primary text found"
+    end
+
+    # Prepare document DOCUMENTS information
+    data = []
+    uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
+    documents = item_documents(document, uris)
+
+    if documents.present?
+      is_cooee = document[MetadataHelper::short_form(MetadataHelper::COLLECTION)][0] == "cooee"
+      type_format = get_type_format(document, is_cooee)
+      documentHash = {}
+      documents.each do |values|
+        if values.has_key?(MetadataHelper::SOURCE)
+          documentHash[:url] = catalog_document_url(document.id, filename: values[MetadataHelper::IDENTIFIER])
+        else
+          documentHash[:url] = values[MetadataHelper::IDENTIFIER]
+        end
+
+        #Type
+        type = values[MetadataHelper::TYPE].to_s
+        if values.has_key?(MetadataHelper::TYPE)
+          field = values[MetadataHelper::TYPE]
+          field = "unlabelled" if field == ""
+          field = "Plain" if is_cooee && field == type
+        else
+          field = "unlabelled"
+        end
+
+        type_solr_name = MetadataHelper.short_form(MetadataHelper::TYPE)
+        type_key = (fieldDisplayName[type_solr_name].nil?)? :type : fieldDisplayName[type_solr_name]
+        documentHash[type_key] = sprintf(type_format, field)
+
+        #Size
+        if values.has_key?(MetadataHelper::EXTENT)
+          field = values[MetadataHelper::EXTENT]
+          if field.nil? || field == ""
+            field = "unknown"
+          else
+            field = format_extent(field.to_i, 'B')
+          end
+        else
+          field = "unknown"
+        end
+        documentHash[:size] = field.strip!
+        data << documentHash.clone
+      end
+
+    end
+
+    itemInfo = ItemInfo.new
+    itemInfo.catalog_url = catalog_url(document)
+    itemInfo.metadata = metadataHash
+    itemInfo.primary_text_url = primary_text
+    itemInfo.annotations_url = catalog_annotations_url(document.id, format: :json)
+    itemInfo.documents = data
+
+    itemInfo
+  end
+
+  #
+  # Query the ItemMetadataFieldNameMapping table and creates a hash containing the rdf_name and the user_friendly_name
+  # This will avoid querying the table for each single field.
+  #
+  def create_display_field_name_mapping(document)
+    fieldsMapping = {}
+    ItemMetadataFieldNameMapping.all.each do |anItemField|
+      fieldsMapping[anItemField.solr_name] = {rdf_name:anItemField.rdf_name, user_friendly_name:anItemField.user_friendly_name}
+    end
+
+    fieldDisplayName = {}
+    document.keys.each do |k|
+      fieldMapping = fieldsMapping[k]
+      if (!fieldMapping.nil? && fieldMapping[:rdf_name].present?)
+        fieldDisplayName[k] = fieldMapping[:rdf_name]
+      elsif (!fieldMapping.nil? && fieldMapping[:user_friendly_name].present?)
+        fieldDisplayName[k] = fieldMapping[:user_friendly_name]
+      elsif (document_show_fields(document).include?(k))
+        fieldDisplayName[k] = render_document_show_field_label(document, :field => k)
+      end
+    end
+    fieldDisplayName
+  end
+
 end

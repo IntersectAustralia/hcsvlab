@@ -1,3 +1,5 @@
+object false
+
 node(:@context) do
   hash = {}
   hash[:@base] = "http://purl.org/dada/schema/0.2/"
@@ -8,5 +10,10 @@ node(:@context) do
   hash[:end] = {:@id => "http://purl.org/dada/schema/0.2/end"}
   hash[:label] = {:@id => "http://purl.org/dada/schema/0.2/label"}
   hash[:annotates] = {:@id => "http://purl.org/dada/schema/0.2/annotates"}
+
+  @vocab_hash.each_pair { |key, value |
+    hash[key] = value
+  }
+
   hash
 end

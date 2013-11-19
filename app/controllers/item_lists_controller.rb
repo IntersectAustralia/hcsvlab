@@ -2,6 +2,7 @@ require "#{Rails.root}/lib/item/download_items_helper.rb"
 
 class ItemListsController < ApplicationController
   include Blacklight::BlacklightHelperBehavior
+  include Blacklight::CatalogHelperBehavior
   include Blacklight::Configurable
   include Blacklight::SolrHelper
   include Item::DownloadItemsHelper
@@ -189,8 +190,8 @@ class ItemListsController < ApplicationController
 
       # Creates a ZIP file containing the documents and item's metadata
       zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
-        @document = aDoc
-        renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
+        @itemInfo = create_display_info_hash(aDoc)
+        renderer = Rabl::Renderer.new('catalog/show', @itemInfo, { :format => 'json', :view_path => 'app/views', :scope => self })
         itemMetadata = renderer.render
         itemMetadata
       end
