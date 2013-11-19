@@ -2,7 +2,7 @@
   <input class='btn' type="hidden" value="hcsvlab_importer" name="tool_id"/>
   <input class='btn' type="hidden" value="<%= ItemList.find(params[:id]).get_galaxy_list(root_url) %>" name="url_paste"/>
   <input class='btn' type="hidden" value="<%= current_user.authentication_token %>" name="api_key"/>
-  <input class='btn' type="hidden" value="HCSVLAB data" name="job_name"/>
+  <input class='btn' type="hidden" value="<%= @item_list.name + " (" + Time.now.utc.localtime.strftime('%d/%m/%Y %H:%M:%S %P') + ")" %>" name="job_name"/>
   <input class='btn' type="hidden" value="<%= Rails.application.config.galaxy_url %>" name="URL"/>
   <input class='btn' type="submit" value="<%= title %>"/>
 </form>
