@@ -31,6 +31,10 @@ class ItemListsController < ApplicationController
         @response = @item_list.get_items(params[:page], params[:per_page])
         @document_list = @response["response"]["docs"]
 
+        if current_user.authentication_token.nil? #generate auth token if one doesn't already exist
+          current_user.reset_authentication_token!
+        end
+
         render :index
       }
       format.json {

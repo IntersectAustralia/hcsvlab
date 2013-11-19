@@ -60,20 +60,16 @@ class ItemList < ActiveRecord::Base
   #
   # Get list of URLs to send to galaxy
   #
-  def get_galaxy_list
+  def get_galaxy_list(root_url)
     ids = get_item_ids
 
     galaxy_list = ""
     ids.each_with_index do |id, index|
-      begin
-        uri = buildURI(id, 'primary_text')
-        if index == 0
-          galaxy_list += uri
-        else
-          galaxy_list += "," + uri
-        end
-      rescue
-        Rails.logger.error("couldn't open primary text for item: " + id.to_s)
+      uri = root_url + Rails.application.routes.url_helpers.catalog_primary_text_path(id)
+      if index == 0
+        galaxy_list += uri
+      else
+        galaxy_list += "," + uri
       end
     end
 
