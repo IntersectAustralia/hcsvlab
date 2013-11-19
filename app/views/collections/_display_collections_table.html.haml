@@ -24,7 +24,7 @@
               %span.btn
                 %input#allnonecheckbox{:onclick => "toggleCollection(this)", :type => "checkbox"}/
           %th.name Collection
-          %th.privacy Licence Type
+          %th.privacy Approval Required
           %th.collection Collection List
           %th.licence Licence
           %th.revoke_access Revoke Access
@@ -42,15 +42,15 @@
                 -if aCollection.private?
                   .label.privacy.personal
                     %span
-                      Personal Approval
+                      Required
                     = link_to("", change_collection_privacy_collections_path(:id => aCollection.id, :privacy => "false"), :method => :put, :class=>"remove")
                 -else
                   .label.privacy
                     %span
-                      Public
+                      Not Required
                     = link_to("", change_collection_privacy_collections_path(:id => aCollection.id, :privacy => "true"), :method => :put, :class=>"remove")
               -else
-                = (aCollection.collectionList.private?) ? "Personal Approval" : "Public"
+                = (aCollection.collectionList.private?) ? "Required" : "Not Required"
             %td.collection
               -if !(aCollection.collectionList.nil?)
                 .label.licence

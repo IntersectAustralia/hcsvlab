@@ -291,12 +291,12 @@ Feature: Managing Collection Lists and Licences
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
     Then I click on the privacy remove icon for the 1st collection list
-    Then I should see "Collection List 1 has been successfully marked as requiring personal approval"
+    Then I should see "Collection List 1 has been successfully marked as requiring approval"
 
   @javascript
   Scenario: Change a collection's privacy status
     Then I click on the privacy remove icon for the 1st collection
-    Then I should see "austlit has been successfully marked as requiring personal approval"
+    Then I should see "austlit has been successfully marked as requiring approval"
     And I have added a licence to private Collection "austlit"
     And I follow "data_owner@intersect.org.au"
     And I follow "Logout"
@@ -316,10 +316,10 @@ Feature: Managing Collection Lists and Licences
       | researcher@intersect.org.au | researcher   | One       |
     And "researcher@intersect.org.au" has role "researcher"
     Then I click on the privacy remove icon for the 1st collection
-    And I should see "austlit has been successfully marked as requiring personal approval"
+    And I should see "austlit has been successfully marked as requiring approval"
     And there is a licence request for collection "austlit" by "researcher@intersect.org.au"
     Then I click on the privacy remove icon for the 1st collection
-    And I should see "austlit has been successfully marked as public"
+    And I should see "austlit has been successfully marked as not requiring approval"
     And I am on the licence requests page
     Then I should see "No requests to display"
 
@@ -338,7 +338,7 @@ Feature: Managing Collection Lists and Licences
     And I press "Create Collections List"
     And there is a licence request for collection list "Collection List 1" by "researcher@intersect.org.au"
     And I click on the privacy remove icon for the 1st collection list
-    And I should see "Collection List 1 has been successfully marked as public"
+    And I should see "Collection List 1 has been successfully marked as not requiring approval"
     And I am on the licence requests page
     Then I should see "No requests to display"
     And I have added a licence to Collection List "Collection List 1"
@@ -386,7 +386,7 @@ Feature: Managing Collection Lists and Licences
     And I click Add Licence for the 1st collection
     And I follow "Creative Commons v3.0 BY-NC"
     And I click on the privacy remove icon for the 1st collection
-    And I should see "austlit has been successfully marked as requiring personal approval"
+    And I should see "austlit has been successfully marked as requiring approval"
     And there is a licence request for collection "austlit" by "researcher2@intersect.org.au"
     And I follow "Revoke Access"
     Then I should see "Are you sure you want to revoke access to austlit for all users?"

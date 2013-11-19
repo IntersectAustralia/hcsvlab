@@ -11,7 +11,7 @@
         %thead
           %tr
             %th.name Collection List
-            %th.privacy Licence Type
+            %th.privacy Approval Required
             %th.owner Owner
             %th.licence Licence
             %th.revoke_access Revoke Access
@@ -39,12 +39,12 @@
                 -if coll_list.private?
                   .label.privacy.personal
                     %span
-                      Personal Approval
+                      Required
                     = link_to("", change_collection_list_privacy_collection_lists_path(:id => coll_list.id, :privacy => "false"), :method => :put, :class=>"remove")
                 -else
                   .label.privacy
                     %span
-                      Public
+                      Not Required
                     = link_to("", change_collection_list_privacy_collection_lists_path(:id => coll_list.id, :privacy => "true"), :method => :put, :class=>"remove")
               %td.owner= coll_list.flat_ownerEmail
               %td.licence

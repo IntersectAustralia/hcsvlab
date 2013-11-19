@@ -130,7 +130,7 @@ class CollectionListsController < ApplicationController
     if private=="false"
       UserLicenceRequest.where(:request_id => collection_list.id).destroy_all
     end
-    private=="true" ? state="requiring personal approval" : state="public"
+    private=="true" ? state="requiring approval" : state="not requiring approval"
     flash[:notice] = "#{collection_list.flat_name} has been successfully marked as #{state}"
     redirect_to licences_path
   end
