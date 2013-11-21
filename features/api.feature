@@ -291,7 +291,6 @@ Feature: Browsing via API
     
     """
 
-
   Scenario: Download document that doesn't exist for item that does exist
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
@@ -315,6 +314,7 @@ Feature: Browsing via API
     """
     {"error":"not-found"}
     """
+
   Scenario: Access collection details via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     And I have user "researcher1@intersect.org.au" with the following groups
@@ -348,6 +348,11 @@ Feature: Browsing via API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given I ingest "ice:S2B-035" with id "hcsvlab:3"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | auslit          | read        |
+      | ice             | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata   |
       | monologue  |
@@ -362,6 +367,11 @@ Feature: Browsing via API
     Given I ingest "ice:S2B-035" with id "hcsvlab:2"
     Given I ingest "auslit:adaessa" with id "hcsvlab:3"
     Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
+      | ice             | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata               |
       | University AND Romance |
@@ -376,6 +386,11 @@ Feature: Browsing via API
     Given I ingest "ice:S2B-035" with id "hcsvlab:2"
     Given I ingest "auslit:adaessa" with id "hcsvlab:3"
     Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
+      | ice             | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata              |
       | University OR Romance |
@@ -390,6 +405,10 @@ Feature: Browsing via API
     Given I ingest "cooee:1-002" with id "hcsvlab:2"
     Given I ingest "auslit:adaessa" with id "hcsvlab:3"
     Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata   |
       | Correspon* |
@@ -402,6 +421,10 @@ Feature: Browsing via API
   Scenario: Search metadata with field:value via the API using solr field name
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata                          |
       | AUSNC_discourse_type_tesim:letter |
@@ -414,6 +437,10 @@ Feature: Browsing via API
   Scenario: Search metadata with field:value via the API using user friendly field name
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata                          |
       | discourse_type:letter |
@@ -426,6 +453,10 @@ Feature: Browsing via API
   Scenario: Search metadata with quotes via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata                       |
       | date_group_facet:"1880 - 1889" |
@@ -438,6 +469,10 @@ Feature: Browsing via API
   Scenario: Search metadata with ranges via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
       | metadata       |
       | [1810 TO 1899] |
@@ -456,6 +491,25 @@ Feature: Browsing via API
     """
     {"error":"bad-query"}
     """
+
+  Scenario: Testing permissions when searching using the API
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "ice:S2B-035" with id "hcsvlab:2"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
+    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | ice             | read        |
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata   |
+      | eng        |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":2,"items":["http://example.org/catalog/hcsvlab:1", "http://example.org/catalog/hcsvlab:2"]}
+    """
+
 
   Scenario: Add items to a new item list via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"

@@ -345,10 +345,9 @@ class CatalogController < ApplicationController
       self.solr_search_params_logic += [:add_metadata_extra_filters]
     end
 
-    @@solr = RSolr.connect(Blacklight.solr_config)
     params['rows'] = 1000
     begin
-      @response = @@solr.get('select', params: params)
+      (@response, document_list) = get_search_results params
     rescue Exception => e
       respond_to do |format|
         format.any { render :json => {:error => "bad-query"}.to_json, :status => 400 }
@@ -361,7 +360,7 @@ class CatalogController < ApplicationController
     # a "give me everything" value for the rows parameter.
     if @response["response"]["numFound"] > params['rows']
       params['rows'] = @response["response"]["numFound"]
-      @response = @@solr.get('select', params: params)
+      (@response, document_list) = get_search_results params
     end
 
     respond_to do |format|
