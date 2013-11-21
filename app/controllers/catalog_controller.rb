@@ -346,6 +346,12 @@ class CatalogController < ApplicationController
     end
 
     params['rows'] = 1000
+
+    # This will allow to search via the API using the parameter q, as it is use via the user-interface
+    if (params[:q].present?)
+      params[:q] = "{!qf=$all_fields_qf pf=$all_fields_pf}#{params[:q]}"
+    end
+
     begin
       (@response, document_list) = get_search_results params
     rescue Exception => e
