@@ -4,6 +4,9 @@ require 'yaml'
 require "#{Rails.root}/lib/item/download_items_helper.rb"
 
 class CatalogController < ApplicationController
+
+  FIXNUM_MAX = 2147483647
+
   # Set catalog tab as current selected
   set_tab :catalog
 
@@ -269,8 +272,8 @@ class CatalogController < ApplicationController
         else
           params[:fq] = "all_metadata:(#{metadataSearchParam})"
         end
-        self.solr_search_params_logic += [:add_metadata_extra_filters]
       end
+      self.solr_search_params_logic += [:add_metadata_extra_filters]
 
       bench_start = Time.now
       super
@@ -342,10 +345,8 @@ class CatalogController < ApplicationController
       else
         params[:fq] = "all_metadata:(#{metadataSearchParam})"
       end
-      self.solr_search_params_logic += [:add_metadata_extra_filters]
     end
-
-    params['rows'] = 1000
+    self.solr_search_params_logic += [:add_metadata_extra_filters]
 
     # This will allow to search via the API using the parameter q, as it is use via the user-interface
     if (params[:q].present?)
@@ -359,14 +360,6 @@ class CatalogController < ApplicationController
         format.any { render :json => {:error => "bad-query"}.to_json, :status => 400 }
       end
       return
-    end
-
-    # If there are more rows in Solr than we asked for, increase the number we're
-    # asking for and ask for them all this time. Sadly, there doesn't appear to be
-    # a "give me everything" value for the rows parameter.
-    if @response["response"]["numFound"] > params['rows']
-      params['rows'] = @response["response"]["numFound"]
-      (@response, document_list) = get_search_results params
     end
 
     respond_to do |format|
@@ -600,6 +593,7 @@ class CatalogController < ApplicationController
   #
   def add_metadata_extra_filters(solr_parameters, user_params)
     solr_parameters[:fq] << user_params[:fq]
+    solr_parameters[:rows] = FIXNUM_MAX
   end
 
   def wrapped_enforce_show_permissions(opts={})
