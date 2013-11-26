@@ -594,7 +594,6 @@ class CatalogController < ApplicationController
   #
   def add_metadata_extra_filters(solr_parameters, user_params)
     solr_parameters[:fq] << user_params[:fq]
-    solr_parameters[:rows] = FIXNUM_MAX
   end
 
   #
