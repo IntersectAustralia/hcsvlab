@@ -1,152 +1,706 @@
 #!/usr/bin/env ruby
 
+require 'terminal-table'
+
 require 'net/http'
 require 'json'
 require 'action_view'
+require 'colorize'
 include ActionView::Helpers::NumberHelper
 
-##### HELPER METHODS
+ITEM_LIST_NAME_PREFIX = "Benchmark_"
+HTTP_READ_TIMEOUT = 600 # 10 minutes
 
-#def calcSizeInkb(res)
-#  (res.body.size.to_f/1024).round(2)
-#end
+############################ API URL CONSTANTS ##############################################
+APPLICATION_VERSION_URL = "/version"
+CATALOG_SEARCH_URL = "/catalog/search"
+ITEM_LISTS_URL = "/item_lists"
+PRIMARY_TEXT_URL = "/primary_text"
+ANNOTATIONS_URL = "/annotations"
 
+
+############################ HELPER METHODS   ##############################################
+
+#
+#
+#
 def millisecondsToReadableFormat(milliseconds)
+  xx, mmss = milliseconds.divmod(1000)
   mm, ss = (milliseconds/1000).divmod(60)
   hh, mm = mm.divmod(60)
   dd, hh = hh.divmod(24)
-  [dd, hh, mm, ss]
+  [dd, hh, mm, ss, mmss]
 end
 
-#######################
+#
+#
+#
+def sendRequest(method, relative_url, params = {}, req_header = {})
+  requestUri = URI(HOST + relative_url)
 
-if (ARGV.length != 3)
-  puts "Error: "
-  puts "Usage: ruby api_benchmark <HOST>:<PORT> <ITEM_LIST_ID> <API_KEY>"
-  abort
-end
-#HOST = "http://localhost:3000"
-#KEY = "zneSSswB4eHLo8Wnjqr6"
-#HOST = "http://ic2-hcsvlab-staging2-vm.intersect.org.au/"
-#KEY = "sU6iXn9zfvVc3HxM5mLX"
-
-ITEM_LISTS = "/item_lists"
-HOST = ARGV[0].to_s
-ITEM_LIST_ID = ARGV[1].to_s
-KEY = ARGV[2].to_s
-
-
-totalItems = 0
-totalItemsTime = 0
-
-totalDocuments = 0
-totalDocumentsSize = 0
-totalDocumentsTime = 0
-infoPerDocType = {}
-
-date = Time.new.strftime("%Y%m%d_%H%M%S")
-logFile = "log/benchmark/api_benchmark_#{date}.log"
-
-
-
-begin
-  whole_bench_start = Time.now
-
-  if (ITEM_LIST_ID.empty?)
-
-    # GETTING ITEM LISTS
-
-    itemListUri = URI(HOST + ITEM_LISTS)
-    req = Net::HTTP::Get.new(itemListUri)
-    req['X-API-KEY'] = KEY
-    req['Accept'] = "application/json"
-
-    res = Net::HTTP.start(itemListUri.hostname, itemListUri.port) {|http|
-      http.request(req)
-    }
+  case method
+    when :get
+      requestUri.query = URI.encode_www_form(params)
+      req = Net::HTTP::Get.new(requestUri)
+    when :post
+      req = Net::HTTP::Post.new(requestUri)
+      req["Content-Type"] = "application/json"
+      req.body = params.to_json
   end
 
-  # GETTING ONE ITEM LIST
-  if (ITEM_LIST_ID.empty?)
-    aItemListResponse = JSON.parse(res.body)
-    aItemListUri = URI(aItemListResponse[0]["item_list_url"])
-  else
-    aItemListUri = URI(HOST + ITEM_LISTS + "/" + ITEM_LIST_ID)
-  end
-
-  req = Net::HTTP::Get.new(aItemListUri)
   req['X-API-KEY'] = KEY
   req['Accept'] = "application/json"
 
-  res = Net::HTTP.start(aItemListUri.hostname, aItemListUri.port) {|http|
+  req_header.each_pair do |key, value|
+    req[key] = value
+  end
+
+  res = Net::HTTP.start(requestUri.hostname, requestUri.port, read_timeout:HTTP_READ_TIMEOUT) {|http|
     http.request(req)
   }
 
-  # GETTING ONE ITEM ON A ITEM LIST
-  aItemResponse = JSON.parse(res.body)
-  if (aItemResponse["items"].nil?)
-    puts "ERROR: Item list #{ITEM_LIST_ID} not found or API_KEY is wrong"
-    abort
+  res
+end
+
+#
+#
+#
+def doSanityCheck(benchmarkInformation)
+
+  # Verify that the server is running
+  begin
+    res = sendRequest(:get, APPLICATION_VERSION_URL)
+
+    jsonResponse = JSON.parse(res.body)
+    app_version = jsonResponse["API version"]
+
+    benchmarkInformation[:app_version] = app_version
+
+  rescue Errno::ECONNREFUSED => e
+    puts "ERROR: Connection to server #{HOST} was refused. Please verify server name and port number.".red
   end
-  puts "Benchmarking an item list with #{aItemResponse["items"].length} items"
-  aItemResponse["items"].each do |aItem|
-    print "."
-    totalItems = totalItems + 1
-    STDOUT.flush
 
-    aItemUri = URI(aItem)
+  # Verify that the KEY is correct and that there are item ingested
 
-    req = Net::HTTP::Get.new(aItemUri)
-    req['X-API-KEY'] = KEY
-    req['Accept'] = "application/json"
+  res = sendRequest(:get, CATALOG_SEARCH_URL)
+  if (res.code == "401")
+    puts "ERROR: Invalid Authentication token.".red
+    raise SecurityError
+  end
+  retrievedItems = JSON.parse(res.body)
+  num_results = retrievedItems["num_results"]
 
-    bench_start = Time.now
-    res = Net::HTTP.start(aItemUri.hostname, aItemUri.port) {|http|
-      http.request(req)
-    }
-    totalItemsTime = totalItemsTime + (Time.now.to_f - bench_start.to_f)
+  benchmarkInformation[:catalog_size] = num_results
 
-    aItemJsonResponse = JSON.parse(res.body)
+  #puts "Running API benchmark on #{HOST}. Application Version #{app_version}".green
+  #puts "Current catalog size #{num_results}".green
+  [app_version, num_results]
+end
 
-    # GETTING PRIMARY TEXT
-    #primary_text_uri = URI(aItemJsonResponse['primary_text_url'])
-    #
-    #req = Net::HTTP::Get.new(primary_text_uri)
-    #req['X-API-KEY'] = "zneSSswB4eHLo8Wnjqr6"
-    #req['Accept'] = "application/json"
-    #
-    #res = Net::HTTP.start(primary_text_uri.hostname, primary_text_uri.port) {|http|
-    #  http.request(req)
-    #}
+#
+#
+#
+def doSearchFullTextBenchmark(benchmarkInformation)
+  puts "Benchmarking Search on Full Text..."
 
-    # GETTING ALL DOCUMENTS
-    aItemJsonResponse['documents'].each do |aDocument|
+  benchmarkInformation[:search_full_text] = []
 
-      doc_uri = URI(aDocument['url'])
+  params = { q: "can"}
+  startTime = Time.now
+  res = sendRequest(:get, CATALOG_SEARCH_URL, params)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  retrievedItems = JSON.parse(res.body)
+  num_results = retrievedItems["num_results"]
+  benchmarkInformation[:search_full_text] << {query: params, num_results:num_results, timeInSecs: timeInSecs}
 
-      req = Net::HTTP::Get.new(doc_uri)
-      req['X-API-KEY'] = KEY
-      req['Accept'] = "application/json"
+  params = { q: "can AND communicating"}
+  startTime = Time.now
+  res = sendRequest(:get, CATALOG_SEARCH_URL, params)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  retrievedItems = JSON.parse(res.body)
+  num_results = retrievedItems["num_results"]
+  benchmarkInformation[:search_full_text] << {query: params, num_results:num_results, timeInSecs: timeInSecs}
 
-      bench_start = Time.now
-      res = Net::HTTP.start(doc_uri.hostname, doc_uri.port) {|http|
-        http.request(req)
-      }
-      bench_end = Time.now
+end
 
-      totalDocuments = totalDocuments + 1
-      totalDocumentsSize = totalDocumentsSize + res.body.size.to_f
-      totalDocumentsTime = totalDocumentsTime + ((bench_end.to_f - bench_start.to_f)*1000)
+#
+#
+#
+def doSearchMetadataBenchmark(benchmarkInformation)
+  puts "Benchmarking Search on Metadata..."
 
-      if (!infoPerDocType.has_key?(aDocument['type']))
-        infoPerDocType[aDocument['type']] = {amount: 0, totalFileSize: 0, timeDownloading: 0}
+  benchmarkInformation[:search_metadata] = []
+
+  params = { metadata: "audience:mass_market"}
+  startTime = Time.now
+  res = sendRequest(:get, CATALOG_SEARCH_URL, params)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  retrievedItems = JSON.parse(res.body)
+  num_results = retrievedItems["num_results"]
+  benchmarkInformation[:search_metadata] << {query: params, num_results:num_results, timeInSecs: timeInSecs}
+
+
+  params = { metadata: "communication_context:face_to_face AND audience:individual"}
+  startTime = Time.now
+  res = sendRequest(:get, CATALOG_SEARCH_URL, params)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  retrievedItems = JSON.parse(res.body)
+  num_results = retrievedItems["num_results"]
+  benchmarkInformation[:search_metadata] << {query: params, num_results:num_results, timeInSecs: timeInSecs}
+
+  params = { metadata: "(communication_context:face_to_face AND audience:individual) OR mode:written"}
+  startTime = Time.now
+  res = sendRequest(:get, CATALOG_SEARCH_URL, params)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  retrievedItems = JSON.parse(res.body)
+  num_results = retrievedItems["num_results"]
+  benchmarkInformation[:search_metadata] << {query: params, num_results:num_results, timeInSecs: timeInSecs}
+
+end
+
+#
+#
+#
+def doCreateItemListBenchmark(benchmarkInformation)
+  puts "Benchmarking Create item list..."
+
+  benchmarkInformation[:create_item_list] = []
+
+  params = { metadata: "eng"}
+  res = sendRequest(:get, CATALOG_SEARCH_URL, params)
+  retrievedItems = JSON.parse(res.body)
+
+
+  params = { name: "#{ITEM_LIST_NAME_PREFIX}#{rand(10000)}", items: retrievedItems["items"][0..299]}
+  startTime = Time.now
+  res = sendRequest(:post, ITEM_LISTS_URL, params)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  if (responseMessage.include?(:error))
+    benchmarkInformation[:create_item_list] << responseMessage
+  else
+    addedItems = responseMessage["success"].match(/(\d+) items added/)[1]
+    benchmarkInformation[:create_item_list] << {itemsAdded: addedItems, timeInSecs: timeInSecs}
+  end
+
+  params = { name: "Benchmark_#{rand(10000)}", items: retrievedItems["items"][0..599]}
+  startTime = Time.now
+  res = sendRequest(:post, ITEM_LISTS_URL, params)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  if (responseMessage.include?(:error))
+    benchmarkInformation[:create_item_list] << responseMessage
+  else
+    addedItems = responseMessage["success"].match(/(\d+) items added/)[1]
+    benchmarkInformation[:create_item_list] << {itemsAdded: addedItems, timeInSecs: timeInSecs}
+  end
+
+  params = { name: "Benchmark_#{rand(10000)}", items: retrievedItems["items"][0..999]}
+  startTime = Time.now
+  res = sendRequest(:post, ITEM_LISTS_URL, params)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  if (responseMessage.has_key?("error"))
+    benchmarkInformation[:create_item_list] << responseMessage
+  else
+    addedItems = responseMessage["success"].match(/(\d+) items added/)[1]
+    benchmarkInformation[:create_item_list] << {itemsAdded: addedItems, timeInSecs: timeInSecs}
+  end
+
+end
+
+#
+#
+#
+def doGetItemListsBenchmark(benchmarkInformation)
+  puts "Benchmarking Get item lists..."
+
+  benchmarkInformation[:get_item_list] = []
+
+  startTime = Time.now
+  res = sendRequest(:get, ITEM_LISTS_URL)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  benchmarkInformation[:get_item_list] << {itemListRetrieved: responseMessage.length, timeInSecs: timeInSecs}
+end
+
+#
+#
+#
+def doGetItemsInItemListBenchmark(benchmarkInformation)
+  puts "Benchmarking Get items from item list..."
+
+  benchmarkInformation[:get_items_in_item_list] = []
+
+  res = sendRequest(:get, ITEM_LISTS_URL)
+  itemLists = JSON.parse(res.body)
+  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(filteredAndSortedItemLists.first["item_list_url"]).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  benchmarkInformation[:get_items_in_item_list] << {itemsRetrieved: responseMessage["num_items"], timeInSecs: timeInSecs}
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(filteredAndSortedItemLists[filteredAndSortedItemLists.length/2]["item_list_url"]).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  benchmarkInformation[:get_items_in_item_list] << {itemsRetrieved: responseMessage["num_items"], timeInSecs: timeInSecs}
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(filteredAndSortedItemLists.last["item_list_url"]).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  benchmarkInformation[:get_items_in_item_list] << {itemsRetrieved: responseMessage["num_items"], timeInSecs: timeInSecs}
+
+end
+
+#
+#
+#
+def doGetItemMetadataBenchmark(benchmarkInformation)
+  puts "Benchmarking Get item metadata..."
+
+  benchmarkInformation[:get_item_metadata] = []
+
+  res = sendRequest(:get, ITEM_LISTS_URL)
+  itemLists = JSON.parse(res.body)
+  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+
+  res = sendRequest(:get, URI(filteredAndSortedItemLists.first["item_list_url"]).path)
+  response = JSON.parse(res.body)
+  items = response["items"]
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items.first).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  benchmarkInformation[:get_item_metadata] << {metadataSize: responseMessage.to_s.length, timeInSecs: timeInSecs}
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items[items.length/2]).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  benchmarkInformation[:get_item_metadata] << {metadataSize: responseMessage.to_s.length, timeInSecs: timeInSecs}
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items.last).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  responseMessage = JSON.parse(res.body)
+  benchmarkInformation[:get_item_metadata] << {metadataSize: responseMessage.to_s.length, timeInSecs: timeInSecs}
+
+end
+
+#
+#
+#
+def doGetItemPrimaryTextBenchmark(benchmarkInformation)
+  puts "Benchmarking Get item primary text..."
+
+  benchmarkInformation[:get_item_primary_text] = []
+
+  res = sendRequest(:get, ITEM_LISTS_URL)
+  itemLists = JSON.parse(res.body)
+  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+
+  res = sendRequest(:get, URI(filteredAndSortedItemLists.first["item_list_url"]).path)
+  response = JSON.parse(res.body)
+  items = response["items"]
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items.first.to_s + PRIMARY_TEXT_URL).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  benchmarkInformation[:get_item_primary_text] << {primaryTextSize: res.body.to_s.length, timeInSecs: timeInSecs}
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items[items.length/2].to_s + PRIMARY_TEXT_URL).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  benchmarkInformation[:get_item_primary_text] << {primaryTextSize: res.body.to_s.length, timeInSecs: timeInSecs}
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items.last.to_s + PRIMARY_TEXT_URL).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  benchmarkInformation[:get_item_primary_text] << {primaryTextSize: res.body.to_s.length, timeInSecs: timeInSecs}
+end
+
+#
+#
+#
+def doGetItemDocuments(benchmarkInformation, type)
+  puts "Benchmarking Get item #{type} documents..."
+
+  benchmarkInformation[:get_item_documents] ||= []
+
+  params = { metadata: "type:#{type}"}
+  res = sendRequest(:get, CATALOG_SEARCH_URL, params)
+  retrievedItems = JSON.parse(res.body)
+
+  res = sendRequest(:get, URI(retrievedItems["items"].first).path)
+  item = JSON.parse(res.body)
+  item["documents"].each do |aDocument|
+    next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
+
+    startTime = Time.now
+    res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+    timeInSecs = (Time.now.to_f - startTime.to_f)
+    benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+  end
+
+  res = sendRequest(:get, URI(retrievedItems["items"][retrievedItems["items"].length/2]).path)
+  item = JSON.parse(res.body)
+  item["documents"].each do |aDocument|
+    next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
+
+    startTime = Time.now
+    res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+    timeInSecs = (Time.now.to_f - startTime.to_f)
+    benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+  end
+
+  res = sendRequest(:get, URI(retrievedItems["items"].last).path)
+  item = JSON.parse(res.body)
+  item["documents"].each do |aDocument|
+    next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
+
+    startTime = Time.now
+    res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+    timeInSecs = (Time.now.to_f - startTime.to_f)
+    benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+  end
+
+
+end
+
+#
+#
+#
+def doGetItemAnnotationsBenchmark(benchmarkInformation)
+  puts "Benchmarking Get item annotations..."
+
+  benchmarkInformation[:get_item_annotations] = []
+
+  res = sendRequest(:get, ITEM_LISTS_URL)
+  itemLists = JSON.parse(res.body)
+  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+
+  res = sendRequest(:get, URI(filteredAndSortedItemLists.last["item_list_url"]).path)
+  response = JSON.parse(res.body)
+  items = response["items"]
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items.first.to_s + ANNOTATIONS_URL).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  benchmarkInformation[:get_item_annotations] << {annotationsSize: res.body.to_s.length, timeInSecs: timeInSecs}
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items.last.to_s + ANNOTATIONS_URL).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  benchmarkInformation[:get_item_annotations] << {annotationsSize: res.body.to_s.length, timeInSecs: timeInSecs}
+
+  startTime = Time.now
+  res = sendRequest(:get, URI(items[items.length/2].to_s + ANNOTATIONS_URL).path)
+  timeInSecs = (Time.now.to_f - startTime.to_f)
+  benchmarkInformation[:get_item_annotations] << {annotationsSize: res.body.to_s.length, timeInSecs: timeInSecs}
+
+end
+
+#
+#
+#
+def doGetItemListInZipFormat(benchmarkInformation)
+  puts "Benchmarking Get item list as ZIP..."
+
+  benchmarkInformation[:get_item_list_zip] = []
+
+  res = sendRequest(:get, ITEM_LISTS_URL)
+  itemLists = JSON.parse(res.body)
+  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+
+  begin
+    startTime = Time.now
+    uri = URI(filteredAndSortedItemLists.first["item_list_url"].to_s).path
+    itemListSize = filteredAndSortedItemLists.first["num_items"]
+    res = sendRequest(:get, uri, {}, {"Accept"=>"application/zip"})
+    timeInSecs = (Time.now.to_f - startTime.to_f)
+    benchmarkInformation[:get_item_list_zip] << {itemListSize: itemListSize, zipSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+  rescue Net::ReadTimeout
+    benchmarkInformation[:get_item_list_zip] << {itemListSize: itemListSize, timeout: true}
+  end
+
+  begin
+    startTime = Time.now
+    uri = URI(filteredAndSortedItemLists[filteredAndSortedItemLists.length/2]["item_list_url"].to_s).path
+    itemListSize = filteredAndSortedItemLists[filteredAndSortedItemLists.length/2]["num_items"]
+    res = sendRequest(:get, uri, {}, {"Accept"=>"application/zip"})
+    timeInSecs = (Time.now.to_f - startTime.to_f)
+    benchmarkInformation[:get_item_list_zip] << {itemListSize: itemListSize, zipSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+  rescue Net::ReadTimeout
+    benchmarkInformation[:get_item_list_zip] << {itemListSize: itemListSize, timeout: true}
+  end
+
+  begin
+    startTime = Time.now
+    uri = URI(filteredAndSortedItemLists.last["item_list_url"].to_s).path
+    itemListSize = filteredAndSortedItemLists.last["num_items"]
+    res = sendRequest(:get, uri, {}, {"Accept"=>"application/zip"})
+    timeInSecs = (Time.now.to_f - startTime.to_f)
+    benchmarkInformation[:get_item_list_zip] << {itemListSize: itemListSize, zipSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+  rescue Net::ReadTimeout
+    benchmarkInformation[:get_item_list_zip] << {itemListSize: itemListSize, timeout: true}
+  end
+end
+
+#
+#
+#
+def showInformation(benchmarkInformation, app_version, catalogSize)
+  puts "----------------------------------------------------------------------------------------------"
+  puts "              APP CURRENT STATE INFORMATION"
+  puts "----------------------------------------------------------------------------------------------"
+
+  puts "** Host: #{HOST}"
+  puts "** Application Version: #{app_version}"
+  puts "** Catalog size: #{catalogSize}"
+  puts "** Date: #{Time.now}"
+
+  puts ""
+  puts ""
+  puts ""
+
+  # Display Search Full Text
+  if (benchmarkInformation.has_key?(:search_full_text))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              SEARCHING FULL TEXT"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Query', 'Number of results', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:search_full_text].each do |info|
+        t << [info[:query][:q], info[:num_results], info[:timeInSecs]]
       end
-      infoPerDocType[aDocument['type']][:amount] = infoPerDocType[aDocument['type']][:amount] + 1
-      infoPerDocType[aDocument['type']][:totalFileSize] = infoPerDocType[aDocument['type']][:totalFileSize] + res.body.size.to_f
-      infoPerDocType[aDocument['type']][:timeDownloading] = infoPerDocType[aDocument['type']][:timeDownloading] + (bench_end.to_f - bench_start.to_f)
-
     end
+    puts table
+
+    puts ""
+    puts ""
   end
+
+  # Display Search Metadata
+  if (benchmarkInformation.has_key?(:search_metadata))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              SEARCHING METADATA"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Query', 'Number of results', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:search_metadata].each do |info|
+        t << [info[:query][:metadata], info[:num_results], info[:timeInSecs]]
+      end
+    end
+    puts table
+
+    puts ""
+    puts ""
+  end
+
+  # Display Create Item List
+  if (benchmarkInformation.has_key?(:create_item_list))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              CREATE ITEM LIST"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Items Added', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:create_item_list].each do |info|
+        t << [info[:itemsAdded], info[:timeInSecs]]
+      end
+    end
+    puts table
+
+    puts ""
+    puts ""
+  end
+
+  # Display Get Item List
+  if (benchmarkInformation.has_key?(:get_item_list))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              GET ITEM LIST"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Items lists Retrieved', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:get_item_list].each do |info|
+        t << [info[:itemListRetrieved], info[:timeInSecs]]
+      end
+    end
+    puts table
+
+    puts ""
+    puts ""
+  end
+
+  # Display Get Items in item list
+  if (benchmarkInformation.has_key?(:get_items_in_item_list))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              GET ITEMS IN AN ITEM LIST"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Items Retrieved', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:get_items_in_item_list].each do |info|
+        t << [info[:itemsRetrieved], info[:timeInSecs]]
+      end
+    end
+    puts table
+
+    puts ""
+    puts ""
+  end
+
+  # Display Get Item metadata
+  if (benchmarkInformation.has_key?(:get_item_metadata))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              GET ITEM METADATA"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Metadata size in bytes', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:get_item_metadata].each do |info|
+        t << [info[:metadataSize], info[:timeInSecs]]
+      end
+    end
+    puts table
+
+    puts ""
+    puts ""
+  end
+
+  # Display Get Item primary text
+  if (benchmarkInformation.has_key?(:get_item_primary_text))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              GET ITEM PRIMARY TEXT"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Primary text size in bytes', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:get_item_primary_text].each do |info|
+        t << [info[:primaryTextSize], info[:timeInSecs]]
+      end
+    end
+    puts table
+
+    puts ""
+    puts ""
+  end
+
+  # Display Get Item document
+  if (benchmarkInformation.has_key?(:get_item_documents))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              GET ITEM DOCUMENT"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Document Type', 'Size', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:get_item_documents].each do |info|
+        t << [info[:type], info[:fileSizeInBytes], info[:timeInSecs]]
+      end
+    end
+    puts table
+
+    puts ""
+    puts ""
+  end
+
+  # Display Get Item annotations
+  if (benchmarkInformation.has_key?(:get_item_annotations))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              GET ITEM ANNOTATIONS"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Annotations size in bytes', 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:get_item_annotations].each do |info|
+        t << [info[:annotationsSize], info[:timeInSecs]]
+      end
+    end
+    puts table
+
+    puts ""
+    puts ""
+  end
+
+  # Display Get Item list as ZIP
+  if (benchmarkInformation.has_key?(:get_item_list_zip))
+    puts "----------------------------------------------------------------------------------------------"
+    puts "              GET ITEM LIST AS ZIP"
+    puts "----------------------------------------------------------------------------------------------"
+    table = Terminal::Table.new do |t|
+      t << ['Item list size', 'ZIP file size' , 'Time in seconds']
+      t << :separator
+      benchmarkInformation[:get_item_list_zip].each do |info|
+        if (info.has_key?(:timeout))
+          t << [info[:itemListSize], "###", "TIMEOUT (#{HTTP_READ_TIMEOUT} seconds)"]
+        else
+          t << [info[:itemListSize], info[:zipSizeInBytes], info[:timeInSecs]]
+        end
+      end
+    end
+    puts table
+  end
+end
+
+###################################################################################################################
+
+
+if (ARGV.length != 2)
+  puts "Error: "
+  puts "Usage: ruby api_benchmark <HOST>:<PORT> <API_KEY>"
+  abort
+end
+
+HOST = ARGV[0].to_s
+KEY = ARGV[1].to_s
+
+#KEY = "sU6iXn9zfvVc3HxM5mLX" #JARED AT STATING2
+#KEY = "p7wadSsozDDuak4tvNsz" # DAVIDC AT LOCALHOST:3000
+#HOST = "http://localhost:3000"
+
+date = Time.new.strftime("%Y%m%d_%H%M%S")
+logFile = "#{File.dirname(__FILE__)}/../log/benchmark/api_benchmark_#{date}.log"
+
+
+whole_bench_start = Time.now
+benchmarkInformation = {}
+
+begin
+  app_version, catalogSize = doSanityCheck(benchmarkInformation)
+
+  doSearchFullTextBenchmark(benchmarkInformation)
+
+  doSearchMetadataBenchmark(benchmarkInformation)
+
+  doCreateItemListBenchmark(benchmarkInformation)
+
+  doGetItemListsBenchmark(benchmarkInformation)
+
+  doGetItemsInItemListBenchmark(benchmarkInformation)
+
+  doGetItemMetadataBenchmark(benchmarkInformation)
+
+  doGetItemPrimaryTextBenchmark(benchmarkInformation)
+
+  doGetItemDocuments(benchmarkInformation, "Audio")
+
+  doGetItemDocuments(benchmarkInformation, "Video")
+
+  doGetItemDocuments(benchmarkInformation, "Text")
+
+  #######doGetItemAnnotationsBenchmark(benchmarkInformation)
+
+  doGetItemListInZipFormat(benchmarkInformation)
+
   puts ""
   puts "*****************************************************************************************************"
   puts "******                              SUMMARY                                                     *****"
@@ -184,70 +738,20 @@ rescue Exception => e
   }
 end
 
-begin
-  File.open(logFile, 'a') {|f|
-    f.puts "Total Items: #{totalItems}"
-    f.puts "Each Item average time: #{((totalItemsTime*1000)/totalItems).round(0)} ms"
+showInformation(benchmarkInformation, app_version, catalogSize)
 
-    f.puts ""
-    f.puts ""
-
-    f.puts "Total documents: #{totalDocuments}"
-    f.puts "Total documents size: #{number_to_human_size(totalDocumentsSize, :precision => 2)}"
-    f.puts "Total documents time: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(totalDocumentsTime)
-    f.puts "Transfer average: #{number_to_human_size((totalDocumentsSize/(totalDocumentsTime/1000)), :precision => 2)}/s"
-
-    f.puts ""
-    f.puts ""
-
-    f.puts "Info per document type"
-    infoPerDocType.each_pair do |key, value|
-      f.puts "      #{key.to_s}:"
-      f.puts "          Amount: #{value[:amount]}"
-      f.puts "          Total size: #{number_to_human_size(value[:totalFileSize], :precision => 2)}"
-      f.puts "          Time for download: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(value[:timeDownloading]*1000)
-      f.puts "          Transfer average: #{number_to_human_size((value[:totalFileSize]/value[:timeDownloading]), :precision => 2)}/s"
-    end
-
-    f.puts ""
-    f.puts ""
-
-    f.puts "Whole process time: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(((Time.now.to_f - whole_bench_start.to_f)*1000))
-    f.puts "*****************************************************************************************************"
-    f.puts ""
-    f.puts ""
-  }
-rescue Exception
-  #do nothing
-end
-
-puts "Total Items: #{totalItems}"
-puts "Each Item average time: #{((totalItemsTime*1000)/totalItems).round(0)} ms"
+$stdout = File.new( logFile, 'a' )
+showInformation(benchmarkInformation, app_version, catalogSize)
+$stdout = STDOUT
 
 puts ""
 puts ""
 
-puts "Total documents: #{totalDocuments}"
-puts "Total documents size: #{number_to_human_size(totalDocumentsSize, :precision => 2)}"
-puts "Total documents time: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(totalDocumentsTime)
-puts "Transfer average: #{number_to_human_size((totalDocumentsSize/(totalDocumentsTime/1000)), :precision => 2)}/s"
-
-puts ""
-puts ""
-
-puts "Info per document type"
-infoPerDocType.each_pair do |key, value|
-  puts "      #{key.to_s}:"
-  puts "          Amount: #{value[:amount]}"
-  puts "          Total size: #{number_to_human_size(value[:totalFileSize], :precision => 2)}"
-  puts "          Time for download: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(value[:timeDownloading]*1000)
-  puts "          Transfer average: #{number_to_human_size((value[:totalFileSize]/value[:timeDownloading]), :precision => 2)}/s"
-end
-
-puts ""
-puts ""
-
-puts "Whole process time: %d days, %d hours, %d minutes and %d seconds" % millisecondsToReadableFormat(((Time.now.to_f - whole_bench_start.to_f)*1000))
+puts "Whole process time: %d days, %d hours, %d minutes and %d seconds with %d milliseconds" % millisecondsToReadableFormat(((Time.now.to_f - whole_bench_start.to_f)*1000))
 puts "*****************************************************************************************************"
 puts ""
 puts ""
+
+
+
+
