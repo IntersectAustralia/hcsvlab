@@ -272,8 +272,8 @@ class CatalogController < ApplicationController
         else
           params[:fq] = "all_metadata:(#{metadataSearchParam})"
         end
+        self.solr_search_params_logic += [:add_metadata_extra_filters]
       end
-      self.solr_search_params_logic += [:add_metadata_extra_filters]
 
       bench_start = Time.now
       super
@@ -347,6 +347,7 @@ class CatalogController < ApplicationController
       end
     end
     self.solr_search_params_logic += [:add_metadata_extra_filters]
+    self.solr_search_params_logic += [:add_unlimited_rows]
 
     # This will allow to search via the API using the parameter q, as it is use via the user-interface
     if (params[:q].present?)
@@ -593,6 +594,13 @@ class CatalogController < ApplicationController
   #
   def add_metadata_extra_filters(solr_parameters, user_params)
     solr_parameters[:fq] << user_params[:fq]
+    solr_parameters[:rows] = FIXNUM_MAX
+  end
+
+  #
+  # Add unlimited rows when searching on metadata fields.
+  #
+  def add_unlimited_rows(solr_parameters, user_params)
     solr_parameters[:rows] = FIXNUM_MAX
   end
 
