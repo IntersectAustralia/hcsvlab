@@ -153,7 +153,6 @@ Feature: Browsing via API
       | $..annotations_url            | http://example.org/catalog/hcsvlab:1/annotations.json  |
       | $..primary_text_url           | http://example.org/catalog/hcsvlab:1/primary_text.json |
 
-  @this
   Scenario: Get item details for austalk item
     Given I ingest "austalk:1_1014_1_11_001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
