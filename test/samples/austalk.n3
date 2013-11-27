@@ -1,0 +1,11 @@
+@prefix austalk: <http://ns.austalk.edu.au/corpus> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+austalk:
+      a dcmitype:Collection ;
+      dc:title "AusTalk: An audio-visual corpus of Australian English" ;
+      dcterms:alternative "AUSTALK" ;
+      dcterms:abstract "AusTalk will be a large state-of-the-art database of spoken Australian English from all around the country. Starting in June 2011, a thousand adults of all ages from 15 different locations in all states & territories are being recorded, representing the regional and social diversity and linguistic variation of Australian English, including Australian Aboriginal English. Each speaker is recorded on three separate occasions so that we can sample their voice in a range of scripted and spontaneous speech situations at various times. Later, this database will be expanded to include more age groups including children, more accents and more ways of speaking." ;
+      .

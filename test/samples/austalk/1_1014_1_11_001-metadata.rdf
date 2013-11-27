@@ -1,0 +1,35 @@
+<http://id.austalk.edu.au/component/1_1014_1_11> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://ns.austalk.edu.au/RecordedComponent> .
+<http://id.austalk.edu.au/component/1_1014_1_11> <http://ns.austalk.edu.au/prototype> <http://id.austalk.edu.au/protocol/component/11> .
+<http://id.austalk.edu.au/component/1_1014_1_11> <http://www.language-archives.org/OLAC/1.1/speaker> <http://id.austalk.edu.au/participant/1_1014> .
+<http://id.austalk.edu.au/component/1_1014_1_11> <http://purl.org/dc/terms/isPartOf> <http://id.austalk.edu.au/session/1_1014_1> .
+<http://id.austalk.edu.au/session/1_1014_1> <http://ns.austalk.edu.au/prototype> <http://id.austalk.edu.au/protocol/session/1> .
+<http://id.austalk.edu.au/session/1_1014_1> <http://www.language-archives.org/OLAC/1.1/speaker> <http://id.austalk.edu.au/participant/1_1014> .
+<http://id.austalk.edu.au/session/1_1014_1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://ns.austalk.edu.au/RecordedSession> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.austalk.edu.au/prompt> "Turn right 90  (face right wall)  2" .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity> <http://ns.ausnc.org.au/schemas/ausnc_md_model/dialogue> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.austalk.edu.au/componentName> "calibration" .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://purl.org/dc/terms/isPartOf> <http://ns.austalk.edu.au/austalk> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/mode> <http://ns.ausnc.org.au/schemas/ausnc_md_model/spoken> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://purl.org/dc/terms/isPartOf> <http://id.austalk.edu.au/component/1_1014_1_11> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style> <http://ns.ausnc.org.au/schemas/ausnc_md_model/spontaneous> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.austalk.edu.au/version> "1.6" .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://purl.org/dc/terms/created> "Fri Sep 09 14:18:48 2011" .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://purl.org/dc/terms/title> "1_1014_1_11_001" .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.austalk.edu.au/session> "1" .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/communication_context> <http://ns.ausnc.org.au/schemas/ausnc_md_model/face_to_face> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://ns.ausnc.org.au/schemas/ausnc_md_model/AusNCObject> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.austalk.edu.au/component> <http://id.austalk.edu.au/protocol/component/11> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://www.language-archives.org/OLAC/1.1/speaker> <http://id.austalk.edu.au/participant/1_1014> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://purl.org/dc/terms/identifier> "1_1014_1_11_001" .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.austalk.edu.au/prototype> <http://id.austalk.edu.au/protocol/item/11_1> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/audience> <http://ns.ausnc.org.au/schemas/ausnc_md_model/individual> .
+
+<http://data.austalk.edu.au/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> <http://ns.austalk.edu.au/version> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://data.austalk.edu.au/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> <http://ns.austalk.edu.au/channel> "ch6-speaker16" .
+<http://data.austalk.edu.au/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> <http://purl.org/dc/terms/format> "audio/wav" .
+<http://data.austalk.edu.au/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Document> .
+<http://data.austalk.edu.au/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> <http://purl.org/dc/terms/type> "Audio" .
+<http://data.austalk.edu.au/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> <http://purl.org/dc/terms/identifier> "1_1014_1_11_001-ch6-speaker16.wav" .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/document> <http://data.austalk.edu.au/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> .
+
+<http://data.austalk.edu.au/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> <http://purl.org/dc/terms/source> <file:///data/austalk/downsampled/UC/1_1014/1/calibration/1_1014_1_11_001-ch6-speaker16.wav> .
