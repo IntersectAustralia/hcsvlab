@@ -373,6 +373,7 @@ namespace :deploy do
     run "cp -p #{current_path}/galaxy_conf/universe_wsgi.ini $GALAXY_HOME/", :env => {'RAILS_ENV' => stage}
     run "sed -i 's+__HCSVLAB_APP_URL__+#{server_url}+g' $GALAXY_HOME/universe_wsgi.ini"
     run "sed -i 's+__GALAXY_PORT__+#{galaxy_port}+g' $GALAXY_HOME/universe_wsgi.ini"
+    run "sed -i 's+__TOOL_SHED_URL__+#{server_url + ':' + toolshed_port}+g' $GALAXY_HOME/tool_sheds_conf.xml"
   end
 
   desc "Update galaxy"
@@ -386,6 +387,35 @@ namespace :deploy do
     update_galaxy
     configure_galaxy
     start_galaxy
+  end
+
+  desc "Start Galaxy Toolshed"
+  task :start_galaxy_toolshed, :role => :app do
+    run "cd $GALAXY_HOME && #{try_sudo} service toolshed start", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Stop Galaxy Toolshed"
+  task :stop_galaxy_toolshed, :role => :app do
+    puts :app
+    run "cd $GALAXY_HOME && #{try_sudo} service toolshed stop", :env => {'RAILS_ENV' => stage}
+  end
+
+  desc "Configure Galaxy Toolshed"
+  task :configure_galaxy_toolshed, :role => :app do
+    run "cp -p #{current_path}/galaxy_conf/tool_shed_wsgi.ini $GALAXY_HOME/", :env => {'RAILS_ENV' => stage}
+    toolshed_config = YAML.load_file('config/galaxy_toolshed.yml')[stage.to_s]
+    run "sed -i 's+__TOOLSHED_PORT__+#{toolshed_port}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
+    run "sed -i 's+__USER__+#{toolshed_config["username"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
+    run "sed -i 's+__PASSWORD__+#{toolshed_config["password"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
+    run "sed -i 's+__HOST__+#{toolshed_config["host"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
+    run "sed -i 's+__DATABASE__+#{toolshed_config["database"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
+  end
+
+  desc "Redeploy Galaxy toolshed"
+  task :redeploy_galaxy_toolshed, :role => :app do
+    stop_galaxy_toolshed
+    configure_galaxy_toolshed
+    start_galaxy_toolshed
   end
 
   # We need to define our own cleanup task since there is an issue on Capistrano deploy:cleanup task

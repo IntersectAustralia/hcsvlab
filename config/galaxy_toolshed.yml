@@ -1,0 +1,26 @@
+default: &defaults
+  username: toolshed
+  password: toolshed
+  host: localhost
+  database: toolshed
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
+
+qa:
+  <<: *defaults
+
+qa2:
+  <<: *defaults
+
+staging:
+  <<: *defaults
+
+staging2:
+  <<: *defaults
