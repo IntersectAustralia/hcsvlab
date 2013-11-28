@@ -8,4 +8,3 @@ role :db,  'ic2-hcsvlab-qa2-vm.intersect.org.au', :primary => true
 set :server_url, "http://ic2-hcsvlab-qa2-vm.intersect.org.au"
 set :galaxy_port, "8081"
 set :toolshed_port, "9009"
-
