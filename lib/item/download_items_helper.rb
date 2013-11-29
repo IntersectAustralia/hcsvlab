@@ -29,6 +29,7 @@ module Item::DownloadItemsHelper
     #
     def createAndRetrieveZipPath(itemsId, &block)
       get_zip_with_documents_and_metadata(itemsId, &block)
+      #get_zip_with_documents_and_metadata_powered(itemsId)
     end
 
     #
@@ -48,12 +49,23 @@ module Item::DownloadItemsHelper
       if (!itemsId.nil? and !itemsId.empty?)
         begin
 
+          timeStart = Time.now
+
           validatedIds = verifyItemsPermissions(itemsId)
+
+          timeEnd = Time.now
+
+          logger.debug "****************** Verify: #{timeEnd.to_f - timeStart.to_f}"
 
           valids = validatedIds[:valids]
           invalids = validatedIds[:invalids]
 
+          timeStart = Time.now
+
           fileNamesByItem = get_documents_path(valids)
+          timeEnd = Time.now
+
+          logger.debug "****************** Doc path: #{timeEnd.to_f - timeStart.to_f}"
 
           digest_filename = Digest::MD5.hexdigest(valids.inspect.to_s)
           bagit_path = "#{Rails.root.join("tmp", "#{digest_filename}_tmp")}"
@@ -62,11 +74,17 @@ module Item::DownloadItemsHelper
           # make a new bag at base_path
           bag = BagIt::Bag.new bagit_path
 
+          timeStart = Time.now
           # add items metadata to the bag
           add_items_metadata_to_the_bag(fileNamesByItem, bag, &block)
+          timeEnd = Time.now
+          logger.debug "****************** Metadata: #{timeEnd.to_f - timeStart.to_f}"
 
+          timeStart = Time.now
           # add items documents to the bag
           add_items_documents_to_the_bag(fileNamesByItem, bag)
+          timeEnd = Time.now
+          logger.debug "****************** doc files: #{timeEnd.to_f - timeStart.to_f}"
 
           # Add Log File
           logJsonText = {}
@@ -77,8 +95,11 @@ module Item::DownloadItemsHelper
             io.puts logJsonText.to_json
           end
 
+          timeStart = Time.now
           # generate the manifest and tagmanifest files
           bag.manifest!
+          timeEnd = Time.now
+          logger.debug "****************** bagit manifest: #{timeEnd.to_f - timeStart.to_f}"
 
           zip_path = "#{Rails.root.join("tmp", "#{digest_filename}.tmp")}"
           zip_file = File.new(zip_path, 'a+')
@@ -363,6 +384,153 @@ module Item::DownloadItemsHelper
       end
     end
 
+    #####################################################################################################################################
+    # THIS CODE IS A PROOF OF CONCEPT FOR IMPROVING THE PERFORMANCE ON DOWNLOADING ITEMS IN ZIP FORMAT
+    # THIS RELIES IN THE FACT THAT THE METADATA IS STORED IN THE BL-CORE.
+    # IN CASE THE PERFORMANCE OF THIS IS ACCEPTABLE, THEN WE SHOULD TIDE UP THE CODE AND REPLACE THE PREVIOUS IMPLEMENTATION
 
+    #
+    # Creates a ZIP file containing all the documents and metadata for the items listed in 'itemsId'.
+    # The returned format respect the BagIt format (http://en.wikipedia.org/wiki/BagIt)
+    #
+    def get_zip_with_documents_and_metadata_powered(itemsId)
+      if (!itemsId.nil? and !itemsId.empty?)
+        begin
+
+          timeStart = Time.now
+
+          info = verifyItemsPermissionsAndExtractMetadata(itemsId)
+
+          timeEnd = Time.now
+
+          logger.debug "****************** Verify: #{timeEnd.to_f - timeStart.to_f}"
+          puts "****************** Verify: #{timeEnd.to_f - timeStart.to_f}"
+
+          valids = info[:valids]
+          invalids = info[:invalids]
+          metadata = info[:metadata]
+
+          timeStart = Time.now
+
+          fileNamesByItem = {}
+          metadata.each_pair do |key, value|
+            handle = value[:metadata]['metadata']['handle'].gsub(':', '_')
+            files = value[:files].map {|filename| filename.to_s.gsub("file://", "")}
+            fileNamesByItem[key] = {handle: handle, files: files}
+          end
+
+          timeEnd = Time.now
+
+          logger.debug "****************** Doc path: #{timeEnd.to_f - timeStart.to_f}"
+          puts "****************** Doc path: #{timeEnd.to_f - timeStart.to_f}"
+
+          digest_filename = Digest::MD5.hexdigest(valids.inspect.to_s)
+          bagit_path = "#{Rails.root.join("tmp", "#{digest_filename}_tmp")}"
+          Dir.mkdir bagit_path
+
+          # make a new bag at base_path
+          bag = BagIt::Bag.new bagit_path
+
+          timeStart = Time.now
+          # add items metadata to the bag
+          add_items_metadata_to_the_bag_powered(metadata, bag)
+          timeEnd = Time.now
+          logger.debug "****************** Metadata: #{timeEnd.to_f - timeStart.to_f}"
+          puts "****************** Metadata: #{timeEnd.to_f - timeStart.to_f}"
+
+          timeStart = Time.now
+          # add items documents to the bag
+          add_items_documents_to_the_bag(fileNamesByItem, bag)
+          timeEnd = Time.now
+          logger.debug "****************** doc files: #{timeEnd.to_f - timeStart.to_f}"
+          puts "****************** doc files: #{timeEnd.to_f - timeStart.to_f}"
+
+          # Add Log File
+          logJsonText = {}
+          logJsonText[:successful] = valids.length
+          logJsonText[:unsuccessful] = invalids.length
+          logJsonText[:unsuccessful_items] = invalids
+          bag.add_file("log.json") do |io|
+            io.puts logJsonText.to_json
+          end
+
+          timeStart = Time.now
+          # generate the manifest and tagmanifest files
+          bag.manifest!
+          timeEnd = Time.now
+          logger.debug "****************** bagit manifest: #{timeEnd.to_f - timeStart.to_f}"
+          puts "****************** bagit manifest: #{timeEnd.to_f - timeStart.to_f}"
+
+          zip_path = "#{Rails.root.join("tmp", "#{digest_filename}.tmp")}"
+          zip_file = File.new(zip_path, 'a+')
+          ZipBuilder.build_zip(zip_file, Dir["#{bagit_path}/*"])
+
+          zip_path
+        ensure
+          zip_file.close if !zip_file.nil?
+          FileUtils.rm_rf bagit_path if !bagit_path.nil?
+        end
+      end
+    end
+
+    #
+    #
+    #
+    def verifyItemsPermissionsAndExtractMetadata(itemsId,batch_group=50)
+      valids = []
+      invalids = []
+      metadata = {}
+
+      itemsId.in_groups_of(batch_group, false) do |groupOfItemsId|
+        # create disjunction condition with the items Ids
+        condition = groupOfItemsId.map{|itemId| "id:\"#{itemId.gsub(":", "\:")}\""}.join(" OR ")
+
+        params = {}
+        params[:q] = condition
+        params[:rows] = FIXNUM_MAX
+
+        (response, document_list) = get_search_results params
+        document_list.each do |aDoc|
+          valids << aDoc[:id]
+          begin
+            jsonMetadata = JSON.parse(aDoc['json_metadata'])
+          rescue
+            puts "******** #{aDoc[:id]}"
+          end
+          metadata[aDoc[:id]] = {}
+          metadata[aDoc[:id]][:files] = jsonMetadata['documentsLocations'].clone.values.flatten
+          jsonMetadata.delete('documentsLocations')
+          metadata[aDoc[:id]][:metadata] = jsonMetadata
+        end
+
+
+
+        #valids += document_list.map{|aDoc| aDoc.id}.flatten
+        invalids += groupOfItemsId - valids
+
+      end
+
+      {valids: valids, invalids: invalids, metadata: metadata}
+
+
+    end
+
+    #
+    #
+    #
+    def add_items_metadata_to_the_bag_powered(metadata, bag)
+      metadata.each_pair do |key, value|
+        # Render the view as JSON
+        itemMetadata = value[:metadata]
+        handle = itemMetadata['metadata']['handle'].gsub(":", "_")
+
+        bag.add_file("#{handle}/#{handle}-metadata.json") do |io|
+          io.puts itemMetadata
+        end
+
+      end
+    end
+
+    ########################################################################################################################################
   end
 end
