@@ -1,5 +1,7 @@
 require 'linkeddata'
 require 'xmlsimple'
+require "#{Rails.root}/app/helpers/blacklight/catalog_helper_behavior.rb"
+require "#{Rails.root}/app/helpers/blacklight/blacklight_helper_behavior"
 
 Dir["#{Rails.root}/lib/rdf/**/*.rb"].each {|f| require f}
 
@@ -7,6 +9,11 @@ Dir["#{Rails.root}/lib/rdf/**/*.rb"].each {|f| require f}
 # Solr_Worker
 #
 class Solr_Worker < ApplicationProcessor
+
+  include Blacklight::CatalogHelperBehavior
+  include Blacklight::BlacklightHelperBehavior
+  include Blacklight::Configurable
+  include Blacklight::SolrHelper
 
   #
   # =============================================================================
@@ -122,7 +129,7 @@ private
       # Now we have the basic results, we have a guddle about for any
       # extra information in which we're interested. Start by creating 
       # the Hash into which we will accumulate this extra data.
-      extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
+      extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], MetadataHelper::SOURCE => [], "date_group_facet" => []}
       full_text = nil
 
       # Look for any fields which we're going to group in the indexing.
@@ -155,6 +162,7 @@ private
         document = result[:document]
         type_query   = RDF::Query.new({document => {MetadataHelper::TYPE => :type}})
         extent_query = RDF::Query.new({document => {MetadataHelper::EXTENT => :extent}})
+        source_query = RDF::Query.new({document => {MetadataHelper::SOURCE => :source}})
 
         inner_results = type_query.execute(graph)
         unless inner_results.size == 0
@@ -167,6 +175,13 @@ private
         unless inner_results.size == 0
           inner_results.each { |inner_result|
             extras[MetadataHelper::EXTENT] << inner_result[:extent].to_s
+          }
+        end
+
+        inner_results = source_query.execute(graph)
+        unless inner_results.size == 0
+          inner_results.each { |inner_result|
+            extras[MetadataHelper::SOURCE] << inner_result[:source].to_s
           }
         end
       }
@@ -232,7 +247,7 @@ private
   # Make a Solr document from information extracted from the Item
   #
   def make_solr_document(object, results, full_text, extras)
-    result = {}
+    document = {}
     configured_fields_found = Set.new()
     ident_parts = {collection: "Unknown Collection", identifier: "Unknown Identifier"}
 
@@ -275,7 +290,7 @@ private
       # Map the field name to it's short form
       field = MetadataHelper::short_form(field)
       configured_fields_found.add(field) if @@configured_fields.include?(field)
-      add_field(result, field, value_encoded, binding)
+      add_field(document, field, value_encoded, binding)
 
     }
     unless extras.nil?
@@ -284,7 +299,7 @@ private
         values = extras[key]
         configured_fields_found.add(field) if @@configured_fields.include?(field) && (values.size > 0)
         values.each { |value|
-          add_field(result, field, value, nil)
+          add_field(document, field, value, nil)
 
           # creates the field mapping
           uri = RDF::URI.new(key)
@@ -301,40 +316,72 @@ private
     end
     unless full_text.nil?
       logger.debug "\tAdding configured field #{:full_text} with value #{trim(full_text, 128)}"
-      ::Solrizer::Extractor.insert_solr_field_value(result, :full_text, full_text)
+      ::Solrizer::Extractor.insert_solr_field_value(document, :full_text, full_text)
     end
     default_il = ['0']
     debug("Solr_Worker", "Adding configured field #{:item_lists} with value #{default_il}")
-    ::Solrizer::Extractor.insert_solr_field_value(result, :item_lists, default_il)
+    ::Solrizer::Extractor.insert_solr_field_value(document, :item_lists, default_il)
     debug("Solr_Worker", "Adding configured field #{:id} with value #{object}")
-    ::Solrizer::Extractor.insert_solr_field_value(result, :id, object)
+    ::Solrizer::Extractor.insert_solr_field_value(document, :id, object)
     ident = ident_parts[:collection] + ":" + ident_parts[:identifier]
     debug("Solr_Worker", "Adding configured field #{:handle} with value #{ident}")
-    ::Solrizer::Extractor.insert_solr_field_value(result, :handle, ident)
+    ::Solrizer::Extractor.insert_solr_field_value(document, :handle, ident)
 
     #Create group permission fields
     debug("Solr_Worker", "Adding discover Permission field for group with value #{ident_parts[:collection]}-discover")
-    ::Solrizer::Extractor.insert_solr_field_value(result, :'discover_access_group_ssim', "#{ident_parts[:collection]}-discover")
+    ::Solrizer::Extractor.insert_solr_field_value(document, :'discover_access_group_ssim', "#{ident_parts[:collection]}-discover")
     debug("Solr_Worker", "Adding read Permission field for group with value #{ident_parts[:collection]}-read")
-    ::Solrizer::Extractor.insert_solr_field_value(result, :'read_access_group_ssim', "#{ident_parts[:collection]}-read")
+    ::Solrizer::Extractor.insert_solr_field_value(document, :'read_access_group_ssim', "#{ident_parts[:collection]}-read")
     debug("Solr_Worker", "Adding edit Permission field for group with value #{ident_parts[:collection]}-edit")
-    ::Solrizer::Extractor.insert_solr_field_value(result, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
+    ::Solrizer::Extractor.insert_solr_field_value(document, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
     #Create user permission fields
     data_owner = Collection.find_by_short_name(ident_parts[:collection]).first.flat_private_data_owner
     if (!data_owner.nil?)
       debug("Solr_Worker", "Adding discover Permission field for user with value #{data_owner}-discover")
-      ::Solrizer::Extractor.insert_solr_field_value(result, :'discover_access_person_ssim', "#{data_owner}")
+      ::Solrizer::Extractor.insert_solr_field_value(document, :'discover_access_person_ssim', "#{data_owner}")
       debug("Solr_Worker", "Adding read Permission field for user with value #{ident_parts[:collection]}-read")
-      ::Solrizer::Extractor.insert_solr_field_value(result, :'read_access_person_ssim', "#{data_owner}")
+      ::Solrizer::Extractor.insert_solr_field_value(document, :'read_access_person_ssim', "#{data_owner}")
       debug("Solr_Worker", "Adding edit Permission field for user with value #{ident_parts[:collection]}-edit")
-      ::Solrizer::Extractor.insert_solr_field_value(result, :'edit_access_person_ssim', "#{data_owner}")
+      ::Solrizer::Extractor.insert_solr_field_value(document, :'edit_access_person_ssim', "#{data_owner}")
     end
 
     # Add in defaults for the configured fields we haven't found so far
     @@configured_fields.each { |field|
-      add_field(result, field, "unspecified", nil) unless configured_fields_found.include?(field)
+      add_field(document, field, "unspecified", nil) unless configured_fields_found.include?(field)
     }
-    return result
+
+    add_json_metadata_field(document)
+
+    return document
+  end
+
+  #
+  #
+  #
+  def add_json_metadata_field(document)
+    itemInfo = create_display_info_hash(document)
+    # Removes id, item_list, *_ssim and *_sim fields
+    metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|item_lists|id)$/)}
+
+    # create a mapping with the documents locations {filename => fullPath}
+    documentsLocations = {}
+    documentsPath = Hash[*document.select{|key, value| key.to_s.match(/#{MetadataHelper.short_form(MetadataHelper::SOURCE.to_s)}_.*/)}.first]
+
+    if (documentsPath.present?)
+      documentsPath.values.first.each do |path|
+        documentsLocations[File.basename(path).to_s] = path.to_s
+      end
+    end
+
+    jsonMetadata = {catalog_url:itemInfo.catalog_url,
+            metadata:metadata,
+            primary_text_url:itemInfo.primary_text_url,
+            annotations_url:itemInfo.annotations_url,
+            documents: itemInfo.documents,
+            documentsLocations: documentsLocations}.to_json
+
+    ::Solrizer::Extractor.insert_solr_field_value(document, 'json_metadata', jsonMetadata.to_s)
+
   end
 
 
@@ -434,7 +481,7 @@ private
       debug("Solr_Worker", "Inserting " + object.to_s )
       response = @@solr.add(document)
       response = @@solr.commit
-    end 
+    end
   end
 
   #

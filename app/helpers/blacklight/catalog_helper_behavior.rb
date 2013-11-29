@@ -120,6 +120,8 @@ module Blacklight::CatalogHelperBehavior
   # of the given document.
   #
   def create_display_info_hash(document)
+    default_url_options = Rails.application.config.action_mailer.default_url_options
+
     fieldDisplayName = create_display_field_name_mapping(document)
 
     # Prepare document METADATA information
@@ -142,11 +144,13 @@ module Blacklight::CatalogHelperBehavior
                       'timestamp' => nil,
                       MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
                       MetadataHelper::short_form(MetadataHelper::IDENT) => nil,
+                      MetadataHelper::short_form(MetadataHelper::SOURCE) + '_tesim' => nil,
                       'date_group_tesim' => nil,
                       'all_metadata' => nil,
                       '_version_' => nil,
                       'item_lists' => nil,
                       'all_metadata' => nil,
+                      'json_metadata' => nil,
                       'discover_access_group_ssim' => nil,
                       'read_access_group_ssim' => nil,
                       'edit_access_group_ssim' => nil,
@@ -169,8 +173,15 @@ module Blacklight::CatalogHelperBehavior
     end
 
     # Prepare document PRIMARY_TEXT_URL information
-    if Item.find_and_load_from_solr({id: document.id}).first.hasPrimaryText?
-      primary_text = catalog_primary_text_url(document.id, format: :json)
+    if Item.find_and_load_from_solr({id: document[:id]}).first.hasPrimaryText?
+      begin
+        primary_text = catalog_primary_text_url(document[:id], format: :json)
+      rescue NoMethodError => e
+        # When we create the json metadata from the solr processor, we need to do the following work around
+        # to have access to routes URL methods
+        parameters = default_url_options.merge({format: :json})
+        primary_text = Rails.application.routes.url_helpers.catalog_primary_text_url(document[:id], parameters)
+      end
     else
       primary_text = "No primary text found"
     end
@@ -186,7 +197,14 @@ module Blacklight::CatalogHelperBehavior
       documentHash = {}
       documents.each do |values|
         if values.has_key?(MetadataHelper::SOURCE)
-          documentHash[:url] = catalog_document_url(document.id, filename: values[MetadataHelper::IDENTIFIER])
+          begin
+            documentHash[:url] = catalog_document_url(document.id, filename: values[MetadataHelper::IDENTIFIER])
+          rescue NoMethodError => e
+            # When we create the json metadata from the solr processor, we need to do the following work around
+            # to have access to routes URL methods
+            parameters = default_url_options.merge({filename: values[MetadataHelper::IDENTIFIER]})
+            documentHash[:url] = Rails.application.routes.url_helpers.catalog_document_url(document[:id], parameters)
+          end
         else
           documentHash[:url] = values[MetadataHelper::IDENTIFIER]
         end
@@ -223,10 +241,23 @@ module Blacklight::CatalogHelperBehavior
     end
 
     itemInfo = ItemInfo.new
-    itemInfo.catalog_url = catalog_url(document)
+    begin
+      itemInfo.catalog_url = catalog_url(document)
+    rescue NoMethodError => e
+      # When we create the json metadata from the solr processor, we need to do the following work around
+      # to have access to routes URL methods
+      itemInfo.catalog_url = Rails.application.routes.url_helpers.catalog_url(document[:id], default_url_options)
+    end
     itemInfo.metadata = metadataHash
     itemInfo.primary_text_url = primary_text
-    itemInfo.annotations_url = catalog_annotations_url(document.id, format: :json)
+    begin
+      itemInfo.annotations_url = catalog_annotations_url(document[:id], format: :json)
+    rescue NoMethodError => e
+      # When we create the json metadata from the solr processor, we need to do the following work around
+      # to have access to routes URL methods
+      parameters = default_url_options.merge({format: :json})
+      itemInfo.annotations_url = Rails.application.routes.url_helpers.catalog_annotations_url(document[:id], parameters)
+    end
     itemInfo.documents = data
 
     itemInfo

@@ -678,7 +678,7 @@ module Blacklight::BlacklightHelperBehavior
   def item_documents(document, uris)
     document_descriptors = []
 
-    uri = buildURI(document.id, 'rdfMetadata')
+    uri = buildURI(document[:id], 'rdfMetadata')
     graph = RDF::Graph.load(uri)
 
     # Find the identity of the Item
@@ -833,6 +833,7 @@ module Blacklight::BlacklightHelperBehavior
   #
   def format_duplicates(list)
     return "" if list.nil?
+    return list unless list.respond_to?("each")
     hash = {}
     list.each { |item|
       if hash.has_key?(item)

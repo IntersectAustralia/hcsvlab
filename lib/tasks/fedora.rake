@@ -360,12 +360,15 @@ namespace :fedora do
     begin
       client = Stomp::Client.open "stomp://localhost:61613"
       client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
-      doc_ids.each { |doc_id|
-        client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
-      }
-      client.close
-    rescue Exception => msg 
+      if doc_ids.present?
+        doc_ids.each { |doc_id|
+          client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
+        }
+      end
+    rescue Exception => msg
       logger.error "Error sending message via stomp: #{msg}"
+    ensure
+      client.close
     end
     return item.pid
   end

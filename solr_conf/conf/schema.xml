@@ -42,6 +42,8 @@
 	<field name="is_governed_by_s" type="string" stored="true" indexed="true"/>
 
     <field name="_version_" type="long" indexed="true" stored="true"/>
+
+    <field name="json_metadata" type="string" indexed="false" stored="true" />
 	
 	<!--
 	These are hard coded in places in hydra-head, but we hope to fix that.
