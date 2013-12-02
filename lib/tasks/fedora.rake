@@ -368,7 +368,7 @@ namespace :fedora do
     rescue Exception => msg
       logger.error "Error sending message via stomp: #{msg}"
     ensure
-      client.close
+      client.close if !client.nil?
     end
     return item.pid
   end
