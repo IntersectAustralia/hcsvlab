@@ -28,8 +28,8 @@ module Item::DownloadItemsHelper
     #
     #
     def createAndRetrieveZipPath(itemsId, &block)
-      get_zip_with_documents_and_metadata(itemsId, &block)
-      #get_zip_with_documents_and_metadata_powered(itemsId)
+      # get_zip_with_documents_and_metadata(itemsId, &block)
+      get_zip_with_documents_and_metadata_powered(itemsId)
     end
 
     #
@@ -212,9 +212,10 @@ module Item::DownloadItemsHelper
           if (File.exist?(file))
             title = file.split('/').last
             # make a new file
-            bag.add_file("#{handle}/#{title}") do |io|
-              io.puts IO.read(file)
-            end
+            # bag.add_file("#{handle}/#{title}") do |io|
+            #   io.puts IO.read(file)
+            # end
+            bag.add_file_link("#{handle}/#{title}", file)
           end
         end
       end
@@ -461,9 +462,13 @@ module Item::DownloadItemsHelper
           logger.debug "****************** bagit manifest: #{timeEnd.to_f - timeStart.to_f}"
           puts "****************** bagit manifest: #{timeEnd.to_f - timeStart.to_f}"
 
+          timeStart = Time.now
           zip_path = "#{Rails.root.join("tmp", "#{digest_filename}.tmp")}"
           zip_file = File.new(zip_path, 'a+')
           ZipBuilder.build_zip(zip_file, Dir["#{bagit_path}/*"])
+          timeEnd = Time.now
+          logger.debug "****************** building zip: #{timeEnd.to_f - timeStart.to_f}"
+          puts "****************** building zip: #{timeEnd.to_f - timeStart.to_f}"
 
           zip_path
         ensure
