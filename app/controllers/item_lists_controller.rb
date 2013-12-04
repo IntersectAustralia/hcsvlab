@@ -179,7 +179,7 @@ class ItemListsController < ApplicationController
     hash = {}
     hash[:apiKey] = current_user.authentication_token
     hash[:cacheDir] = "/path/to/directory"
-    file.write(hash.to_json)
+    file.puts(hash.to_json)
     file.close
     send_file file.path, :filename => "hcsvlab.config", :disposition => "attachment"
   end
