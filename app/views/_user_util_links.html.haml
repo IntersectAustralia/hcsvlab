@@ -33,7 +33,7 @@
             %a#zc_copy_token{"data-clipboard-text" => current_user.authentication_token, :href => "#"}
               Copy to Clipboard
           %li{:class => li_class}
-            = link_to 'Download API Key', account_download_token_path
+            = link_to 'Download API Key', account_api_key_path
       - if current_user.is_superuser? || current_user.is_data_owner?
         %li.divider
         %li= link_to "Admin", admin_index_path

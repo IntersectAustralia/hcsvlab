@@ -24,7 +24,7 @@ HcsvlabWeb::Application.routes.draw do
     get "/account/licence_agreements", :to => "user_registers#licence_agreements" #allow users to edit their own password
     put "/account/update_password", :to => "user_registers#update_password" #allow users to edit their own password
     put "/account/generate_token", :to => "user_registers#generate_token" #allow users to generate an API token
-    get "/account/download_token", :to => "user_registers#download_token"
+    get "/account_api_key", :to => "user_registers#download_token"
     delete "/account/delete_token", :to => "user_registers#delete_token" #allow users to delete their API token
     delete "/account/licence_agreements/:id/cancel_request", :to => "user_licence_requests#cancel_request", :as => 'cancel_request'
   end

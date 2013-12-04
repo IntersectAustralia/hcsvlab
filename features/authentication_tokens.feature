@@ -46,5 +46,5 @@ Feature: Create and manage authentication tokens
     And I am on the home page
     Then I should see the api token displayed for user "diego@intersect.org.au"
     And I follow "Download API Key"
-    Then I should get the authentication token json file for "diego@intersect.org.au"
+    Then I should get the API config file for "diego@intersect.org.au"
 

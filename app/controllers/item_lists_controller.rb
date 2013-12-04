@@ -170,20 +170,6 @@ class ItemListsController < ApplicationController
     end
   end
 
-  def download_config_file
-    if current_user.authentication_token.nil? #generate auth token if one doesn't already exist
-      current_user.reset_authentication_token!
-    end
-
-    file = Tempfile.new("newfile")
-    hash = {}
-    hash[:apiKey] = current_user.authentication_token
-    hash[:cacheDir] = "/path/to/directory"
-    file.puts(hash.to_json)
-    file.close
-    send_file file.path, :filename => "hcsvlab.config", :disposition => "attachment"
-  end
-
   private
 
   #

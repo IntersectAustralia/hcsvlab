@@ -67,8 +67,17 @@ class UserRegistersController < Devise::RegistrationsController
   end
 
   def download_token
-    json_data = {auth_token: current_user.authentication_token}
-    send_data json_data, type: :json, filename: "hcsvlab_#{current_user.full_name.downcase.gsub(' ', "_")}_token.json"
+    if current_user.authentication_token.nil? #generate auth token if one doesn't already exist
+      current_user.reset_authentication_token!
+    end
+
+    file = Tempfile.new("newfile")
+    hash = {}
+    hash[:apiKey] = current_user.authentication_token
+    hash[:cacheDir] = "/path/to/directory"
+    file.puts(hash.to_json)
+    file.close
+    send_file file.path, type: :json, :filename => "hcsvlab.config", :disposition => "attachment"
   end
 
   def generate_token
