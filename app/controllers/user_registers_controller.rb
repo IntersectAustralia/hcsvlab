@@ -74,7 +74,7 @@ class UserRegistersController < Devise::RegistrationsController
     file = Tempfile.new("newfile")
     hash = {}
     hash[:apiKey] = current_user.authentication_token
-    hash[:cacheDir] = "/path/to/directory"
+    hash[:cacheDir] = "/full/path/to/directory"
     file.puts(hash.to_json)
     file.close
     send_file file.path, type: :json, :filename => "hcsvlab.config", :disposition => "attachment"
