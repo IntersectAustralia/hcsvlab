@@ -146,4 +146,34 @@ class Collection < HcsvlabActiveFedora
     collections = Collection.find(:private_data_owner => userEmail)
     return collections.select{ |c| c.collectionList.nil? }
   end
+
+  #
+  # ===========================================================================
+  # Support for adding licences to collections via scripts
+  # ===========================================================================
+  #
+
+  #
+  # Find the collection with the given short name and, as long as we found such
+  # a collection, set its licence to the one supplied.
+  #
+  def self.assign_licence(collection_name, licence)
+    # Find the collection
+    array = Collection.find_by_short_name(collection_name)
+    if array.empty?
+      Rails.logger.error("Collection.assign_licence: cannot find a collection called #{name}")
+      return
+    elsif array.size > 1
+      Rails.logger.error("Collection.assign_licence: multiples collections called #{name}!")
+      return
+    end
+
+    collection = array[0]
+    collection.setLicence(licence) unless licence.nil?
+
+    Rails.logger.info("Licence #{licence.name} assigned to Collection #{collection.flat_name}") unless licence.nil?
+  end
+  # End of Support for adding licences to collections via scripts
+  # ---------------------------------------------------------------------------
+  #
 end
