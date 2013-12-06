@@ -73,6 +73,20 @@ And /^I ingest licences$/ do
   create_default_licences(SAMPLE_FOLDER)
 end
 
+And /^I have (\d+) licences belonging to "([^"]*)"$/ do |amount, email|
+  amount = amount.to_i
+
+  (1..amount).each { | i |
+    s = sprintf("%02d", i)
+    c = Collection.new
+    c.uri = "www.example.com/#{s}"
+    c.short_name = "Licence #{s}"
+    c.private_data_owner = email
+    c.privacy_status = 'false'
+    c.save
+  }
+end
+
 And /^I have "([^:]*):([^:]*)" with id "(hcsvlab:\d+)" indexed$/ do |corpus, prefix, pid|
   rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
 

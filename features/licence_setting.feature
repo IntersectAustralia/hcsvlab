@@ -423,3 +423,25 @@ Feature: Managing Collection Lists and Licences
     Then I should see "All access to Collection List 1 has been successfully revoked"
     And I am on the licence requests page
     Then I should see "No requests to display"
+
+  @javascript
+  Scenario: Can see all collections
+    When I have 15 licences belonging to "data_owner@intersect.org.au"
+    And I am on the licences page
+    Then I should see "Licence 01"
+    And I should see "Licence 02"
+    And I should see "Licence 03"
+    And I should see "Licence 04"
+    And I should see "Licence 05"
+    And I should see "Licence 06"
+    And I should see "Licence 07"
+    And I should see "Licence 08"
+    And I should see "Licence 09"
+    And I should see "Licence 10"
+    And I should see "Licence 11"
+    And I should see "Licence 12"
+    And I should see "Licence 13"
+    And I should see "Licence 14"
+    And I should see "Licence 15"
+
+
