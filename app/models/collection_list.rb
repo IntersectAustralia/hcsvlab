@@ -163,4 +163,79 @@ class CollectionList < HcsvlabActiveFedora
       end
     end
   end
+
+  #
+  # ===========================================================================
+  # Support for creation of CollectionLists via scripts
+  # ===========================================================================
+  #
+
+  #
+  # Create a public collection list with the given name and add the collections
+  # with the given short names to it. Assign the new CollectionList to the
+  # owner of the first collection. Return the new CollectionList if one was
+  # created, otherwise return nil. Note that if there is already a
+  # CollectionList with the given name then _no Collections will be added to
+  # it_. Be tolerant of collections which are named but do not exist - just
+  # skip them (with a warning). Once the CollectionList has been created,
+  # assign the given licence to it (allow a nil licence).
+  #
+  def self.create_public_list(name, licence, *collection_names)
+    # Check there isn't already a CollectionList with that name.
+    cls = CollectionList.find_by_name(name)
+    unless cls.empty?
+      Rails.logger.error("CollectionList.create_public_list: there is already a CollectionList called #{name}")
+      return nil
+    end
+
+    # Find the Collections with the given collection_names
+    user = nil
+    found = []
+    warnings = []
+    collection_names.each { |cn|
+      array = Collection.find_by_short_name(cn)
+      if array.empty?
+        # Couldn't find such a collection
+        warnings << "cannot find a Collection called #{cn}"
+      elsif !array[0].collectionList.nil?
+        # Collection is already in a list
+        warnings << "Collection #{cn} is already part of CollectionList #{array[0].collectionList.name}"
+      else
+        # got it!
+        found << array[0].id
+        user = array[0].data_owner if user.nil?
+      end
+    }
+
+    unless warnings.empty?
+      # There were missing collections.
+      warnings.each { |w|
+        Rails.logger.warning("CollectionList.create_public_list: #{w}")
+      }
+    end
+
+    if found.empty?
+      Rails.logger.error("CollectionList.create_public_list: no viable collections in argument list!")
+      return nil
+    end
+
+    # Do the actual creation and adding
+    result = CollectionList.new
+    result.name           = name
+    result.ownerEmail     = user.email
+    result.ownerId        = user.id.to_s
+    result.privacy_status = 'false'
+    result.save
+    result.add_collections(found)
+    result.setLicence(licence) unless licence.nil?
+
+    Rails.logger.info("Collection list #{result.name} created with #{result.collection_ids.size} collection(s)")
+    Rails.logger.info("Licence #{licence.name} assigned to Collection list #{result.name}") unless licence.nil?
+
+    # Return the new CollectionList
+    return result
+  end
+  # End of Support for creation of CollectionLists via scripts
+  # ---------------------------------------------------------------------------
+  #
 end
