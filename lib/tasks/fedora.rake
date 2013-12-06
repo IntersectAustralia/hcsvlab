@@ -264,6 +264,26 @@ namespace :fedora do
 
 
   #
+  # Set up the default CollectionLists and License assignments
+  #
+  task :collection_setup => :environment do
+    logger.info "rake fedora:collection_setup"
+
+    licences = {}
+    Licence.all.each { |licence|
+      licences[licence.flat_name] = licence
+    }
+
+    setup_collection_list("AUSNC", licences["AusNC Terms of Use"],
+                           "ace", "austlit", "braidedchannels", "cooee", "gcsause", "ice", "mitcheldelbridge", "monash")
+    setup_collection_list("PARADISEC",  licences["PARADISEC Conditions of Access"],
+                          "paradisec", "eopas_test")
+    Collection.assign_licence("austalk", licences["AusTalk Terms of Use"])
+    Collection.assign_licence("avozes",  licences["AVOZES Non-commercial (Academic) Licence"])
+
+  end
+
+  #
   # Check a corpus directory, given as an argument
   #
   task :check => :environment do
@@ -534,4 +554,8 @@ namespace :fedora do
     response['response']['docs']
   end
 
+  def setup_collection_list(list_name, licence, *collection_names)
+    list = CollectionList.create_public_list(list_name,  licence, *collection_names)
+    logger.warning("Didn't create CollectionList #{list_name}") if list.nil?
+  end
 end
