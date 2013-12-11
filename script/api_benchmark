@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
 
 require 'terminal-table'
+require 'colorize'
 
 require 'net/http'
 require 'json'
 require 'action_view'
-require 'colorize'
+require 'pathname'
 include ActionView::Helpers::NumberHelper
 
 ITEM_LIST_NAME_PREFIX = "Benchmark_"
@@ -669,7 +670,8 @@ KEY = ARGV[1].to_s
 
 date = Time.new.strftime("%Y%m%d_%H%M%S")
 logFile = "#{File.dirname(__FILE__)}/../log/benchmark/api_benchmark_#{date}.log"
-
+dir = Pathname.new(logFile).dirname.to_s
+Dir.mkdir(dir) unless Dir.exist?(dir)
 
 whole_bench_start = Time.now
 benchmarkInformation = {}
