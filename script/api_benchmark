@@ -337,38 +337,42 @@ def doGetItemDocuments(benchmarkInformation, type)
   params = { metadata: "type:#{type}"}
   res = sendRequest(:get, CATALOG_SEARCH_URL, params)
   retrievedItems = JSON.parse(res.body)
+  if (retrievedItems["items"].present?)
 
-  res = sendRequest(:get, URI(retrievedItems["items"].first).path)
-  item = JSON.parse(res.body)
-  item["documents"].each do |aDocument|
-    next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
+    res = sendRequest(:get, URI(retrievedItems["items"].first).path)
+    item = JSON.parse(res.body)
+    item["documents"].each do |aDocument|
+      next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
-    startTime = Time.now
-    res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
-    timeInSecs = (Time.now.to_f - startTime.to_f)
-    benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
-  end
+      startTime = Time.now
+      res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      timeInSecs = (Time.now.to_f - startTime.to_f)
+      benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+    end
 
-  res = sendRequest(:get, URI(retrievedItems["items"][retrievedItems["items"].length/2]).path)
-  item = JSON.parse(res.body)
-  item["documents"].each do |aDocument|
-    next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
+    res = sendRequest(:get, URI(retrievedItems["items"][retrievedItems["items"].length/2]).path)
+    item = JSON.parse(res.body)
+    item["documents"].each do |aDocument|
+      next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
-    startTime = Time.now
-    res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
-    timeInSecs = (Time.now.to_f - startTime.to_f)
-    benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
-  end
+      startTime = Time.now
+      res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      timeInSecs = (Time.now.to_f - startTime.to_f)
+      benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+    end
 
-  res = sendRequest(:get, URI(retrievedItems["items"].last).path)
-  item = JSON.parse(res.body)
-  item["documents"].each do |aDocument|
-    next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
+    res = sendRequest(:get, URI(retrievedItems["items"].last).path)
+    item = JSON.parse(res.body)
+    item["documents"].each do |aDocument|
+      next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
-    startTime = Time.now
-    res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
-    timeInSecs = (Time.now.to_f - startTime.to_f)
-    benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+      startTime = Time.now
+      res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      timeInSecs = (Time.now.to_f - startTime.to_f)
+      benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
+    end
+  else
+    benchmarkInformation[:get_item_documents] << {type: type, ErrorMessage: "No items with #{type} documents found", error: true}
   end
 
 
@@ -605,7 +609,11 @@ def showInformation(benchmarkInformation, app_version, catalogSize)
       t << ['Document Type', 'Size', 'Time in seconds']
       t << :separator
       benchmarkInformation[:get_item_documents].each do |info|
-        t << [info[:type], info[:fileSizeInBytes], info[:timeInSecs]]
+        if (info.has_key?(:error))
+          t << [info[:type], info[:ErrorMessage], "###"]
+        else
+          t << [info[:type], info[:fileSizeInBytes], info[:timeInSecs]]
+        end
       end
     end
     puts table
