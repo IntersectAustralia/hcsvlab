@@ -222,11 +222,16 @@ class ItemListsController < ApplicationController
 
       bench_start = Time.now
 
+      dont_show = Set.new(Item.development_only_fields)
+
       # Creates a WARC file containing the documents and item's metadata
       archive_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveWarcPath(itemsId, request.original_url) do |aDoc|
         @document = aDoc
-        renderer = Rabl::Renderer.new('catalog/show', @document, { :format => 'json', :view_path => 'app/views', :scope => self })
-        itemMetadata = renderer.render
+        itemMetadata = {}
+        keys = aDoc.keys
+        aDoc.keys.each { |key|
+          itemMetadata[key] = aDoc[key].join(', ') unless dont_show.include?(key)
+        }
         itemMetadata
       end
 

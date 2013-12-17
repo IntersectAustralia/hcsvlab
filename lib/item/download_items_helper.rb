@@ -282,13 +282,15 @@ module Item::DownloadItemsHelper
 
       fileNamesByItem.each_pair do |itemId, info|
         filenames = info[:files]
+        metadata  = info[:metadata] || {}
+
         handle = (info[:handle].nil?)? itemId.gsub(":", "_") : info[:handle]
 
         filenames.each do |file|
           if (File.exist?(file))
             title = file.split('/').last
             # make a new file
-            warc.add_record_from_file({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}/document/#{title}"}, file)
+            warc.add_record_from_file(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}/document/#{title}"}), file)
           else
             logger.warn("Document file #{file} does not exist (part of Item #{itemId}")
           end
@@ -297,7 +299,8 @@ module Item::DownloadItemsHelper
     end
 
     #
-    # This method will add each item metadata for the items listed in 'fileNamesByItem' to the WARC
+    # This method will add each item metadata for the items listed in 'fileNamesByItem' into
+    # fileNamesByItem under the [:metadata] key.
     # It will also modify the parameter 'fileNamesByItem' to set the item handle
     #
     # fileNamesByItem = Hash structure containing the items id as key and the list of files as value
@@ -324,7 +327,7 @@ module Item::DownloadItemsHelper
 
           # Render the view as JSON
           itemMetadata = block.call aDoc
-          warc.add_record_from_string({"WARC-Type" => "metadata", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}.json"}, itemMetadata)
+          fileNamesByItem[itemId][:metadata] = itemMetadata
         end
       end
     end
