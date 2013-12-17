@@ -580,7 +580,7 @@ Feature: Browsing via API
     {"error":"name and items parameters not found"}
     """
 
-  Scenario: Add items to an item list via the API including non-existant items
+  Scenario: Add items to an item list via the API including non-existent items
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | name  | items                                                                             |
@@ -600,3 +600,10 @@ Feature: Browsing via API
     """
     {"error":"items parameter not an array"}
     """
+
+  Scenario: Download items metadata and files in Zip format including non-existent items
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
+      | format   | items                                                                             |
+      | zip      | ["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:666"] |
+    Then I should get a 200 response code

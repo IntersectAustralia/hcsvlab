@@ -72,6 +72,9 @@ module NavigationHelpers
       when /^the catalog page for "(.*)"$/
         catalog_path($1, options)
 
+      when /^the download_items page$/
+        catalog_download_items_api_path(options)
+
       when /^the licences page$/
         licences_path(options)
 

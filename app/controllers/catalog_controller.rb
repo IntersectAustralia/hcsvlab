@@ -558,7 +558,7 @@ class CatalogController < ApplicationController
       bench_start = Time.now
 
       # Creates a ZIP file containing the documents and item's metadata
-      zip_path = DownloadItemsInZipFormat.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
+      zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
         @itemInfo = create_display_info_hash(aDoc)
 
         renderer = Rabl::Renderer.new('catalog/show', @itemInfo, { :format => 'json', :view_path => 'app/views', :scope => self })

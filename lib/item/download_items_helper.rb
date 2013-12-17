@@ -408,7 +408,7 @@ module Item::DownloadItemsHelper
           timeEnd = Time.now
 
           logger.debug "****************** Verify: #{timeEnd.to_f - timeStart.to_f}"
-          puts "****************** Verify: #{timeEnd.to_f - timeStart.to_f}"
+          #puts "****************** Verify: #{timeEnd.to_f - timeStart.to_f}"
 
           valids = info[:valids]
           invalids = info[:invalids]
@@ -426,7 +426,7 @@ module Item::DownloadItemsHelper
           timeEnd = Time.now
 
           logger.debug "****************** Doc path: #{timeEnd.to_f - timeStart.to_f}"
-          puts "****************** Doc path: #{timeEnd.to_f - timeStart.to_f}"
+          #puts "****************** Doc path: #{timeEnd.to_f - timeStart.to_f}"
 
           digest_filename = Digest::MD5.hexdigest(valids.inspect.to_s)
           bagit_path = "#{Rails.root.join("tmp", "#{digest_filename}_tmp")}"
@@ -440,14 +440,14 @@ module Item::DownloadItemsHelper
           add_items_metadata_to_the_bag_powered(metadata, bag)
           timeEnd = Time.now
           logger.debug "****************** Metadata: #{timeEnd.to_f - timeStart.to_f}"
-          puts "****************** Metadata: #{timeEnd.to_f - timeStart.to_f}"
+          #puts "****************** Metadata: #{timeEnd.to_f - timeStart.to_f}"
 
           timeStart = Time.now
           # add items documents to the bag
           add_items_documents_to_the_bag(fileNamesByItem, bag)
           timeEnd = Time.now
           logger.debug "****************** doc files: #{timeEnd.to_f - timeStart.to_f}"
-          puts "****************** doc files: #{timeEnd.to_f - timeStart.to_f}"
+          #puts "****************** doc files: #{timeEnd.to_f - timeStart.to_f}"
 
           # Add Log File
           logJsonText = {}
@@ -463,7 +463,7 @@ module Item::DownloadItemsHelper
           bag.manifest!
           timeEnd = Time.now
           logger.debug "****************** bagit manifest: #{timeEnd.to_f - timeStart.to_f}"
-          puts "****************** bagit manifest: #{timeEnd.to_f - timeStart.to_f}"
+          #puts "****************** bagit manifest: #{timeEnd.to_f - timeStart.to_f}"
 
           timeStart = Time.now
           zip_path = "#{Rails.root.join("tmp", "#{digest_filename}.tmp")}"
@@ -471,7 +471,7 @@ module Item::DownloadItemsHelper
           ZipBuilder.build_zip(zip_file, Dir["#{bagit_path}/*"])
           timeEnd = Time.now
           logger.debug "****************** building zip: #{timeEnd.to_f - timeStart.to_f}"
-          puts "****************** building zip: #{timeEnd.to_f - timeStart.to_f}"
+          #puts "****************** building zip: #{timeEnd.to_f - timeStart.to_f}"
 
           zip_path
         ensure
