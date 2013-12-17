@@ -42,4 +42,26 @@ class Item < HcsvlabActiveFedora
   def hasPrimaryText?
     !self.primary_text.size.nil?
   end
+
+  #
+  # The list of Item fields which we should not to the user.
+  #
+  def self.development_only_fields
+    ['id',
+     'timestamp',
+     'full_text',
+     MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim',
+     'handle',
+     '_version_',
+     'item_lists',
+     'all_metadata',
+     'discover_access_group_ssim',
+     'read_access_group_ssim',
+     'edit_access_group_ssim',
+     'discover_access_person_ssim',
+     'read_access_person_ssim',
+     'edit_access_person_ssim',
+     "json_metadata",
+     "score"]
+  end
 end

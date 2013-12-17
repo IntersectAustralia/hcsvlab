@@ -53,21 +53,7 @@
       - else
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
           = render_document_show_field_value document, :field => solr_fname
-  - development_only = {'id' => nil,
-                        'timestamp' => nil,
-                        'full_text' => nil,
-                        MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
-                        'handle' => nil,
-                        '_version_' => nil,
-                        'item_lists' => nil,
-                        'all_metadata' => nil,
-                        'discover_access_group_ssim' => nil,
-                        'read_access_group_ssim' => nil,
-                        'edit_access_group_ssim' => nil,
-                        'discover_access_person_ssim' => nil,
-                        'read_access_person_ssim' => nil,
-                        'edit_access_person_ssim' => nil,
-                        "json_metadata" => nil}
+  - development_only = Item.development_only_fields.inject({}) { |hash, field| hash[field] = nil; hash}
   - do_not_display = development_only.merge(document_show_fields(document)) # document_show_fields have already been shown, so don't duplicate them
   - document.keys.each do |k|
     - v = document[k]
