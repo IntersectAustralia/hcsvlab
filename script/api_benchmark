@@ -83,7 +83,8 @@ def doSanityCheck(benchmarkInformation)
 
   # Verify that the KEY is correct and that there are item ingested
 
-  res = sendRequest(:get, CATALOG_SEARCH_URL)
+  params = { q: "incredible"}
+  res = sendRequest(:get, CATALOG_SEARCH_URL, params)
   if (res.code == "401")
     puts "ERROR: Invalid Authentication token.".red
     raise SecurityError
