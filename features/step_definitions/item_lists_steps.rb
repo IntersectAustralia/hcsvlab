@@ -92,6 +92,6 @@ Then(/^I should get the API config file for "(.*?)"$/) do |user|
   page.response_headers['Content-Disposition'].should include("filename=\"hcsvlab.config\"")
   page.response_headers['Content-Disposition'].should include("attachment")
 
-  page.body.should eq('{"apiKey":"' + User.find_by_email(user).authentication_token + '","cacheDir":"/full/path/to/directory"}
+  page.body.should eq('{"apiKey":"' + User.find_by_email(user).authentication_token + '","cacheDir":"wrassp_cache"}
 ')
 end
