@@ -95,12 +95,10 @@ gem 'stomp'
 gem 'celluloid'
 gem 'daemons'
 gem 'activemessaging'
-gem "rdf-turtle"
 
 gem 'solrizer'
 # gem 'solrizer-fedora', "3.0.0.pre1"
 gem 'rsolr'
-gem "linkeddata"
 gem "xml-simple"
 gem 'nokogiri'
 gem 'fileutils'
@@ -115,6 +113,9 @@ gem 'rabl'
 # exception tracker
 gem 'whoops_rails_logger', git: 'https://github.com/IntersectAustralia/whoops_rails_logger.git'
 
+gem "linkeddata"
+gem "rdf-turtle"
+gem "rdf-sesame"
 gem 'sparql'
 
 gem 'request_exception_handler'

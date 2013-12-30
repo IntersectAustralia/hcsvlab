@@ -321,6 +321,9 @@ GEM
     rdf-rdfxml (1.0.2)
       rdf (>= 1.0)
       rdf-xsd (>= 1.0)
+    rdf-sesame (0.1.0)
+      json_pure (>= 1.2.0)
+      rdf (>= 0.0.9)
     rdf-trig (1.0.0)
       ebnf (>= 0.2.0)
       rdf (>= 1.0)
@@ -511,6 +514,7 @@ DEPENDENCIES
   pry-rails
   rabl
   rails (= 3.2.13)
+  rdf-sesame
   rdf-turtle
   request_exception_handler
   rsolr

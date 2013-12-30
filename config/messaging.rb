@@ -12,7 +12,10 @@ ActiveMessaging::Gateway.define do |s|
  
   s.destination :solr_worker, '/queue/hcsvlab.solr.worker'
 
+  s.destination :sesame_worker, '/queue/hcsvlab.sesame.worker'
+
   s.processor_group :fedora_group, :fedora_worker, :vacuum_cleaner
   s.processor_group :solr_group, :solr_worker
+  s.processor_group :sesame_group, :sesame_worker
 
 end

@@ -53,7 +53,6 @@ namespace :fedora do
     ingest_corpus(corpus_dir, num_spec, random, annotations)
   end
 
-
   #
   # Clear everything out of the system
   #
@@ -361,7 +360,15 @@ namespace :fedora do
       end
     end
 
+    populate_triple_store(corpus_dir)
+
     report_results(label, corpus_dir, successes, errors)
+  end
+
+
+  def populate_triple_store(corpus_dir)
+    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+    stomp_client.publish('/queue/hcsvlab.sesame.worker', "{\"action\": \"ingest\", \"corpus_directory\":\"#{corpus_dir}\"}")
   end
 
 

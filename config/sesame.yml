@@ -1,0 +1,16 @@
+development:
+  url: http://localhost:8983/openrdf-sesame
+test: &TEST
+  url: http://localhost:8983/openrdf-sesame
+qa:
+  url: http://localhost:8080/openrdf-sesame
+qa2:
+  url: http://localhost:8080/openrdf-sesame
+staging:
+  url: http://localhost:8080/openrdf-sesame
+staging2:
+  url: http://localhost:8080/openrdf-sesame
+production:
+  url: http://localhost:8080/openrdf-sesame
+cucumber:
+  <<: *TEST
