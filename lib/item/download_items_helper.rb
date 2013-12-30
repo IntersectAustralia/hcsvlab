@@ -133,7 +133,6 @@ module Item::DownloadItemsHelper
 
           warc.add_warcinfo(url, url)
 
-
           base_url = url.sub(/item_lists.*/, "")
           # add items metadata to the archive
           add_items_metadata_to_the_warc(fileNamesByItem, warc, base_url, &block)
@@ -280,6 +279,7 @@ module Item::DownloadItemsHelper
     #
     def add_items_documents_to_the_warc(fileNamesByItem, warc, base_url)
 
+      item_metadata_added = Array.new
       fileNamesByItem.each_pair do |itemId, info|
         filenames = info[:files]
         metadata  = info[:metadata] || {}
@@ -290,7 +290,9 @@ module Item::DownloadItemsHelper
           if (File.exist?(file))
             title = file.split('/').last
             # make a new file
+            metadata = {} if item_metadata_added.include? itemId # don't add item metadata if already added for another document
             warc.add_record_from_file(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}/document/#{title}"}), file)
+            item_metadata_added.push itemId
           else
             logger.warn("Document file #{file} does not exist (part of Item #{itemId}")
           end
