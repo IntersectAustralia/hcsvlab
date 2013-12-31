@@ -619,7 +619,7 @@ class CatalogController < ApplicationController
   #
   def query_annotations(item, solr_document, type, label)
     uri = buildURI(item.id, 'annotationSet1')
-    repo = RDF::Repository.load(uri)
+    repo = RDF::Repository.load(uri, :format => :ttl)
     corpus = solr_document[MetadataHelper::short_form(MetadataHelper::COLLECTION)].first
     queryConfig = YAML.load_file(Rails.root.join("config", "sparql.yml"))
 
