@@ -1,0 +1,25 @@
+%h3
+  Searchable metadata fields
+%table.table.table-striped
+  %thead
+    %tr
+      %td
+        %b
+          RDF Name
+      %td
+        %b
+          User Name
+  %tbody
+    -if @nameMappings.empty?
+      %tr
+        %td{:colspan => 2}
+          No searchable fields found
+    -else
+      -@nameMappings.each do |aNameMapping|
+        %tr
+          %td
+            =aNameMapping[:rdfName]
+          %td
+            =aNameMapping[:user_friendly_name]
+
+= render 'shared/nectar_attribution'

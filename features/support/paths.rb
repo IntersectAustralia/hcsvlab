@@ -105,6 +105,9 @@ module NavigationHelpers
       when /^the licence requests page$/
         user_licence_requests_path(options)
 
+      when /^the searchable fields page$/
+        searchable_fields_path(options)
+
 
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:

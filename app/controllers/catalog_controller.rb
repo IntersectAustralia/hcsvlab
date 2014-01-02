@@ -10,7 +10,7 @@ class CatalogController < ApplicationController
   # Set catalog tab as current selected
   set_tab :catalog
 
-  before_filter :authenticate_user!, :except => [:index, :annotation_context]
+  before_filter :authenticate_user!, :except => [:index, :annotation_context, :searchable_fields]
   #load_and_authorize_resource
 
   include Blacklight::Catalog
@@ -513,6 +513,18 @@ class CatalogController < ApplicationController
     end
 
   end
+
+  #
+  # Display every field that can be user to do a search in the metadata
+  #
+  def searchable_fields
+    @nameMappings = []
+    ItemMetadataFieldNameMapping.all.each do |aNameMapping|
+      @nameMappings << {rdfName: aNameMapping['rdf_name'], user_friendly_name: aNameMapping['user_friendly_name']}
+    end
+    @nameMappings
+  end
+
 
   private
 

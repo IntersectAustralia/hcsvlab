@@ -176,3 +176,12 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
+
+  @javascript
+  Scenario: The searchable fields should be displayed
+    Given I reindex all
+    Given I am on the searchable fields page
+    Then I should see a table with the following rows in any order:
+      | RDF Name  | User Name   |
+      | rdf:type  | RDF_type    |
+      | dc:type   | type        |

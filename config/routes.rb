@@ -4,6 +4,7 @@ HcsvlabWeb::Application.routes.draw do
   get "version", :to => "application#version"
 
   get "catalog/search", :to => 'catalog#search', :as => 'catalog_search'
+  get "catalog/searchable_fields", :to => 'catalog#searchable_fields', :as => 'searchable_fields'
 
   Blacklight.add_routes(self)
   get "catalog/:id/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text'
@@ -47,7 +48,6 @@ HcsvlabWeb::Application.routes.draw do
   match '/eopas/:id' => 'transcripts#show', :as => 'eopas'
 
   match 'schema/json-ld' => 'catalog#annotation_context', :as => 'annotation_context'
-
   resources :issue_reports, :only => [:new, :create] do
   end
 
