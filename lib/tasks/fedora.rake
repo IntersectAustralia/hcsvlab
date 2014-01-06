@@ -318,6 +318,8 @@ namespace :fedora do
     label += "   annotations: #{annotations}"
     puts label
 
+    start = Time.now
+
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
     if num_spec == :all
@@ -353,6 +355,7 @@ namespace :fedora do
     rdf_files.each do |rdf_file|
       begin
         pid = ingest_rdf_file(corpus_dir, rdf_file, annotations)
+
         successes[rdf_file] = pid
       rescue => e
         logger.error "Error! #{e.message}"
@@ -363,9 +366,15 @@ namespace :fedora do
     populate_triple_store(corpus_dir)
 
     report_results(label, corpus_dir, successes, errors)
+    endTime = Time.new
+    logger.debug("Time for ingesting #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - start.to_f)*1000)}ms)")
+
   end
 
-
+  #
+  # Send message to sesame worker with the directory where metadata and annotations
+  # have to be ingested in the triple store
+  #
   def populate_triple_store(corpus_dir)
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     stomp_client.publish('/queue/hcsvlab.sesame.worker', "{\"action\": \"ingest\", \"corpus_directory\":\"#{corpus_dir}\"}")
@@ -377,10 +386,14 @@ namespace :fedora do
       raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
     end
     logger.info "Ingesting item: #{rdf_file}"
+
     item, update = create_item_from_file(corpus_dir, rdf_file)
+
     if update
       look_for_annotations(item, rdf_file) if annotations
+
       doc_ids = look_for_documents(item, corpus_dir)
+
       item.save!
     end
 

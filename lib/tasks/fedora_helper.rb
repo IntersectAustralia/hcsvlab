@@ -23,17 +23,23 @@ def create_item_from_file(corpus_dir, rdf_file)
 
   handle = "#{collection_name}:#{identifier}"
 
-  if Collection.where(short_name: collection_name).count == 0
+  collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
+
+  if collection.nil?
     create_collection(collection_name, corpus_dir)
+    collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
   end
 
-  existing = Item.where(:handle => handle).to_a
-  if !existing[0].nil? && File.mtime(rdf_file).utc < Time.parse(existing[0].modified_date) && !existing.empty?
-    logger.info "Item = #{existing[0].id} already up to date"
-    return existing[0], false
-  elsif !existing.empty?
-    logger.info "Item = #{existing[0].id} updated"
-    return update_item_from_file(existing[0], graph, result), true
+  # We can't use find_and_load_from_solr method here since the result is not a full DigitalObject
+  # and thus we can't call methods like modified_date
+  existingItem = Array(Item.where(:handle => handle)).first
+
+  if !existingItem.nil? && File.mtime(rdf_file).utc < Time.parse(existingItem.modified_date)
+    logger.info "Item = #{existingItem.id} already up to date"
+    return existingItem, false
+  elsif !existingItem.nil?
+    logger.info "Item = #{existingItem.id} updated"
+    return update_item_from_file(existingItem, graph, result), true
   else
     item = Item.new
     item.save!
@@ -42,7 +48,7 @@ def create_item_from_file(corpus_dir, rdf_file)
     item.label = item.rdfMetadata.graph.statements.first.subject
 
     item.handle = handle
-    item.collection = Collection.find_by_short_name(collection_name).first
+    item.collection = collection
 
     # Add Groups to the created item
     item.set_discover_groups(["#{collection_name}-discover"], [])
@@ -141,7 +147,7 @@ def look_for_documents(item, corpus_dir)
                          })
   query.execute(item.rdfMetadata.graph).each do |result|
     file_name = last_bit(result.source.to_s)
-    existing_doc = Document.where(:file_name => file_name, :item_id => item.id).to_a
+    existing_doc = Document.find_and_load_from_solr({:file_name => file_name, :item_id => item.id})
     if existing_doc.empty?
       # Create a document in fedora
       begin
@@ -183,7 +189,7 @@ def look_for_documents(item, corpus_dir)
                   logger.warn "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item" unless Rails.env.test?
               end
             end
-            doc.save
+            #doc.save
             logger.info "#{result.type.to_s} Document = #{doc.pid.to_s}" unless Rails.env.test?
             break
           end
