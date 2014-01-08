@@ -688,13 +688,17 @@ class CatalogController < ApplicationController
     avoid_context << RDF::DOAP.to_uri
     avoid_context << RDF::EXIF.to_uri
     avoid_context << RDF::GEO.to_uri
+    avoid_context << RDF::GR.to_uri
     avoid_context << RDF::HCalendar.to_uri
     avoid_context << RDF::HCard.to_uri
     avoid_context << RDF::HTTP.to_uri
+    avoid_context << RDF::ICAL.to_uri
     avoid_context << RDF::LOG.to_uri
     avoid_context << RDF::MA.to_uri
     avoid_context << RDF::MD.to_uri
+    avoid_context << RDF::OG.to_uri
     avoid_context << RDF::OWL.to_uri
+    avoid_context << RDF::PROV.to_uri
     avoid_context << RDF::PTR.to_uri
     avoid_context << RDF::RDFA.to_uri
     avoid_context << RDF::RDFS.to_uri
@@ -703,10 +707,16 @@ class CatalogController < ApplicationController
     avoid_context << RDF::RSS.to_uri
     avoid_context << RDF::SIOC.to_uri
     avoid_context << RDF::SKOS.to_uri
-    avoid_context << SPARQL::Grammar::SPARQL_GRAMMAR.to_uri
+    avoid_context << RDF::SKOSXL.to_uri
+    avoid_context << RDF::V.to_uri
+    avoid_context << RDF::VCARD.to_uri
+    avoid_context << RDF::VOID.to_uri
+    avoid_context << RDF::WDRS.to_uri
     avoid_context << RDF::WOT.to_uri
     avoid_context << RDF::XHTML.to_uri
     avoid_context << RDF::XHV.to_uri
+
+    avoid_context << SPARQL::Grammar::SPARQL_GRAMMAR.to_uri
 
     avoid_context << "http://rdfs.org/sioc/types#"
     avoid_context

@@ -113,9 +113,10 @@ gem 'rabl'
 # exception tracker
 gem 'whoops_rails_logger', git: 'https://github.com/IntersectAustralia/whoops_rails_logger.git'
 
-gem "linkeddata"
-gem "rdf-turtle"
-gem "rdf-sesame"
+gem 'linkeddata', '~> 1.0.0'
+gem 'rdf-turtle'
+gem 'rdf-sesame', git: 'https://github.com/ruby-rdf/rdf-sesame.git'
+gem 'json_pure', '1.8.0'
 gem 'sparql'
 
 gem 'request_exception_handler'
