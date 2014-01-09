@@ -4,6 +4,10 @@ STORE_DOCUMENT_TYPES = ['Text']
 
 
 def create_item_from_file(corpus_dir, rdf_file)
+  # Loading the graph in memory consume about 70% of the time needed to create an item.
+  # We are loading the whole graph in order to recover the collection_name and the item identifier
+  # TODO: We should try to find a faster way to retrieve collection_name and item identifier
+  #
   graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
   query = RDF::Query.new({
                              :item => {
@@ -24,7 +28,6 @@ def create_item_from_file(corpus_dir, rdf_file)
   handle = "#{collection_name}:#{identifier}"
 
   collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
-
   if collection.nil?
     create_collection(collection_name, corpus_dir)
     collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
@@ -63,6 +66,7 @@ def create_item_from_file(corpus_dir, rdf_file)
     end
 
     logger.info "Item = #{item.pid} created"
+
     return item, true
   end
 end

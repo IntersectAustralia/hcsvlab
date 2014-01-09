@@ -12,6 +12,15 @@ GIT
       rails (~> 3)
       whoops_logger (= 0.1.4)
 
+GIT
+  remote: https://github.com/ruby-rdf/rdf-sesame.git
+  revision: 90e0f324a3a334fbe9514147ef24e031ebfa6464
+  specs:
+    rdf-sesame (1.1)
+      addressable (~> 2.3)
+      json_pure (~> 1.8)
+      rdf (~> 1.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -297,8 +306,7 @@ GEM
       rdoc (~> 3.4)
       thor (>= 0.14.6, < 2.0)
     rake (10.0.4)
-    rdf (1.0.8)
-      addressable (>= 2.2)
+    rdf (1.1.1.1)
     rdf-aggregate-repo (0.1.2)
       rdf (>= 1.0)
     rdf-isomorphic (1.0.1)
@@ -321,9 +329,6 @@ GEM
     rdf-rdfxml (1.0.2)
       rdf (>= 1.0)
       rdf-xsd (>= 1.0)
-    rdf-sesame (0.1.0)
-      json_pure (>= 1.2.0)
-      rdf (>= 0.0.9)
     rdf-trig (1.0.0)
       ebnf (>= 0.2.0)
       rdf (>= 1.0)
@@ -502,9 +507,10 @@ DEPENDENCIES
   hydra-head (~> 6.0.0)
   jettywrapper
   jquery-rails (= 2.3.0)
+  json_pure (= 1.8.0)
   jsonpath
   launchy
-  linkeddata
+  linkeddata (~> 1.0.0)
   mimemagic
   newrelic_rpm
   nokogiri
@@ -514,7 +520,7 @@ DEPENDENCIES
   pry-rails
   rabl
   rails (= 3.2.13)
-  rdf-sesame
+  rdf-sesame!
   rdf-turtle
   request_exception_handler
   rsolr

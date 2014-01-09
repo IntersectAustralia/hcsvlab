@@ -2,6 +2,8 @@ require File.dirname(__FILE__) + '/fedora_helper.rb'
 
 namespace :fedora do
 
+  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env]
+
   @solr = RSolr.connect(Blacklight.solr_config)
 
   #
@@ -128,6 +130,12 @@ namespace :fedora do
       logger.info "Removing collection object #{collection.pid}"
       collection.delete
     }
+
+    # Clear all metadata and annotations from the triple store
+    server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
+    repository = server.repository(corpus)
+    repository.clear()
+
   end
 
 
@@ -318,7 +326,7 @@ namespace :fedora do
     label += "   annotations: #{annotations}"
     puts label
 
-    start = Time.now
+    overall_start = Time.now
 
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
@@ -367,7 +375,7 @@ namespace :fedora do
 
     report_results(label, corpus_dir, successes, errors)
     endTime = Time.new
-    logger.debug("Time for ingesting #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - start.to_f)*1000)}ms)")
+    logger.debug("Time for ingesting #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - overall_start.to_f)*1000)}ms)")
 
   end
 
@@ -386,7 +394,6 @@ namespace :fedora do
       raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
     end
     logger.info "Ingesting item: #{rdf_file}"
-
     item, update = create_item_from_file(corpus_dir, rdf_file)
 
     if update
