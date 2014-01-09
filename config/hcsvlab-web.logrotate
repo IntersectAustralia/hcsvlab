@@ -1,0 +1,10 @@
+/home/devel/hcsvlab-web/shared/log/*.log {
+    rotate 520
+    weekly
+    copytruncate
+    missingok
+    notifempty
+    olddir /home/devel/hcsvlab-web/shared/log_archive
+    compress
+    dateext
+}
