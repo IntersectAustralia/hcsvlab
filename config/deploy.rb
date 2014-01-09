@@ -378,7 +378,36 @@ namespace :deploy do
 
   desc "Update galaxy"
   task :update_galaxy, :role => :app do
-    run "cd $GALAXY_HOME && git reset --hard HEAD && git pull origin master", :env => {'RAILS_ENV' => stage}
+
+    # First show the branches and tags to decide from where are we going to deploy
+    require 'colorize'
+    default_tag = 'HEAD'
+
+    run "cd $GALAXY_HOME", :env => {'RAILS_ENV' => stage}
+    availableLocalBranches = capture("cd $GALAXY_HOME && git branch").split (/\r?\n/)
+    availableLocalBranches.map! { |s|  "(local) " + s.strip}
+
+    availableRemoteBranches = capture("cd $GALAXY_HOME && git branch -r").split (/\r?\n/)
+    availableRemoteBranches.map! { |s|  "(remote) " + s.split('/')[-1].strip}
+
+    availableTags = capture("cd $GALAXY_HOME && git tag").split (/\r?\n/)
+
+    puts "Availible tags:".colorize(:yellow)
+    availableTags.each {|s| puts s}
+    puts "Availible branches:".colorize(:yellow)
+    availableLocalBranches.each {|s| puts s}
+    availableRemoteBranches.each {|s| puts s.colorize(:red)}
+
+    tag = Capistrano::CLI.ui.ask "Tag to deploy (make sure to push the branch/tag first) or HEAD?: [#{default_tag}] ".colorize(:yellow)
+    tag = default_tag if tag.empty?
+
+    puts "Deploying brach/tag: #{tag}".colorize(:red)
+
+
+    # Once we chose the branch/tag, we setup up it in the local repository.
+    run "cd $GALAXY_HOME && git pull origin master", :env => {'RAILS_ENV' => stage}
+    run "cd $GALAXY_HOME && git reset --hard #{tag}", :env => {'RAILS_ENV' => stage}
+
   end
 
   desc "Redeploy Galaxy, stops, updates, configures and starts galaxy"
