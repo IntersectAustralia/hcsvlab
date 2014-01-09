@@ -4,7 +4,7 @@ text: >
   <div>This licence agreement governs the relationship between the copyright and intellectual property owner
   (“the licensor”) of the audio-video speech data corpus known as the AVOZES data corpus and “the licensee”.
   This licence regulates the use of the AVOZES data corpus for <b>non-commercial</b>, in particular <b>academic
-  research, purposes ONLY</b> by the licensee. If at any stage a commercial use of the AVOZES data corpus is
+  research, purposes ONLY</b> by the licensee. If at any stage a <b>commercial use</b> of the AVOZES data corpus is
   intended or actively pursued, a commercial licence must be obtained.</div>
   <h2>Parties to this Licence Agreement</h2>
   <ol><li><b>The Licensor:</b><br>
@@ -34,7 +34,7 @@ text: >
   <div>2.3 Any external and internal publications based on the use of the Licensed Data must be made in accordance with
   clause 3. </div>
   <div>2.4 The Licensor is not responsible for any damage to, or loss of, the Equipment used for processing and/or storage
-  of the Licensed Data</div>
+  of the Licensed Data.</div>
   <div>2.5 The Licensee will not allow any third party to use the Licensed Data or the
   Documentation and the Licensee may not use them on behalf of, or for the benefit of, any third party in any way
   without explicit, prior written permission of the Licensor. </div>
@@ -58,7 +58,7 @@ text: >
   <div>3.1 The Licensee is permitted to publish external and internal research reports (for example, but not limited to,
   technical reports, conference papers, journal papers, books, student theses, whether in printed, electronic or any
   other form) which result from the Licensee's use of the Licensed Data in accordance with this Licence Agreement, on
-  the conditi on that the Licensee acknowledges the use of the Licensed Data in the research report in the form of a
+  the condition that the Licensee acknowledges the use of the Licensed Data in the research report in the form of a
   reference to the following paper:
   <blockquote>R. Goecke and J.B. Millar, “The Audio-Video Australian English Speech Data Corpus AVOZES”, <em>Proceedings
   of the 8th International Conference on Spoken Language Processing ICSLP2004</em>, Volume III, pages 2525-2528, Jeju
