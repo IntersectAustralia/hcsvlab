@@ -383,7 +383,7 @@ namespace :deploy do
     require 'colorize'
     default_tag = 'HEAD'
 
-    run "cd $GALAXY_HOME", :env => {'RAILS_ENV' => stage}
+    run "cd $GALAXY_HOME && git pull", :env => {'RAILS_ENV' => stage}
     availableLocalBranches = capture("cd $GALAXY_HOME && git branch").split (/\r?\n/)
     availableLocalBranches.map! { |s|  "(local) " + s.strip}
 
