@@ -119,7 +119,7 @@ Feature: Managing Item Lists
     And I follow "Use Item List in Emu/R"
     Then I should see "Use Test1 in Emu/R"
     And I should see "Copy the following code into your R environment"
-    And I should see "item_list = readItemList"
+    And I should see "item_list <- client$get_item_list_by_id"
     And I follow "Download API key config file"
     And I should get the API config file for "researcher@intersect.org.au"
 
