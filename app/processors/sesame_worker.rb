@@ -92,10 +92,6 @@ class Sesame_Worker < ApplicationProcessor
     results.each do |rdfItem|
       item_id = rdfItem['item_id']
 
-
-      #[RDF::Resource]          subject
-      #   @param  [RDF::URI]               predicate
-      #   @param  [RDF::Term]              object
       subject = RDF::Resource.new(item_id)
       predicate = RDF::URI.new("http://ns.ausnc.org.au/schemas/ausnc_md_model/auth")
       object = "#{collection_name}-read"

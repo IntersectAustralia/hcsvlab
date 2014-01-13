@@ -69,7 +69,7 @@ module RDF::Sesame
 
       system_repository = self.repository(:SYSTEM)
       if (!self.has_repository?(id))
-        response = self.post(system_repository.url(:statements), data, 'Content-Type' => 'application/x-trig;charset=UTF-8')
+        response = self.post(system_repository.path(:statements), data, 'Content-Type' => 'application/x-trig;charset=UTF-8')
         "204".eql?(response.code)
       else
         return false

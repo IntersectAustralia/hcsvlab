@@ -40,7 +40,7 @@ module RDF::Sesame
           data += IO.read(rdfFileUri)
         end
 
-        response = server.post(self.url(:statements), data, 'Content-Type' => 'application/x-turtle')
+        response = server.post(self.path(:statements), data, 'Content-Type' => 'application/x-turtle')
         raise Exception.new(response.message) unless "204".eql?(response.code)
       end
     end
