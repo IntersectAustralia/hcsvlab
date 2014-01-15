@@ -287,11 +287,12 @@ namespace :fedora do
     }
 
     setup_collection_list("AUSNC", licences["AusNC Terms of Use"],
-                           "ace", "austlit", "braidedchannels", "cooee", "gcsause", "ice", "mitcheldelbridge", "monash")
+                           "ace", "art", "austlit", "braidedchannels", "cooee", "gcsause", "ice", "mitcheldelbridge", "monash")
     setup_collection_list("PARADISEC",  licences["PARADISEC Conditions of Access"],
                           "paradisec", "eopas_test")
     Collection.assign_licence("austalk", licences["AusTalk Terms of Use"])
     Collection.assign_licence("avozes",  licences["AVOZES Non-commercial (Academic) Licence"])
+    Collection.assign_licence("clueweb", licences["ClueWeb Terms of Use"])
 
   end
 
