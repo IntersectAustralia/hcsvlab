@@ -129,7 +129,8 @@ private
       # Now we have the basic results, we have a guddle about for any
       # extra information in which we're interested. Start by creating 
       # the Hash into which we will accumulate this extra data.
-      extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], MetadataHelper::SOURCE => [], "date_group_facet" => []}
+      extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
+      internalUseData = {:documents_path => []}
       full_text = nil
 
       # Look for any fields which we're going to group in the indexing.
@@ -181,12 +182,12 @@ private
         inner_results = source_query.execute(graph)
         unless inner_results.size == 0
           inner_results.each { |inner_result|
-            extras[MetadataHelper::SOURCE] << inner_result[:source].to_s
+            internalUseData[:documents_path] << inner_result[:source].to_s
           }
         end
       }
 
-      store_results(object, basic_results, full_text, extras)
+      store_results(object, basic_results, full_text, extras, internalUseData)
     end
   end
 
@@ -246,7 +247,7 @@ private
   #
   # Make a Solr document from information extracted from the Item
   #
-  def make_solr_document(object, results, full_text, extras)
+  def make_solr_document(object, results, full_text, extras, internalUseData)
     document = {}
     configured_fields_found = Set.new()
     ident_parts = {collection: "Unknown Collection", identifier: "Unknown Identifier"}
@@ -350,7 +351,7 @@ private
       add_field(document, field, "unspecified", nil) unless configured_fields_found.include?(field)
     }
 
-    add_json_metadata_field(document)
+    add_json_metadata_field(document, internalUseData)
 
     return document
   end
@@ -358,17 +359,18 @@ private
   #
   #
   #
-  def add_json_metadata_field(document)
+  def add_json_metadata_field(document, internalUseData)
     itemInfo = create_display_info_hash(document)
     # Removes id, item_list, *_ssim and *_sim fields
     metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|item_lists|id)$/)}
 
     # create a mapping with the documents locations {filename => fullPath}
     documentsLocations = {}
-    documentsPath = Hash[*document.select{|key, value| key.to_s.match(/#{MetadataHelper.short_form(MetadataHelper::SOURCE.to_s)}_.*/)}.first]
+    #documentsPath = Hash[*document.select{|key, value| key.to_s.match(/#{MetadataHelper.short_form(MetadataHelper::SOURCE.to_s)}_.*/)}.first]
+    documentsPath = internalUseData[:documents_path]
 
     if (documentsPath.present?)
-      documentsPath.values.first.each do |path|
+      documentsPath.each do |path|
         documentsLocations[File.basename(path).to_s] = path.to_s
       end
     end
@@ -467,9 +469,9 @@ private
   #
   # Update Solr with the information we've found
   #
-  def store_results(object, results, full_text, extras = nil)
+  def store_results(object, results, full_text, extras = nil, internalUseData)
     get_solr_connection()
-    document = make_solr_document(object, results, full_text, extras)
+    document = make_solr_document(object, results, full_text, extras, internalUseData)
     if (object_exists_in_solr?(object))
       debug("Solr_Worker", "Updating " + object.to_s)
       xml_update = make_solr_update(document)
