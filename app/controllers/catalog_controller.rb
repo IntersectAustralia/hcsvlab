@@ -455,7 +455,7 @@ class CatalogController < ApplicationController
           content = doc.datastreams['CONTENT1'].content[offset, length+1]
         else
           content = doc.datastreams['CONTENT1'].content
-          response.header["Content-Length"] = content.length.to_s
+          response.header["Content-Length"] = Rack::Utils.bytesize(content).to_s
 
         end
 
