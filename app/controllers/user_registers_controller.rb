@@ -77,7 +77,7 @@ class UserRegistersController < Devise::RegistrationsController
     hash[:cacheDir] = "wrassp_cache"
     file.puts(hash.to_json)
     file.close
-    send_file file.path, type: :json, :filename => "hcsvlab.config", :disposition => "attachment"
+    send_file file.path, :filename => "hcsvlab.config", :disposition => "attachment"
   end
 
   def generate_token
