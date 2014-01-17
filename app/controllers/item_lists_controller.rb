@@ -62,7 +62,7 @@ class ItemListsController < ApplicationController
   def create
     if request.format == 'json' and request.post?
       name = params[:name]
-      if (!name.nil? and !name.blank?) and (!params[:items].nil? and params[:items].is_a? Array)
+      if (!name.nil? and !name.blank? and !name.length>255) and (!params[:items].nil? and params[:items].is_a? Array)
         item_lists = current_user.item_lists.where(:name => name)
         if item_lists.empty?
           @item_list = ItemList.new(:name => name, :user_id => current_user.id)
@@ -81,7 +81,7 @@ class ItemListsController < ApplicationController
           @success_message = "#{added_set.count} items added to existing item list #{@item_list.name}"
         end
       else
-        err_message = "name parameter" if name.nil? or name.blank?
+        err_message = "name parameter" if name.nil? or name.blank? or name.lenght>255
         err_message = "items parameter" if params[:items].nil?
         err_message = "name and items parameters" if (name.nil? or name.blank?) and params[:items].nil?
         err_message << " not found" if !err_message.nil?
@@ -103,13 +103,15 @@ class ItemListsController < ApplicationController
           flash[:notice] = 'Item list created successfully'
           addItemsResult = add_item_to_item_list(@item_list, documents)
           session[:profiler] = addItemsResult[:profiler]
-          redirect_to @item_list
+          redirect_to @item_list and return
         end
+        flash[:error] = "Error trying to create an Item list, name too long (max. 255 characters)" if (name.length > 255)
+        flash[:error] = "Error trying to create an Item list" unless (name.length > 255)
+        redirect_to :back and return
       else
         flash[:error] = "Item list with name '#{name}' already exists."
-        redirect_to :back
+        redirect_to :back and return
       end
-
     end
   end
 

@@ -22,6 +22,30 @@ Feature: Managing Item Lists
     And I should see "1 - 3 of 3"
 
   @javascript
+  Scenario: Creating an Item List with empty name
+    And I should see "You searched for:"
+    And I should see "Add All to list"
+    And I follow "Add All to list"
+    And I follow "Create New List"
+    And I wait 2 seconds
+    And I should see "Create New Item List"
+    And I fill in "Name" with ""
+    And I press "Create List"
+    Then I should see "Name can't be blank"
+
+  @javascript
+  Scenario: Creating an Item List with empty name
+    And I should see "You searched for:"
+    And I should see "Add All to list"
+    And I follow "Add All to list"
+    And I follow "Create New List"
+    And I wait 2 seconds
+    And I should see "Create New Item List"
+    And I fill in "Name" with "This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name"
+    And I press "Create List"
+    Then I should see "Error trying to create an Item list, name too long (max. 255 characters)"
+
+  @javascript
   Scenario: Creating an Item List with all items from search
     And I should see "You searched for:"
     And I should see "Add All to list"
@@ -32,6 +56,7 @@ Feature: Managing Item Lists
     And I fill in "Name" with "Add All Test"
     And I press "Create List"
     And I wait 5 seconds
+    And Save a screenshot with name "tmp/test1.png"
     And I should be on the item list page for "Add All Test"
     And I should see "Item list created successfully"
     And the item list "Add All Test" should have 3 items

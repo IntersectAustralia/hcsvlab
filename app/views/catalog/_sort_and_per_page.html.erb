@@ -83,6 +83,12 @@
           error = true;
         }
       });
+      jQuery('a[href$="add_to_existing_item_list"]').each(function() {
+        if(new_name.length > 255) {
+          jQuery("#item_list_error").text("Item list name too long (max. 255 characters)");
+          error = true;
+        }
+      });
       if(error)
         return false;
       jQuery("#new-item-list").hide();

@@ -14,6 +14,7 @@ class ItemList < ActiveRecord::Base
   attr_accessible :name, :id, :user_id
 
   validates :name, presence: true
+  validates_length_of :name, :maximum => 255 , message:"Name is too long (maximum is 255 characters)"
 
   #
   # Class variables for information about Solr
