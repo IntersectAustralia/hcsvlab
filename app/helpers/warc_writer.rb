@@ -52,6 +52,13 @@ class WARCWriter
     puts ""
   end
 
+  def add_record_metadata(header_hash)
+    puts "WARC/#{@version}"
+    puts "WARC-Date: #{@timestamp}"
+    header_hash.each_pair { |k, v| puts "#{k}: #{v}" }
+    puts ""
+  end
+
   def add_record_from_file(header_hash, filename)
     File.open(filename, "r") { |stream| add_record_from_stream(header_hash, stream)}
   end

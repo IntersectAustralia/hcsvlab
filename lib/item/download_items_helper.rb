@@ -135,23 +135,20 @@ module Item::DownloadItemsHelper
     #
     def add_items_documents_to_the_warc(fileNamesByItem, warc, base_url)
 
-      item_metadata_added = Array.new
       fileNamesByItem.each_pair do |itemId, info|
         filenames = info[:files]
         metadata  = info[:metadata] || {}
 
-        handle = (info[:handle].nil?)? itemId.gsub(":", "_") : info[:handle]
-
-        filenames.each do |file|
-          if (File.exist?(file))
-            title = file.split('/').last
-            # make a new file
-            metadata = {} if item_metadata_added.include? itemId # don't add item metadata if already added for another document
-            warc.add_record_from_file(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}/document/#{title}"}), file)
-            item_metadata_added.push itemId
-          else
-            logger.warn("Document file #{file} does not exist (part of Item #{itemId}")
-          end
+        indexable_text_document = (filenames.select {|f| f.include? "-plain.txt"}).empty? ? "" : (filenames.select {|f| f.include? "-plain.txt"})[0]
+        if File.exist?(indexable_text_document)
+          title = indexable_text_document.split('/').last
+          warc.add_record_from_file(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}/document/#{title}"}), indexable_text_document)
+        elsif indexable_text_document.blank?
+          logger.warn("No primary (plaintext) document found for Item #{itemId}")
+          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}"}))
+        else
+          logger.warn("Document file #{indexable_text_document} does not exist (part of Item #{itemId}")
+          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}"}))
         end
       end
     end
