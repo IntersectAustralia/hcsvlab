@@ -8,6 +8,7 @@ class ItemListsController < ApplicationController
   include Item::DownloadItemsHelper
 
   before_filter :authenticate_user!
+  before_filter :validate_id_parameter
   load_and_authorize_resource
 
   # Set itemList tab as current selected
@@ -261,6 +262,15 @@ class ItemListsController < ApplicationController
 
   def add_item_to_item_list(item_list, documents_ids)
     item_list.add_items(documents_ids) unless item_list.nil?
+  end
+
+  #
+  #
+  #
+  def validate_id_parameter
+    if (params[:id].to_i > 2147483647)
+      resource_not_found(Exception.new("Couldn't find ItemList with id=#{params[:id]}"))
+    end
   end
 
 end
