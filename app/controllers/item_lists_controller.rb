@@ -11,6 +11,8 @@ class ItemListsController < ApplicationController
   before_filter :validate_id_parameter
   load_and_authorize_resource
 
+  FIXNUM_MAX = 2147483647
+
   # Set itemList tab as current selected
   set_tab :itemList
 
@@ -89,17 +91,25 @@ class ItemListsController < ApplicationController
         end
       end
     else
-      if params[:all_items] == 'true'
-        documents = @item_list.getAllItemsFromSearch(params[:query_all_params])
+      name = params[:item_list][:name]
+      item_lists = current_user.item_lists.find_by_name(name)
+      if (item_lists.nil?)
+        if params[:all_items] == 'true'
+          documents = @item_list.getAllItemsFromSearch(params[:query_all_params])
+        else
+          documents = params[:sel_document_ids].split(",")
+        end
+        if @item_list.save
+          flash[:notice] = 'Item list created successfully'
+          addItemsResult = add_item_to_item_list(@item_list, documents)
+          session[:profiler] = addItemsResult[:profiler]
+          redirect_to @item_list
+        end
       else
-        documents = params[:sel_document_ids].split(",")
+        flash[:error] = "Item list with name '#{name}' already exists."
+        redirect_to :back
       end
-      if @item_list.save
-        flash[:notice] = 'Item list created successfully'
-        addItemsResult = add_item_to_item_list(@item_list, documents)
-        session[:profiler] = addItemsResult[:profiler]
-        redirect_to @item_list
-      end
+
     end
   end
 
@@ -268,7 +278,7 @@ class ItemListsController < ApplicationController
   #
   #
   def validate_id_parameter
-    if (params[:id].to_i > 2147483647)
+    if (params[:id].to_i > FIXNUM_MAX)
       resource_not_found(Exception.new("Couldn't find ItemList with id=#{params[:id]}"))
     end
   end
