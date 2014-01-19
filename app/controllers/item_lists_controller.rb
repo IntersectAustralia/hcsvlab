@@ -62,7 +62,7 @@ class ItemListsController < ApplicationController
   def create
     if request.format == 'json' and request.post?
       name = params[:name]
-      if (!name.nil? and !name.blank? and !name.length>255) and (!params[:items].nil? and params[:items].is_a? Array)
+      if (!name.nil? and !name.blank? and !(name.length > 255)) and (!params[:items].nil? and params[:items].is_a? Array)
         item_lists = current_user.item_lists.where(:name => name)
         if item_lists.empty?
           @item_list = ItemList.new(:name => name, :user_id => current_user.id)
@@ -81,7 +81,7 @@ class ItemListsController < ApplicationController
           @success_message = "#{added_set.count} items added to existing item list #{@item_list.name}"
         end
       else
-        err_message = "name parameter" if name.nil? or name.blank? or name.lenght>255
+        err_message = "name parameter" if name.nil? or name.blank? or name.length > 255
         err_message = "items parameter" if params[:items].nil?
         err_message = "name and items parameters" if (name.nil? or name.blank?) and params[:items].nil?
         err_message << " not found" if !err_message.nil?
