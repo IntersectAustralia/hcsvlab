@@ -73,6 +73,7 @@ class UserRegistersController < Devise::RegistrationsController
 
     file = Tempfile.new("newfile")
     hash = {}
+    hash[:base_url] = root_url
     hash[:apiKey] = current_user.authentication_token
     hash[:cacheDir] = "wrassp_cache"
     file.puts(hash.to_json)
