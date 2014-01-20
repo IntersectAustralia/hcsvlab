@@ -173,7 +173,6 @@ Feature: Browsing via API
       | $..['austalk:prototype']      | 11_1                                                    |
       | $..['austalk:session']        | 1                                                       |
       | $..['austalk:version']        | 1.6                                                     |
-      | $..annotations_url            | http://example.org/catalog/hcsvlab:1/annotations.json   |
       | $..primary_text_url           | No primary text found                                   |
 
   Scenario: Get item details should not return fields used for authorization
