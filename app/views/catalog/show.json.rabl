@@ -10,7 +10,9 @@ else
 
   node(:primary_text_url) { @itemInfo.primary_text_url }
 
-  node(:annotations_url) { @itemInfo.annotations_url }
+  unless @itemInfo.annotations_url.nil?
+  	node(:annotations_url) { @itemInfo.annotations_url }
+  end
 
   node(:documents) { @itemInfo.documents }
 

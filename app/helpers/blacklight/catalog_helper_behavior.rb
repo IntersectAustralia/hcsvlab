@@ -173,7 +173,8 @@ module Blacklight::CatalogHelperBehavior
     end
 
     # Prepare document PRIMARY_TEXT_URL information
-    if Item.find_and_load_from_solr({id: document[:id]}).first.hasPrimaryText?
+    solr_item = Item.find_and_load_from_solr({id: document[:id]}).first
+    if solr_item.hasPrimaryText?
       begin
         primary_text = catalog_primary_text_url(document[:id], format: :json)
       rescue NoMethodError => e
@@ -251,7 +252,9 @@ module Blacklight::CatalogHelperBehavior
     itemInfo.metadata = metadataHash
     itemInfo.primary_text_url = primary_text
     begin
-      itemInfo.annotations_url = catalog_annotations_url(document[:id], format: :json)
+      unless solr_item.annotation_set.empty?
+        itemInfo.annotations_url = catalog_annotations_url(document[:id], format: :json)
+      end
     rescue NoMethodError => e
       # When we create the json metadata from the solr processor, we need to do the following work around
       # to have access to routes URL methods
