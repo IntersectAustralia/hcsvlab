@@ -134,7 +134,8 @@ class UsersController < ApplicationController
 
     current_user.accept_licence_request(coll_id)
 
-    flash[:notice] = "Licence terms to #{type} #{name} accepted."
+    type == "collection" ? friendly_type = "collection" : friendly_type = "collection list"
+    flash[:notice] = "Licence terms to #{friendly_type} #{name} accepted."
     redirect_to account_licence_agreements_path
   end
 

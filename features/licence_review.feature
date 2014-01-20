@@ -256,7 +256,8 @@ Feature: Managing Subscriptions to Collections
     And I am on the licence agreements page
     And I follow "Preview & Accept Licence Terms"
     And I click "Accept" on the 1st licence dialogue
-    Then the Review and Acceptance of Licence Terms table should have
+    Then I should see "Licence terms to collection austlit accepted"
+    And the Review and Acceptance of Licence Terms table should have
       | title   | collection | owner                       | state    |
       | austlit | 1          | data_owner@intersect.org.au | Accepted |
 
