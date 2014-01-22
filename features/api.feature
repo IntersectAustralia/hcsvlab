@@ -609,3 +609,13 @@ Feature: Browsing via API
       | format   | items                                                                             |
       | zip      | ["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:666"] |
     Then I should get a 200 response code
+
+  Scenario: Download items metadata and files in Warc format including non-existent items
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And "researcher1@intersect.org.au" has item lists
+      | name   |
+      | Test 1 |
+    And the item list "Test 1" has items hcsvlab:1
+    Given I make a WARC request for the item list page for "Test 1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+

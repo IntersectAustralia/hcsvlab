@@ -45,12 +45,22 @@ class ItemListsController < ApplicationController
         @document_list = @response["response"]["docs"]
       }
       format.zip {
+        if @item_list.get_item_ids.length == 0
+          flash[:error] = "No items in the item list you are trying to download"
+          redirect_to @item_list and return
+        end
+        
         # Get the items of the item list
         itemsId = @item_list.get_item_ids
 
         download_as_zip(itemsId, "#{@item_list.name}.zip")
       }
       format.warc {
+        if @item_list.get_item_ids.length == 0
+          flash[:error] = "No items in the item list you are trying to download"
+          redirect_to @item_list and return
+        end
+
         # Get the items of the item list
         itemsId = @item_list.get_item_ids
 

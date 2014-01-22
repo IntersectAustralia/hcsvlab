@@ -63,6 +63,11 @@ When /^I make a (JSON )?request for (.*) with an invalid API token$/ do |json, p
   end
 end
 
+When /^I make a WARC request for (.*) with the API token for "(.*)"$/ do |page_name, email|
+  user = User.find_by_email!(email)
+  get path_to(page_name), {:format => :warc}, {'X-API-KEY' => user.authentication_token}
+end
+
 Then /^I should see no api token$/ do
   with_scope("the api token dropdown") do
     page.should have_xpath("//li[@class='disabled']", :text => "No API Key generated")
