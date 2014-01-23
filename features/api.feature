@@ -610,8 +610,9 @@ Feature: Browsing via API
       | zip      | ["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:666"] |
     Then I should get a 200 response code
 
-  Scenario: Download items metadata and files in Warc format including non-existent items
+  Scenario: Download items metadata and files in Warc format
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And I reindex all
     And "researcher1@intersect.org.au" has item lists
       | name   |
       | Test 1 |
