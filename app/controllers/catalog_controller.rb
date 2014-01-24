@@ -623,6 +623,11 @@ class CatalogController < ApplicationController
         format.html {raise e}
         format.any { render :json => {:error => "access-denied"}.to_json, :status => 403 }
       end
+    rescue Blacklight::Exceptions::InvalidSolrID => e
+      respond_to do |format|
+        format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return}
+        format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      end
     end
   end
 
