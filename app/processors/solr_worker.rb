@@ -34,6 +34,7 @@ class Solr_Worker < ApplicationProcessor
 
   FEDORA_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env] unless const_defined?(:FEDORA_CONFIG)
   FACETS_CONFIG = YAML.load_file(Rails.root.join("config", "facets.yml")) unless const_defined?(:FACETS_CONFIG)
+  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless const_defined?(:SESAME_CONFIG)
 
   load_config()
   subscribes_to :solr_worker
@@ -111,84 +112,57 @@ private
   # Do the indexing for an Item
   #
   def index_item(object)
-    uri = buildURI(object, 'rdfMetadata')
-    graph = RDF::Graph.load(uri)
+    fed_item = Item.find(object)
 
-    # Find the identity of the Item
-    query = RDF::Query.new({:item => {MetadataHelper::IS_PART_OF => :corpus}})
-    results = query.execute(graph)
+    begin
+      server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+      repository = server.repository(fed_item.collection.flat_name)
+      raise Exception.new "Repository not found - #{fed_item.collection.flat_name}" if repository.nil?
+    rescue => e
+      error("Solr Worker", e.message)
+      error("Solr Worker", e.backtrace)
+      return
+    end 
 
-    unless results.size == 0
-      # Now find all the triplets which have the Item as the subject
-      # and add them all to the index
-      item = results[0][:item]
-      query = RDF::Query.new({item => {:predicate => :object}})
-      basic_results = query.execute(graph)
-#      print_results(basic_results, "bloody hell")
+    basic_results = repository.query(:subject => RDF::URI.new(fed_item.flat_uri))
 
-      # Now we have the basic results, we have a guddle about for any
-      # extra information in which we're interested. Start by creating 
-      # the Hash into which we will accumulate this extra data.
-      extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
-      internalUseData = {:documents_path => []}
-      full_text = nil
+    extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
+    internalUseData = {:documents_path => []}
 
-      # Look for any fields which we're going to group in the indexing.
-      # At the moment this is solely the Date field.
-      query = RDF::Query.new({item => {MetadataHelper::CREATED => :date}})
-      results = query.execute(graph)
-      results.each { |result|
-        date = result[:date]
-        group = date_group(date)
-        extras["date_group_facet"] << group unless group.nil?
-      }
-
-      # Get the full text, if there is any
-      fed_item = Item.find(object)
-      begin
-        unless fed_item.nil? || fed_item.primary_text.nil?
-          full_text = fed_item.primary_text.content
-        end 
-      rescue
-        warning("Solr_Worker", "caught exception fetching full_text for: #{object}")
-        full_text = ""
-      end
-
-      # Finally look for references to Documents within the metadata and
-      # find their types and extents.
-      query = RDF::Query.new({item => {MetadataHelper::DOCUMENT => :document}})
-      results = query.execute(graph)
-
-      results.each { |result|
-        document = result[:document]
-        type_query   = RDF::Query.new({document => {MetadataHelper::TYPE => :type}})
-        extent_query = RDF::Query.new({document => {MetadataHelper::EXTENT => :extent}})
-        source_query = RDF::Query.new({document => {MetadataHelper::SOURCE => :source}})
-
-        inner_results = type_query.execute(graph)
-        unless inner_results.size == 0
-          inner_results.each { |inner_result|
-            extras[MetadataHelper::TYPE] << inner_result[:type].to_s
-          }
-        end
-
-        inner_results = extent_query.execute(graph)
-        unless inner_results.size == 0
-          inner_results.each { |inner_result|
-            extras[MetadataHelper::EXTENT] << inner_result[:extent].to_s
-          }
-        end
-
-        inner_results = source_query.execute(graph)
-        unless inner_results.size == 0
-          inner_results.each { |inner_result|
-            internalUseData[:documents_path] << inner_result[:source].to_s
-          }
-        end
-      }
-
-      store_results(object, basic_results, full_text, extras, internalUseData)
+    # Get date group if there is one
+    date_result = repository.query(:subject => RDF::URI.new(fed_item.flat_uri), :predicate => MetadataHelper::CREATED)
+    unless date_result.empty?
+      date = date_result.first_object
+      group = date_group(date)
+      extras["date_group_facet"] << group unless group.nil?
     end
+
+    # get full text from item
+    begin
+      unless fed_item.nil? || fed_item.primary_text.nil?
+        full_text = fed_item.primary_text.content
+      end 
+    rescue
+      warning("Solr_Worker", "caught exception fetching full_text for: #{object}")
+      full_text = ""
+    end
+
+    # Get document info
+    document_results = repository.query(:subject => RDF::URI.new(fed_item.flat_uri), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
+
+    document_results.each { |result|
+      document = result.to_hash[:object]
+
+      doc_info = repository.query(:subject => document).to_hash[document]
+
+      extras[MetadataHelper::TYPE] << doc_info[MetadataHelper::TYPE][0].to_s unless doc_info[MetadataHelper::TYPE].nil?
+
+      extras[MetadataHelper::EXTENT] << doc_info[MetadataHelper::EXTENT][0].to_s unless doc_info[MetadataHelper::EXTENT].nil?
+
+      internalUseData[:documents_path] << doc_info[MetadataHelper::SOURCE][0].to_s unless doc_info[MetadataHelper::SOURCE].nil?
+    }
+
+    store_results(object, basic_results, full_text, extras, internalUseData)
   end
 
   #
@@ -253,6 +227,7 @@ private
     ident_parts = {collection: "Unknown Collection", identifier: "Unknown Identifier"}
 
     results.each { |binding|
+      binding = binding.to_hash
 
       # Set the defaults for field and value
       field = binding[:predicate].to_s

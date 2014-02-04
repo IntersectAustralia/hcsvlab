@@ -5,11 +5,9 @@ Feature: Searching item lists
   So that I can analyse my collection
 
   Background:
-    Given I have "cooee:1-001" with id "hcsvlab:1" indexed
-    Given I have "cooee:1-001" with id "hcsvlab:2" indexed
-    Given I have "cooee:1-001" with id "hcsvlab:3" indexed
-    Given I have "auslit:adaessa" with id "hcsvlab:4" indexed
-    Given I have "auslit:bolroma" with id "hcsvlab:5" indexed
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:4"
+    Given I ingest "auslit:bolroma" with id "hcsvlab:5"
     Given I have the usual roles and permissions
     Given I have users
       | email                       | first_name | last_name |
@@ -43,12 +41,11 @@ Feature: Searching item lists
     When I fill in "Concordance search for" with "make"
     And I press "execute_concordance_search"
     Then concordance search for "make" in item list "Concordance search" should show this results
-      | documentTitle      | textBefore                                     | textHighlighted | textAfter                                 |
-      | cooee:1-001        | get the small fish, of which they              | make            |  no account in the Summer nor can          |
-      | cooee:1-001        | will, Sir, be so obliging as to                | make            |  my Compliments acceptable to Lady Banks & |
-      | auslit:adaessa.xml | of such a current; and, (I will                | make            |  a clean breast of it at once!),           |
-      | auslit:adaessa.xml | which distinguish the genial littérateur , and | make            |  his work, as one of my fellow             |
-
+      | documentTitle       | textBefore                                     | textHighlighted | textAfter                                 |
+      | cooee:1-001         | get the small fish, of which they              | make            | no account in the Summer nor can          |
+      | cooee:1-001         | will, Sir, be so obliging as to                | make            | my Compliments acceptable to Lady Banks & |
+      | austlit:adaessa.xml | of such a current; and, (I will                | make            | a clean breast of it at once!),           |
+      | austlit:adaessa.xml | is too extreme for us ever to                  | make            | it a colony in the sense that             |
   Scenario: Doing a concordance search for "concordance"
     And "researcher@intersect.org.au" has item lists
       | name       |
@@ -98,7 +95,7 @@ Feature: Searching item lists
     And I press "execute_frequency_search"
     Then frequency search for "can" in item list "Frequency search" should show this results
       | facetValue | matchingDocuments | totalDocs | termOccurrences | totalWords |
-      | auslit     | 1                 | 1         | 131             | 89728      |
+      | austlit     | 1                 | 1         | 131             | 89728      |
 
   Scenario: Doing a frequency search for words word (what)
     And "researcher@intersect.org.au" has item lists
@@ -128,7 +125,7 @@ Feature: Searching item lists
     And I press "execute_frequency_search"
     Then frequency search for "what's" in item list "Frequency search" should show this results
       | facetValue | matchingDocuments | totalDocs | termOccurrences | totalWords |
-      | auslit     | 1                 | 1         | 10              | 89728      |
+      | austlit     | 1                 | 1         | 10              | 89728      |
 
   Scenario: Doing an empty frequency search
     And "researcher@intersect.org.au" has item lists

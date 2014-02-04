@@ -9,6 +9,8 @@ module Blacklight::BlacklightHelperBehavior
   include HtmlHeadHelper
   include FacetsHelper
 
+  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless const_defined?(:SESAME_CONFIG)
+
   def application_name
     return Rails.application.config.application_name if Rails.application.config.respond_to? :application_name
 
@@ -678,73 +680,32 @@ module Blacklight::BlacklightHelperBehavior
   def item_documents(document, uris)
     document_descriptors = []
 
-    uri = buildURI(document[:id], 'rdfMetadata')
-    graph = RDF::Graph.load(uri)
+    fed_item = Item.find(document[:id])
+    item = fed_item.flat_uri
 
-    # Find the identity of the Item
-    query = RDF::Query.new({:item => {MetadataHelper::IS_PART_OF => :corpus}})
-    item_results = query.execute(graph)
+    begin
+      server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+      repository = server.repository(fed_item.collection.flat_name)
 
-    unless item_results.size == 0
-      item = item_results[0][:item]
+      raise Exception.new "Repository not found - #{fed_item.collection.flat_name}" if repository.nil?
 
-      # Look for references to Documents within the metadata and
-      # find their fields as specified in uris.
-      query = RDF::Query.new({item => {MetadataHelper::DOCUMENT => :document}})
-      document_results = query.execute(graph)
+      document_results = repository.query(:subject => RDF::URI.new(item), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
 
       document_results.each { |result|
-        document = result[:document]
+        document = result.to_hash[:object]
         descriptor = {}
 
         uris.each { |uri|
-          field_query = RDF::Query.new({document => {uri => :value}})
-          field_results = field_query.execute(graph)
+          field_results = repository.query(:subject => document, :predicate => uri)
           unless field_results.size == 0
-            descriptor[uri] = field_results[0][:value]
+            descriptor[uri] = field_results.first_object
           end
         }
         document_descriptors << descriptor
       }
-    end
-
-    return document_descriptors
-  end
-
-  # NOTE: this method duplicates that above with the exception of passing an id in rather than the
-  # document. Since the above only uses the document for its id, this method could replace all
-  # references of the above
-  def item_documents_from_id(document_id, uris)
-    document_descriptors = []
-
-    uri = buildURI(document_id, 'rdfMetadata')
-    graph = RDF::Graph.load(uri)
-
-    # Find the identity of the Item
-    query = RDF::Query.new({:item => {MetadataHelper::IS_PART_OF => :corpus}})
-    item_results = query.execute(graph)
-
-    unless item_results.size == 0
-      item = item_results[0][:item]
-
-      # Look for references to Documents within the metadata and
-      # find their fields as specified in uris.
-      query = RDF::Query.new({item => {MetadataHelper::DOCUMENT => :document}})
-      document_results = query.execute(graph)
-
-      document_results.each { |result|
-        document = result[:document]
-        descriptor = {}
-
-        uris.each { |uri|
-          field_query = RDF::Query.new({document => {uri => :value}})
-          field_results = field_query.execute(graph)
-          unless field_results.size == 0
-            descriptor[uri] = field_results[0][:value]
-          end
-        }
-        document_descriptors << descriptor
-      }
+    rescue => e
+      Rails.logger.error "Could not connect to triplestore - #{SESAME_CONFIG["url"].to_s}"
+      return document_descriptors
     end
 
     return document_descriptors

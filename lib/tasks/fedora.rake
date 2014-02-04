@@ -19,7 +19,7 @@ namespace :fedora do
     end
 
     logger.info "rake fedora:ingest_one #{corpus_rdf}"
-    pid = ingest_rdf_file(File.dirname(corpus_rdf), corpus_rdf, true)
+    pid = ingest_one(File.dirname(corpus_rdf), corpus_rdf, true)
     puts "Ingested item #{pid}" if Rails.env.test?
 
   end
@@ -317,6 +317,26 @@ namespace :fedora do
     check_corpus(corpus_dir)
   end
 
+  #
+  # Create a manifest for a collection outlining the collection name, item ids and document metadata
+  #
+  task :create_collection_manifest => :environment do
+    corpus_dir = ENV['corpus'] unless ENV['corpus'].nil?
+
+    if (corpus_dir.nil?) || (!Dir.exists?(corpus_dir))
+      if corpus_dir.nil?
+        puts "No corpus directory specified."
+      else
+        puts "Corpus directory #{corpus_dir} does not exist."
+      end
+      puts "Usage: rake fedora:create_collection_manifest corpus=<corpus folder>"
+      exit 1
+    end
+
+    logger.info "rake fedora:create_collection_manifest corpus=#{corpus_dir}"
+    create_collection_manifest(corpus_dir)
+  end
+
 
   def ingest_corpus(corpus_dir, num_spec=:all, shuffle=false, annotations=true)
 
@@ -327,7 +347,16 @@ namespace :fedora do
     label += "   annotations: #{annotations}"
     puts label
 
+    check_and_create_manifest(corpus_dir)
+
     overall_start = Time.now
+
+    manifest = JSON.parse(IO.read(File.join(corpus_dir, "manifest.json")))
+
+    collection_name = manifest["collection_name"]
+    collection = check_and_create_collection(collection_name, corpus_dir)
+
+    populate_triple_store(corpus_dir)
 
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
@@ -363,7 +392,7 @@ namespace :fedora do
 
     rdf_files.each do |rdf_file|
       begin
-        pid = ingest_rdf_file(corpus_dir, rdf_file, annotations)
+        pid = ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection, nil)
 
         successes[rdf_file] = pid
       rescue => e
@@ -372,58 +401,10 @@ namespace :fedora do
       end
     end
 
-    populate_triple_store(corpus_dir)
-
     report_results(label, corpus_dir, successes, errors)
     endTime = Time.new
     logger.debug("Time for ingesting #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - overall_start.to_f)*1000)}ms)")
 
-  end
-
-  #
-  # Send message to sesame worker with the directory where metadata and annotations
-  # have to be ingested in the triple store
-  #
-  def populate_triple_store(corpus_dir)
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    stomp_client.publish('/queue/hcsvlab.sesame.worker', "{\"action\": \"ingest\", \"corpus_directory\":\"#{corpus_dir}\"}")
-  end
-
-
-  def ingest_rdf_file(corpus_dir, rdf_file, annotations)
-    unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
-      raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
-    end
-    logger.info "Ingesting item: #{rdf_file}"
-    item, update = create_item_from_file(corpus_dir, rdf_file)
-
-    if update
-      look_for_annotations(item, rdf_file) if annotations
-
-      doc_ids = look_for_documents(item, corpus_dir)
-
-      item.save!
-    end
-
-#    if Collection.where(short_name: item.collection).count == 0
-#      create_collection(item.collection.first, corpus_dir)
-#    end
-
-    # Msg to fedora.apim.update
-    begin
-      client = Stomp::Client.open "stomp://localhost:61613"
-      client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
-      if doc_ids.present?
-        doc_ids.each { |doc_id|
-          client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
-        }
-      end
-    rescue Exception => msg
-      logger.error "Error sending message via stomp: #{msg}"
-    ensure
-      client.close if !client.nil?
-    end
-    return item.pid
   end
 
 
@@ -437,7 +418,6 @@ namespace :fedora do
   def reindex_item_by_id(item_id, stomp_client)
     reindex_item(Item.find(item_id), stomp_client)
   end
-
 
   def check_corpus(corpus_dir)
 

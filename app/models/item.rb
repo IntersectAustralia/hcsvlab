@@ -11,17 +11,20 @@ class Item < HcsvlabActiveFedora
 
   has_datastream :name => 'annotation_set', :type => ActiveFedora::Datastream, :controlGroup => 'E', :prefix => 'annotationSet'
 
-  has_metadata 'rdfMetadata', type: ActiveFedora::RdfxmlRDFDatastream
-
   has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
   has_many :documents, :property => :is_member_of
   belongs_to :collection, :property => :is_member_of_collection
 
   delegate :handle, to: 'descMetadata'
+  delegate :uri, to: 'descMetadata'
 
   def flat_handle
     return handle[0]
+  end
+
+  def flat_uri
+    return uri[0]
   end
 
   #

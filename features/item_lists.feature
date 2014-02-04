@@ -4,9 +4,8 @@ Feature: Managing Item Lists
   So that I can organise my collection
 
   Background:
-    Given I have "cooee:1-001" with id "hcsvlab:1" indexed
-    Given I have "cooee:1-001" with id "hcsvlab:2" indexed
-    Given I have "cooee:1-001" with id "hcsvlab:3" indexed
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-002" with id "hcsvlab:2"
     Given I have the usual roles and permissions
     Given I have users
       | email                       | first_name | last_name |
@@ -18,8 +17,8 @@ Feature: Managing Item Lists
     And I am logged in as "researcher@intersect.org.au"
     And I have done a search with collection "cooee"
     And I should see the applied facet "Collection" with the value "cooee"
-    And I should get exactly 3 results
-    And I should see "1 - 3 of 3"
+    And I should get exactly 2 results
+    And I should see "1 - 2 of 2"
 
   @javascript
   Scenario: Creating an Item List with empty name
@@ -34,7 +33,7 @@ Feature: Managing Item Lists
     Then I should see "Name can't be blank"
 
   @javascript
-  Scenario: Creating an Item List with empty name
+  Scenario: Creating an Item List with long name
     And I should see "You searched for:"
     And I should see "Add All to list"
     And I follow "Add All to list"
@@ -59,14 +58,13 @@ Feature: Managing Item Lists
     And Save a screenshot with name "tmp/test1.png"
     And I should be on the item list page for "Add All Test"
     And I should see "Item list created successfully"
-    And the item list "Add All Test" should have 3 items
+    And the item list "Add All Test" should have 2 items
     And the item list "Add All Test" should contain ids
       | pid       |
       | hcsvlab:1 |
       | hcsvlab:2 |
-      | hcsvlab:3 |
     And I am on the item list page for "Add All Test"
-    And I should see "1 - 3 of 3"
+    And I should see "1 - 2 of 2"
 
   @javascript
   Scenario: Creating an Item List with no items and then adding to it later
@@ -81,22 +79,21 @@ Feature: Managing Item Lists
     And I should be on the item list page for "Add Selected Test"
     And the item list "Add Selected Test" should have 0 items
     And I have done a search with collection "cooee"
-    And I should get exactly 3 results
-    And I should see "1 - 3 of 3"
+    And I should get exactly 2 results
+    And I should see "1 - 2 of 2"
     And I toggle the select all checkbox
     And I follow "Add Selected to list"
     And I follow "Add Selected Test"
     And I wait 2 seconds
     And I should be on the item list page for "Add Selected Test"
-    And I should see "3 added to item list Add Selected Test"
-    And the item list "Add Selected Test" should have 3 items
+    And I should see "2 added to item list Add Selected Test"
+    And the item list "Add Selected Test" should have 2 items
     And the item list "Add Selected Test" should contain ids
       | pid       |
       | hcsvlab:1 |
       | hcsvlab:2 |
-      | hcsvlab:3 |
     And I am on the item list page for "Add Selected Test"
-    And I should see "1 - 3 of 3"
+    And I should see "1 - 2 of 2"
 
   Scenario: Accessing other user's Item Lists
     Given I have users
@@ -113,21 +110,21 @@ Feature: Managing Item Lists
     And "researcher@intersect.org.au" has item lists
       | name       |
       | Clear Test |
-    And the item list "Clear Test" has items hcsvlab:1, hcsvlab:2, hcsvlab:3
+    And the item list "Clear Test" has items hcsvlab:1, hcsvlab:2
     And I wait 5 seconds
     And I am on the item list page for "Clear Test"
-    And the item list "Clear Test" should have 3 items
+    And the item list "Clear Test" should have 2 items
     And I follow "Clear Item List"
-    And I should see "3 cleared from item list Clear Test"
+    And I should see "2 cleared from item list Clear Test"
 
   Scenario: Deleting an Item List
     And "researcher@intersect.org.au" has item lists
       | name        |
       | Delete Test |
-    And the item list "Delete Test" has items hcsvlab:1, hcsvlab:2, hcsvlab:3
+    And the item list "Delete Test" has items hcsvlab:1, hcsvlab:2
     And I wait 5 seconds
     And I am on the item list page for "Delete Test"
-    And the item list "Delete Test" should have 3 items
+    And the item list "Delete Test" should have 2 items
     And I follow the delete icon for item list "Delete Test"
     And I should see "Item list Delete Test deleted successfully"
 

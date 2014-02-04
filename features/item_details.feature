@@ -67,7 +67,6 @@ Feature: Displaying Items
       | Communication Medium                      | radio                                 |
       | Communication Setting                     | educational                           |
       | Audience                                  | massed                                |
-      | Discourse Type                            | letter                                |
       | Discourse Type                            | singing                               |
       | Language (ISO 639-3 Code)                 | eng                                   |
       | Type                                      | Original, Raw, Text                   |

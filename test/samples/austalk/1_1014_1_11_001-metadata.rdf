@@ -8,7 +8,7 @@
 <http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.austalk.edu.au/prompt> "Turn right 90  (face right wall)  2" .
 <http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/interactivity> <http://ns.ausnc.org.au/schemas/ausnc_md_model/dialogue> .
 <http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.austalk.edu.au/componentName> "calibration" .
-<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://purl.org/dc/terms/isPartOf> <http://ns.austalk.edu.au/austalk> .
+<http://id.austalk.edu.au/item/1_1014_1_11_001> <http://purl.org/dc/terms/isPartOf> <http://ns.austalk.edu.au/corpus> .
 <http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/mode> <http://ns.ausnc.org.au/schemas/ausnc_md_model/spoken> .
 <http://id.austalk.edu.au/item/1_1014_1_11_001> <http://purl.org/dc/terms/isPartOf> <http://id.austalk.edu.au/component/1_1014_1_11> .
 <http://id.austalk.edu.au/item/1_1014_1_11_001> <http://ns.ausnc.org.au/schemas/ausnc_md_model/speech_style> <http://ns.ausnc.org.au/schemas/ausnc_md_model/spontaneous> .

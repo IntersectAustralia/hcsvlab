@@ -87,11 +87,11 @@ class FedoraWorker < ApplicationProcessor
 
       @@cache[xmlHelper.summary][symbol] = true
 
-      if symbol == :finishedWork && @@cache[xmlHelper.summary].size < 3
+      if symbol == :finishedWork && @@cache[xmlHelper.summary].size < 2
         debug("Fedora_Worker", "WHOOPS! - #{symbol} #{xmlHelper.summary} arrived before its two chums")
       end
 
-      if @@cache[xmlHelper.summary].size == 3
+      if @@cache[xmlHelper.summary].size == 2
         send_solr_message("index", xmlHelper.summary)
         @@cache.delete(xmlHelper.summary)
       end

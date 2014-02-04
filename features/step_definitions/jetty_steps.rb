@@ -13,49 +13,13 @@ end
 
 And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, pid|
   rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
+  manifest_file = "#{SAMPLE_FOLDER}/#{corpus}/manifest.json"
+  corpus_dir = "#{SAMPLE_FOLDER}/#{corpus}"
 
-  item = Item.create(pid: pid)
-  item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
-  item.label = item.rdfMetadata.graph.statements.first.subject
-  item.save!
+  ingest_one(corpus_dir, rdf_file, true, pid)
 
-  query = RDF::Query.new({
-                             :item => {
-                                 RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
-                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
-                             }
-                         })
-  result = query.execute(item.rdfMetadata.graph)[0]
-
-  collectionName = last_bit(result.collection.to_s)
-
-  if Collection.where(short_name: collectionName).count == 0
-    create_collection(collectionName, "#{SAMPLE_FOLDER}/#{corpus}")
-  end
-
-  item.collection = Collection.find_by_short_name(collectionName).first
-
-  # Add Groups to the created item
-  item.set_discover_groups(["#{collectionName}-discover"], [])
-  item.set_read_groups(["#{collectionName}-read"], [])
-  item.set_edit_groups(["#{collectionName}-edit"], [])
-  # Add complete permission for data_owner
-  data_owner = item.collection.flat_private_data_owner
-  if (!data_owner.nil?)
-    #puts "    Creating Item users (discover, read, edit) with #{data_owner}"
-    item.set_discover_users([data_owner], [])
-    item.set_read_users([data_owner], [])
-    item.set_edit_users([data_owner], [])
-  end
-
-  look_for_annotations(item, rdf_file)
-  look_for_documents(item, "#{SAMPLE_FOLDER}/#{corpus}")
-
-  item.save!
-
-  # update solr
+  # # update solr
   Solr_Worker.new.on_message("index #{pid}")
-
 end
 
 And /^I reindex all$/ do
@@ -86,40 +50,6 @@ And /^I have (\d+) licences belonging to "([^"]*)"$/ do |amount, email|
     c.save
   }
 end
-
-And /^I have "([^:]*):([^:]*)" with id "(hcsvlab:\d+)" indexed$/ do |corpus, prefix, pid|
-  rdf_file = "#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-metadata.rdf"
-
-  item = Item.create(pid: pid)
-  item.rdfMetadata.graph.load(rdf_file, :format => :ttl, :validate => true)
-  item.label = item.rdfMetadata.graph.statements.first.subject
-
-  # Add Groups to the created item
-  item.set_discover_groups(["#{corpus}-discover"], [])
-  item.set_read_groups(["#{corpus}-read"], [])
-  item.set_edit_groups(["#{corpus}-edit"], [])
-
-  item.save!
-
-  xml = File.read("#{SAMPLE_FOLDER}/#{corpus}/#{prefix}-solr.xml")
-  # replace HCSVLAB_ID in solr xml
-  xml.gsub!("HCSVLAB_ID", pid)
-  xml = "<add>" + xml + "</add>"
-  # create in solr with xml
-  uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
-
-  req = Net::HTTP::Post.new(uri)
-  req.body = xml
-
-  req.content_type = "text/xml; charset=utf-8"
-  req.body.force_encoding("UTF-8")
-  res = Net::HTTP.start(uri.hostname, uri.port) do |http|
-    http.request(req)
-  end
- 
-  res.code.to_i.should eq(200)
-end
-
 
 Then /^I should get the primary text for "([^:]*):([^:]*)"$/ do |corpus, prefix|
   last_response.headers['Content-Type'].should == "text/plain"

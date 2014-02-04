@@ -25,21 +25,21 @@
 <http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Original> a foaf:Document ;
     dc:extent 546058 ;
     dc:identifier "bolroma.xml" ;
-    dc:source <http://ic2-hcsvlab-data-vm.intersect.org.au/ausnc/AUSTLIT/bolroma.xml> ;
+    dc:source <file:///data_hcsvlab/auslit/bolroma.xml> ;
     dc:title "bolroma#Original" ;
     dc:type "Original" .
 
 <http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Raw> a foaf:Document ;
     dc:extent 546058 ;
     dc:identifier "bolroma-raw.txt" ;
-    dc:source <http://ic2-hcsvlab-data-vm.intersect.org.au/ausnc/AUSTLIT/bolroma-raw.txt> ;
+    dc:source <file:///data_hcsvlab/auslit/bolroma-raw.txt> ;
     dc:title "bolroma#Raw" ;
     dc:type "Raw" .
 
 <http://ns.ausnc.org.au/corpora/austlit/source/bolroma#Text> a foaf:Document ;
     dc:extent 505682 ;
     dc:identifier "bolroma-plain.txt" ;
-    dc:source <http://ic2-hcsvlab-data-vm.intersect.org.au/ausnc/AUSTLIT/bolroma-plain.txt> ;
+    dc:source <file:///data_hcsvlab/auslit/bolroma-plain.txt> ;
     dc:title "bolroma#Text" ;
     dc:type "Text" .
 

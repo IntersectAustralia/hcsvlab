@@ -1,37 +1,65 @@
 require 'find'
 ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 STORE_DOCUMENT_TYPES = ['Text']
+MANIFEST_FILE_NAME = "manifest.json"
 
+SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env]
 
-def create_item_from_file(corpus_dir, rdf_file)
-  # Loading the graph in memory consume about 70% of the time needed to create an item.
-  # We are loading the whole graph in order to recover the collection_name and the item identifier
-  # TODO: We should try to find a faster way to retrieve collection_name and item identifier
-  #
-  graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
-  query = RDF::Query.new({
-                             :item => {
-                                 RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
-                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
-                             }
-                         })
-  result = query.execute(graph)[0]
-  identifier = result.identifier.to_s
-  collection_name = last_bit(result.collection.to_s)
+#
+# Ingests a single item, creating both a collection object and manifest if they don't
+# already exist. NOTE: the id variable should only be passed in for use in automated tests!
+#
+def ingest_one(corpus_dir, rdf_file, annotations, id=nil)
+  check_and_create_manifest(corpus_dir)
+  manifest = JSON.parse(IO.read(File.join(corpus_dir, MANIFEST_FILE_NAME)))
 
-  # small hack to handle austalk for the time being, can be fixed up 
-  # when we look at getting some form of data uniformity
-  if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
-    collection_name = "austalk"
+  collection_name = manifest["collection_name"]
+  collection = check_and_create_collection(collection_name, corpus_dir)
+
+  populate_triple_store(corpus_dir)
+
+  ingest_rdf_file(corpus_dir, rdf_file, true, manifest, collection, id)
+end
+
+def ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection, id)
+  unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
+    raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
+  end
+  logger.info "Ingesting item: #{rdf_file}"
+
+  item, update = create_item_from_file(corpus_dir, rdf_file, manifest, collection, id)
+
+  if update
+    look_for_annotations(item, rdf_file) if annotations
+
+    doc_ids = look_for_documents(item, corpus_dir, rdf_file, manifest)
+
+    item.save!
   end
 
+  # Msg to fedora.apim.update
+  begin
+    client = Stomp::Client.open "stomp://localhost:61613"
+    client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
+    if doc_ids.present?
+      doc_ids.each { |doc_id|
+        client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
+      }
+    end
+  rescue Exception => msg
+    logger.error "Error sending message via stomp: #{msg}"
+  ensure
+    client.close if !client.nil?
+  end
+  return item.pid
+end
+
+def create_item_from_file(corpus_dir, rdf_file, manifest, collection, id=nil)
+  item_info = manifest["files"][File.basename(rdf_file)]
+  identifier = item_info["id"]
+  uri = item_info["uri"]
+  collection_name = manifest["collection_name"]
   handle = "#{collection_name}:#{identifier}"
-
-  collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
-  if collection.nil?
-    create_collection(collection_name, corpus_dir)
-    collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
-  end
 
   # We can't use find_and_load_from_solr method here since the result is not a full DigitalObject
   # and thus we can't call methods like modified_date
@@ -42,15 +70,18 @@ def create_item_from_file(corpus_dir, rdf_file)
     return existingItem, false
   elsif !existingItem.nil?
     logger.info "Item = #{existingItem.id} updated"
-    return update_item_from_file(existingItem, graph, result), true
+    return update_item_from_file(existingItem, manifest), true
   else
-    item = Item.new
+    if id.nil?
+      item = Item.new
+    else
+      item = Item.create(pid: id)
+    end
     item.save!
 
-    item.rdfMetadata.graph.insert(graph)
-    item.label = item.rdfMetadata.graph.statements.first.subject
-
+    item.label = handle
     item.handle = handle
+    item.uri = uri
     item.collection = collection
 
     # Add Groups to the created item
@@ -71,12 +102,15 @@ def create_item_from_file(corpus_dir, rdf_file)
   end
 end
 
-def update_item_from_file(item, graph, result)
-  item.rdfMetadata.graph.clear
-  item.rdfMetadata.graph.insert(graph)
-  item.label = item.rdfMetadata.graph.statements.first.subject
+def update_item_from_file(item, manifest)
+  item_info = manifest["files"][File.basename(rdf_file)]
+  identifier = item_info["id"]
+  uri = item_info["uri"]
+  collection_name = manifest["collection_name"]
+  handle = "#{collection_name}:#{identifier}"
+  item.label = handle
 
-  collection_name = last_bit(result.collection.to_s)
+  item.uri = uri
   item.collection = Collection.find_by_short_name(collection_name).first
 
   item.save!
@@ -86,7 +120,17 @@ def update_item_from_file(item, graph, result)
   item
 end
 
+def check_and_create_collection(collection_name, corpus_dir)
+  collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
+  if collection.nil?
+    create_collection(collection_name, corpus_dir)
+    collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
+  end
+  return collection
+end
+
 def create_collection(collection_name, corpus_dir)
+  logger.info "Creating collection #{collection_name}"
   if collection_name == "ice" && File.basename(corpus_dir)!="ice" #ice has different directory structure
     dir = File.expand_path("../../..", corpus_dir)
   else
@@ -138,29 +182,27 @@ def create_collection_from_file(collection_file, collection_name)
   logger.info "Collection '#{coll.flat_short_name}' Metadata = #{coll.pid}" unless Rails.env.test?
 end
 
-def look_for_documents(item, corpus_dir)
-
+def look_for_documents(item, corpus_dir, rdf_file, manifest)
   doc_ids = []
 
-  query = RDF::Query.new({
-                             :document => {
-                                 RDF::URI("http://purl.org/dc/terms/type") => :type,
-                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
-                                 RDF::URI("http://purl.org/dc/terms/source") => :source
-                             }
-                         })
-  query.execute(item.rdfMetadata.graph).each do |result|
-    file_name = last_bit(result.source.to_s)
+  docs = manifest["files"][File.basename(rdf_file)]["docs"]
+
+  docs.each do |result|
+    identifier = result["identifier"]
+    source = result["source"]
+    type = result["type"]
+
+    file_name = last_bit(source)
     existing_doc = Document.find_and_load_from_solr({:file_name => file_name, :item_id => item.id})
     if existing_doc.empty?
       # Create a document in fedora
       begin
         doc = Document.new
         doc.file_name = file_name
-        doc.type      = result.type.to_s
+        doc.type      = type
         doc.mime_type = mime_type_lookup(doc.file_name[0])
-        doc.label     = result.source.to_s
-        doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => result.source.to_s)
+        doc.label     = source
+        doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => source)
         doc.item = item
         doc.item_id = item.id
 
@@ -182,61 +224,50 @@ def look_for_documents(item, corpus_dir)
         doc_ids << doc.id
 
         # Create a primary text datastream in the fedora Item for primary text documents
-        Find.find(corpus_dir) do |path|
-          if File.basename(path).eql? result.identifier.to_s and File.file? path
-            # Only create a datastream for certain file types
-            if STORE_DOCUMENT_TYPES.include? result.type.to_s
-              case result.type.to_s
-                when 'Text'
-                  item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
-                else
-                  logger.warn "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item" unless Rails.env.test?
-              end
-            end
-            #doc.save
-            logger.info "#{result.type.to_s} Document = #{doc.pid.to_s}" unless Rails.env.test?
-            break
+        path = source.gsub("file:", "")
+        if File.exists? path and File.file? path and STORE_DOCUMENT_TYPES.include? type
+          case type
+            when 'Text'
+              item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
+            else
+              logger.warn "??? Creating a #{type} document for #{path} but not adding it to its Item" unless Rails.env.test?
           end
         end
+        logger.info "#{type} Document = #{doc.pid.to_s}" unless Rails.env.test?
       rescue Exception => e
         logger.error("Error creating document: #{e.message}")
       end
     else
-      update_document(existing_doc.first, item, file_name, result, corpus_dir)
+      update_document(existing_doc.first, item, file_name, identifier, source, type, corpus_dir)
       doc_ids << existing_doc.first.id
     end
   end
   return doc_ids
 end
 
-def update_document(document, item, file_name, result, corpus_dir)
+def update_document(document, item, file_name, identifier, source, type, corpus_dir)
   begin
     document.file_name = file_name
-    document.type      = result.type.to_s
+    document.type      = type
     document.mime_type = mime_type_lookup(document.file_name[0])
-    document.label     = result.source.to_s
-    document.update_named_datastream('content', :mimeType => document.mime_type[0], :dsid => "CONTENT1", :dsLocation => result.source.to_s)
+    document.label     = source
+    document.update_named_datastream('content', :mimeType => document.mime_type[0], :dsid => "CONTENT1", :dsLocation => source)
     document.item = item
     document.item_id = item.id
     document.save
 
-    # Update primary text datastream in the fedora Item for primary text documents
-    Find.find(corpus_dir) do |path|
-      if File.basename(path).eql? result.identifier.to_s and File.file? path
-        # Only create a datastream for certain file types
-        if STORE_DOCUMENT_TYPES.include? result.type.to_s
-          case result.type.to_s
-            when 'Text'
-              item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
-              item.primary_text.save
-            else
-              logger.warn "??? Creating a #{result.type.to_s} document for #{path} but not adding it to its Item" unless Rails.env.test?
-          end
-        end
-        logger.info "Updated #{result.type.to_s} Document = #{document.pid.to_s}" unless Rails.env.test?
-        break
+    # Create a primary text datastream in the fedora Item for primary text documents
+    path = source.gsub("file:", "")
+    logger.info "Path:" + path
+    if File.exists? path and File.file? path and STORE_DOCUMENT_TYPES.include? type
+      case type
+        when 'Text'
+          item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
+        else
+          logger.warn "??? Creating a #{type} document for #{path} but not adding it to its Item" unless Rails.env.test?
       end
     end
+    logger.info "#{type} Document = #{doc.pid.to_s}" unless Rails.env.test?
   rescue Exception => e
     logger.error("Error creating document: #{e.message}")
   end
@@ -283,6 +314,133 @@ def set_data_owner(collection)
   end
 end
 
+#
+# Create collection manifest if one doesn't already exist
+#
+def check_and_create_manifest(corpus_dir)
+  if !File.exists? File.join(corpus_dir, "manifest.json")
+    create_collection_manifest(corpus_dir)
+  end
+end
+
+#
+# Create the collection manifest file for a directory
+#
+def create_collection_manifest(corpus_dir)
+  logger.info("Creating collection manifest for #{corpus_dir}")
+  overall_start = Time.now
+
+  rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
+
+  manifest_hash = {"collection_name" => extract_manifest_collection(rdf_files.first), "files" => {}}
+
+  rdf_files.each do |rdf_file|
+    filename, manifest_entry = extract_manifest_info(rdf_file)
+    manifest_hash["files"][filename] = manifest_entry
+  end
+
+  file = File.open(File.join(corpus_dir, MANIFEST_FILE_NAME), "w")
+  file.puts(manifest_hash.to_json)
+  file.close
+
+  endTime = Time.now
+  logger.debug("Time for creating manifest for #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - overall_start.to_f)*1000)}ms)")
+end
+
+#
+# query the given rdf file to find the collection name
+#
+def extract_manifest_collection(rdf_file)
+  graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
+  query = RDF::Query.new({
+                           :item => {
+                               RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection
+                           }
+                         })
+  result = query.execute(graph)[0]
+  collection_name = last_bit(result.collection.to_s)
+
+  # small hack to handle austalk for the time being, can be fixed up 
+  # when we look at getting some form of data uniformity
+  if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
+    collection_name = "austalk"
+  end
+  return collection_name
+end
+
+#
+# query the given rdf file to produce a hash item to add to the manifest
+#
+def extract_manifest_info(rdf_file)
+  graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
+  query = RDF::Query.new({
+                           :item => {
+                               RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                           }
+                         })
+  result = query.execute(graph)[0]
+  identifier = result.identifier.to_s
+  uri = result[:item].to_s
+
+  filename = File.basename(rdf_file)
+  hash = {"id" => identifier, "uri" => uri, "docs" => []}
+
+  query = RDF::Query.new({
+                           :document => {
+                               RDF::URI("http://purl.org/dc/terms/type") => :type,
+                               RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
+                               RDF::URI("http://purl.org/dc/terms/source") => :source
+                           }
+                         })
+  query.execute(graph).each do |result|
+    hash["docs"].append({"identifier" => result.identifier.to_s, "source" => result.source.to_s, "type" => result.type.to_s})
+  end
+
+  return filename, hash
+end
+
+
+#
+# Store all metadata and annotations from the given directory in the triplestore
+#
+def populate_triple_store(corpus_dir)
+  logger.debug "Start ingesting metadata and annotations in #{corpus_dir}"
+  metadataFiles = Dir["#{corpus_dir}/**/*-metadata.rdf"]
+
+  graph = RDF::Graph.load(metadataFiles.first, :format => :ttl, :validate => true)
+  query = RDF::Query.new({
+                             :item => {
+                                 RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
+                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                             }
+                         })
+  result = query.execute(graph)[0]
+  collection_name = last_bit(result.collection.to_s)
+  # small hack to handle austalk for the time being, can be fixed up
+  # when we look at getting some form of data uniformity
+  if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
+    collection_name = "austalk"
+  end
+
+  server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+
+  # First we will create the repository for the collection, in case it does not exists
+  server.create_repository(RDF::Sesame::HcsvlabServer::NATIVE_STORE_TYPE, collection_name, "Metadata and Annotations for #{collection_name} collection")
+
+  # Create a instance of the repository where we are going to store the metadata
+  repository = server.repository(collection_name)
+
+  # Now will store every RDF file
+  repository.insert_from_rdf_files(metadataFiles)
+
+  annotationsFiles = Dir["#{corpus_dir}/**/*-ann.rdf"]
+  # Now will store every RDF file
+  repository.insert_from_rdf_files(annotationsFiles)
+
+  #insert_access_control_info(collection_name, repository)
+
+  logger.debug "Finished ingesting metadata and annotations in #{corpus_dir}"
+end
 
 #
 # Given an RDF query result set, find the first system user corresponding to a :person
