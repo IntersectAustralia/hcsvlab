@@ -21,6 +21,10 @@ namespace :jetty do
     system 'cp -vp solr_conf/conf/solrconfig.xml jetty/solr/development-AF-core/conf/'
     system 'cp -vp solr_conf/conf/solrconfig.xml jetty/solr/test-core/conf/'
     system 'cp -vp solr_conf/conf/solrconfig.xml jetty/solr/test-AF-core/conf/'
+
+    # Adds OpenRDF Sesame into jetty.
+    system 'cp -vp sesame_bin/openrdf-sesame.war jetty/webapps/'
+    system 'cp -vp sesame_bin/openrdf-workbench.war jetty/webapps/'
   end
 
   task :clean => :environment do
@@ -35,7 +39,7 @@ namespace :jetty do
   task :start => :environment do
     Jettywrapper.start(JETTY_CONFIG)
     puts "jetty started at PID #{Jettywrapper.pid(JETTY_CONFIG)}"
-    puts "Waiting for Fedora and Solr to be ready...".yellow
+    puts "Waiting for Fedora, Solr and Sesame to be ready...".yellow
     sleep 30
 
     while !ping(Blacklight.solr_config[:url]) do
