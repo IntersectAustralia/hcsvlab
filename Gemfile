@@ -117,6 +117,7 @@ gem 'linkeddata', '~> 1.0.0'
 gem 'rdf-turtle'
 gem 'rdf-sesame', git: 'https://github.com/ruby-rdf/rdf-sesame.git'
 gem 'json_pure', '1.8.0'
+gem 'json-ld'
 gem 'sparql'
 
 gem 'request_exception_handler'

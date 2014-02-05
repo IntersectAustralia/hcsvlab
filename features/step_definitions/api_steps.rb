@@ -38,6 +38,21 @@ When /^I make a JSON post request for (.*) with the API token for "(.*)" with JS
   post path_to(page_name), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
 end
 
+When /^I make a JSON multipart request for (.*) with the API token for "(.*)" with JSON params$/ do |page_name, email, table|
+  user = User.find_by_email!(email)
+  table = table.hashes
+
+  request = table.inject({}) do |hash, row|
+    if row['Filename'].present?
+      hash[row['Name']] = Rack::Test::UploadedFile.new(Rails.root.join(row['Filename']), row['Type'])
+    else
+      hash[row['Name']] = row['Content'].strip
+    end
+    hash
+  end
+  post path_to(page_name), request.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
+end
+
 When /^I make a (JSON )?request for (.*) with the API token for "(.*)" outside the header$/ do |json, page_name, email|
   user = User.find_by_email!(email)
   if json.present?

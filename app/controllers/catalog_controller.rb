@@ -283,6 +283,8 @@ class CatalogController < ApplicationController
 
       params.delete(:fq)
     rescue RSolr::Error::Http => e
+      Rails.logger.debug(e.message)
+      Rails.logger.debug(e.backtrace)
       flash[:error] = "Sorry, error in search parameters."
       redirect_to root_url and return
 
@@ -302,18 +304,29 @@ class CatalogController < ApplicationController
     end
   end
 
+  #
   # override default show method to allow for json response
+  #
   def show
     if Item.where(id: params[:id]).count != 0
-        @response, @document = get_solr_response_for_doc_id
-    elsif(Item.where(id: params[:id]).count == 0)
-        respond_to do |format|
-            format.html { 
-                flash[:error] = "Sorry, you have requested a record that doesn't exist."
-                redirect_to root_url and return
-            }
-            format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
-        end
+      @response, @document = get_solr_response_for_doc_id
+
+
+      #By now we are not going to show user uploaded annotation in the webapp
+      #solr_item = Item.find_and_load_from_solr({id: @document[:id]}).first
+      #@has_main_annotation = !solr_item.annotation_set.empty?
+
+      #@user_annotations = UserAnnotation.find_all_by_item_identifier(@document[:handle])
+
+    else
+      respond_to do |format|
+        format.html {
+          flash[:error] = "Sorry, you have requested a record that doesn't exist."
+          redirect_to root_url and return
+        }
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      end
+      return
     end
     respond_to do |format|
       format.html { setup_next_and_previous_documents }
@@ -322,7 +335,7 @@ class CatalogController < ApplicationController
       # export formats.
       if !@document.nil?
 
-        @itemInfo = create_display_info_hash(@document)
+        @itemInfo = create_display_info_hash(@document, @user_annotations)
 
         @document.export_formats.each_key do |format_name|
           # It's important that the argument to send be a symbol;
@@ -525,6 +538,93 @@ class CatalogController < ApplicationController
     @nameMappings
   end
 
+  #
+  #
+  #
+  # API command:
+  #               curl -H "X-API-KEY:<api_key>" -H "Accept: application/json" -F file=@<path_to_file> <host>/catalog/:id/annotations
+  def upload_annotation
+    uploaded_file = params[:file]
+    id = params[:id]
+
+    # Validate item
+    item = Item.find_and_load_from_solr({id: id.to_s})
+    if item.empty?
+      respond_to do |format|
+        format.json {
+          render :json => {:error => "No Item with id '#{id}' exists."}.to_json, :status => 412
+          return
+        }
+      end
+    end
+    item_handler = item.first[:handle].first
+
+    if uploaded_file.blank? or uploaded_file.size == 0
+      render :json => {:error => "Uploaded file is not present or empty."}.to_json, :status => 412
+      return
+    else
+
+      # Here will validate that if the uploaded file is already in the system.
+      # If we have a file with the same name, for the same item and with the same MD5 checksum will suppose that
+      # that file was already uploaded, and hence will reject it.
+      similarUploadedAnnotations = UserAnnotation.where(original_filename: uploaded_file.original_filename, item_identifier: item_handler)
+      if (!similarUploadedAnnotations.empty?)
+        currentFileContentMD5 = Digest::MD5.hexdigest(IO.read(uploaded_file.tempfile))
+
+        similarUploadedAnnotations.each do |anUploadedAnnotations|
+          existingFileMD5 = Digest::MD5.hexdigest(IO.read(anUploadedAnnotations.file_location))
+          if(existingFileMD5.eql?(currentFileContentMD5))
+            Rails.logger.debug("File already uploaded: Record id #{anUploadedAnnotations.id}.")
+            render :json => {:error => "File already uploaded."}.to_json, :status => 412
+            return
+          end
+        end
+      end
+
+      file_created = UserAnnotation.create_new_user_annotation(current_user, item_handler, uploaded_file)
+
+      respond_to do |format|
+        format.json {
+          if file_created
+            render :json => {:message => "file #{uploaded_file.original_filename} uploaded successfully"}.to_json, :status => 200
+          else
+            render :json => {:error => "Error uploading file #{uploaded_file.original_filename}."}.to_json, :status => 500
+          end
+        }
+      end
+    end
+  end
+
+  #
+  #
+  #
+  # API command:
+  #             curl -H "X-API-KEY:<key>" -H "Accept: application/json" <host>/catalog/download_annotation/<annotation_id>
+  #def download_annotation
+  #  begin
+  #    userAnnotation = UserAnnotation.find(params[:id].to_i)
+  #
+  #    if (userAnnotation.nil?)
+  #      raise Exception.new
+  #    end
+  #
+  #    send_file userAnnotation.file_location,
+  #              :filename => userAnnotation.original_filename,
+  #              :type => userAnnotation.file_type
+  #    return
+  #  rescue => e
+  #    Rails.logger.error(e.backtrace)
+  #  end
+  #  respond_to do |format|
+  #    format.html {
+  #      flash[:error] = "Sorry, you have requested an annotation that doesn't exist."
+  #      redirect_to root_path and return
+  #    }
+  #    format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
+  #  end
+  #
+  #end
+
 
   private
 
@@ -615,6 +715,9 @@ class CatalogController < ApplicationController
     solr_parameters[:rows] = FIXNUM_MAX
   end
 
+  #
+  #
+  #
   def wrapped_enforce_show_permissions(opts={})
     begin
       enforce_show_permissions(opts)

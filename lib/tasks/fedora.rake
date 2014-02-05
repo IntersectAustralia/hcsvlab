@@ -134,7 +134,7 @@ namespace :fedora do
     # Clear all metadata and annotations from the triple store
     server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
     repository = server.repository(corpus)
-    repository.clear()
+    repository.clear() if !repository.nil?
 
   end
 

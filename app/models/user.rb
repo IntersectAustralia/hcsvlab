@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   has_many :item_lists
   has_many :user_licence_agreements
   has_many :user_licence_requests
+  has_many :user_annotations
 
   # Setup accessible attributes (status/approved flags should NEVER be accessible by mass assignment)
   attr_accessible :email, :password, :password_confirmation, :first_name, :last_name

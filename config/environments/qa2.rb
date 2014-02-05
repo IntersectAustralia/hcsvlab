@@ -4,7 +4,10 @@ HcsvlabWeb::Application.configure do
   config.action_mailer.default_url_options = { :host => 'ic2-hcsvlab-qa2-vm.intersect.org.au' }
 
   config.galaxy_url = 'http://ic2-hcsvlab-qa2-vm.intersect.org.au:8081/root'
- 
+
+  # Base directory where user contributed annotations will be stored
+  config.user_annotations_location = "/data/contributed_annotations/"
+
   # Settings specified here will take precedence over those in config/application.rb
 
   # Code is not reloaded between requests

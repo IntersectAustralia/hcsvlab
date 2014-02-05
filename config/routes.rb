@@ -11,8 +11,10 @@ HcsvlabWeb::Application.routes.draw do
   get "catalog/:id/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/
   get "catalog/:id/document/", :to => 'catalog#document', :as => 'catalog_document_api'
   get "catalog/:id/annotations", :to => 'catalog#annotations', :as => 'catalog_annotations'
+  post 'catalog/:id/annotations', :to => 'catalog#upload_annotation'
 
   post 'catalog/download_items', :to => 'catalog#download_items', :as => 'catalog_download_items_api'
+  #get 'catalog/download_annotation/:id', :to => 'catalog#download_annotation', :as => 'catalog_download_annotation'
 
   HydraHead.add_routes(self)
   

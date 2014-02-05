@@ -1,5 +1,12 @@
-default:
+default: &default
   jetty_port: 8983
   java_opts:
-    - "-XX:MaxPermSize=256m" 
+    - "-XX:MaxPermSize=256m"
     - "-Xmx1g"
+
+test:
+  jetty_port: 8984
+  java_opts:
+    - "-XX:MaxPermSize=256m"
+    - "-Xmx1g"
+    - "-Dinfo.aduna.platform.appdata.basedir = ~/.aduna-test/"

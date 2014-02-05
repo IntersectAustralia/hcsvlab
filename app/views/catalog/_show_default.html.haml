@@ -116,4 +116,56 @@
           %td= field
   - if eopas_viewable? params[:id]
     = link_to('View in EOPAS', eopas_path, class: 'btn')
+
+-# User uploaded annotations will no be shown by now
+-#%h3
+-#  %span Annotations
+-#%table.table.table-striped
+-#  %thead
+-#    %tr
+-#      %td
+-#        %b
+-#          Name
+-#      %td
+-#        %b
+-#          Owner
+-#      %td
+-#        %b
+-#          Date Uploaded
+-#  %tbody
+-#    -if (@has_main_annotation == true)
+-#      %tr{class:'warning'}
+-#        %td{colspan:3, style:"text-align:center;"}
+-#          Item main annotation
+-#      %tr
+-#        %td
+-#          =link_to @document[:handle].split(':').last + "-ann", :controller=>'catalog', :action=>'annotations', :format => :json
+-#        %td
+-#          ="N/A"
+-#        %td
+-#          ="N/A"
+-#    %tr{class:'warning'}
+-#      %td{colspan:3, style:"text-align:center;"}
+-#        User contributed annotations
+-#    -if @user_annotations.empty?
+-#      %tr
+-#        %td{:colspan => 3}
+-#          No User contributed annotations found.
+-#    -else
+-#
+-#      -@user_annotations.each do |aUserAnnotation|
+-#        %tr
+-#          %td
+-#            = link_to(aUserAnnotation.original_filename, {:controller => "catalog", :action => "download_annotation", :id => aUserAnnotation.id}, :method => 'GET')
+-#          %td
+-#            ="#{aUserAnnotation.user.first_name} #{aUserAnnotation.user.last_name}"
+-#          %td
+-#            =aUserAnnotation.created_at.strftime("%d/%m/%Y %I:%M:%S %P")
+-#.form-actions
+-#  = form_tag({:action => 'upload_annotation', :controller => 'catalog'}, :method=>"POST", :multipart => 'true') do
+-#    = field_set_tag do
+-#      = hidden_field_tag :item_handle, @document[:handle]
+-#      = file_field_tag :file
+-#      = submit_tag "Upload Annotation", :class => "btn btn-primary", :id => "submit-button"
+
 = render 'shared/nectar_attribution'

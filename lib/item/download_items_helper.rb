@@ -271,7 +271,7 @@ module Item::DownloadItemsHelper
           begin
             jsonMetadata = JSON.parse(aDoc['json_metadata'])
           rescue
-            puts "******** #{aDoc[:id]}"
+            Rails.logger.debug("Error parsing json_metadata for document #{aDoc[:id]}")
           end
           metadata[aDoc[:id]] = {}
           metadata[aDoc[:id]][:files] = jsonMetadata['documentsLocations'].clone.values.flatten

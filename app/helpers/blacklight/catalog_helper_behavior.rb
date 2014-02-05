@@ -119,7 +119,7 @@ module Blacklight::CatalogHelperBehavior
   # Creates an instance of ItemInfo class with all the information (Metadata, PrimaryText, Documents, etc.)
   # of the given document.
   #
-  def create_display_info_hash(document)
+  def create_display_info_hash(document, userAnnotations=nil)
     default_url_options = Rails.application.config.action_mailer.default_url_options
 
     fieldDisplayName = create_display_field_name_mapping(document)
@@ -187,8 +187,8 @@ module Blacklight::CatalogHelperBehavior
       primary_text = "No primary text found"
     end
 
-    # Prepare document DOCUMENTS information
-    data = []
+    # Prepare DOCUMENTS information
+    documentsData = []
     uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
     documents = item_documents(document, uris)
 
@@ -236,10 +236,31 @@ module Blacklight::CatalogHelperBehavior
           field = "unknown"
         end
         documentHash[:size] = field.strip!
-        data << documentHash.clone
+        documentsData << documentHash.clone
       end
-
     end
+
+    # Prepare ANNOTATIONS information
+    #userAnnotationsData = []
+    #if (userAnnotations.present?)
+    #  userAnnotations.each do |aUserAnnotation|
+    #    data = {}
+    #    data[:name] = aUserAnnotation.original_filename
+    #    data[:owner] = "#{aUserAnnotation.user.first_name} #{aUserAnnotation.user.last_name}"
+    #    data[:data_uploaded] = aUserAnnotation.created_at.strftime("%d/%m/%Y %I:%M:%S %P")
+    #    begin
+    #      data[:url] = catalog_download_annotation_url(aUserAnnotation.id)
+    #    rescue NoMethodError => e
+    #      # When we create the json metadata from the solr processor, we need to do the following work around
+    #      # to have access to routes URL methods
+    #      data[:url] = Rails.application.routes.url_helpers.catalog_download_annotation_url(aUserAnnotation.id, default_url_options)
+    #    end
+    #
+    #    userAnnotationsData << data
+    #  end
+    #end
+
+
 
     itemInfo = ItemInfo.new
     begin
@@ -253,15 +274,23 @@ module Blacklight::CatalogHelperBehavior
     itemInfo.primary_text_url = primary_text
     begin
       unless solr_item.annotation_set.empty?
+        #itemInfo.annotations = {main_annotation_url: catalog_annotations_url(document[:id], format: :json)}
         itemInfo.annotations_url = catalog_annotations_url(document[:id], format: :json)
       end
     rescue NoMethodError => e
       # When we create the json metadata from the solr processor, we need to do the following work around
       # to have access to routes URL methods
       parameters = default_url_options.merge({format: :json})
+      #itemInfo.annotations =  Rails.application.routes.url_helpers.catalog_annotations_url(document[:id], parameters)
       itemInfo.annotations_url = Rails.application.routes.url_helpers.catalog_annotations_url(document[:id], parameters)
     end
-    itemInfo.documents = data
+    #if (!userAnnotationsData.empty?)
+    #  itemInfo.annotations = {} if itemInfo.annotations.nil?
+    #  itemInfo.annotations[:user_annotationes] = userAnnotationsData
+    #end
+
+
+    itemInfo.documents = documentsData
 
     itemInfo
   end

@@ -28,10 +28,11 @@ module RDF::Sesame
     #
     # Inserts the statements given in the RDF file path into this repository.
     #
-    # @param  [Array] rdfFiles
+    # @param  [Array{String} rdfFiles
+    # @param  [RDF::URI] context (Optional)
     # @param  [integer] group_size
     #
-    def insert_from_rdf_files(rdfFiles, group_size = 100)
+    def insert_from_rdf_files(rdfFiles, context = nil, group_size = 100)
       rdfFiles.in_groups_of(group_size).each do |fileUriGroup|
 
         data = ""
@@ -40,7 +41,10 @@ module RDF::Sesame
           data += IO.read(rdfFileUri)
         end
 
-        response = server.post(self.path(:statements), data, 'Content-Type' => 'application/x-turtle')
+        statements_options = {}
+        statements_options[:context] = "<#{context.to_s}>" if !context.nil?
+
+        response = server.post(self.path(:statements, statements_options), data, 'Content-Type' => 'application/x-turtle')
         raise Exception.new(response.message) unless "204".eql?(response.code)
       end
     end

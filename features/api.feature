@@ -620,3 +620,61 @@ Feature: Browsing via API
     Given I make a WARC request for the item list page for "Test 1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
 
+  ###########################################################################################################
+  #### UPLOAD ANNOTATIONS TESTS                                                                          ####
+  ###########################################################################################################
+  Scenario: Successfully uploaded user annotation
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                | Type                      |
+      | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
+    Then I should get a 200 response code
+
+  Scenario: Upload annotation to non existing item
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:30" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                | Type                      |
+      | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
+    Then I should get a 412 response code
+    And the JSON response should be:
+    """
+    {"error":"No Item with id 'hcsvlab:30' exists."}
+    """
+
+  Scenario: Upload blank annotation to an item
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                      | Type                      |
+      | file  |         | test/samples/annotations/blank_upload_annotation_sample.json  | application/octet-stream  |
+    Then I should get a 412 response code
+    And the JSON response should be:
+    """
+    {"error":"Uploaded file is not present or empty."}
+    """
+
+  Scenario: Upload same annotation file twice
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                      | Type                      |
+      | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
+    Then I should get a 200 response code
+
+    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                 | Type                      |
+      | file  |         | test/samples/annotations/upload_annotation_sample.json   | application/octet-stream  |
+    Then I should get a 412 response code
+    And the JSON response should be:
+    """
+    {"error":"File already uploaded."}
+    """
+
+  Scenario: Upload malformed annotation to an item
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                          | Type                      |
+      | file  |         | test/samples/annotations/malformed_upload_annotation_sample.json  | application/octet-stream  |
+    Then I should get a 500 response code
+    And the JSON response should be:
+    """
+    {"error":"Error uploading file malformed_upload_annotation_sample.json."}
+    """

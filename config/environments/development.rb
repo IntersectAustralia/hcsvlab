@@ -3,7 +3,10 @@ HcsvlabWeb::Application.configure do
   # TODO: set your own correct URL for action mailer
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
   
-  config.galaxy_url = 'http://localhost:8080/root'
+  config.galaxy_url = 'http://localhost:8081/root'
+
+  # Base directory where user contributed annotations will be stored
+  config.user_annotations_location = "/data/contributed_annotations/"
 
   # Settings specified here will take precedence over those in config/application.rb
 

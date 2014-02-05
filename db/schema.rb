@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131107002123) do
+ActiveRecord::Schema.define(:version => 20140120011702) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -20,11 +20,6 @@ ActiveRecord::Schema.define(:version => 20131107002123) do
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
     t.string   "user_type"
-  end
-
-  create_table "collections", :force => true do |t|
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
   end
 
   create_table "item_lists", :force => true do |t|
@@ -60,6 +55,21 @@ ActiveRecord::Schema.define(:version => 20131107002123) do
   end
 
   add_index "searches", ["user_id"], :name => "index_searches_on_user_id"
+
+  create_table "user_annotations", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "original_filename"
+    t.string   "file_type"
+    t.integer  "size_in_bytes"
+    t.string   "item_identifier"
+    t.boolean  "shareable"
+    t.string   "file_location"
+    t.string   "annotationCollectionId"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
+
+  add_index "user_annotations", ["user_id"], :name => "index_user_annotations_on_user_id"
 
   create_table "user_licence_agreements", :force => true do |t|
     t.string   "group_name"

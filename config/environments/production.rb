@@ -5,6 +5,9 @@ HcsvlabWeb::Application.configure do
   
   config.galaxy_url = 'http://hcsvlab-prod-galaxy.intersect.org.au/root'
 
+  # Base directory where user contributed annotations will be stored
+  config.user_annotations_location = "/data/contributed_annotations/"
+
   # Settings specified here will take precedence over those in config/application.rb
 
   # Code is not reloaded between requests

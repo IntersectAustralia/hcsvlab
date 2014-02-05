@@ -3,7 +3,7 @@ ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 STORE_DOCUMENT_TYPES = ['Text']
 MANIFEST_FILE_NAME = "manifest.json"
 
-SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env]
+SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
 
 #
 # Ingests a single item, creating both a collection object and manifest if they don't

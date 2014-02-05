@@ -41,6 +41,15 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
+
+
+  config.before do
+    clear_jetty
+  end
+
+  config.after do
+    clear_jetty
+  end
 end
 class Warden::SessionSerializer
   def serialize(record)

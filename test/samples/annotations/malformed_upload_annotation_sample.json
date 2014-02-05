@@ -1,0 +1,8 @@
+{
+    "@context": {
+        "@base": "http://purl.org/dada/schema/0.2/",
+        "annotations": {
+            "@id": "http://purl.org/dada/schema/0.2/annotations",
+            "@container": "@list"
+        }
+}
