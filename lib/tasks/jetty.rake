@@ -45,7 +45,7 @@ namespace :jetty do
     while !ping(Blacklight.solr_config[:url]) do
       sleep 5
     end
-    puts "Fedora and Solr ready".green
+    puts "Fedora, Solr and Sesame are ready".green
   end
 
 end
