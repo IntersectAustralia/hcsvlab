@@ -586,7 +586,7 @@ class CatalogController < ApplicationController
       respond_to do |format|
         format.json {
           if file_created
-            render :json => {:message => "file #{uploaded_file.original_filename} uploaded successfully"}.to_json, :status => 200
+            render :json => {:success => "file #{uploaded_file.original_filename} uploaded successfully"}.to_json, :status => 200
           else
             render :json => {:error => "Error uploading file #{uploaded_file.original_filename}."}.to_json, :status => 500
           end
