@@ -2,6 +2,8 @@
 #
 #
 namespace :sesame do
+  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? (SESAME_CONFIG)
+
   #
   # Ingest one collection metadata and annotations, given as an argument
   #
@@ -21,6 +23,20 @@ namespace :sesame do
 
     logger.info "rake sesame:ingest collection=#{collection_dir}"
     ingest_collection(collection_dir)
+  end
+
+  #
+  # Clear and Remove each repository in Sesame
+  #
+  task :clear => :environment do
+    # Clear Sesame
+    server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
+    repositories = server.repositories
+    repositories.each_key do |repositoryName|
+      if (!"SYSTEM".eql? repositoryName)
+        server.delete(repositories[repositoryName].path)
+      end
+    end
   end
 
   #
