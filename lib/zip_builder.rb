@@ -49,8 +49,12 @@ class ZipBuilder
     entry = (rootPath.nil?)?File.basename(path) :"#{rootPath}/#{File.basename(path)}"
 
     zos.put_next_entry(entry)
-    file = File.open(path, 'rb')
-    write_to_zip(zos, file)
+    begin
+      file = File.open(path, 'rb')
+      write_to_zip(zos, file)
+    ensure
+      file.close if !file.nil?
+    end
   end
 
   def self.write_to_zip(zos, file)

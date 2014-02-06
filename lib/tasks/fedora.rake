@@ -482,75 +482,81 @@ namespace :fedora do
 
 
   def report_results(label, corpus_dir, successes, errors)
-    logfile = "log/ingest_#{File.basename(corpus_dir)}.log"
-    logstream = File.open(logfile, "w")
+    begin
+      logfile = "log/ingest_#{File.basename(corpus_dir)}.log"
+      logstream = File.open(logfile, "w")
 
-    message = "Successfully ingested #{successes.size} Item#{successes.size==1 ? '' : 's'}"
-    message += ", and rejected #{errors.size} Item#{errors.size==1 ? '' : 's'}" unless errors.empty?
-    logger.info message
-    logger.info "Writing summary to #{logfile}"
+      message = "Successfully ingested #{successes.size} Item#{successes.size==1 ? '' : 's'}"
+      message += ", and rejected #{errors.size} Item#{errors.size==1 ? '' : 's'}" unless errors.empty?
+      logger.info message
+      logger.info "Writing summary to #{logfile}"
 
-    logstream << "#{label}" << "\n\n"
-    logstream << message << "\n"
+      logstream << "#{label}" << "\n\n"
+      logstream << message << "\n"
 
-    unless successes.empty?
-      logstream << "\n"
-      logstream << "Successfully Ingested" << "\n"
-      logstream << "=====================" << "\n"
-      successes.each { |item, message|
-        logstream << "Item #{item} as #{message}" << "\n"
-      }
+      unless successes.empty?
+        logstream << "\n"
+        logstream << "Successfully Ingested" << "\n"
+        logstream << "=====================" << "\n"
+        successes.each { |item, message|
+          logstream << "Item #{item} as #{message}" << "\n"
+        }
+      end
+
+      unless errors.empty?
+        logstream << "\n"
+        logstream << "Error Summary" << "\n"
+        logstream << "=============" << "\n"
+        errors.each { |item, message|
+          logstream << "\nItem #{item}:" << "\n\n"
+          logstream << "#{message}" << "\n"
+        }
+
+        puts "Error ingesting #{File.basename(corpus_dir)} collection. See #{logfile} for details."
+      end
+    ensure
+      logstream.close if !logstream.nil?
     end
-
-    unless errors.empty?
-      logstream << "\n"
-      logstream << "Error Summary" << "\n"
-      logstream << "=============" << "\n"
-      errors.each { |item, message|
-        logstream << "\nItem #{item}:" << "\n\n"
-        logstream << "#{message}" << "\n"
-      }
-
-      puts "Error ingesting #{File.basename(corpus_dir)} collection. See #{logfile} for details."
-    end
-    logstream.close
   end
 
   def report_check_results(size, corpus_dir, errors, handles)
-    logfile = "log/check_#{File.basename(corpus_dir)}.log"
-    logstream = File.open(logfile, "w")
+    begin
+      logfile = "log/check_#{File.basename(corpus_dir)}.log"
+      logstream = File.open(logfile, "w")
 
-    message = "Checked #{size} metadata file#{size==1 ? '' : 's'}"
-    message += ", finding #{errors.size} syntax error#{errors.size==1 ? '' : 's'}"
-    message += ", and #{handles.size} duplicate handle#{handles.size==1 ? '' : 's'}"
-    logger.info message
-    logger.info "Writing summary to #{logfile}"
+      message = "Checked #{size} metadata file#{size==1 ? '' : 's'}"
+      message += ", finding #{errors.size} syntax error#{errors.size==1 ? '' : 's'}"
+      message += ", and #{handles.size} duplicate handle#{handles.size==1 ? '' : 's'}"
+      logger.info message
+      logger.info "Writing summary to #{logfile}"
 
-    logstream << "Checking #{corpus_dir}" << "\n\n"
-    logstream << message << "\n"
+      logstream << "Checking #{corpus_dir}" << "\n\n"
+      logstream << message << "\n"
 
-    unless errors.empty?
-      logstream << "\n"
-      logstream << "Error Summary" << "\n"
-      logstream << "=============" << "\n"
-      errors.each { |item, message|
-        logstream << "\nItem #{item}:" << "\n\n"
-        logstream << "#{message}" << "\n"
-      }
-    end
-
-    unless handles.empty?
-      logstream << "\n"
-      logstream << "Duplicate Handles" << "\n"
-      logstream << "=================" << "\n"
-      handles.each { |handle, list|
-        logstream << "\nHandle #{handle}:" << "\n"
-        list.each { |filename|
-          logstream << "\t#{filename}" << "\n"
+      unless errors.empty?
+        logstream << "\n"
+        logstream << "Error Summary" << "\n"
+        logstream << "=============" << "\n"
+        errors.each { |item, message|
+          logstream << "\nItem #{item}:" << "\n\n"
+          logstream << "#{message}" << "\n"
         }
-      }
+      end
+
+      unless handles.empty?
+        logstream << "\n"
+        logstream << "Duplicate Handles" << "\n"
+        logstream << "=================" << "\n"
+        handles.each { |handle, list|
+          logstream << "\nHandle #{handle}:" << "\n"
+          list.each { |filename|
+            logstream << "\t#{filename}" << "\n"
+          }
+        }
+      end
+    ensure
+      logstream.close
     end
-    logstream.close
   end
 
 

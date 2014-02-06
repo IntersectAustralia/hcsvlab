@@ -612,11 +612,11 @@ Feature: Browsing via API
 
   Scenario: Download items metadata and files in Warc format
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    And I reindex all
     And "researcher1@intersect.org.au" has item lists
       | name   |
       | Test 1 |
     And the item list "Test 1" has items hcsvlab:1
+    And I wait 5 seconds
     Given I make a WARC request for the item list page for "Test 1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
 

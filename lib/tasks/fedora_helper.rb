@@ -344,9 +344,12 @@ def create_collection_manifest(corpus_dir)
     end
   end
 
-  file = File.open(File.join(corpus_dir, MANIFEST_FILE_NAME), "w")
-  file.puts(manifest_hash.to_json)
-  file.close
+  begin
+    file = File.open(File.join(corpus_dir, MANIFEST_FILE_NAME), "w")
+    file.puts(manifest_hash.to_json)
+  ensure
+    file.close if !file.nil?
+  end
 
   endTime = Time.now
   logger.debug("Time for creating manifest for #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - overall_start.to_f)*1000)}ms)")

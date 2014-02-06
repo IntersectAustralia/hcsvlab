@@ -7,7 +7,7 @@ class CountryLanguage < Struct.new(:code, :name)
   end
 
   def self.setup_languages
-    data = File.open("#{Rails.root}/data/LanguageIndex.tab", "rb").read
+    data = IO.read("#{Rails.root}/data/LanguageIndex.tab")
     data.encode!('UTF-8', 'ISO-8859-1')
     data.each_line do |line|
       next if line =~ /^LangID/

@@ -1,7 +1,7 @@
 class Country < Struct.new(:code, :name)
 
   def self.setup_countries
-    data = File.open("#{Rails.root}/data/CountryCodes.tab", "rb").read
+    data = IO.read("#{Rails.root}/data/CountryCodes.tab")
     data.encode!('UTF-8', 'ISO-8859-1')
 
     countries = {}
@@ -10,7 +10,6 @@ class Country < Struct.new(:code, :name)
       code, name, _ = line.split("\t")
       countries[code] = name
     end
-
     countries
   end
 
