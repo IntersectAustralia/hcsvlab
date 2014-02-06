@@ -299,7 +299,7 @@ module Item::DownloadItemsHelper
         handle = itemMetadata['metadata']['handle'].gsub(":", "_")
 
         bag.add_file("#{handle}/#{handle}-metadata.json") do |io|
-          io.puts itemMetadata
+          io.puts itemMetadata.to_json
         end
 
       end
