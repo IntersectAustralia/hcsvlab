@@ -56,6 +56,7 @@ end
 
 def create_item_from_file(corpus_dir, rdf_file, manifest, collection, id=nil)
   item_info = manifest["files"][File.basename(rdf_file)]
+  raise StandardError, "Error with file during manifest creation - #{rdf_file}" if !item_info["error"].nil?
   identifier = item_info["id"]
   uri = item_info["uri"]
   collection_name = manifest["collection_name"]
@@ -330,6 +331,7 @@ def create_collection_manifest(corpus_dir)
   logger.info("Creating collection manifest for #{corpus_dir}")
   overall_start = Time.now
 
+  failures = []
   rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
   manifest_hash = {"collection_name" => extract_manifest_collection(rdf_files.first), "files" => {}}
@@ -337,6 +339,9 @@ def create_collection_manifest(corpus_dir)
   rdf_files.each do |rdf_file|
     filename, manifest_entry = extract_manifest_info(rdf_file)
     manifest_hash["files"][filename] = manifest_entry
+    if !manifest_entry["error"].nil?
+      failures << filename
+    end
   end
 
   file = File.open(File.join(corpus_dir, MANIFEST_FILE_NAME), "w")
@@ -345,6 +350,7 @@ def create_collection_manifest(corpus_dir)
 
   endTime = Time.now
   logger.debug("Time for creating manifest for #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - overall_start.to_f)*1000)}ms)")
+  logger.debug("Failures: #{failures.to_s}")
 end
 
 #
@@ -372,28 +378,33 @@ end
 # query the given rdf file to produce a hash item to add to the manifest
 #
 def extract_manifest_info(rdf_file)
-  graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
-  query = RDF::Query.new({
-                           :item => {
-                               RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
-                           }
-                         })
-  result = query.execute(graph)[0]
-  identifier = result.identifier.to_s
-  uri = result[:item].to_s
-
   filename = File.basename(rdf_file)
-  hash = {"id" => identifier, "uri" => uri, "docs" => []}
+  begin
+    graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
+    query = RDF::Query.new({
+                             :item => {
+                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                             }
+                           })
+    result = query.execute(graph)[0]
+    identifier = result.identifier.to_s
+    uri = result[:item].to_s
 
-  query = RDF::Query.new({
-                           :document => {
-                               RDF::URI("http://purl.org/dc/terms/type") => :type,
-                               RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
-                               RDF::URI("http://purl.org/dc/terms/source") => :source
-                           }
-                         })
-  query.execute(graph).each do |result|
-    hash["docs"].append({"identifier" => result.identifier.to_s, "source" => result.source.to_s, "type" => result.type.to_s})
+    hash = {"id" => identifier, "uri" => uri, "docs" => []}
+
+    query = RDF::Query.new({
+                             :document => {
+                                 RDF::URI("http://purl.org/dc/terms/type") => :type,
+                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
+                                 RDF::URI("http://purl.org/dc/terms/source") => :source
+                             }
+                           })
+    query.execute(graph).each do |result|
+      hash["docs"].append({"identifier" => result.identifier.to_s, "source" => result.source.to_s, "type" => result.type.to_s})
+    end
+  rescue => e
+    logger.error "Error! #{e.message}"
+    return filename, {"error" => "parse-error"}
   end
 
   return filename, hash
