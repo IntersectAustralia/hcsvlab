@@ -16,7 +16,7 @@ def ingest_one(corpus_dir, rdf_file, annotations, id=nil)
   collection_name = manifest["collection_name"]
   collection = check_and_create_collection(collection_name, corpus_dir)
 
-  populate_triple_store(corpus_dir)
+  populate_triple_store(corpus_dir, collection_name)
 
   ingest_rdf_file(corpus_dir, rdf_file, true, manifest, collection, id)
 end
@@ -319,7 +319,7 @@ end
 # Create collection manifest if one doesn't already exist
 #
 def check_and_create_manifest(corpus_dir)
-  if !File.exists? File.join(corpus_dir, "manifest.json")
+  if !File.exists? File.join(corpus_dir, MANIFEST_FILE_NAME)
     create_collection_manifest(corpus_dir)
   end
 end
@@ -353,7 +353,7 @@ def create_collection_manifest(corpus_dir)
 
   endTime = Time.now
   logger.debug("Time for creating manifest for #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - overall_start.to_f)*1000)}ms)")
-  logger.debug("Failures: #{failures.to_s}")
+  logger.debug("Failures: #{failures.to_s}") if failures.size > 0
 end
 
 #
@@ -417,24 +417,9 @@ end
 #
 # Store all metadata and annotations from the given directory in the triplestore
 #
-def populate_triple_store(corpus_dir)
+def populate_triple_store(corpus_dir, collection_name)
   logger.debug "Start ingesting metadata and annotations in #{corpus_dir}"
   metadataFiles = Dir["#{corpus_dir}/**/*-metadata.rdf"]
-
-  graph = RDF::Graph.load(metadataFiles.first, :format => :ttl, :validate => true)
-  query = RDF::Query.new({
-                             :item => {
-                                 RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
-                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
-                             }
-                         })
-  result = query.execute(graph)[0]
-  collection_name = last_bit(result.collection.to_s)
-  # small hack to handle austalk for the time being, can be fixed up
-  # when we look at getting some form of data uniformity
-  if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
-    collection_name = "austalk"
-  end
 
   server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
 

@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/fedora_helper.rb'
 
 namespace :fedora do
 
-  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env]
-
   @solr = RSolr.connect(Blacklight.solr_config)
 
   #
@@ -351,12 +349,12 @@ namespace :fedora do
 
     overall_start = Time.now
 
-    manifest = JSON.parse(IO.read(File.join(corpus_dir, "manifest.json")))
+    manifest = JSON.parse(IO.read(File.join(corpus_dir, MANIFEST_FILE_NAME)))
 
     collection_name = manifest["collection_name"]
     collection = check_and_create_collection(collection_name, corpus_dir)
 
-    populate_triple_store(corpus_dir)
+    populate_triple_store(corpus_dir, collection_name)
 
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
