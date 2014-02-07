@@ -17,16 +17,16 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/0> a dada:Annotation ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/1-002/0> a dada:Annotation ;
     ns1:val "ai" ;
-    dada:partof <http://ns.ausnc.org.au/corpora/cooee/annotation/47b2599c-32b4-404d-8234-3d73923c77bd> ;
-    dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/0L> ;
+    dada:partof <http://ns.ausnc.org.au/corpora/cooee/annotation/1-002/47b2599c-32b4-404d-8234-3d73923c77bd> ;
+    dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/1-002/0L> ;
     dada:type "phonetic" .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/0L> a dada:SecondRegion ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/1-002/0L> a dada:SecondRegion ;
     dada:end 1.1548 ;
     dada:start 1.1348 .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/47b2599c-32b4-404d-8234-3d73923c77bd> a dada:AnnotationCollection ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/1-002/47b2599c-32b4-404d-8234-3d73923c77bd> a dada:AnnotationCollection ;
     dada:annotates <http://ns.ausnc.org.au/corpora/cooee/items/1-002> .
 

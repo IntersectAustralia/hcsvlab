@@ -17,25 +17,25 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/0> a dada:Annotation ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0> a dada:Annotation ;
     ns1:val "11" ;
-    dada:partof <http://ns.ausnc.org.au/corpora/cooee/annotation/47b2599c-32b4-404d-8234-3d73923c77bd> ;
-    dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/0L> ;
+    dada:partof <http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/47b2599c-32b4-404d-8234-3d73923c77bd> ;
+    dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0L> ;
     dada:type "pageno" .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/1> a dada:Annotation ;
-    dada:partof <http://ns.ausnc.org.au/corpora/cooee/annotation/47b2599c-32b4-404d-8234-3d73923c77bd> ;
-    dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/1L> ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1> a dada:Annotation ;
+    dada:partof <http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/47b2599c-32b4-404d-8234-3d73923c77bd> ;
+    dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1L> ;
     dada:type "ellipsis" .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/0L> a dada:UTF8Region ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0L> a dada:UTF8Region ;
     dada:end 2460 ;
     dada:start 2460 .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/1L> a dada:UTF8Region ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1L> a dada:UTF8Region ;
     dada:end 2460 ;
     dada:start 2460 .
 
-<http://ns.ausnc.org.au/corpora/cooee/annotation/47b2599c-32b4-404d-8234-3d73923c77bd> a dada:AnnotationCollection ;
+<http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/47b2599c-32b4-404d-8234-3d73923c77bd> a dada:AnnotationCollection ;
     dada:annotates <http://ns.ausnc.org.au/corpora/cooee/items/1-001> .
 

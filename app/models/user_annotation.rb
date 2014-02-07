@@ -8,7 +8,7 @@ class UserAnnotation < ActiveRecord::Base
   belongs_to :user
   attr_accessible :file_location, :file_type, :item_identifier, :original_filename, :shareable, :size_in_bytes, :annotationCollectionId
 
-  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env]
+  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
 
   ANNOTATIONS_BASE_URI = "http://hcsvlab.org.au/corpora/"
   USER_BASE_URI = "http://hcsvlab.org.au/users/"

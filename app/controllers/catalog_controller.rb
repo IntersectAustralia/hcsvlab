@@ -6,6 +6,9 @@ require "#{Rails.root}/lib/item/download_items_helper.rb"
 class CatalogController < ApplicationController
 
   FIXNUM_MAX = 2147483647
+  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
+  SPARQL_QUERY_PREFIXES = YAML.load_file(Rails.root.join("config", "sparql.yml")) unless defined? SPARQL_QUERY_PREFIXES
+
 
   # Set catalog tab as current selected
   set_tab :catalog
@@ -398,7 +401,9 @@ class CatalogController < ApplicationController
         return
       end
     rescue Exception => e
-        # Fall through to return Not Found
+      Rails.logger.error(e.message)
+      Rails.logger.error(e.backtrace)
+      # Fall through to return Not Found
     end
     respond_to do |format|
         format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
@@ -738,16 +743,21 @@ class CatalogController < ApplicationController
   # query the annotations for an item and return them along with the "primary" document
   #
   def query_annotations(item, solr_document, type, label)
-    uri = buildURI(item.id, 'annotationSet1')
-    repo = RDF::Repository.load(uri, :format => :ttl)
+    item_short_identifier = item.flat_handle.split(":").last
     corpus = solr_document[MetadataHelper::short_form(MetadataHelper::COLLECTION)].first
-    queryConfig = YAML.load_file(Rails.root.join("config", "sparql.yml"))
 
-    q = "
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repo = server.repository(corpus)
+
+    query = """
       PREFIX dada:<http://purl.org/dada/schema/0.2#>
-      PREFIX cp:<" + (queryConfig[corpus]['corpus_prefix'] unless queryConfig[corpus].nil?).to_s + ">
-      select * where
-      {
+      PREFIX dc: <http://purl.org/dc/terms/>
+      PREFIX cp:<#{(SPARQL_QUERY_PREFIXES[corpus]['corpus_prefix'] unless SPARQL_QUERY_PREFIXES[corpus].nil?).to_s}>
+      SELECT *
+      WHERE {
+        ?identifier dc:identifier '#{item_short_identifier}'.
+        ?annoCol dada:annotates ?identifier .
+        ?anno dada:partof ?annoCol .
         ?anno a dada:Annotation .
         OPTIONAL { ?anno cp:val ?label . }
         OPTIONAL { ?anno dada:type ?type . }
@@ -756,17 +766,15 @@ class CatalogController < ApplicationController
           OPTIONAL { ?loc a ?region . }
           OPTIONAL { ?loc dada:start ?start . }
           OPTIONAL { ?loc dada:end ?end . }
-        }
-    "
+      }
+    """
     if type.present?
-      q << "?anno dada:type '" + CGI.escape(type).to_s.strip + "' ."
+      query << "?anno dada:type '" + CGI.escape(type).to_s.strip + "' ."
     end
     if label.present?
-      q << "?anno cp:val '" + CGI.escape(label).to_s.strip + "' ."
+      query << "?anno cp:val '" + CGI.escape(label).to_s.strip + "' ."
     end
-    q << "}"
-
-    query = SPARQL.parse(q)
+    query << "}"
 
     # hacky way to find the "primary" document, need to make this standard in RDF
     if !@item.primary_text.content.nil?
@@ -781,7 +789,9 @@ class CatalogController < ApplicationController
       end
     end
 
-    return query.execute(repo), annotates_document
+    solution = repo.sparql_query(query)
+
+    return solution, annotates_document
   end
 
   #

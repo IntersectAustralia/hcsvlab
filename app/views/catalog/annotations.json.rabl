@@ -16,8 +16,8 @@ node(:annotations) do
     hash[:@id] = ann[:anno].to_s
     hash[:type] = ann[:type].to_s
     hash[:label] = ann[:label].to_s
-    hash[:start] = ann[:start].to_f
-    hash[:end] = ann[:end].to_f
+    hash[:start] = ann[:start].to_s.to_f
+    hash[:end] = ann[:end].to_s.to_f
     data << hash.clone
   end
   data
