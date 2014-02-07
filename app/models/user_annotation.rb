@@ -78,7 +78,7 @@ class UserAnnotation < ActiveRecord::Base
       end
 
       # Finally, remove added triples from the triple store
-      removeTriplesFromContext(collection_name, context)
+      removeTriplesFromContext(collection_name, context) if context.present?
 
       Rails.logger.error("Error Processing uploaded annotation - #{e.message}")
       Rails.logger.error(e.backtrace.join("\n"))
@@ -217,6 +217,8 @@ class UserAnnotation < ActiveRecord::Base
     """
 
     result = repository.sparql_query(sparqlQuery)
+
+    raise Exception.new("No item with identifier '#{item_short_identifier}' found in Repository '#{collection_name}' in sesame server") if (result.empty?)
 
     result.each.first['identifier']
   end
