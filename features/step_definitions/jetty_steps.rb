@@ -16,7 +16,7 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   manifest_file = "#{SAMPLE_FOLDER}/#{corpus}/manifest.json"
   corpus_dir = "#{SAMPLE_FOLDER}/#{corpus}"
 
-  ingest_one(corpus_dir, rdf_file, true, pid)
+  ingest_one(corpus_dir, rdf_file, pid)
 
   # # update solr
   Solr_Worker.new.on_message("index #{pid}")
