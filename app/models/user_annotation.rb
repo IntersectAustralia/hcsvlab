@@ -13,9 +13,6 @@ class UserAnnotation < ActiveRecord::Base
   ANNOTATIONS_BASE_URI = "http://hcsvlab.org.au/corpora/"
   USER_BASE_URI = "http://hcsvlab.org.au/users/"
 
-  RDF_TYPE = RDF::URI.new("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
-  DC_CREATOR = RDF::URI.new("http://purl.org/dc/terms/creator")
-
   #
   # Creates a new user annotations and relates it with the 'user'
   #
@@ -127,10 +124,12 @@ class UserAnnotation < ActiveRecord::Base
   # @return [String, RDF::URI]
   #
   def self.createRDFGraph(rdfStatements, collection_name, item_handle, user)
-    prefixes = {:rdf => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    raise Exception.new("No annotations founds.") if rdfStatements.empty?
+
+    prefixes = {:rdf => RDF.to_uri.to_s,
                 :dada => "http://purl.org/dada/schema/0.2#",
-                :foaf => "http://xmlns.com/foaf/0.1/",
-                :dc => "http://purl.org/dc/terms/"}
+                :foaf => RDF::FOAF.to_uri.to_s,
+                :dc => RDF::DC.to_uri.to_s}
 
     item_identifier = retrieve_item_identifier(collection_name, item_handle)
 
@@ -138,14 +137,14 @@ class UserAnnotation < ActiveRecord::Base
 
     # Creates annotation collection
     annotationCollectionId = RDF::URI.new("#{ANNOTATIONS_BASE_URI}#{collection_name}/#{item_handle.gsub(":", "_")}/#{SecureRandom.uuid}")
-    graph << RDF::Statement.new(annotationCollectionId, RDF_TYPE, RDF::URI.new("http://purl.org/dada/schema/0.2#AnnotationCollection"))
+    graph << RDF::Statement.new(annotationCollectionId, RDF.type.to_uri, RDF::URI.new("http://purl.org/dada/schema/0.2#AnnotationCollection"))
     graph << RDF::Statement.new(annotationCollectionId, RDF::URI.new("http://purl.org/dada/schema/0.2#annotates"), item_identifier)
-    graph << RDF::Statement.new(annotationCollectionId, RDF::URI.new("http://purl.org/dc/terms/created"), Time.now.strftime("%d/%m/%Y %H:%M:%S"))
+    graph << RDF::Statement.new(annotationCollectionId, RDF::DC.created.to_uri, Time.now.strftime("%d/%m/%Y %H:%M:%S"))
 
     userIdUri = RDF::URI.new("#{USER_BASE_URI}#{Digest::MD5.hexdigest(user.email)}")
-    graph << RDF::Statement.new(annotationCollectionId, DC_CREATOR, userIdUri)
-    graph << RDF::Statement.new(userIdUri, RDF_TYPE, RDF::URI.new("http://xmlns.com/foaf/0.1/Person"))
-    graph << RDF::Statement.new(userIdUri, RDF::URI.new("http://xmlns.com/foaf/0.1/name"), "#{user.first_name} #{user.last_name}")
+    graph << RDF::Statement.new(annotationCollectionId, RDF::DC.creator.to_uri, userIdUri)
+    graph << RDF::Statement.new(userIdUri, RDF.type.to_uri, RDF::FOAF.Person.to_uri)
+    graph << RDF::Statement.new(userIdUri, RDF::FOAF.name.to_uri, "#{user.first_name} #{user.last_name}")
 
     annotationIdMap = {}
     rdfStatements.each do |aStatement|
@@ -159,7 +158,7 @@ class UserAnnotation < ActiveRecord::Base
         annotationIdUri = annotationIdMap[aStatement.subject]
         locatorIdUri = RDF::URI.new("#{annotationIdUri.to_s}/Locator")
 
-        graph << RDF::Statement.new(annotationIdUri, RDF_TYPE, RDF::URI.new("http://purl.org/dada/schema/0.2#Annotation"))
+        graph << RDF::Statement.new(annotationIdUri, RDF.type.to_uri, RDF::URI.new("http://purl.org/dada/schema/0.2#Annotation"))
         graph << RDF::Statement.new(annotationIdUri, RDF::URI.new("http://purl.org/dada/schema/0.2#partof"), annotationCollectionId)
         graph << RDF::Statement.new(annotationIdUri, RDF::URI.new("http://purl.org/dada/schema/0.2#targets"), locatorIdUri)
 
@@ -208,7 +207,7 @@ class UserAnnotation < ActiveRecord::Base
     raise Exception.new("Repository #{collection_name} not found in sesame server") if (repository.nil?)
 
     sparqlQuery ="""
-        PREFIX dc: <http://purl.org/dc/terms/>
+        PREFIX dc: <#{RDF::DC.to_uri.to_s}>
 
         SELECT ?identifier
         WHERE {

@@ -1,6 +1,6 @@
 {
   "@context": {
-	"@base": "http://purl.org/dada/schema/0.2/",
+	"@base": "http://purl.org/dada/schema/0.2#",
 	"annotations": {
     		"@id": "http://purl.org/dada/schema/0.2/annotations",
     		"@container": "@list"
@@ -9,20 +9,20 @@
 		"@id": "http://purl.org/dada/schema/0.2/commonProperties"
 	},
 	"type": {
-    		"@id": "http://purl.org/dada/schema/0.2/type"
+    		"@id": "http://purl.org/dada/schema/0.2#type"
 	},
 	"start": {
-    		"@id": "http://purl.org/dada/schema/0.2/start"
+    		"@id": "http://purl.org/dada/schema/0.2#start"
 	},
 	"end": {
-    		"@id": "http://purl.org/dada/schema/0.2/end"
+    		"@id": "http://purl.org/dada/schema/0.2#end"
 	},
 	"label": {
-    		"@id": "http://purl.org/dada/schema/0.2/label"
+    		"@id": "http://purl.org/dada/schema/0.2#label"
 	},
 	"annotates": {
-    		"@id": "http://purl.org/dada/schema/0.2/annotates"
-	}  
+    		"@id": "http://purl.org/dada/schema/0.2#annotates"
+    }
   },
   "@graph":[
     {

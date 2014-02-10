@@ -9,6 +9,8 @@ class CatalogController < ApplicationController
   SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
   SPARQL_QUERY_PREFIXES = YAML.load_file(Rails.root.join("config", "sparql.yml")) unless defined? SPARQL_QUERY_PREFIXES
 
+  TYPE_LOOKUP = {"http://purl.org/dada/schema/0.2#SecondRegion" => "SecondAnnotation", "http://purl.org/dada/schema/0.2#UTF8Region" => "TextAnnotation"}
+
 
   # Set catalog tab as current selected
   set_tab :catalog
@@ -402,7 +404,7 @@ class CatalogController < ApplicationController
       end
     rescue Exception => e
       Rails.logger.error(e.message)
-      Rails.logger.error(e.backtrace)
+      Rails.logger.error(e.backtrace.join("\n"))
       # Fall through to return Not Found
     end
     respond_to do |format|
@@ -413,8 +415,9 @@ class CatalogController < ApplicationController
   end
 
   def annotation_context
+    @predefinedProperties = collect_predefined_context_properties()
 
-    avoid_context = collect_restricted_predefined_vocabulary
+    avoid_context = collect_restricted_predefined_vocabulary()
 
     @vocab_hash = {}
     RDF::Vocabulary.each {|vocab|
@@ -763,10 +766,8 @@ class CatalogController < ApplicationController
         OPTIONAL { ?anno dada:type ?type . }
         OPTIONAL {
           ?anno dada:targets ?loc .
-          OPTIONAL { ?loc a ?region . }
-          OPTIONAL { ?loc dada:start ?start . }
-          OPTIONAL { ?loc dada:end ?end . }
-      }
+          OPTIONAL { ?loc ?property ?value . }
+        }
     """
     if type.present?
       query << "?anno dada:type '" + CGI.escape(type).to_s.strip + "' ."
@@ -775,6 +776,43 @@ class CatalogController < ApplicationController
       query << "?anno cp:val '" + CGI.escape(label).to_s.strip + "' ."
     end
     query << "}"
+
+    solution = repo.sparql_query(query)
+
+    hash = {}
+    commonProperties = {}
+
+    # Look for properties defined in the project's Json-LD
+    predefinedProperties = collect_predefined_context_properties()
+    predefinedPropertiesMap = {}
+    predefinedProperties.map { |key, value|
+      if (value.is_a?(String))
+        predefinedPropertiesMap[value] = key
+      else
+        predefinedPropertiesMap[value[:@id].to_s] = key
+      end
+    }
+
+
+    solution.each do |aSolution|
+
+      hash[aSolution[:anno].to_s] = {} if (hash[aSolution[:anno].to_s].nil?)
+
+      hash[aSolution[:anno].to_s][:label] = aSolution[:label].to_s unless aSolution[:label].nil?
+      hash[aSolution[:anno].to_s][:type] = aSolution[:type].to_s unless aSolution[:type].nil?
+
+      if (RDF.type.to_s.eql? (aSolution[:property].to_s))
+        hash[aSolution[:anno].to_s][:@type] = TYPE_LOOKUP[aSolution[:value].to_s]
+      else
+        # If the property URI is predefined in our Json-ld, then we should use the short_name of the URI
+        if (predefinedPropertiesMap.has_key?(aSolution[:property].to_s))
+          hash[aSolution[:anno].to_s][predefinedPropertiesMap[aSolution[:property].to_s]] = aSolution[:value].to_s
+        else
+          hash[aSolution[:anno].to_s][aSolution[:property].to_s] = aSolution[:value].to_s
+        end
+      end
+    end
+
 
     # hacky way to find the "primary" document, need to make this standard in RDF
     if !@item.primary_text.content.nil?
@@ -789,9 +827,24 @@ class CatalogController < ApplicationController
       end
     end
 
-    solution = repo.sparql_query(query)
+    return {commonProperties: commonProperties, annotations: hash}, annotates_document
+  end
 
-    return solution, annotates_document
+  #
+  #
+  #
+  def collect_predefined_context_properties
+    predefinedProperties = {}
+    predefinedProperties[:@base] = "http://purl.org/dada/schema/0.2#"
+    predefinedProperties[:annotations] = { :@id => "http://purl.org/dada/schema/0.2#annotations", :@container => "@list" }
+    predefinedProperties[:commonProperties] = {:@id => "http://purl.org/dada/schema/0.2#commonProperties"}
+    predefinedProperties[:type] = {:@id => "http://purl.org/dada/schema/0.2#type"}
+    predefinedProperties[:start] = {:@id => "http://purl.org/dada/schema/0.2#start"}
+    predefinedProperties[:end] = {:@id => "http://purl.org/dada/schema/0.2#end"}
+    predefinedProperties[:label] = {:@id => "http://purl.org/dada/schema/0.2#label"}
+    predefinedProperties[:annotates] = {:@id => "http://purl.org/dada/schema/0.2#annotates"}
+
+    predefinedProperties
   end
 
   #

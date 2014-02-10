@@ -9,7 +9,7 @@ SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env
 # Ingests a single item, creating both a collection object and manifest if they don't
 # already exist. NOTE: the id variable should only be passed in for use in automated tests!
 #
-def ingest_one(corpus_dir, rdf_file, annotations, id=nil)
+def ingest_one(corpus_dir, rdf_file, id=nil)
   check_and_create_manifest(corpus_dir)
   manifest = JSON.parse(IO.read(File.join(corpus_dir, MANIFEST_FILE_NAME)))
 

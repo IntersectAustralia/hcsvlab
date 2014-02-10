@@ -5,6 +5,7 @@ require "#{Rails.root}/spec/support/ingest_helper.rb"
 describe UserAnnotation do
 
   ANNOTATION_SAMPLE_FILE = "#{Rails.root}/test/samples/annotations/upload_annotation_sample.json"
+  EMPTY_GRAPH_ANNOTATION_SAMPLE_FILE = "#{Rails.root}/test/samples/annotations/upload_empty_graph_annotation_sample.json"
   SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
 
   describe 'Successfully uploaded annotation' do
@@ -16,11 +17,13 @@ describe UserAnnotation do
       uploadedFile = ActionDispatch::Http::UploadedFile.new({filename:"upload_annotation_sample.json", tempfile: ANNOTATION_SAMPLE_FILE})
 
       created = UserAnnotation.create_new_user_annotation(user, "cooee:1-001", uploadedFile)
+      created.should eq true
+
       createdAnnotation = UserAnnotation.find_by_item_identifier("cooee:1-001")
+      createdAnnotation.should_not be nil
+
       annotationCollectionId = createdAnnotation.annotationCollectionId
 
-      created.should eq true
-      createdAnnotation.should_not be nil
       createdAnnotation.item_identifier.should eq "cooee:1-001"
       createdAnnotation.user.email.should eq "hcsvlab_test_user@intersect.org.au"
       createdAnnotation.original_filename.should eq "upload_annotation_sample.json"
@@ -110,12 +113,25 @@ describe UserAnnotation do
         mapResult = {}
         result.map{|aSolution| mapResult[aSolution['subject']] = aSolution['object']}
 
-        mapResult[RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")].should eq RDF::URI("http://purl.org/dada/schema/0.2#UTF8Region")
-        mapResult[RDF::URI("http://purl.org/dada/schema/0.2/type")].to_s.should eq "pageno"
-        mapResult[RDF::URI("http://purl.org/dada/schema/0.2/start")].should eq mapResult[RDF::URI("http://purl.org/dada/schema/0.2/end")]
+        mapResult[RDF.type.to_uri].should eq RDF::URI("http://purl.org/dada/schema/0.2#UTF8Region")
+        mapResult[RDF::URI("http://purl.org/dada/schema/0.2#type")].to_s.should eq "pageno"
+        mapResult[RDF::URI("http://purl.org/dada/schema/0.2#start")].should eq mapResult[RDF::URI("http://purl.org/dada/schema/0.2#end")]
       end
 
 
     end
   end
+
+  describe 'Unsuccessfully uploaded annotation' do
+    it 'should raise an exception if the graph section is empty or not present' do
+      ingest_one("cooee", "1-001")
+      user = FactoryGirl.create(:user, :status => 'A', :email => "hcsvlab_test_user@intersect.org.au")
+
+      uploadedFile = ActionDispatch::Http::UploadedFile.new({filename:"upload_empty_graph_annotation_sample.json", tempfile: EMPTY_GRAPH_ANNOTATION_SAMPLE_FILE})
+      created = UserAnnotation.create_new_user_annotation(user, "cooee:1-001", uploadedFile)
+
+      created.should be false
+    end
+  end
+
 end
