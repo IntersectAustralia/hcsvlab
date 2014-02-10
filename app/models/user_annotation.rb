@@ -65,26 +65,25 @@ class UserAnnotation < ActiveRecord::Base
       context = annotationCollectionId
       storeRdfInTriplestore(absolute_rdf_filename, collection_name, context)
 
-    rescue => e
+    rescue Exception, JSON::LD::InvalidContext, JSON::LD::ProcessingError, JSON::LD::InvalidFrame  => e
       # If something went wrong, we have to remove the copied file and created directories
-      remove_created_files_and_directories(absolute_file_path, absolute_filename, absolute_rdf_filename, base_path)
-
-      # Removes entry for the new annotations
-      if !new_annotation.nil? and new_annotation.persisted?
-        new_annotation.destroy
-      end
-
-      # Finally, remove added triples from the triple store
-      removeTriplesFromContext(collection_name, context) if context.present?
+      clear_created_directories_and_data(absolute_file_path, absolute_filename, absolute_rdf_filename, base_path, collection_name, context, new_annotation)
 
       Rails.logger.error("Error Processing uploaded annotation - #{e.message}")
       Rails.logger.error(e.backtrace.join("\n"))
       return false
+    rescue => e
+      # If something went wrong, we have to remove the copied file and created directories
+      clear_created_directories_and_data(absolute_file_path, absolute_filename, absolute_rdf_filename, base_path, collection_name, context, new_annotation)
+
+      Rails.logger.error("Error Processing uploaded annotation - #{e.message}")
+      Rails.logger.error(e.backtrace.join("\n"))
+      return false
+
     end
 
     return true
   end
-
 
   private
 
@@ -220,6 +219,29 @@ class UserAnnotation < ActiveRecord::Base
     raise Exception.new("No item with identifier '#{item_short_identifier}' found in Repository '#{collection_name}' in sesame server") if (result.empty?)
 
     result.each.first['identifier']
+  end
+
+  #
+  # Removes created directories, registry in the UserAnnotation table and the context created in the triplestore
+  #
+  # @param [String] absolute_file_path
+  # @param [String] absolute_filename
+  # @param [String] absolute_file_path
+  # @param [String] base_path
+  # @param [String] collection_name
+  # @param [RDF:URI] context
+  # @param [UserAnnotation] new_annotation
+  #
+  def self.clear_created_directories_and_data(absolute_file_path, absolute_filename, absolute_rdf_filename, base_path, collection_name, context, new_annotation)
+    remove_created_files_and_directories(absolute_file_path, absolute_filename, absolute_rdf_filename, base_path)
+
+    # Removes entry for the new annotations
+    if !new_annotation.nil? and new_annotation.persisted?
+      new_annotation.destroy
+    end
+
+    # Finally, remove added triples from the triple store
+    removeTriplesFromContext(collection_name, context) if context.present?
   end
 
   #

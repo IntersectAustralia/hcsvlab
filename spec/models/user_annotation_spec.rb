@@ -5,7 +5,6 @@ require "#{Rails.root}/spec/support/ingest_helper.rb"
 describe UserAnnotation do
 
   ANNOTATION_SAMPLE_FILE = "#{Rails.root}/test/samples/annotations/upload_annotation_sample.json"
-  EMPTY_GRAPH_ANNOTATION_SAMPLE_FILE = "#{Rails.root}/test/samples/annotations/upload_empty_graph_annotation_sample.json"
   SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
 
   describe 'Successfully uploaded annotation' do
@@ -127,7 +126,19 @@ describe UserAnnotation do
       ingest_one("cooee", "1-001")
       user = FactoryGirl.create(:user, :status => 'A', :email => "hcsvlab_test_user@intersect.org.au")
 
-      uploadedFile = ActionDispatch::Http::UploadedFile.new({filename:"upload_empty_graph_annotation_sample.json", tempfile: EMPTY_GRAPH_ANNOTATION_SAMPLE_FILE})
+      uploadedFile = ActionDispatch::Http::UploadedFile.new({filename:"upload_empty_graph_annotation_sample.json",
+                                                             tempfile: "#{Rails.root}/test/samples/annotations/upload_empty_graph_annotation_sample.json"})
+      created = UserAnnotation.create_new_user_annotation(user, "cooee:1-001", uploadedFile)
+
+      created.should be false
+    end
+
+    it 'should raise an exception if the context section is wrong' do
+      ingest_one("cooee", "1-001")
+      user = FactoryGirl.create(:user, :status => 'A', :email => "hcsvlab_test_user@intersect.org.au")
+
+      uploadedFile = ActionDispatch::Http::UploadedFile.new({filename:"upload_empty_graph_annotation_sample.json",
+                                                             tempfile: "#{Rails.root}/test/samples/annotations/wrong_context_annotation_sample.json"})
       created = UserAnnotation.create_new_user_annotation(user, "cooee:1-001", uploadedFile)
 
       created.should be false
