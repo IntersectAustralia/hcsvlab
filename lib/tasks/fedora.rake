@@ -17,7 +17,7 @@ namespace :fedora do
     end
 
     logger.info "rake fedora:ingest_one #{corpus_rdf}"
-    pid = ingest_one(File.dirname(corpus_rdf), corpus_rdf, true)
+    pid = ingest_one(File.dirname(corpus_rdf), corpus_rdf)
     puts "Ingested item #{pid}" if Rails.env.test?
 
   end
