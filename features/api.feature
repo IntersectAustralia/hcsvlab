@@ -205,148 +205,6 @@ Feature: Browsing via API
     {"error":"not-found"}
     """
 
-  Scenario: Get annotations for item
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 200 response code
-    Then the JSON response should be:
-    """
-    {"@context":"http://example.org/schema/json-ld",
-      "commonProperties":{
-        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
-      },
-      "annotations":[
-        {
-          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0",
-          "label":"11",
-          "type":"pageno",
-          "@type":"TextAnnotation",
-          "end":"2460",
-          "start":"2460"
-        },
-        {
-          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1",
-          "type":"ellipsis",
-          "@type":"TextAnnotation",
-          "end":"2460",
-          "start":"2460"
-        }
-      ]
-    }
-    """
-
-  Scenario: Get annotations for item with different @type
-    Given I ingest "cooee:1-002" with id "hcsvlab:1"
-    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 200 response code
-    Then the JSON response should be:
-    """
-    {
-      "@context":"http://example.org/schema/json-ld",
-      "commonProperties":{
-        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
-      },
-      "annotations":[
-        {
-          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-002/0",
-          "label":"ai",
-          "type":"phonetic",
-          "@type":"SecondAnnotation",
-          "end":"1.1548",
-          "start":"1.1348"
-        }
-      ]
-    }
-    """
-
-  Scenario: Get annotation context
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    And "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the annotation context page with the API token for "researcher1@intersect.org.au"
-    Then I should get a 200 response code
-    And the JSON response should be:
-    """
-    {"@context":{"@base":"http://purl.org/dada/schema/0.2#","annotations":{"@id":"http://purl.org/dada/schema/0.2#annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2#annotates"},"ace": {"@id": "http://ns.ausnc.org.au/schemas/ace/"},"ausnc": {"@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk": {"@id": "http://ns.austalk.edu.au/"},"austlit": {"@id": "http://ns.ausnc.org.au/schemas/austlit/"},"bibo": {"@id": "http://purl.org/ontology/bibo/"},"cooee": {"@id": "http://ns.ausnc.org.au/schemas/cooee/"},"dc": {"@id": "http://purl.org/dc/terms/"},"foaf": {"@id": "http://xmlns.com/foaf/0.1/"},"gcsause": {"@id": "http://ns.ausnc.org.au/schemas/gcsause/"},"ice": {"@id": "http://ns.ausnc.org.au/schemas/ice/"},"olac": {"@id": "http://www.language-archives.org/OLAC/1.1/"},"purl": {"@id": "http://purl.org/"},"rdf": {"@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema": {"@id": "http://schema.org/"},"xsd": {"@id": "http://www.w3.org/2001/XMLSchema#"}}}
-    """
-
-  Scenario: Get annotation context without API token
-    Given I make a JSON request for the annotation context page without an API token
-    Then I should get a 200 response code
-    And the JSON response should be:
-    """
-    {"@context":{"@base":"http://purl.org/dada/schema/0.2#","annotations":{"@id":"http://purl.org/dada/schema/0.2#annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2#annotates"},"ace": {"@id": "http://ns.ausnc.org.au/schemas/ace/"},"ausnc": {"@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk": {"@id": "http://ns.austalk.edu.au/"},"austlit": {"@id": "http://ns.ausnc.org.au/schemas/austlit/"},"bibo": {"@id": "http://purl.org/ontology/bibo/"},"cooee": {"@id": "http://ns.ausnc.org.au/schemas/cooee/"},"dc": {"@id": "http://purl.org/dc/terms/"},"foaf": {"@id": "http://xmlns.com/foaf/0.1/"},"gcsause": {"@id": "http://ns.ausnc.org.au/schemas/gcsause/"},"ice": {"@id": "http://ns.ausnc.org.au/schemas/ice/"},"olac": {"@id": "http://www.language-archives.org/OLAC/1.1/"},"purl": {"@id": "http://purl.org/"},"rdf": {"@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema": {"@id": "http://schema.org/"},"xsd": {"@id": "http://www.w3.org/2001/XMLSchema#"}}}
-    """
-
-  Scenario: Request annotations for item that doesn't have annotations
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
-    Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:2" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 404 response code
-
-  Scenario: Get annotations for item that doesn't exist
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
-    Then I should get a 404 response code
-
-  Scenario: Get specific annotations for item by label
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I have user "researcher1@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
-      | label |
-      | 11    |
-    Then I should get a 200 response code
-    Then the JSON response should be:
-    """
-    {
-      "@context":"http://example.org/schema/json-ld",
-      "commonProperties":{
-        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
-      },
-      "annotations":[
-        {
-          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0",
-          "label":"11",
-          "type":"pageno",
-          "@type":"TextAnnotation",
-          "end":"2460",
-          "start":"2460"
-        }
-      ]
-    }
-    """
-
-  Scenario: Get specific annotations for item by type
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I have user "researcher1@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
-      | type     |
-      | ellipsis |
-    Then I should get a 200 response code
-    Then the JSON response should be:
-    """
-    {
-      "@context":"http://example.org/schema/json-ld",
-      "commonProperties":{
-        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
-      },
-      "annotations":[
-        {
-          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1",
-          "type":"ellipsis",
-          "@type":"TextAnnotation",
-          "end":"2460",
-          "start":"2460"
-        }
-      ]
-    }
-    """
-
   Scenario: Download primary_text from item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
@@ -684,6 +542,173 @@ Feature: Browsing via API
     And I wait 5 seconds
     Given I make a WARC request for the item list page for "Test 1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
+
+  ###########################################################################################################
+  #### RETRIEVE ANNOTATIONS TESTS                                                                        ####
+  ###########################################################################################################
+
+  Scenario: Get annotation context
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    When I make a JSON request for the annotation context page with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"@context":{"@base":"http://purl.org/dada/schema/0.2#","annotations":{"@id":"http://purl.org/dada/schema/0.2#annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2#annotates"},"ace": {"@id": "http://ns.ausnc.org.au/schemas/ace/"},"ausnc": {"@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk": {"@id": "http://ns.austalk.edu.au/"},"austlit": {"@id": "http://ns.ausnc.org.au/schemas/austlit/"},"bibo": {"@id": "http://purl.org/ontology/bibo/"},"cooee": {"@id": "http://ns.ausnc.org.au/schemas/cooee/"},"dc": {"@id": "http://purl.org/dc/terms/"},"foaf": {"@id": "http://xmlns.com/foaf/0.1/"},"gcsause": {"@id": "http://ns.ausnc.org.au/schemas/gcsause/"},"ice": {"@id": "http://ns.ausnc.org.au/schemas/ice/"},"olac": {"@id": "http://www.language-archives.org/OLAC/1.1/"},"purl": {"@id": "http://purl.org/"},"rdf": {"@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema": {"@id": "http://schema.org/"},"xsd": {"@id": "http://www.w3.org/2001/XMLSchema#"}}}
+    """
+
+  Scenario: Get annotation context without API token
+    Given I make a JSON request for the annotation context page without an API token
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"@context":{"@base":"http://purl.org/dada/schema/0.2#","annotations":{"@id":"http://purl.org/dada/schema/0.2#annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2#annotates"},"ace": {"@id": "http://ns.ausnc.org.au/schemas/ace/"},"ausnc": {"@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk": {"@id": "http://ns.austalk.edu.au/"},"austlit": {"@id": "http://ns.ausnc.org.au/schemas/austlit/"},"bibo": {"@id": "http://purl.org/ontology/bibo/"},"cooee": {"@id": "http://ns.ausnc.org.au/schemas/cooee/"},"dc": {"@id": "http://purl.org/dc/terms/"},"foaf": {"@id": "http://xmlns.com/foaf/0.1/"},"gcsause": {"@id": "http://ns.ausnc.org.au/schemas/gcsause/"},"ice": {"@id": "http://ns.ausnc.org.au/schemas/ice/"},"olac": {"@id": "http://www.language-archives.org/OLAC/1.1/"},"purl": {"@id": "http://purl.org/"},"rdf": {"@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema": {"@id": "http://schema.org/"},"xsd": {"@id": "http://www.w3.org/2001/XMLSchema#"}}}
+    """
+
+  Scenario: Get annotations for item
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    Then the JSON response should be:
+    """
+    {"@context":"http://example.org/schema/json-ld",
+      "commonProperties":{
+        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+      },
+      "annotations":[
+        {
+          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0",
+          "label":"11",
+          "type":"pageno",
+          "@type":"TextAnnotation",
+          "end":"2460",
+          "start":"2460"
+        },
+        {
+          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1",
+          "type":"ellipsis",
+          "@type":"TextAnnotation",
+          "end":"2460",
+          "start":"2460"
+        }
+      ]
+    }
+    """
+
+  Scenario: Get annotations for item with different @type
+    Given I ingest "cooee:1-002" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    Then the JSON response should be:
+    """
+    {
+      "@context":"http://example.org/schema/json-ld",
+      "commonProperties":{
+        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+      },
+      "annotations":[
+        {
+          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-002/0",
+          "label":"ai",
+          "type":"phonetic",
+          "@type":"SecondAnnotation",
+          "end":"1.1548",
+          "start":"1.1348"
+        }
+      ]
+    }
+    """
+
+  Scenario: Request annotations for item that doesn't have annotations
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
+    When I make a JSON request for the catalog annotations page for "hcsvlab:2" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+
+  Scenario: Get annotations for item that doesn't exist
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON request for the catalog annotations page for "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+
+  Scenario: Get specific annotations for item by label
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
+      | label |
+      | 11    |
+    Then I should get a 200 response code
+    Then the JSON response should be:
+    """
+    {
+      "@context":"http://example.org/schema/json-ld",
+      "commonProperties":{
+        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+      },
+      "annotations":[
+        {
+          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0",
+          "label":"11",
+          "type":"pageno",
+          "@type":"TextAnnotation",
+          "end":"2460",
+          "start":"2460"
+        }
+      ]
+    }
+    """
+
+  Scenario: Get specific annotations for item by type
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
+      | type     |
+      | ellipsis |
+    Then I should get a 200 response code
+    Then the JSON response should be:
+    """
+    {
+      "@context":"http://example.org/schema/json-ld",
+      "commonProperties":{
+        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+      },
+      "annotations":[
+        {
+          "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1",
+          "type":"ellipsis",
+          "@type":"TextAnnotation",
+          "end":"2460",
+          "start":"2460"
+        }
+      ]
+    }
+    """
+
+  Scenario: Get annotations for item including a user uploaded one
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                | Type                      |
+      | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
+    Then I should get a 200 response code
+    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should have 5 user uploaded annotations
+    And the JSON response should have the following annotations properties in any order:
+        | label   | type    |  @type         | end   | start |
+        | 11      | pageno  | TextAnnotation | 2460  | 2460  |
+        |         | ellipsis| TextAnnotation | 2460  | 2460  |
+        | 449     | pageno  | TextAnnotation | 421   | 421   |
+        | ...     | pageno  | TextAnnotation | 2524  | 2524  |
+        | 451     | pageno  | TextAnnotation | 6309  | 6309  |
+        | ...     | pageno  | TextAnnotation | 6598  | 6598  |
+        | 450     | pageno  | TextAnnotation | 3475  | 3475  |
+
 
   ###########################################################################################################
   #### UPLOAD ANNOTATIONS TESTS                                                                          ####

@@ -213,3 +213,48 @@ Then /^the (JSON )?response should be:$/ do |json, input|
     assert_equal actual, response
   end
 end
+
+Then /^the (JSON )?response should have (\d+) user uploaded annotations$/ do |json, numberOfAnnotations|
+  if json.present?
+    actual = JSON.parse(last_response.body)
+  else
+    actual = last_response.body
+  end
+
+  matches = actual.to_s.scan(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/)
+
+  if self.respond_to?(:should)
+    matches.size.should == numberOfAnnotations.to_i
+  else
+    assert_equal matches.size, numberOfAnnotations.to_i
+  end
+end
+
+Then /^the JSON response should have the following annotations properties in any order:$/ do |table|
+  actual = JSON.parse(last_response.body)
+
+  annotations = actual['annotations']
+
+  annotations.length.should == table.hashes.length
+
+  for x in 0..table.hashes.length-1
+    expectedAnnotation = table.hashes[x]
+
+    annotationFound = false
+    y = 0
+    while (!annotationFound and y < annotations.length) do
+      actualAnnotation = annotations[y]
+      allmatches = true
+      expectedAnnotation.each_pair do |key, value|
+        allmatches = allmatches & ((!value.present? & !actualAnnotation.has_key?(key)) | (value.present? and actualAnnotation[key] == value))
+      end
+      annotationFound = allmatches
+      y = y + 1
+    end
+
+    annotationFound.should be(true), "Annotation #{expectedAnnotation.inspect} not found."
+
+  end
+
+end
+

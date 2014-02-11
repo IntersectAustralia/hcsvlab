@@ -555,7 +555,8 @@ class CatalogController < ApplicationController
     uploaded_file = params[:file]
     id = params[:id]
 
-    # Validate item
+    # Validate item. This line will also validate that the user has permission for adding
+    # the annotation in that item.
     item = Item.find_and_load_from_solr({id: id.to_s})
     if item.empty?
       respond_to do |format|
