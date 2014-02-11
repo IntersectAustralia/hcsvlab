@@ -568,7 +568,10 @@ class CatalogController < ApplicationController
     end
     item_handler = item.first[:handle].first
 
-    if uploaded_file.blank? or uploaded_file.size == 0
+    if (!uploaded_file.is_a? ActionDispatch::Http::UploadedFile)
+      render :json => {:error => "Error in file parameter."}.to_json, :status => 412
+      return
+    elsif uploaded_file.blank? or uploaded_file.size == 0
       render :json => {:error => "Uploaded file is not present or empty."}.to_json, :status => 412
       return
     else
