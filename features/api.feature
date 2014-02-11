@@ -715,6 +715,7 @@ Feature: Browsing via API
   ###########################################################################################################
   Scenario: Successfully uploaded user annotation
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
@@ -722,6 +723,7 @@ Feature: Browsing via API
 
   Scenario: Upload annotation to non existing item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "hcsvlab:30" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
@@ -733,6 +735,7 @@ Feature: Browsing via API
 
   Scenario: Upload blank annotation to an item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                      | Type                      |
       | file  |         | test/samples/annotations/blank_upload_annotation_sample.json  | application/octet-stream  |
@@ -744,6 +747,7 @@ Feature: Browsing via API
 
   Scenario: Upload same annotation file twice
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                      | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
@@ -760,6 +764,7 @@ Feature: Browsing via API
 
   Scenario: Upload malformed annotation to an item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                          | Type                      |
       | file  |         | test/samples/annotations/malformed_upload_annotation_sample.json  | application/octet-stream  |
@@ -768,3 +773,10 @@ Feature: Browsing via API
     """
     {"error":"Error uploading file malformed_upload_annotation_sample.json."}
     """
+
+  Scenario: Uploaded user annotation for an item I have no read access
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                | Type                      |
+      | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
+    Then I should get a 403 response code

@@ -27,7 +27,7 @@ class CatalogController < ApplicationController
   include ERB::Util
 
   # These before_filters apply the hydra access controls
-  before_filter :wrapped_enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations]
+  before_filter :wrapped_enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations, :upload_annotation]
   # This applies appropriate access controls to all solr queries
   CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
   # This filters out objects that you want to exclude from search results, like FileAssets
