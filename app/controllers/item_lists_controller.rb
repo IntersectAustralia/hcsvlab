@@ -109,6 +109,10 @@ class ItemListsController < ApplicationController
         else
           documents = params[:sel_document_ids].split(",")
         end
+        if documents.empty?
+          flash[:error] = "No items were selected to add to item list"
+          redirect_to :back and return
+        end
         if @item_list.save
           flash[:notice] = 'Item list created successfully'
           addItemsResult = add_item_to_item_list(@item_list, documents)
@@ -130,6 +134,11 @@ class ItemListsController < ApplicationController
       documents = @item_list.getAllItemsFromSearch(params[:query_params])
     else
       documents = params[:document_ids].split(",")
+    end
+
+    if documents.empty?
+      flash[:error] = "No items were selected to add to item list"
+      redirect_to :back and return
     end
 
     addItemsResult = add_item_to_item_list(@item_list, documents)

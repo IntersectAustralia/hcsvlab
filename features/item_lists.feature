@@ -67,7 +67,19 @@ Feature: Managing Item Lists
     And I should see "1 - 2 of 2"
 
   @javascript
-  Scenario: Creating an Item List with no items and then adding to it later
+  Scenario: Adding 0 items to an existing item list
+    And "researcher@intersect.org.au" has item lists
+      | name          |
+      | Existing Test |
+    And the item list "Existing Test" has items hcsvlab:1
+    And I wait 3 seconds
+    And I have done a search with collection "non-existant"
+    And I follow "Add All to list"
+    And I follow "Existing Test"
+    Then I should see "No items were selected to add to item list"
+
+  @javascript
+  Scenario: Creating an Item List with no items
     And I should see "You searched for:"
     And I should see "Add Selected to list"
     And I follow "Add Selected to list"
@@ -76,24 +88,7 @@ Feature: Managing Item Lists
     And I should see "Create New Item List"
     And I fill in "Name" with "Add Selected Test"
     And I press "Create List"
-    And I should be on the item list page for "Add Selected Test"
-    And the item list "Add Selected Test" should have 0 items
-    And I have done a search with collection "cooee"
-    And I should get exactly 2 results
-    And I should see "1 - 2 of 2"
-    And I toggle the select all checkbox
-    And I follow "Add Selected to list"
-    And I follow "Add Selected Test"
-    And I wait 2 seconds
-    And I should be on the item list page for "Add Selected Test"
-    And I should see "2 added to item list Add Selected Test"
-    And the item list "Add Selected Test" should have 2 items
-    And the item list "Add Selected Test" should contain ids
-      | pid       |
-      | hcsvlab:1 |
-      | hcsvlab:2 |
-    And I am on the item list page for "Add Selected Test"
-    And I should see "1 - 2 of 2"
+    Then I should see "No items were selected to add to item list"
 
   Scenario: Accessing other user's Item Lists
     Given I have users
