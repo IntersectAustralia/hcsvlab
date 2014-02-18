@@ -292,6 +292,7 @@ namespace :fedora do
     Collection.assign_licence("avozes",  licences["AVOZES Non-commercial (Academic) Licence"])
     Collection.assign_licence("clueweb", licences["ClueWeb Terms of Use"])
     Collection.assign_licence("pixar", licences["Creative Commons v3.0 BY-NC-SA"])
+    Collection.assign_licence("rirusyd", licences["Creative Commons v3.0 BY-NC-SA"])
 
   end
 
