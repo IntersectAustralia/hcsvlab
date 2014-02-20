@@ -1,4 +1,7 @@
 require 'find'
+require "#{Rails.root}/lib/rdf-sesame/hcsvlab_server.rb"
+
+
 ALLOWED_DOCUMENT_TYPES = ['Text', 'Image', 'Audio', 'Video', 'Other']
 STORE_DOCUMENT_TYPES = ['Text']
 MANIFEST_FILE_NAME = "manifest.json"

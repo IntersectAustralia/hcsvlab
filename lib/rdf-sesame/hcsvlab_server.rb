@@ -1,3 +1,5 @@
+require "#{Rails.root}/lib/rdf-sesame/hcsvlab_repository.rb"
+
 module RDF::Sesame
   ##
   # A server endpoint compatible with the Sesame 2.0 HTTP protocol.

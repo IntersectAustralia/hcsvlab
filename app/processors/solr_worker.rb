@@ -2,6 +2,7 @@ require 'linkeddata'
 require 'xmlsimple'
 require "#{Rails.root}/app/helpers/blacklight/catalog_helper_behavior.rb"
 require "#{Rails.root}/app/helpers/blacklight/blacklight_helper_behavior"
+require "#{Rails.root}/lib/rdf-sesame/hcsvlab_server.rb"
 
 Dir["#{Rails.root}/lib/rdf/**/*.rb"].each {|f| require f}
 

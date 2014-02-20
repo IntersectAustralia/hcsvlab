@@ -2,6 +2,7 @@ require 'json/ld'
 require 'net/http'
 require 'uri'
 require 'rdf/turtle'
+require "#{Rails.root}/lib/rdf-sesame/hcsvlab_server.rb"
 
 
 class UserAnnotation < ActiveRecord::Base
