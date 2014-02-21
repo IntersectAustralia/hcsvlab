@@ -12,7 +12,7 @@ Feature: Reset forgotten password
     When I follow "Forgot your password?"
     And I fill in "Email" with "georgina@intersect.org.au"
     And I press "Send me reset password instructions"
-    Then I should see "If the email address you entered was valid, you will receive an email with instructions about how to reset your password in a few minutes."
+    Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
     And I should be on the login page
     And "georgina@intersect.org.au" should receive an email
     When I open the email
@@ -28,7 +28,7 @@ Feature: Reset forgotten password
   Scenario: Deactivated user gets an email saying they can't reset their password
     Given I have a deactivated user "deac@intersect.org.au"
     When I request a reset for "deac@intersect.org.au"
-    Then I should see "If the email address you entered was valid, you will receive an email with instructions about how to reset your password in a few minutes."
+    Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
     And I should be on the login page
     And "deac@intersect.org.au" should receive an email
     When I open the email
@@ -37,7 +37,7 @@ Feature: Reset forgotten password
   Scenario: Pending approval user gets an email saying they can't reset their password
     Given I have a pending approval user "pa@intersect.org.au"
     When I request a reset for "pa@intersect.org.au"
-    Then I should see "If the email address you entered was valid, you will receive an email with instructions about how to reset your password in a few minutes."
+    Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
     And I should be on the login page
     And "pa@intersect.org.au" should receive an email
     When I open the email
@@ -46,22 +46,15 @@ Feature: Reset forgotten password
   Scenario: Rejected as spam user trying to request a reset just sees default message but doesn't get email (so we don't reveal which users exist)
     Given I have a rejected as spam user "spam@intersect.org.au"
     When I request a reset for "spam@intersect.org.au"
-    Then I should see "If the email address you entered was valid, you will receive an email with instructions about how to reset your password in a few minutes."
+    Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
     And I should be on the login page
     But "spam@intersect.org.au" should receive no emails
 
   Scenario: Non existent user trying to request a reset just sees default message but doesn't get email (so we don't reveal which users exist)
     Given I am on the home page
     When I request a reset for "noexist@intersect.org.au"
-    Then I should see "If the email address you entered was valid, you will receive an email with instructions about how to reset your password in a few minutes."
-    And I should be on the login page
-    But "noexist@intersect.org.au" should receive no emails
-
-  Scenario: Non existent user trying to request a reset just sees default message but doesn't get email (so we don't reveal which users exist)
-    Given I am on the home page
-    When I request a reset for "noexist@intersect.org.au"
-    Then I should see "If the email address you entered was valid, you will receive an email with instructions about how to reset your password in a few minutes."
-    And I should be on the login page
+    Then I should see "Invalid email."
+    And I should be on the forgot password page
     But "noexist@intersect.org.au" should receive no emails
 
   Scenario: Error displayed if email left blank

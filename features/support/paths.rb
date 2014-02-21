@@ -36,6 +36,9 @@ module NavigationHelpers
       when /^the reset password page$/
         edit_user_password_path(options)
 
+      when /^the forgot password page$/
+        new_user_password_path(options)
+
       when /^the access requests page$/
         access_requests_users_path(options)
 
