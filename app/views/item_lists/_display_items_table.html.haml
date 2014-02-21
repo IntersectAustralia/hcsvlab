@@ -9,7 +9,7 @@
           %li
             = link_to("Clear Item List", {:controller => "item_lists", :action => "clear"}, :method => 'POST', :id => params[:id].to_i)
           %li
-            = link_to("Use Item List in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
+            %a{"data-toggle" => "modal", :href => "#use_in_galaxy", :role => "button"} Use Item List in Galaxy
           %li
             %a{"data-toggle" => "modal", :href => "#get_r_script", :role => "button"} Use Item List in Emu/R
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
@@ -25,7 +25,6 @@
         %strong empty
         %a.close{"data-dismiss" => "alert", :href => "#"} ×
     - else
-      = render 'galaxy_link', :title => "Use Item List in Galaxy "
       = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => params[:id]}
       = render 'results_pagination'
   .modal.hide.fade.in{:id => "get_r_script","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
@@ -54,6 +53,22 @@
     .modal-footer
       %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 
+  .modal.hide.fade.in{:id => "use_in_galaxy","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+      %h3#myModalLabel= "Use " + @item_list.name + " in Galaxy"
+    .use_galaxy_dialog.modal-body
+      %div#use_galaxy_intermediary.use_galaxy_intermediary
+        %p#use_galaxy_text.use_galaxy_text
+          If you are not currently logged in to Galaxy proceed to the login screen via the button below.
+          If you are logged in, click Use Item list in Galaxy to open up the tool page here in this dialog.
+        %br
+        %a#use_galaxy_login.btn{ :href => Rails.application.config.galaxy_url, :target => "_blank", :role => "button" } Login to Galaxy
+        %a#use_galaxy_load_frame.btn.btn-primary{ :onclick => "prepare_iframe('use_galaxy_frame', '#{@galaxy_tool_source}')", :role => "button" } Use Item list in Galaxy
+      %iframe#use_galaxy_frame.use_galaxy_frame
+    .modal-footer
+      %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+
 :javascript
 
   function checkCompleteCookie() {
@@ -63,3 +78,8 @@
     }
   }
 
+  function prepare_iframe(iframe, source) {
+    document.getElementById("use_galaxy_intermediary").style.display = 'none';
+    document.getElementById(iframe).src = source;
+    document.getElementById(iframe).style.display = 'block';
+  }

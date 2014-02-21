@@ -126,6 +126,15 @@ Feature: Managing Item Lists
 #TODO check output maybe?
 
   Scenario: Sending Item List to Galaxy
+    Given "researcher@intersect.org.au" has item lists
+      | name  |
+      | Test1 |
+    And the item list "Test1" has items hcsvlab:1
+    And I am on the item list page for "Test1"
+    And I follow "Use Item List in Galaxy"
+    Then I should see "If you are not currently logged in to Galaxy proceed to the login screen via the button below"
+    And I should see "click Use Item list in Galaxy to open up the tool page here in this dialog"
+    And I should see "Use Item list in Galaxy"
 
   Scenario: Sending item list to R
     Given "researcher@intersect.org.au" has item lists
@@ -139,4 +148,3 @@ Feature: Managing Item Lists
     And I should see "item_list <- client$get_item_list_by_id"
     And I follow "Download API key config file"
     And I should get the API config file for "researcher@intersect.org.au"
-

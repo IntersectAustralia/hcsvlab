@@ -38,6 +38,9 @@ class ItemListsController < ApplicationController
           current_user.reset_authentication_token!
         end
 
+        params = { :tool_id => "hcsvlab_data_importer", :item_list => item_list_url(@item_list), :api_key => current_user.authentication_token, :job_name => @item_list.name + " (" + Time.now.utc.localtime.strftime('%d/%m/%Y %I:%M:%S %P') + ")" }
+        @galaxy_tool_source = Rails.application.config.galaxy_url.gsub("root", "tool_runner?") + params.to_query
+
         render :index
       }
       format.json {
