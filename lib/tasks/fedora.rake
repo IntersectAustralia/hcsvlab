@@ -294,7 +294,7 @@ namespace :fedora do
     Collection.assign_licence("pixar", licences["Creative Commons v3.0 BY-NC-SA"])
     Collection.assign_licence("rirusyd", licences["Creative Commons v3.0 BY-NC-SA"])
     Collection.assign_licence("mbep", licences["Creative Commons v3.0 BY-NC-SA"])
-
+    Collection.assign_licence("jakartan_indonesian", licences["Creative Commons v3.0 BY-NC-SA"])
   end
 
   #
