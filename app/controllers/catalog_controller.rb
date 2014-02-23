@@ -648,28 +648,32 @@ class CatalogController < ApplicationController
     #         word:word
     #         word:"word word"
     #         word:word~
-    #
-    searchPattern = /(\w+)\s*:\s*([^\s")]+(\s\S+")*|"[^"]*")/i
+    #         word
+    searchPattern = /(\w+)\s*:\s*([^\s")]+(\s\S+")*|"[^"]*")|(\w+)/i
     matchingData = metadataSearchParam.to_enum(:scan, searchPattern).map {Regexp.last_match}
 
     matchingData.each { |m|
-      key = m[1].to_s
-      value = m[2].to_s
+      if (m.to_s.include?(':'))
+        key = m[1].to_s
+        value = m[2].to_s
 
-      queryFragments = []
-      fieldsMappings = ItemMetadataFieldNameMapping.find_text_in_any_column(key)
-      fieldsMappings.each do |anItemFieldMapping|
-        solr_field_name = anItemFieldMapping.solr_name
+        queryFragments = []
+        fieldsMappings = ItemMetadataFieldNameMapping.find_text_in_any_column(key)
+        fieldsMappings.each do |anItemFieldMapping|
+          solr_field_name = anItemFieldMapping.solr_name
 
-        queryFragments << "#{solr_field_name}:#{value}"
-      end
+          queryFragments << "#{solr_field_name}:#{value}"
+        end
 
-      if (!queryFragments.empty?)
-        newQuery = "(#{queryFragments.join(" OR ")})"
+        if (!queryFragments.empty?)
+          newQuery = "(#{queryFragments.join(" OR ")})"
 
+          metadataSearchParam.sub!(m[0], newQuery)
+        end
+      elsif ('AND'!=m.to_s and 'OR'!=m.to_s)
+        newQuery = "all_metadata:#{m[0].to_s}"
         metadataSearchParam.sub!(m[0], newQuery)
       end
-
     }
     metadataSearchParam
   end

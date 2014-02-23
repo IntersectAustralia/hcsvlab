@@ -398,6 +398,38 @@ Feature: Browsing via API
     {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
     """
 
+  Scenario: Search metadata with field:value via the API using user friendly field name and all metadata search
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata                                  |
+      | Correspondence AND discourse_type:letter  |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    """
+
+  Scenario: Search metadata with field:value via the API using user friendly field name and all metadata search with asterisk
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
+    Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
+      | metadata                              |
+      | Correspon* AND discourse_type:letter  |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    """
+
   Scenario: Search metadata with quotes via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
