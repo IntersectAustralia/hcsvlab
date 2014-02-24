@@ -54,7 +54,7 @@ Feature: Locking out users after multiple failed password attempts
     When I attempt to login with "shuqian@intersect.org.au" and "Pas$w0rd"
     Then I should see "You entered an incorrect password 3 times in a row. For security reasons your account has been locked for one hour."
     When I request a reset for "shuqian@intersect.org.au"
-    Then I should see "If the email address you entered was valid, you will receive an email with instructions about how to reset your password in a few minutes."
+    Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
     And "shuqian@intersect.org.au" should receive an email
     When I open the email
     Then I should see "Someone has requested a link to change your password on the HCSVLAB site, and you can do this through the link below." in the email body

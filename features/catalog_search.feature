@@ -131,6 +131,30 @@ Feature: Searching for items
       | cooee:1-002         | 10/11/1791   | Text                |
 
   @javascript
+  Scenario: Search for term with field:value in all metadata using user friendly field name and all metadata search
+    #We need to repopulate the fields name mappings
+    Given I reindex all
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with "Correspondence AND discourse_type:letter"
+    And I press "search_metadata"
+    Then I should see a table with the following rows in any order:
+      | Identifier          | Created Date | Type(s)             |
+      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-002         | 10/11/1791   | Text                |
+
+  @javascript
+  Scenario: Search for term with field:value in all metadata using user friendly field name and all metadata search with asterisk
+    #We need to repopulate the fields name mappings
+    Given I reindex all
+    When I expand the facet Search Metadata
+    And I fill in "Metadata" with "Correspon* AND discourse_type:letter"
+    And I press "search_metadata"
+    Then I should see a table with the following rows in any order:
+      | Identifier          | Created Date | Type(s)             |
+      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-002         | 10/11/1791   | Text                |
+
+  @javascript
   Scenario: Search for term using quotes in all metadata
     #We need to repopulate the fields name mappings
     Given I reindex all
