@@ -125,17 +125,6 @@ Feature: Managing Item Lists
 
 #TODO check output maybe?
 
-  Scenario: Sending Item List to Galaxy
-    Given "researcher@intersect.org.au" has item lists
-      | name  |
-      | Test1 |
-    And the item list "Test1" has items hcsvlab:1
-    And I am on the item list page for "Test1"
-    And I follow "Use Item List in Galaxy"
-    Then I should see "If you are not currently logged in to Galaxy proceed to the login screen via the button below"
-    And I should see "click Use Item list in Galaxy to open up the tool page here in this dialog"
-    And I should see "Use Item list in Galaxy"
-
   Scenario: Sending item list to R
     Given "researcher@intersect.org.au" has item lists
       | name  |
