@@ -233,7 +233,7 @@ end
 Then /^the JSON response should have the following annotations properties in any order:$/ do |table|
   actual = JSON.parse(last_response.body)
 
-  annotations = actual['annotations']
+  annotations = actual['hcsvlab:annotations']
 
   annotations.length.should == table.hashes.length
 

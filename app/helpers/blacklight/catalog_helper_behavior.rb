@@ -1,6 +1,8 @@
 # -*- encoding : utf-8 -*-
 module Blacklight::CatalogHelperBehavior
 
+  HCSVLAB_PREFIX = "hcsvlab"
+
   # Pass in an RSolr::Response (or duck-typed similar) object,
   # it translates to a Kaminari-paginatable
   # object, with the keys Kaminari views expect.
@@ -132,10 +134,13 @@ module Blacklight::CatalogHelperBehavior
     values = values.collect do |solr_fname, field|
       #key = render_document_show_field_label(@document, :field => solr_fname)
       key = (fieldDisplayName[solr_fname].nil?)? solr_fname : fieldDisplayName[solr_fname]
+
       if solr_fname == 'OLAC_language_tesim'
         metadataHash[key] = raw(render_language_codes(document[solr_fname]))
       elsif solr_fname == 'DC_type_facet'
         metadataHash[key] = format_duplicates(document[solr_fname])
+      elsif solr_fname == 'date_group_facet' or solr_fname == '"full_text'
+        metadataHash[:"#{HCSVLAB_PREFIX}:#{key}"] = render_document_show_field_value(document, :field => solr_fname)
       else
         metadataHash[key] = render_document_show_field_value(document, :field => solr_fname)
       end
@@ -166,6 +171,8 @@ module Blacklight::CatalogHelperBehavior
         key = (fieldDisplayName[k].nil?)? k : fieldDisplayName[k]
         if k == 'DC_type_facet'
           metadataHash[key] = format_duplicates(v)
+        elsif k == 'full_text' or k == 'handle'
+          metadataHash[:"#{HCSVLAB_PREFIX}:#{key}"] = format_value(v)
         else
           metadataHash[key] = format_value(v)
         end
@@ -197,17 +204,18 @@ module Blacklight::CatalogHelperBehavior
       type_format = get_type_format(document, is_cooee)
       documentHash = {}
       documents.each do |values|
+        #URL
         if values.has_key?(MetadataHelper::SOURCE)
           begin
-            documentHash[:url] = catalog_document_url(document.id, filename: values[MetadataHelper::IDENTIFIER])
+            documentHash[:"#{HCSVLAB_PREFIX}:url"] = catalog_document_url(document.id, filename: values[MetadataHelper::IDENTIFIER])
           rescue NoMethodError => e
             # When we create the json metadata from the solr processor, we need to do the following work around
             # to have access to routes URL methods
             parameters = default_url_options.merge({filename: values[MetadataHelper::IDENTIFIER]})
-            documentHash[:url] = Rails.application.routes.url_helpers.catalog_document_url(document[:id], parameters)
+            documentHash[:"#{HCSVLAB_PREFIX}:url"] = Rails.application.routes.url_helpers.catalog_document_url(document[:id], parameters)
           end
         else
-          documentHash[:url] = values[MetadataHelper::IDENTIFIER]
+          documentHash[:"#{HCSVLAB_PREFIX}:url"] = values[MetadataHelper::IDENTIFIER]
         end
 
         #Type
@@ -235,7 +243,7 @@ module Blacklight::CatalogHelperBehavior
         else
           field = "unknown"
         end
-        documentHash[:size] = field.strip!
+        documentHash[:"#{HCSVLAB_PREFIX}:size"] = field.strip!
         documentsData << documentHash.clone
       end
     end

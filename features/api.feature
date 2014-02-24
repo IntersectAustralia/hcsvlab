@@ -138,20 +138,20 @@ Feature: Browsing via API
     When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
-      | json_path                     | text                                                   |
-      | $..['dc:created']             | 10/11/1791                                             |
-      | $..['dc:identifier']          | 1-001                                                  |
-      | $..['dc:isPartOf']            | cooee                                                  |
-      | $..['dc:type']                | Original, Raw, Text                                    |
-      | $..['ausnc:itemwordcount']    | 924                                                    |
-      | $..['ausnc:discourse_type']   | letter                                                 |
-      | $..['olac:language']          | eng                                                    |
-      | $..['olac:speaker']           | 1-001addressee, 1-001author                            |
-      | $..['cooee:register']         | Private Written                                        |
-      | $..['cooee:texttype']         | Private Correspondence                                 |
-      | $..['bibo:pages']             | 10-11                                                  |
-      | $..annotations_url            | http://example.org/catalog/hcsvlab:1/annotations.json  |
-      | $..primary_text_url           | http://example.org/catalog/hcsvlab:1/primary_text.json |
+      | json_path                       | text                                                   |
+      | $..['dc:created']               | 10/11/1791                                             |
+      | $..['dc:identifier']            | 1-001                                                  |
+      | $..['dc:isPartOf']              | cooee                                                  |
+      | $..['dc:type']                  | Original, Raw, Text                                    |
+      | $..['ausnc:itemwordcount']      | 924                                                    |
+      | $..['ausnc:discourse_type']     | letter                                                 |
+      | $..['olac:language']            | eng                                                    |
+      | $..['olac:speaker']             | 1-001addressee, 1-001author                            |
+      | $..['cooee:register']           | Private Written                                        |
+      | $..['cooee:texttype']           | Private Correspondence                                 |
+      | $..['bibo:pages']               | 10-11                                                  |
+      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/hcsvlab:1/annotations.json  |
+      | $..['hcsvlab:primary_text_url'] | http://example.org/catalog/hcsvlab:1/primary_text.json |
 
   Scenario: Get item details for austalk item
     Given I ingest "austalk:1_1014_1_11_001" with id "hcsvlab:1"
@@ -161,22 +161,22 @@ Feature: Browsing via API
     When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
-      | json_path                     | text                                                    |
-      | $..['dc:created']             | Fri Sep 09 14:18:48 2011                                |
-      | $..['dc:identifier']          | 1_1014_1_11_001                                         |
-      | $..['dc:isPartOf']            | 1_1014_1_11                                             |
-      | $..['dc:type']                | Audio                                                   |
-      | $..['olac:speaker']           | 1_1014                                                  |
-      | $..['austalk:component']      | 11                                                      |
-      | $..['austalk:componentName']  | calibration                                             |
-      | $..['austalk:prompt']         | Turn right 90  (face right wall)  2                     |
-      | $..['austalk:prototype']      | 11_1                                                    |
-      | $..['austalk:session']        | 1                                                       |
-      | $..['austalk:version']        | 1.6                                                     |
-      | $..primary_text_url           | No primary text found                                   |
+      | json_path                       | text                                                    |
+      | $..['dc:created']               | Fri Sep 09 14:18:48 2011                                |
+      | $..['dc:identifier']            | 1_1014_1_11_001                                         |
+      | $..['dc:isPartOf']              | 1_1014_1_11                                             |
+      | $..['dc:type']                  | Audio                                                   |
+      | $..['olac:speaker']             | 1_1014                                                  |
+      | $..['austalk:component']        | 11                                                      |
+      | $..['austalk:componentName']    | calibration                                             |
+      | $..['austalk:prompt']           | Turn right 90  (face right wall)  2                     |
+      | $..['austalk:prototype']        | 11_1                                                    |
+      | $..['austalk:session']          | 1                                                       |
+      | $..['austalk:version']          | 1.6                                                     |
+      | $..['hcsvlab:primary_text_url'] | No primary text found                                   |
     And the JSON response should not have
-      | json_path          | text                                                  |
-      | $..annotations_url | http://example.org/catalog/hcsvlab:1/annotations.json |
+      | json_path                       | text                                                  |
+      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/hcsvlab:1/annotations.json |
 
   Scenario: Get item details should not return fields used for authorization
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
@@ -288,9 +288,9 @@ Feature: Browsing via API
     When I make a request with no accept header for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
-      | json_path           | text                                                   |
-      | $..annotations_url  | http://example.org/catalog/hcsvlab:1/annotations.json  |
-      | $..primary_text_url | http://example.org/catalog/hcsvlab:1/primary_text.json |
+      | json_path                       | text                                                   |
+      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/hcsvlab:1/annotations.json  |
+      | $..['hcsvlab:primary_text_url'] | http://example.org/catalog/hcsvlab:1/primary_text.json |
 
   Scenario: Search for simple term in all metadata
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
@@ -586,7 +586,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"@context":{"@base":"http://purl.org/dada/schema/0.2#","annotations":{"@id":"http://purl.org/dada/schema/0.2#annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2#annotates"},"ace": {"@id": "http://ns.ausnc.org.au/schemas/ace/"},"ausnc": {"@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk": {"@id": "http://ns.austalk.edu.au/"},"austlit": {"@id": "http://ns.ausnc.org.au/schemas/austlit/"},"bibo": {"@id": "http://purl.org/ontology/bibo/"},"cooee": {"@id": "http://ns.ausnc.org.au/schemas/cooee/"},"dc": {"@id": "http://purl.org/dc/terms/"},"foaf": {"@id": "http://xmlns.com/foaf/0.1/"},"gcsause": {"@id": "http://ns.ausnc.org.au/schemas/gcsause/"},"ice": {"@id": "http://ns.ausnc.org.au/schemas/ice/"},"olac": {"@id": "http://www.language-archives.org/OLAC/1.1/"},"purl": {"@id": "http://purl.org/"},"rdf": {"@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema": {"@id": "http://schema.org/"},"xsd": {"@id": "http://www.w3.org/2001/XMLSchema#"}}}
+    {"@context":{"@base":"http://purl.org/dada/schema/0.2#","annotations":{"@id":"http://purl.org/dada/schema/0.2#annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2#annotates"},"hcsvlab":{"@id":"http://hcsvlab.org.au/schema/"},"ace":{"@id":"http://ns.ausnc.org.au/schemas/ace/"},"ausnc":{"@id":"http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk":{"@id":"http://ns.austalk.edu.au/"},"austlit":{"@id":"http://ns.ausnc.org.au/schemas/austlit/"},"bibo":{"@id":"http://purl.org/ontology/bibo/"},"cooee":{"@id":"http://ns.ausnc.org.au/schemas/cooee/"},"dc":{"@id":"http://purl.org/dc/terms/"},"foaf":{"@id":"http://xmlns.com/foaf/0.1/"},"gcsause":{"@id":"http://ns.ausnc.org.au/schemas/gcsause/"},"ice":{"@id":"http://ns.ausnc.org.au/schemas/ice/"},"olac":{"@id":"http://www.language-archives.org/OLAC/1.1/"},"purl":{"@id":"http://purl.org/"},"rdf":{"@id":"http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema":{"@id":"http://schema.org/"},"xsd":{"@id":"http://www.w3.org/2001/XMLSchema#"}}}
     """
 
   Scenario: Get annotation context without API token
@@ -594,7 +594,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"@context":{"@base":"http://purl.org/dada/schema/0.2#","annotations":{"@id":"http://purl.org/dada/schema/0.2#annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2#annotates"},"ace": {"@id": "http://ns.ausnc.org.au/schemas/ace/"},"ausnc": {"@id": "http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk": {"@id": "http://ns.austalk.edu.au/"},"austlit": {"@id": "http://ns.ausnc.org.au/schemas/austlit/"},"bibo": {"@id": "http://purl.org/ontology/bibo/"},"cooee": {"@id": "http://ns.ausnc.org.au/schemas/cooee/"},"dc": {"@id": "http://purl.org/dc/terms/"},"foaf": {"@id": "http://xmlns.com/foaf/0.1/"},"gcsause": {"@id": "http://ns.ausnc.org.au/schemas/gcsause/"},"ice": {"@id": "http://ns.ausnc.org.au/schemas/ice/"},"olac": {"@id": "http://www.language-archives.org/OLAC/1.1/"},"purl": {"@id": "http://purl.org/"},"rdf": {"@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema": {"@id": "http://schema.org/"},"xsd": {"@id": "http://www.w3.org/2001/XMLSchema#"}}}
+    {"@context":{"@base":"http://purl.org/dada/schema/0.2#","annotations":{"@id":"http://purl.org/dada/schema/0.2#annotations","@container":"@list"},"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"annotates":{"@id":"http://purl.org/dada/schema/0.2#annotates"},"hcsvlab":{"@id":"http://hcsvlab.org.au/schema/"},"ace":{"@id":"http://ns.ausnc.org.au/schemas/ace/"},"ausnc":{"@id":"http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk":{"@id":"http://ns.austalk.edu.au/"},"austlit":{"@id":"http://ns.ausnc.org.au/schemas/austlit/"},"bibo":{"@id":"http://purl.org/ontology/bibo/"},"cooee":{"@id":"http://ns.ausnc.org.au/schemas/cooee/"},"dc":{"@id":"http://purl.org/dc/terms/"},"foaf":{"@id":"http://xmlns.com/foaf/0.1/"},"gcsause":{"@id":"http://ns.ausnc.org.au/schemas/gcsause/"},"ice":{"@id":"http://ns.ausnc.org.au/schemas/ice/"},"olac":{"@id":"http://www.language-archives.org/OLAC/1.1/"},"purl":{"@id":"http://purl.org/"},"rdf":{"@id":"http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema":{"@id":"http://schema.org/"},"xsd":{"@id":"http://www.w3.org/2001/XMLSchema#"}}}
     """
 
   Scenario: Get annotations for item
@@ -606,9 +606,9 @@ Feature: Browsing via API
     """
     {"@context":"http://example.org/schema/json-ld",
       "commonProperties":{
-        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+        "hcsvlab:annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
       },
-      "annotations":[
+      "hcsvlab:annotations":[
         {
           "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0",
           "label":"11",
@@ -638,9 +638,9 @@ Feature: Browsing via API
     {
       "@context":"http://example.org/schema/json-ld",
       "commonProperties":{
-        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+        "hcsvlab:annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
       },
-      "annotations":[
+      "hcsvlab:annotations":[
         {
           "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-002/0",
           "label":"ai",
@@ -678,9 +678,9 @@ Feature: Browsing via API
     {
       "@context":"http://example.org/schema/json-ld",
       "commonProperties":{
-        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+        "hcsvlab:annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
       },
-      "annotations":[
+      "hcsvlab:annotations":[
         {
           "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/0",
           "label":"11",
@@ -707,9 +707,9 @@ Feature: Browsing via API
     {
       "@context":"http://example.org/schema/json-ld",
       "commonProperties":{
-        "annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+        "hcsvlab:annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
       },
-      "annotations":[
+      "hcsvlab:annotations":[
         {
           "@id":"http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1",
           "type":"ellipsis",

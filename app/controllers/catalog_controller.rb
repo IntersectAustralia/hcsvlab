@@ -851,6 +851,7 @@ class CatalogController < ApplicationController
     predefinedProperties[:end] = {:@id => "http://purl.org/dada/schema/0.2#end"}
     predefinedProperties[:label] = {:@id => "http://purl.org/dada/schema/0.2#label"}
     predefinedProperties[:annotates] = {:@id => "http://purl.org/dada/schema/0.2#annotates"}
+    predefinedProperties[:hcsvlab] = { :@id => "http://hcsvlab.org.au/schema/" }
 
     predefinedProperties
   end
