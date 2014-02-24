@@ -1,3 +1,5 @@
+require File.dirname(__FILE__) + '/fedora_helper.rb'
+
 #
 #
 #
@@ -43,8 +45,20 @@ namespace :sesame do
   #
   #
   def ingest_collection(collection_dir)
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    stomp_client.publish('/queue/hcsvlab.sesame.worker', "{\"action\": \"ingest\", \"corpus_directory\":\"#{collection_dir}\"}")
+    metadataFiles = Dir["#{collection_dir}/**/*-metadata.rdf"]
+
+    graph = RDF::Graph.load(metadataFiles.first, :format => :ttl, :validate => true)
+    query = RDF::Query.new({
+                               :item => {
+                                   RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
+                                   RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                               }
+                           })
+    result = query.execute(graph)[0]
+    collection_name = last_bit(result.collection.to_s)
+
+    populate_triple_store(collection_dir, collection_name)
+
   end
 
 end
