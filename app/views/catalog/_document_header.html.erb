@@ -4,7 +4,7 @@
   <% # main title container for doc partial view   -%>
   <% if (extraRenderParams[:showCheckbox].nil? || extraRenderParams[:showCheckbox] == true) %>
     <td class="checkbox_field">
-      <input type="checkbox" class="toggle_item_list" name="<%= document.id %>"/>
+      <input type="checkbox" class="toggle_item_list" name="<%= document[:handle] %>"/>
     </td>
   <% end %>
   <%# <td class="count_field"> %>

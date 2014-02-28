@@ -36,14 +36,14 @@ Feature: Collection access control
     Given I am on the home page
     And I have done a search with collection "austlit"
     And I should see "blacklight_results" table with
-      | Identifier          | Type(s)             |
-      | austlit:adaessa.xml | Original, Raw, Text |
-      | austlit:bolroma.xml | Original, Raw, Text |
+      | Identifier      | Type(s)             |
+      | austlit:adaessa | Original, Raw, Text |
+      | austlit:bolroma | Original, Raw, Text |
 
   @javascript
   Scenario: Data Owner should be able to see the details of his items
     Given I am logged in as "data_owner1@intersect.org.au"
-    Given I am on the catalog page for "hcsvlab:1"
+    Given I am on the catalog page for "cooee:1-001"
     Then I should see "cooee:1-001"
     And I should see "Primary Document"
     And I should see "Documents"
@@ -51,7 +51,7 @@ Feature: Collection access control
   @javascript
   Scenario: User should not be able to see the details of items he has no permission
     Given I am logged in as "data_owner1@intersect.org.au"
-    Given I am on the catalog page for "hcsvlab:2"
+    Given I am on the catalog page for "austlit:adaessa"
     Then I should see "You do not have sufficient access privileges to read this document"
 
   @javascript
@@ -71,9 +71,9 @@ Feature: Collection access control
     Given I am on the home page
     And I have done a search with collection "austlit"
     And I should see "blacklight_results" table with
-      | Identifier          | Type(s)             |
-      | austlit:adaessa.xml | Original, Raw, Text |
-      | austlit:bolroma.xml | Original, Raw, Text |
+      | Identifier      | Type(s)             |
+      | austlit:adaessa | Original, Raw, Text |
+      | austlit:bolroma | Original, Raw, Text |
 
   @javascript
   Scenario: User should not be able to see details of items for which he has discover access
@@ -84,7 +84,7 @@ Feature: Collection access control
       |collection |
       |austlit    |
       |cooee      |
-    Then I am on the catalog page for "hcsvlab:1"
+    Then I am on the catalog page for "cooee:1-001"
     And I should see "You do not have sufficient access privileges to read this document"
 
   @javascript
@@ -104,9 +104,9 @@ Feature: Collection access control
     Given I am on the home page
     And I have done a search with collection "austlit"
     And I should see "blacklight_results" table with
-      | Identifier          | Type(s)             |
-      | austlit:adaessa.xml | Original, Raw, Text |
-      | austlit:bolroma.xml | Original, Raw, Text |
+      | Identifier      | Type(s)             |
+      | austlit:adaessa | Original, Raw, Text |
+      | austlit:bolroma | Original, Raw, Text |
 
   @javascript
   Scenario: User should be able to see details of items for which he has read access
@@ -117,25 +117,26 @@ Feature: Collection access control
       |collection |
       |austlit    |
       |cooee      |
-    Then I am on the catalog page for "hcsvlab:1"
+    Then I am on the catalog page for "cooee:1-001"
     And I should see "cooee:1-001"
     And I should see "Primary Document"
     And I should see "Documents"
+
 #----------- No Access
   Scenario: Get item details for an item I have not access
-    When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
 
   Scenario: Get annotations for item I have not access
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
 
   Scenario: Get primary text for item I have not access
-    When I make a JSON request for the catalog primary text page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog primary text page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
 
   Scenario: Download document which exists but I have not access
-    When I make a JSON request for the document content page for file "1-001-plain.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the document content page for file "1-001-plain.txt" for item "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
 
   Scenario: Access collection details for which I have not access
@@ -145,22 +146,22 @@ Feature: Collection access control
 #----------- Discover Access
   Scenario: Get item details for an item I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
-    When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
 
   Scenario: Get annotations for item I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
 
   Scenario: Get primary text for item I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
-    When I make a JSON request for the catalog primary text page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog primary text page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
 
   Scenario: Download document which exists but I have discover access
     Given "researcher1@intersect.org.au" has "discover" access to collection "cooee"
-    When I make a JSON request for the document content page for file "1-001-plain.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the document content page for file "1-001-plain.txt" for item "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
 
   Scenario: Access collection details for which I have discover access
@@ -171,22 +172,22 @@ Feature: Collection access control
 #----------- Read Access
   Scenario: Get item details for an item I have read access
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
 
   Scenario: Get annotations for item I have read access
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
 
   Scenario: Get primary text for item I have read access
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the catalog primary text page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog primary text page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
 
   Scenario: Download document which exists and I have read access
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the document content page for file "1-001-plain.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the document content page for file "1-001-plain.txt" for item "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
 
   Scenario: Access collection details for which I have read access

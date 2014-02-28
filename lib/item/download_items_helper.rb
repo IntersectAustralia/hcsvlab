@@ -142,13 +142,13 @@ module Item::DownloadItemsHelper
         indexable_text_document = (filenames.select {|f| f.include? "-plain.txt"}).empty? ? "" : (filenames.select {|f| f.include? "-plain.txt"})[0]
         if File.exist?(indexable_text_document)
           title = indexable_text_document.split('/').last
-          warc.add_record_from_file(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}/document/#{title}"}), indexable_text_document)
+          warc.add_record_from_file(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{info[:handle]}/document/#{title}"}), indexable_text_document)
         elsif indexable_text_document.blank?
           logger.warn("No primary (plaintext) document found for Item #{itemId}")
-          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}"}))
+          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{info[:handle]}"}))
         else
           logger.warn("Document file #{indexable_text_document} does not exist (part of Item #{itemId}")
-          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{itemId}"}))
+          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{info[:handle]}"}))
         end
       end
     end

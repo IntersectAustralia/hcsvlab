@@ -91,15 +91,15 @@ Feature: Browsing via API
     Then I should get a <code> response code
   # home page does not accept json response
   Examples:
-    | page                                                               | code |
-    | the item lists page                                                | 401  |
-    | the item list page for "Test 1"                                    | 401  |
-    | the collection page for "cooee"                                    | 401  |
-    | the catalog page for "hcsvlab:1"                                   | 401  |
-    | the catalog primary text page for "hcsvlab:1"                      | 401  |
-    | the document content page for file "blah.txt" for item "hcsvlab:1" | 401  |
-    | the catalog annotations page for "hcsvlab:1"                       | 401  |
-    | the home page                                                      | 406  |
+    | page                                                                 | code |
+    | the item lists page                                                  | 401  |
+    | the item list page for "Test 1"                                      | 401  |
+    | the collection page for "cooee"                                      | 401  |
+    | the catalog page for "cooee:1-001"                                   | 401  |
+    | the catalog primary text page for "cooee:1-001"                      | 401  |
+    | the document content page for file "blah.txt" for item "cooee:1-001" | 401  |
+    | the catalog annotations page for "cooee:1-001"                       | 401  |
+    | the home page                                                        | 406  |
 
   Scenario: Get item lists for researcher
     When I make a JSON request for the item lists page with the API token for "researcher1@intersect.org.au"
@@ -135,55 +135,55 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
-      | json_path                       | text                                                   |
-      | $..['dc:created']               | 10/11/1791                                             |
-      | $..['dc:identifier']            | 1-001                                                  |
-      | $..['dc:isPartOf']              | cooee                                                  |
-      | $..['dc:type']                  | Original, Raw, Text                                    |
-      | $..['ausnc:itemwordcount']      | 924                                                    |
-      | $..['ausnc:discourse_type']     | letter                                                 |
-      | $..['olac:language']            | eng                                                    |
-      | $..['olac:speaker']             | 1-001addressee, 1-001author                            |
-      | $..['cooee:register']           | Private Written                                        |
-      | $..['cooee:texttype']           | Private Correspondence                                 |
-      | $..['bibo:pages']               | 10-11                                                  |
-      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/hcsvlab:1/annotations.json  |
-      | $..['hcsvlab:primary_text_url'] | http://example.org/catalog/hcsvlab:1/primary_text.json |
+      | json_path                       | text                                                      |
+      | $..['dc:created']               | 10/11/1791                                                |
+      | $..['dc:identifier']            | 1-001                                                     |
+      | $..['dc:isPartOf']              | cooee                                                     |
+      | $..['dc:type']                  | Original, Raw, Text                                       |
+      | $..['ausnc:itemwordcount']      | 924                                                       |
+      | $..['ausnc:discourse_type']     | letter                                                    |
+      | $..['olac:language']            | eng                                                       |
+      | $..['olac:speaker']             | 1-001addressee, 1-001author                               |
+      | $..['cooee:register']           | Private Written                                           |
+      | $..['cooee:texttype']           | Private Correspondence                                    |
+      | $..['bibo:pages']               | 10-11                                                     |
+      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/cooee:1-001/annotations.json   |
+      | $..['hcsvlab:primary_text_url'] | http://example.org/catalog/cooee:1-001/primary_text.json  |
 
   Scenario: Get item details for austalk item
     Given I ingest "austalk:1_1014_1_11_001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | austalk         | read        |
-    When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "austalk:1_1014_1_11_001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
-      | json_path                       | text                                                    |
-      | $..['dc:created']               | Fri Sep 09 14:18:48 2011                                |
-      | $..['dc:identifier']            | 1_1014_1_11_001                                         |
-      | $..['dc:isPartOf']              | 1_1014_1_11                                             |
-      | $..['dc:type']                  | Audio                                                   |
-      | $..['olac:speaker']             | 1_1014                                                  |
-      | $..['austalk:component']        | 11                                                      |
-      | $..['austalk:componentName']    | calibration                                             |
-      | $..['austalk:prompt']           | Turn right 90  (face right wall)  2                     |
-      | $..['austalk:prototype']        | 11_1                                                    |
-      | $..['austalk:session']          | 1                                                       |
-      | $..['austalk:version']          | 1.6                                                     |
-      | $..['hcsvlab:primary_text_url'] | No primary text found                                   |
+      | json_path                       | text                                                                |
+      | $..['dc:created']               | Fri Sep 09 14:18:48 2011                                            |
+      | $..['dc:identifier']            | 1_1014_1_11_001                                                     |
+      | $..['dc:isPartOf']              | 1_1014_1_11                                                         |
+      | $..['dc:type']                  | Audio                                                               |
+      | $..['olac:speaker']             | 1_1014                                                              |
+      | $..['austalk:component']        | 11                                                                  |
+      | $..['austalk:componentName']    | calibration                                                         |
+      | $..['austalk:prompt']           | Turn right 90  (face right wall)  2                                 |
+      | $..['austalk:prototype']        | 11_1                                                                |
+      | $..['austalk:session']          | 1                                                                   |
+      | $..['austalk:version']          | 1.6                                                                 |
+      | $..['hcsvlab:primary_text_url'] | No primary text found                                               |
     And the JSON response should not have
-      | json_path                       | text                                                  |
-      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/hcsvlab:1/annotations.json |
+      | json_path                       | text                                                                |
+      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/austalk:1_1014_1_11_001/annotations.json |
 
   Scenario: Get item details should not return fields used for authorization
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should not have "$..discover_access_group_ssim"
     And the JSON response should not have "$..read_access_group_ssim"
@@ -192,13 +192,11 @@ Feature: Browsing via API
     And the JSON response should not have "$..read_access_person_ssim"
     And the JSON response should not have "$..edit_access_person_ssim"
 
-
-
   Scenario: Get item details for non-existent item (TODO: should return 404, probably?)
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog page for "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
     Then the JSON response should be:
     """
@@ -210,7 +208,7 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog primary text page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog primary text page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     Then I should get the primary text for "cooee:1-001"
 
@@ -231,7 +229,7 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the document content page for file "1-002-plain.txt" for item "hcsvlab:2" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the document content page for file "1-002-plain.txt" for item "cooee:1-002" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the response should be:
     """
@@ -244,7 +242,7 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the document content page for file "blah.txt" for item "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the document content page for file "blah.txt" for item "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
     Then the JSON response should be:
     """
@@ -256,7 +254,7 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the document content page for file "blah.txt" for item "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the document content page for file "blah.txt" for item "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
     Then the JSON response should be:
     """
@@ -273,7 +271,7 @@ Feature: Browsing via API
     And the JSON response should have "$..collection_name" with the text "cooee"
 
   Scenario: Access collection details via the API for non-existant collection
-    Given I make a JSON request for the collection page for id "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    Given I make a JSON request for the collection page for id "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
     And the JSON response should be:
     """
@@ -285,12 +283,12 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a request with no accept header for the catalog page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a request with no accept header for the catalog page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
       | json_path                       | text                                                   |
-      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/hcsvlab:1/annotations.json  |
-      | $..['hcsvlab:primary_text_url'] | http://example.org/catalog/hcsvlab:1/primary_text.json |
+      | $..['hcsvlab:annotations_url']  | http://example.org/catalog/cooee:1-001/annotations.json  |
+      | $..['hcsvlab:primary_text_url'] | http://example.org/catalog/cooee:1-001/primary_text.json |
 
   Scenario: Search for simple term in all metadata
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
@@ -307,7 +305,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:3"]}
+    {"num_results":1,"items":["http://example.org/catalog/ice:S2B-035"]}
     """
 
   Scenario: Search for two simple term in all metadata joined with AND via the API
@@ -326,7 +324,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:4"]}
+    {"num_results":1,"items":["http://example.org/catalog/austlit:bolroma"]}
     """
 
   Scenario: Search for two simple term in all metadata joined with OR via the API
@@ -345,7 +343,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":2,"items":["http://example.org/catalog/hcsvlab:3","http://example.org/catalog/hcsvlab:4"]}
+    {"num_results":2,"items":["http://example.org/catalog/austlit:adaessa","http://example.org/catalog/austlit:bolroma"]}
     """
 
   Scenario: Search for term with asterisk in all metadata via the API
@@ -363,7 +361,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":2,"items":["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:2"]}
+    {"num_results":2,"items":["http://example.org/catalog/cooee:1-001","http://example.org/catalog/cooee:1-002"]}
     """
 
   Scenario: Search metadata with field:value via the API using solr field name
@@ -379,7 +377,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    {"num_results":1,"items":["http://example.org/catalog/cooee:1-001"]}
     """
 
   Scenario: Search metadata with field:value via the API using user friendly field name
@@ -390,12 +388,12 @@ Feature: Browsing via API
       | cooee           | read        |
       | austlit         | read        |
     Given I make a JSON request for the catalog search page with the API token for "researcher1@intersect.org.au" with params
-      | metadata                          |
+      | metadata              |
       | discourse_type:letter |
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    {"num_results":1,"items":["http://example.org/catalog/cooee:1-001"]}
     """
 
   Scenario: Search metadata with field:value via the API using user friendly field name and all metadata search
@@ -411,7 +409,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    {"num_results":1,"items":["http://example.org/catalog/cooee:1-001"]}
     """
 
   Scenario: Search metadata with field:value via the API using user friendly field name and all metadata search with asterisk
@@ -427,7 +425,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:1"]}
+    {"num_results":1,"items":["http://example.org/catalog/cooee:1-001"]}
     """
 
   Scenario: Search metadata with quotes via the API
@@ -443,7 +441,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:2"]}
+    {"num_results":1,"items":["http://example.org/catalog/austlit:adaessa"]}
     """
 
   Scenario: Search metadata with ranges via the API
@@ -459,7 +457,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":1,"items":["http://example.org/catalog/hcsvlab:2"]}
+    {"num_results":1,"items":["http://example.org/catalog/austlit:adaessa"]}
     """
 
   Scenario: Search metadata via the API using a badly formed query
@@ -487,16 +485,15 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"num_results":2,"items":["http://example.org/catalog/hcsvlab:1", "http://example.org/catalog/hcsvlab:2"]}
+    {"num_results":2,"items":["http://example.org/catalog/cooee:1-001", "http://example.org/catalog/ice:S2B-035"]}
     """
-
 
   Scenario: Add items to a new item list via the API
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "cooee:1-002" with id "hcsvlab:2"
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
-      | name  | items                                                                           |
-      | cooee | ["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:2"] |
+      | name  | items                                                                               |
+      | cooee | ["http://example.org/catalog/cooee:1-001","http://example.org/catalog/cooee:1-002"] |
     Then I should get a 200 response code
     And the JSON response should be:
     """
@@ -509,8 +506,8 @@ Feature: Browsing via API
       | cooee |
     Given I ingest "cooee:1-002" with id "hcsvlab:1"
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
-      | name  | items                                    |
-      | cooee | ["http://example.org/catalog/hcsvlab:1"] |
+      | name  | items                                       |
+      | cooee | ["http://example.org/catalog/cooee:1-002"]  |
     Then I should get a 200 response code
     And the JSON response should be:
     """
@@ -520,7 +517,7 @@ Feature: Browsing via API
   Scenario: Add items to an item list via the API without specifying a name
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | items                                    |
-      | ["http://example.org/catalog/hcsvlab:1"] |
+      | ["http://example.org/catalog/cooee:any"] |
     Then I should get a 400 response code
     And the JSON response should be:
     """
@@ -540,8 +537,8 @@ Feature: Browsing via API
   Scenario: Add items to an item list via the API including non-existent items
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
-      | name  | items                                                                             |
-      | cooee | ["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:666"] |
+      | name  | items                                                                                     |
+      | cooee | ["http://example.org/catalog/cooee:1-001","http://example.org/catalog/cooee:non-exists"]  |
     Then I should get a 200 response code
     And the JSON response should be:
     """
@@ -550,8 +547,8 @@ Feature: Browsing via API
 
   Scenario: Add items to an item list via the API sending in items as string
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
-      | name  | items                                |
-      | cooee | http://example.org/catalog/hcsvlab:1 |
+      | name  | items                                   |
+      | cooee | http://example.org/catalog/hcsvlab:any  |
     Then I should get a 400 response code
     And the JSON response should be:
     """
@@ -561,8 +558,8 @@ Feature: Browsing via API
   Scenario: Download items metadata and files in Zip format including non-existent items
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
-      | format   | items                                                                             |
-      | zip      | ["http://example.org/catalog/hcsvlab:1","http://example.org/catalog/hcsvlab:666"] |
+      | format   | items                                                                                    |
+      | zip      | ["http://example.org/catalog/cooee:1-001","http://example.org/catalog/cooee:non-exists"] |
     Then I should get a 200 response code
 
   Scenario: Download items metadata and files in Warc format
@@ -570,7 +567,7 @@ Feature: Browsing via API
     And "researcher1@intersect.org.au" has item lists
       | name   |
       | Test 1 |
-    And the item list "Test 1" has items hcsvlab:1
+    And the item list "Test 1" has items cooee:1-001
     And I wait 5 seconds
     Given I make a WARC request for the item list page for "Test 1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
@@ -600,13 +597,13 @@ Feature: Browsing via API
   Scenario: Get annotations for item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     Then the JSON response should be:
     """
     {"@context":"http://example.org/schema/json-ld",
       "commonProperties":{
-        "hcsvlab:annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+        "hcsvlab:annotates":"http://example.org/catalog/cooee:1-001/primary_text.json"
       },
       "hcsvlab:annotations":[
         {
@@ -631,14 +628,14 @@ Feature: Browsing via API
   Scenario: Get annotations for item with different @type
     Given I ingest "cooee:1-002" with id "hcsvlab:1"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog annotations page for "cooee:1-002" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     Then the JSON response should be:
     """
     {
       "@context":"http://example.org/schema/json-ld",
       "commonProperties":{
-        "hcsvlab:annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+        "hcsvlab:annotates":"http://example.org/catalog/cooee:1-002/primary_text.json"
       },
       "hcsvlab:annotations":[
         {
@@ -656,12 +653,12 @@ Feature: Browsing via API
   Scenario: Request annotations for item that doesn't have annotations
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:2" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog annotations page for "auslit:adaessa" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
   Scenario: Get annotations for item that doesn't exist
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    When I make a JSON request for the catalog annotations page for "hcsvlab:666" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog annotations page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
   Scenario: Get specific annotations for item by label
@@ -669,7 +666,7 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with params
       | label |
       | 11    |
     Then I should get a 200 response code
@@ -678,7 +675,7 @@ Feature: Browsing via API
     {
       "@context":"http://example.org/schema/json-ld",
       "commonProperties":{
-        "hcsvlab:annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+        "hcsvlab:annotates":"http://example.org/catalog/cooee:1-001/primary_text.json"
       },
       "hcsvlab:annotations":[
         {
@@ -698,7 +695,7 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with params
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with params
       | type     |
       | ellipsis |
     Then I should get a 200 response code
@@ -707,7 +704,7 @@ Feature: Browsing via API
     {
       "@context":"http://example.org/schema/json-ld",
       "commonProperties":{
-        "hcsvlab:annotates":"http://example.org/catalog/hcsvlab:1/primary_text.json"
+        "hcsvlab:annotates":"http://example.org/catalog/cooee:1-001/primary_text.json"
       },
       "hcsvlab:annotations":[
         {
@@ -724,11 +721,11 @@ Feature: Browsing via API
   Scenario: Get annotations for item including a user uploaded one
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
     Then I should get a 200 response code
-    When I make a JSON request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have 5 user uploaded annotations
     And the JSON response should have the following annotations properties in any order:
@@ -745,17 +742,18 @@ Feature: Browsing via API
   ###########################################################################################################
   #### UPLOAD ANNOTATIONS TESTS                                                                          ####
   ###########################################################################################################
+
   Scenario: Successfully uploaded user annotation
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
     Then I should get a 200 response code
 
   Scenario: Upload annotation to non existing item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:30" with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON multipart request for the catalog annotations page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
     Then I should get a 404 response code
@@ -763,7 +761,7 @@ Feature: Browsing via API
   Scenario: Upload blank annotation to an item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                      | Type                      |
       | file  |         | test/samples/annotations/blank_upload_annotation_sample.json  | application/octet-stream  |
     Then I should get a 412 response code
@@ -775,12 +773,12 @@ Feature: Browsing via API
   Scenario: Upload same annotation file twice
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
-      | Name  | Content | Filename                                                      | Type                      |
+    When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
     Then I should get a 200 response code
 
-    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                 | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json   | application/octet-stream  |
     Then I should get a 412 response code
@@ -792,7 +790,7 @@ Feature: Browsing via API
   Scenario: Upload malformed annotation to an item
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
-    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                          | Type                      |
       | file  |         | test/samples/annotations/malformed_upload_annotation_sample.json  | application/octet-stream  |
     Then I should get a 500 response code
@@ -803,7 +801,7 @@ Feature: Browsing via API
 
   Scenario: Uploaded user annotation for an item I have no read access
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    When I make a JSON multipart request for the catalog annotations page for "hcsvlab:1" with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name  | Content | Filename                                                | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
     Then I should get a 403 response code

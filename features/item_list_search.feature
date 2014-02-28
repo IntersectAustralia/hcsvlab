@@ -18,9 +18,9 @@ Feature: Searching item lists
 
   Scenario: Doing a concordance search for "family"
     And "researcher@intersect.org.au" has item lists
-      | name       |
-      | Concordance search |
-    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+      | name                |
+      | Concordance search  |
+    And the item list "Concordance search" has items cooee:1-001, austlit:adaessa
     And I am on the item list page for "Concordance search"
     And the item list "Concordance search" should have 2 items
     When I select "Concordance" from "search_type"
@@ -32,25 +32,26 @@ Feature: Searching item lists
 
   Scenario: Doing a concordance search for "make"
     And "researcher@intersect.org.au" has item lists
-      | name       |
-      | Concordance search |
-    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+      | name                |
+      | Concordance search  |
+    And the item list "Concordance search" has items cooee:1-001, austlit:adaessa
     And I am on the item list page for "Concordance search"
     And the item list "Concordance search" should have 2 items
     When I select "Concordance" from "search_type"
     When I fill in "Concordance search for" with "make"
     And I press "execute_concordance_search"
     Then concordance search for "make" in item list "Concordance search" should show this results
-      | documentTitle       | textBefore                                     | textHighlighted | textAfter                                 |
-      | cooee:1-001         | get the small fish, of which they              | make            | no account in the Summer nor can          |
-      | cooee:1-001         | will, Sir, be so obliging as to                | make            | my Compliments acceptable to Lady Banks & |
-      | austlit:adaessa.xml | of such a current; and, (I will                | make            | a clean breast of it at once!),           |
-      | austlit:adaessa.xml | is too extreme for us ever to                  | make            | it a colony in the sense that             |
+      | documentTitle   | textBefore                                     | textHighlighted | textAfter                                 |
+      | cooee:1-001     | get the small fish, of which they              | make            | no account in the Summer nor can          |
+      | cooee:1-001     | will, Sir, be so obliging as to                | make            | my Compliments acceptable to Lady Banks & |
+      | austlit:adaessa | of such a current; and, (I will                | make            | a clean breast of it at once!),           |
+      | austlit:adaessa | is too extreme for us ever to                  | make            | it a colony in the sense that             |
+
   Scenario: Doing a concordance search for "concordance"
     And "researcher@intersect.org.au" has item lists
-      | name       |
-      | Concordance search |
-    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+      | name                |
+      | Concordance search  |
+    And the item list "Concordance search" has items cooee:1-001, austlit:adaessa
     And I am on the item list page for "Concordance search"
     And the item list "Concordance search" should have 2 items
     When I select "Concordance" from "search_type"
@@ -60,9 +61,9 @@ Feature: Searching item lists
 
   Scenario: Doing a failing concordance search for "dog-"
     And "researcher@intersect.org.au" has item lists
-      | name       |
-      | Concordance search |
-    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+      | name                |
+      | Concordance search  |
+    And the item list "Concordance search" has items cooee:1-001, austlit:adaessa
     And I am on the item list page for "Concordance search"
     And the item list "Concordance search" should have 2 items
     When I select "Concordance" from "search_type"
@@ -72,9 +73,9 @@ Feature: Searching item lists
 
   Scenario: Doing a failing concordance search for "dog like"
     And "researcher@intersect.org.au" has item lists
-      | name       |
-      | Concordance search |
-    And the item list "Concordance search" has items hcsvlab:1, hcsvlab:4
+      | name                |
+      | Concordance search  |
+    And the item list "Concordance search" has items cooee:1-001, austlit:adaessa
     And I am on the item list page for "Concordance search"
     And the item list "Concordance search" should have 2 items
     When I select "Concordance" from "search_type"
@@ -84,9 +85,9 @@ Feature: Searching item lists
 
   Scenario: Doing a frequency search for simple words (can)
     And "researcher@intersect.org.au" has item lists
-      | name       |
-      | Frequency search |
-    And the item list "Frequency search" has items hcsvlab:5
+      | name              |
+      | Frequency search  |
+    And the item list "Frequency search" has items austlit:bolroma
     And I am on the item list page for "Frequency search"
     And the item list "Frequency search" should have 1 items
     When I select "Frequency" from "search_type"
@@ -94,14 +95,14 @@ Feature: Searching item lists
     When I fill in "Frequency search for" with "can"
     And I press "execute_frequency_search"
     Then frequency search for "can" in item list "Frequency search" should show this results
-      | facetValue | matchingDocuments | totalDocs | termOccurrences | totalWords |
+      | facetValue  | matchingDocuments | totalDocs | termOccurrences | totalWords |
       | austlit     | 1                 | 1         | 131             | 89728      |
 
   Scenario: Doing a frequency search for words word (what)
     And "researcher@intersect.org.au" has item lists
-      | name       |
-      | Frequency search |
-    And the item list "Frequency search" has items hcsvlab:5
+      | name              |
+      | Frequency search  |
+    And the item list "Frequency search" has items austlit:bolroma
     And I am on the item list page for "Frequency search"
     And the item list "Frequency search" should have 1 items
     When I select "Frequency" from "search_type"
@@ -116,7 +117,7 @@ Feature: Searching item lists
     And "researcher@intersect.org.au" has item lists
       | name       |
       | Frequency search |
-    And the item list "Frequency search" has items hcsvlab:5
+    And the item list "Frequency search" has items austlit:bolroma
     And I am on the item list page for "Frequency search"
     And the item list "Frequency search" should have 1 items
     When I select "Frequency" from "search_type"
@@ -124,14 +125,14 @@ Feature: Searching item lists
     When I fill in "Frequency search for" with "what's"
     And I press "execute_frequency_search"
     Then frequency search for "what's" in item list "Frequency search" should show this results
-      | facetValue | matchingDocuments | totalDocs | termOccurrences | totalWords |
+      | facetValue  | matchingDocuments | totalDocs | termOccurrences | totalWords |
       | austlit     | 1                 | 1         | 10              | 89728      |
 
   Scenario: Doing an empty frequency search
     And "researcher@intersect.org.au" has item lists
-      | name       |
-      | Frequency search |
-    And the item list "Frequency search" has items hcsvlab:5
+      | name              |
+      | Frequency search  |
+    And the item list "Frequency search" has items austlit:bolroma
     And I am on the item list page for "Frequency search"
     And the item list "Frequency search" should have 1 items
     When I select "Frequency" from "search_type"

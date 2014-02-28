@@ -95,7 +95,7 @@
         %tr
           - if values.has_key?(MetadataHelper::SOURCE)
             %td
-              %a{:href => "/catalog/#{document[:id]}/document/#{values[MetadataHelper::IDENTIFIER]}"}= values[MetadataHelper::IDENTIFIER]
+              %a{:href => "/catalog/#{document[:handle]}/document/#{values[MetadataHelper::IDENTIFIER]}"}= values[MetadataHelper::IDENTIFIER]
           - else
             %td= values[MetadataHelper::IDENTIFIER]
           - if values.has_key?(MetadataHelper::TYPE)

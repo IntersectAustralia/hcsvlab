@@ -37,7 +37,7 @@ Feature: Collections
   @javascript
   Scenario: Access collection details from item details page
     Given "researcher@intersect.org.au" has "read" access to collection "cooee"
-    Given I am on the catalog page for "hcsvlab:1"
+    Given I am on the catalog page for "cooee:1-001"
     And I follow "cooee"
     Then I should be on the collection page for "cooee"
     And I should see "cooee"

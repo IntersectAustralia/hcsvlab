@@ -10,6 +10,7 @@ class TranscriptsController < ApplicationController
   include Blacklight::BlacklightHelperBehavior
   include EopasHelper
 
+  prepend_before_filter :retrieve_and_set_item_id
   before_filter :authenticate_user!
 
   MEDIA_ITEM_FIELDS = %w(title description recorded_on copyright license format media depositor)
@@ -46,6 +47,7 @@ class TranscriptsController < ApplicationController
   def get_solr_document(item_id)
     documents = get_solr_response_for_doc_id(item_id)[0]
     document = documents['response']['docs'][0]
+
     document
   end
 
@@ -122,6 +124,24 @@ class TranscriptsController < ApplicationController
     attributes['transcription'] = find_doc_by_extension 'xml'
 
     attributes
+  end
+
+  private
+
+  #
+  #
+  #
+  def retrieve_and_set_item_id
+    if (params[:id].present?)
+      item = Item.find_and_load_from_solr({handle:params[:id]})
+      if (!item.present?)
+        respond_to do |format|
+          format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a record that doesn't exist.")) and return}
+          format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return}
+        end
+      end
+      params[:id] = item.first.id
+    end
   end
 
 end

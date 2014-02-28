@@ -26,6 +26,8 @@ class CatalogController < ApplicationController
   include Item::DownloadItemsHelper
   include ERB::Util
 
+  prepend_before_filter :retrieve_and_set_item_id
+
   # These before_filters apply the hydra access controls
   before_filter :wrapped_enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations, :upload_annotation]
   # This applies appropriate access controls to all solr queries
@@ -315,7 +317,6 @@ class CatalogController < ApplicationController
   def show
     if Item.where(id: params[:id]).count != 0
       @response, @document = get_solr_response_for_doc_id
-
 
       #By now we are not going to show user uploaded annotation in the webapp
       #solr_item = Item.find_and_load_from_solr({id: @document[:id]}).first
@@ -734,6 +735,22 @@ class CatalogController < ApplicationController
   #
   #
   #
+  def retrieve_and_set_item_id
+    if (params[:id].present?)
+      item = Item.find_and_load_from_solr({handle:params[:id]})
+      if (!item.present?)
+        respond_to do |format|
+          format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return}
+          format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return}
+        end
+      end
+      params[:id] = item.first.id
+    end
+  end
+
+  #
+  #
+  #
   def wrapped_enforce_show_permissions(opts={})
     begin
       enforce_show_permissions(opts)
@@ -824,7 +841,7 @@ class CatalogController < ApplicationController
 
     # hacky way to find the "primary" document, need to make this standard in RDF
     if !@item.primary_text.content.nil?
-      annotates_document = "#{catalog_primary_text_url(@item.id, format: :json)}"
+      annotates_document = "#{catalog_primary_text_url(@item.handle, format: :json)}"
     else
       uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
       documents = item_documents(@document, uris)

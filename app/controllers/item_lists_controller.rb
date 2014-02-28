@@ -106,6 +106,7 @@ class ItemListsController < ApplicationController
       if (item_lists.nil?)
         if params[:all_items] == 'true'
           documents = @item_list.getAllItemsFromSearch(params[:query_all_params])
+          documents = documents.map{|d| d[:handle]}
         else
           documents = params[:sel_document_ids].split(",")
         end
@@ -115,6 +116,7 @@ class ItemListsController < ApplicationController
         end
         if @item_list.save
           flash[:notice] = 'Item list created successfully'
+
           addItemsResult = add_item_to_item_list(@item_list, documents)
           session[:profiler] = addItemsResult[:profiler]
           redirect_to @item_list and return
@@ -132,6 +134,7 @@ class ItemListsController < ApplicationController
   def add_items
     if params[:add_all_items] == "true"
       documents = @item_list.getAllItemsFromSearch(params[:query_params])
+      documents = documents.map{|d| d[:handle]}
     else
       documents = params[:document_ids].split(",")
     end
@@ -291,8 +294,8 @@ class ItemListsController < ApplicationController
     end
   end
 
-  def add_item_to_item_list(item_list, documents_ids)
-    item_list.add_items(documents_ids) unless item_list.nil?
+  def add_item_to_item_list(item_list, documents_handles)
+    item_list.add_items(documents_handles) unless item_list.nil?
   end
 
   #

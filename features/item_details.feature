@@ -16,7 +16,7 @@ Feature: Displaying Items
 
   Scenario: HCSVLAB-272 - Clicking through to a COOEE Item's details
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I am on the catalog page for "hcsvlab:1"
+    Given I am on the catalog page for "cooee:1-001"
     Then I should see "cooee:1-001"
     And I should see "Primary Document"
     And I should see "Documents"
@@ -49,7 +49,7 @@ Feature: Displaying Items
 
   Scenario: Verify presence of every faceted field
     Given I ingest "custom:custom1" with id "hcsvlab:2"
-    Given I am on the catalog page for "hcsvlab:2"
+    Given I am on the catalog page for "custom:custom1"
     Then I should see "custom:custom1"
     And I should see "Primary Document"
     And I should see "Documents"

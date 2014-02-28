@@ -486,9 +486,9 @@ module Blacklight::BlacklightHelperBehavior
   # so we only need the +counter+ param here. We also need to know if we are viewing to document as part of search results.
   def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true})
     if !opts[:itemViewList].nil?
-      link_to label, solr_document_path(doc[:id], :il => opts[:itemViewList])
+      link_to label, solr_document_path(doc[:handle], :il => opts[:itemViewList])
     else
-      link_to label, doc, {:'data-counter' => opts[:counter]}.merge(opts.reject { |k, v| [:label, :counter, :results_view].include? k })
+      link_to label, catalog_url(doc[:handle]), {:'data-counter' => opts[:counter]}.merge(opts.reject { |k, v| [:label, :counter, :results_view].include? k })
     end
   end
 

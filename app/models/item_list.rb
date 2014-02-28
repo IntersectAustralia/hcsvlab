@@ -53,7 +53,7 @@ class ItemList < ActiveRecord::Base
 
     docs = Array.new
     response["response"]["docs"].each do |d|
-      docs.push(d["id"])
+      docs.push({id: d['id'], handle:d['handle']})
     end
     return docs
   end
@@ -105,14 +105,14 @@ class ItemList < ActiveRecord::Base
   end
 
   #
-  # Get the list of Item catalog urls which this ItemList contains.
+  # Get the list of Item handles which this ItemList contains.
   # Return an array of Strings.
   #
-  def get_item_urls(options = {})
+  def get_item_handles
     get_solr_connection
 
     # The query is: give me items which have my item_list.id in their item_lists field
-    params = {:start=>0, :q=>"item_lists:#{RSolr.escape(id.to_s)}", :fl=>"id"}
+    params = {:start=>0, :q=>"item_lists:#{RSolr.escape(id.to_s)}", :fl=>"handle"}
     max_rows = 100
 
     # First stab at the query
@@ -123,12 +123,12 @@ class ItemList < ActiveRecord::Base
     # asking for and ask for them all this time. Sadly, there doesn't appear to be
     # a "give me everything" value for the rows parameter.
     if response["response"]["numFound"] > max_rows
-        params[:rows] = response["response"]["numFound"]
-        response = @@solr.get('select', params: params)
+      params[:rows] = response["response"]["numFound"]
+      response = @@solr.get('select', params: params)
     end
 
     # Now extract the ids from the response
-    return response["response"]["docs"].map { |thingy| thingy["id"] }.sort
+    return response["response"]["docs"].map { |thingy| thingy["handle"] }.sort
   end
 
   #
@@ -158,18 +158,18 @@ class ItemList < ActiveRecord::Base
   # their ids. Don't add an Item which is already part of this ItemList.
   # Return a Set of the ids of the Items which were added.
   #
-  def add_items(item_ids)
+  def add_items(item_handles)
     bench_start = Time.now
 
-    adding = Set.new(item_ids.map{ |item_id| item_id.to_s })
-    adding.subtract(get_item_ids)
+    adding = Set.new(item_handles.map{ |item_handle| item_handle.to_s })
+    adding.subtract(get_item_handles)
 
     # The variable adding now contains only the new ids
 
     verifiedIds = []
     adding.each { |item_id|
         # Get the specified Item's Solr Document
-        params = {:q=>"id:#{RSolr.escape(item_id.to_s)}"}
+        params = {:q=>"handle:#{RSolr.escape(item_id.to_s)}"}
         response = @@solr.get('select', params: params)
 
         # Check that we got something useful...
@@ -185,7 +185,7 @@ class ItemList < ActiveRecord::Base
         else
             #... and if we did, update it
             #update_solr_field(item_id, :item_lists, id)
-            verifiedIds << item_id
+            verifiedIds << response['response']['docs'].first['id']
             #patch_after_update(item_id)
         end
     }

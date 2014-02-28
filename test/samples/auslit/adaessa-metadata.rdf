@@ -16,7 +16,7 @@
     ns1:location "Sydney, Australia" ;
     dc:contributor "Francis Adams" ;
     dc:created "1886" ;
-    dc:identifier "adaessa.xml" ;
+    dc:identifier "adaessa" ;
     dc:isPartOf corpus:austlit ;
     dc:publisher "University of Sydney Library" ;
     dc:title "Australian Essays" ;

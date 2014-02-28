@@ -105,7 +105,7 @@ Feature: Managing Item Lists
     And "researcher@intersect.org.au" has item lists
       | name       |
       | Clear Test |
-    And the item list "Clear Test" has items hcsvlab:1, hcsvlab:2
+    And the item list "Clear Test" has items cooee:1-001, cooee:1-002
     And I wait 5 seconds
     And I am on the item list page for "Clear Test"
     And the item list "Clear Test" should have 2 items
@@ -116,7 +116,7 @@ Feature: Managing Item Lists
     And "researcher@intersect.org.au" has item lists
       | name        |
       | Delete Test |
-    And the item list "Delete Test" has items hcsvlab:1, hcsvlab:2
+    And the item list "Delete Test" has items cooee:1-001, cooee:1-002
     And I wait 5 seconds
     And I am on the item list page for "Delete Test"
     And the item list "Delete Test" should have 2 items
@@ -129,7 +129,7 @@ Feature: Managing Item Lists
     Given "researcher@intersect.org.au" has item lists
       | name  |
       | Test1 |
-    And the item list "Test1" has items hcsvlab:1, hcsvlab:2, hcsvlab:3
+    And the item list "Test1" has items cooee:1-001, cooee:1-002, hcsvlab:3
     And I am on the item list page for "Test1"
     And I follow "Use Item List in Emu/R"
     Then I should see "Use Test1 in Emu/R"
