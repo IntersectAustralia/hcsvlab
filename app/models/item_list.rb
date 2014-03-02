@@ -10,8 +10,7 @@ class ItemList < ActiveRecord::Base
   CONCORDANCE_PRE_POST_CHUNK_SIZE = 7
 
   belongs_to :user
-
-  attr_accessible :name, :id, :user_id
+  attr_accessible :name, :id
 
   validates :name, presence: true
   validates_length_of :name, :maximum => 255 , message:"Name is too long (maximum is 255 characters)"
@@ -21,16 +20,6 @@ class ItemList < ActiveRecord::Base
   #
   @@solr_config = nil
   @@solr = nil
-
-  #
-  # Initialise the connection to Solr
-  #
-  def get_solr_connection
-    if @@solr_config.nil?
-      @@solr_config = Blacklight.solr_config
-      @@solr        = RSolr.connect(@@solr_config)
-    end
-  end
 
   #
   # Get the documents ids from given search parameters
@@ -82,26 +71,10 @@ class ItemList < ActiveRecord::Base
   # Return an array of Strings.
   #
   def get_item_ids
-    get_solr_connection
-
-    # The query is: give me items which have my item_list.id in their item_lists field
-    params = {:start=>0, :q=>"item_lists:#{RSolr.escape(id.to_s)}", :fl=>"id"}
-    max_rows = 100
-
-    # First stab at the query
-    params[:rows] = max_rows
-    response = @@solr.get('select', params: params)
-
-    # If there are more rows in Solr than we asked for, increase the number we're
-    # asking for and ask for them all this time. Sadly, there doesn't appear to be
-    # a "give me everything" value for the rows parameter.
-    if response["response"]["numFound"] > max_rows
-        params[:rows] = response["response"]["numFound"]
-        response = @@solr.get('select', params: params)
-    end
+    items_id_and_handle = get_items_id_and_handle
 
     # Now extract the ids from the response
-    return response["response"]["docs"].map { |thingy| thingy["id"] }.sort
+    return items_id_and_handle.map { |thingy| thingy[:id] }.sort
   end
 
   #
@@ -109,26 +82,10 @@ class ItemList < ActiveRecord::Base
   # Return an array of Strings.
   #
   def get_item_handles
-    get_solr_connection
-
-    # The query is: give me items which have my item_list.id in their item_lists field
-    params = {:start=>0, :q=>"item_lists:#{RSolr.escape(id.to_s)}", :fl=>"handle"}
-    max_rows = 100
-
-    # First stab at the query
-    params[:rows] = max_rows
-    response = @@solr.get('select', params: params)
-
-    # If there are more rows in Solr than we asked for, increase the number we're
-    # asking for and ask for them all this time. Sadly, there doesn't appear to be
-    # a "give me everything" value for the rows parameter.
-    if response["response"]["numFound"] > max_rows
-      params[:rows] = response["response"]["numFound"]
-      response = @@solr.get('select', params: params)
-    end
+    items_id_and_handle = get_items_id_and_handle
 
     # Now extract the ids from the response
-    return response["response"]["docs"].map { |thingy| thingy["handle"] }.sort
+    return items_id_and_handle.map { |thingy| thingy[:handle] }.sort
   end
 
   #
@@ -186,7 +143,6 @@ class ItemList < ActiveRecord::Base
             #... and if we did, update it
             #update_solr_field(item_id, :item_lists, id)
             verifiedIds << response['response']['docs'].first['id']
-            #patch_after_update(item_id)
         end
     }
 
@@ -253,7 +209,6 @@ class ItemList < ActiveRecord::Base
                     update_solr_field(item_id, :item_lists, current_id, 'add')
                 }
             end
-            #patch_after_update(item_id)
         end
     }
 
@@ -357,27 +312,35 @@ class ItemList < ActiveRecord::Base
   private
 
   #
-  # When you update the Solr document of an Item, it appears to throw
-  # away the indexing of the Item's primary text. So, this patch will
-  # regenerate the index. However, it does it slowly, we need to find a
-  # much better way.
+  # Get the list of Item ids and handles which this ItemList contains.
+  # Return an array of Strings.
   #
-  # Incidentally, Solr may well throw away other indexing, too, but
-  # this has not manifested (yet).
-  #
-  # NOTE: This method is no longer needed since we are storing the primary text
-  # and in that way solr is not loosing the indexes
-  #
-=begin
-  def patch_after_update(item_id)
-    puts item_id
-    item = Item.find(item_id)
-    unless item.primary_text.content.nil?
-      update_solr_field(item_id, :full_text, item.primary_text.content, 'set')
-    end
-  end
-=end
+  def get_items_id_and_handle
+    get_solr_connection
 
+    # The query is: give me items which have my item_list.id in their item_lists field
+    params = {:start=>0, :q=>"item_lists:#{RSolr.escape(id.to_s)}", :fl=>"id, handle"}
+    max_rows = 100
+
+    # First stab at the query
+    params[:rows] = max_rows
+    response = @@solr.get('select', params: params)
+
+    # If there are more rows in Solr than we asked for, increase the number we're
+    # asking for and ask for them all this time. Sadly, there doesn't appear to be
+    # a "give me everything" value for the rows parameter.
+    if response["response"]["numFound"] > max_rows
+      params[:rows] = response["response"]["numFound"]
+      response = @@solr.get('select', params: params)
+    end
+
+    # Now extract the ids from the response
+    return response["response"]["docs"].map { |thingy| {id:thingy["id"], handle:thingy["handle"]} }
+  end
+
+  #
+  #
+  #
   def update_solr_field(item_id, field_id, field_value, mode='add')
     doc1 = {:id => item_id, field_id => field_value}
     add_attributes = {:allowDups => false, :commitWithin => 10}
@@ -389,6 +352,9 @@ class ItemList < ActiveRecord::Base
     @@solr.update :data => xml_update
   end
 
+  #
+  #
+  #
   def update_solr_field_array(item_ids, field_id, field_value, mode='add')
     docs = []
     item_ids.each do |item_id|
@@ -404,13 +370,18 @@ class ItemList < ActiveRecord::Base
     @@solr.update :data => xml_update
   end
 
-
+  #
+  #
+  #
   def clear_solr_field(item_id, field_id)
     # TODO: ermm, this, properly (see http://wiki.apache.org/solr/UpdateXmlMessages#Optional_attributes_for_.22field.22
     # and https://github.com/mwmitchell/rsolr)
     update_solr_field(item_id, field_id, '.', 'set')
   end
 
+  #
+  #
+  #
   def force_to_utf8(value)
     case value
       when Hash
@@ -489,5 +460,15 @@ class ItemList < ActiveRecord::Base
   def blacklight_solr
     get_solr_connection
     @@solr
+  end
+
+  #
+  # Initialise the connection to Solr
+  #
+  def get_solr_connection
+    if @@solr_config.nil?
+      @@solr_config = Blacklight.solr_config
+      @@solr        = RSolr.connect(@@solr_config)
+    end
   end
 end
