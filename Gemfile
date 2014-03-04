@@ -129,5 +129,5 @@ gem 'rvm-capistrano'
 gem "capistrano_colors"
 
 gem 'tinymce-rails'
-gem 'rubyzip'
+gem 'rubyzip', '0.9.9'
 gem 'bagit'
