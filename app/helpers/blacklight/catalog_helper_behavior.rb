@@ -153,7 +153,6 @@ module Blacklight::CatalogHelperBehavior
                       'date_group_tesim' => nil,
                       'all_metadata' => nil,
                       '_version_' => nil,
-                      'item_lists' => nil,
                       'all_metadata' => nil,
                       'json_metadata' => nil,
                       'discover_access_group_ssim' => nil,

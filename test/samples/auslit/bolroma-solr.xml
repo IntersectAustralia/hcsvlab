@@ -1716,7 +1716,6 @@
 
     "
   </field>
-  <field name="item_lists">0</field>
   <field name="id">HCSVLAB_ID</field>
   <field name="discover_access_group_ssim">auslit-discover</field>
   <field name="read_access_group_ssim">auslit-read</field>

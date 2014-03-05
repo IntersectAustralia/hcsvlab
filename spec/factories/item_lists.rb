@@ -2,5 +2,7 @@
 
 FactoryGirl.define do
   factory :item_list do
+    name "itemList"
+    association :user, factory: :user
   end
 end

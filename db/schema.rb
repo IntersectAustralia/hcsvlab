@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140120011702) do
+ActiveRecord::Schema.define(:version => 20140302222240) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -40,6 +40,15 @@ ActiveRecord::Schema.define(:version => 20140120011702) do
 
   add_index "item_metadata_field_name_mappings", ["solr_name"], :name => "index_item_metadata_field_name_mappings_on_solr_name", :unique => true
 
+  create_table "items_in_item_lists", :force => true do |t|
+    t.integer  "item_list_id"
+    t.string   "item"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "items_in_item_lists", ["item_list_id"], :name => "index_items_in_item_lists_on_item_list_id"
+
   create_table "roles", :force => true do |t|
     t.string   "name"
     t.datetime "created_at", :null => false
@@ -64,9 +73,9 @@ ActiveRecord::Schema.define(:version => 20140120011702) do
     t.string   "item_identifier"
     t.boolean  "shareable"
     t.string   "file_location"
+    t.datetime "created_at",             :null => false
+    t.datetime "updated_at",             :null => false
     t.string   "annotationCollectionId"
-    t.datetime "created_at",        :null => false
-    t.datetime "updated_at",        :null => false
   end
 
   add_index "user_annotations", ["user_id"], :name => "index_user_annotations_on_user_id"

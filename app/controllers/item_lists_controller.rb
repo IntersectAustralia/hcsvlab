@@ -158,10 +158,10 @@ class ItemListsController < ApplicationController
     removed_set = @item_list.clear
     bench_end = Time.now
 
-    Rails.logger.debug("Time for clear item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
-    session[:profiler] = ["Time for clear item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
+    Rails.logger.debug("Time for clear item list of #{removed_set} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
+    session[:profiler] = ["Time for clear item list of #{removed_set} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
-    flash[:notice] = "#{view_context.pluralize(removed_set.size, "")} cleared from item list #{@item_list.name}"
+    flash[:notice] = "#{view_context.pluralize(removed_set, "")} cleared from item list #{@item_list.name}"
     redirect_to @item_list
   end
 

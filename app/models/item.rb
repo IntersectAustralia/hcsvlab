@@ -56,7 +56,6 @@ class Item < HcsvlabActiveFedora
      MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim',
      'handle',
      '_version_',
-     'item_lists',
      'all_metadata',
      'discover_access_group_ssim',
      'read_access_group_ssim',

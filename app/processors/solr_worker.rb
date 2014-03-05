@@ -296,8 +296,8 @@ private
       ::Solrizer::Extractor.insert_solr_field_value(document, :full_text, full_text)
     end
     default_il = ['0']
-    debug("Solr_Worker", "Adding configured field #{:item_lists} with value #{default_il}")
-    ::Solrizer::Extractor.insert_solr_field_value(document, :item_lists, default_il)
+    #debug("Solr_Worker", "Adding configured field #{:item_lists} with value #{default_il}")
+    #::Solrizer::Extractor.insert_solr_field_value(document, :item_lists, default_il)
     debug("Solr_Worker", "Adding configured field #{:id} with value #{object}")
     ::Solrizer::Extractor.insert_solr_field_value(document, :id, object)
     ident = ident_parts[:collection] + ":" + ident_parts[:identifier]
@@ -338,7 +338,8 @@ private
   def add_json_metadata_field(document, internalUseData)
     itemInfo = create_display_info_hash(document)
     # Removes id, item_list, *_ssim and *_sim fields
-    metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|item_lists|id)$/)}
+    #metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|item_lists|id)$/)}
+    metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|id)$/)}
 
     # create a mapping with the documents locations {filename => fullPath}
     documentsLocations = {}
