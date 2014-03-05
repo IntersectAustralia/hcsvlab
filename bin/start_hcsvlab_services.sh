@@ -22,3 +22,7 @@ sleep 5
 # Starting Solr and Fedora Workers
 cd /home/devel/hcsvlab-web/current/
 /home/devel/.rvm/gems/ruby-2.0.0-p0\@global/bin/rake  a13g:start_pollers
+
+# Start Galaxy
+cd $GALAXY_HOME
+./galaxy start
