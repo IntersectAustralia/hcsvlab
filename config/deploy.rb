@@ -358,32 +358,25 @@ namespace :deploy do
     run "cd $ACTIVEMQ_HOME && bin/activemq stop", :env => {'RAILS_ENV' => stage}
   end
 
-  desc "Start Galaxy"
-  task :start_galaxy, :role => :app do
-    run "cd $GALAXY_HOME && ./galaxy start", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Stop Galaxy"
-  task :stop_galaxy, :role => :app do
-    run "cd $GALAXY_HOME && ./galaxy stop", :env => {'RAILS_ENV' => stage}
+  desc "Restart Galaxy"
+  task :restart_galaxy, :roles => :galaxy do
+    run "cd $GALAXY_HOME && ./galaxy restart"
   end
 
   desc "Configure Galaxy"
-  task :configure_galaxy, :role => :app do
-    run "cp -p #{current_path}/galaxy_conf/universe_wsgi.ini $GALAXY_HOME/", :env => {'RAILS_ENV' => stage}
+  task :configure_galaxy, :roles => :galaxy do
     run "sed -i 's+__HCSVLAB_APP_URL__+#{server_url}+g' $GALAXY_HOME/universe_wsgi.ini"
     run "sed -i 's+__GALAXY_PORT__+#{galaxy_port}+g' $GALAXY_HOME/universe_wsgi.ini"
-    run "sed -i 's+__TOOL_SHED_URL__+#{server_url + ':' + toolshed_port}+g' $GALAXY_HOME/tool_sheds_conf.xml"
+    run "sed -i 's+__TOOL_SHED_URL__+#{galaxy_url + ':' + toolshed_port}+g' $GALAXY_HOME/tool_sheds_conf.xml"
   end
 
   desc "Update galaxy"
-  task :update_galaxy, :role => :app do
+  task :update_galaxy, :roles => :galaxy do
 
     # First show the branches and tags to decide from where are we going to deploy
     require 'colorize'
     default_tag = 'HEAD'
-
-    run "cd $GALAXY_HOME && git pull", :env => {'RAILS_ENV' => stage}
+    run "cd $GALAXY_HOME && git pull origin master"
     availableLocalBranches = capture("cd $GALAXY_HOME && git branch").split (/\r?\n/)
     availableLocalBranches.map! { |s|  "(local) " + s.strip}
 
@@ -405,33 +398,33 @@ namespace :deploy do
 
 
     # Once we chose the branch/tag, we setup up it in the local repository.
-    run "cd $GALAXY_HOME && git pull origin master", :env => {'RAILS_ENV' => stage}
-    run "cd $GALAXY_HOME && git reset --hard #{tag}", :env => {'RAILS_ENV' => stage}
+    run "cd $GALAXY_HOME && git pull origin master"
+    run "cd $GALAXY_HOME && git reset --hard #{tag}"
 
   end
 
   desc "Redeploy Galaxy, stops, updates, configures and starts galaxy"
-  task :redeploy_galaxy, :role => :app do
-    stop_galaxy
+  task :redeploy_galaxy, :roles => :galaxy do
+    set(:user) { "galaxy" }
+    set :default_shell, '/bin/bash'
     update_galaxy
     configure_galaxy
-    start_galaxy
+    restart_galaxy
+    redeploy_galaxy_toolshed
   end
 
   desc "Start Galaxy Toolshed"
-  task :start_galaxy_toolshed, :role => :app do
+  task :start_galaxy_toolshed, :roles => :galaxy do
     run "cd $GALAXY_HOME && #{try_sudo} service toolshed start", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Stop Galaxy Toolshed"
-  task :stop_galaxy_toolshed, :role => :app do
-    puts :app
+  task :stop_galaxy_toolshed, :roles => :galaxy do
     run "cd $GALAXY_HOME && #{try_sudo} service toolshed stop", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Configure Galaxy Toolshed"
-  task :configure_galaxy_toolshed, :role => :app do
-    run "cp -p #{current_path}/galaxy_conf/tool_shed_wsgi.ini $GALAXY_HOME/", :env => {'RAILS_ENV' => stage}
+  task :configure_galaxy_toolshed, :roles => :galaxy do
     toolshed_config = YAML.load_file('config/galaxy_toolshed.yml')[stage.to_s]
     run "sed -i 's+__TOOLSHED_PORT__+#{toolshed_port}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
     run "sed -i 's+__USER__+#{toolshed_config["username"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
@@ -441,7 +434,9 @@ namespace :deploy do
   end
 
   desc "Redeploy Galaxy toolshed"
-  task :redeploy_galaxy_toolshed, :role => :app do
+  task :redeploy_galaxy_toolshed, :roles => :galaxy do
+    set(:user) { "galaxy" }
+    set :default_shell, '/bin/bash'
     stop_galaxy_toolshed
     configure_galaxy_toolshed
     start_galaxy_toolshed
