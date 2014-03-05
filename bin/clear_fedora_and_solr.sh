@@ -6,6 +6,12 @@
 # the SQL database.
 #
 
+if [ -z "$CATALINA_HOME" ]
+then
+    echo "Please set CATALINA_HOME"
+    exit 1
+fi
+
 if [ -z "$FEDORA_HOME" ]
 then
     echo "Please set FEDORA_HOME"
@@ -17,6 +23,13 @@ then
     echo "Please set SOLR_HOME"
     exit 1
 fi 
+
+# Stop Apache Tomcat
+
+echo ""
+echo "Stopping apache tomcat..."
+$CATALINA_HOME/bin/shutdown.sh
+
 
 # Clear solr
 
@@ -39,8 +52,23 @@ rm -rf $FEDORA_HOME/derby/*
 
 echo ""
 echo "Running the Fedora rebuild script to rebuild the SQL Database"
+echo "Select 2 - Rebuild SQL database. and then 1 - Yes"
 echo ""
 
 $FEDORA_HOME/server/bin/fedora-rebuild.sh
+
+
+# Start Apache Tomcat
+
+echo ""
+echo "Starting apache tomcat..."
+$CATALINA_HOME/bin/startup.sh
+
+sleep 10
+
+echo ""
+echo "Deleting Sesame triples"
+echo ""
+rake sesame:clear
 
 exit 0
