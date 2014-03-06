@@ -4,7 +4,8 @@ HcsvlabWeb::Application.routes.draw do
   get "version", :to => "application#version"
 
   get "catalog/search", :to => 'catalog#search', :as => 'catalog_search'
-  get "catalog/searchable_fields", :to => 'catalog#searchable_fields', :as => 'searchable_fields'
+  get "catalog/searchable_fields", :to => 'catalog#searchable_fields', :as => 'catalog_searchable_fields'
+  get 'catalog/sparql', :to => 'catalog#sparqlQuery', :as => 'catalog_sparqlQuery'
 
   Blacklight.add_routes(self)
   get "catalog/:id/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text'

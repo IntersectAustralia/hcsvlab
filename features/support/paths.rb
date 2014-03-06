@@ -75,8 +75,14 @@ module NavigationHelpers
       when /^the catalog page for "(.*)"$/
         catalog_path($1, options)
 
+      when /^the catalog sparql page$/
+        catalog_sparqlQuery_path(options)
+
       when /^the download_items page$/
         catalog_download_items_api_path(options)
+
+      when /^the searchable fields page$/
+        catalog_searchable_fields_path(options)
 
       when /^the licences page$/
         licences_path(options)
@@ -108,8 +114,6 @@ module NavigationHelpers
       when /^the licence requests page$/
         user_licence_requests_path(options)
 
-      when /^the searchable fields page$/
-        searchable_fields_path(options)
 
 
 # Add more mappings here.

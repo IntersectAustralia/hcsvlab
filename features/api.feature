@@ -805,3 +805,134 @@ Feature: Browsing via API
       | Name  | Content | Filename                                                | Type                      |
       | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
     Then I should get a 403 response code
+
+  ###########################################################################################################
+  #### SPARQL ENDPOINT TESTS                                                                             ####
+  ###########################################################################################################
+
+  Scenario: Send sparql query without specifying the collection.
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | query                       |
+      | select * where {?s ?p ?o}   |
+    Then I should get a 412 response code
+    And the JSON response should be:
+    """
+    {"error":"Parameters 'collection' and 'query' are required."}
+    """
+
+  Scenario: Send sparql query without specifying the query.
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | collection  |
+      | cooee       |
+    Then I should get a 412 response code
+    And the JSON response should be:
+    """
+    {"error":"Parameters 'collection' and 'query' are required."}
+    """
+
+  Scenario: Send sparql query to a collection I have no access.
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | collection  | query                       |
+      | austlit     | select * where {?s ?p ?o}   |
+    Then I should get a 403 response code
+
+  Scenario: Send sparql query to a collection that does not exists.
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | collection  | query                      |
+      | notExists   | select * where {?s ?p ?o}  |
+    Then I should get a 404 response code
+    And the JSON response should be:
+    """
+    {"error":"collection not-found"}
+    """
+
+  Scenario: Send sparql query to retrieve an item identifier
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | collection | query                                                                                                        |
+      | cooee      | select * where {<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/identifier> ?o} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "head":{
+        "vars":[
+          "o"
+        ]
+      },
+      "results":{
+        "bindings":[
+          {
+            "o":{
+              "type":"literal",
+              "value":"1-001"
+            }
+          }
+        ]
+      }
+    }
+    """
+
+  Scenario: Send sparql query to retrieve all items' collection name
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-002" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | collection | query                                                                                                        |
+      | cooee      | select * where {?s <http://purl.org/dc/terms/isPartOf> ?o} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "head":{
+        "vars":[
+          "s",
+          "o"
+        ]
+      },
+      "results":{
+        "bindings":[
+          {
+            "s":{
+              "type":"uri",
+              "value":"http://ns.ausnc.org.au/corpora/cooee/items/1-001"
+            },
+            "o":{
+              "type":"uri",
+              "value":"http://ns.ausnc.org.au/corpora/cooee"
+            }
+          },
+          {
+            "s":{
+              "type":"uri",
+              "value":"http://ns.ausnc.org.au/corpora/cooee/items/1-002"
+            },
+            "o":{
+              "type":"uri",
+              "value":"http://ns.ausnc.org.au/corpora/cooee"
+            }
+          }
+        ]
+      }
+    }
+    """
