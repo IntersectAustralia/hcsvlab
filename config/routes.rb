@@ -1,4 +1,8 @@
 HcsvlabWeb::Application.routes.draw do
+  # This constraint specify that we are going to accept any character except '/' for an item id.
+  catalogRoutesConstraints = {:id => /[^\/]+/}
+  catalogRoutesConstraintsIncludingJson = {:id => /[^\/]+[^(?<!\.json)$]/}
+
   root :to => "catalog#index"
 
   get "version", :to => "application#version"
@@ -8,11 +12,17 @@ HcsvlabWeb::Application.routes.draw do
   get 'catalog/sparql', :to => 'catalog#sparqlQuery', :as => 'catalog_sparqlQuery'
 
   Blacklight.add_routes(self)
-  get "catalog/:id/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text'
-  get "catalog/:id/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/
-  get "catalog/:id/document/", :to => 'catalog#document', :as => 'catalog_document_api'
-  get "catalog/:id/annotations", :to => 'catalog#annotations', :as => 'catalog_annotations'
-  post 'catalog/:id/annotations', :to => 'catalog#upload_annotation'
+
+  # We need to override this routes defined by the method 'Blacklight.add_routes' in order to add the constraints.
+  resources :solr_document,  :path => 'catalog', :controller => 'catalog', :only => [:show, :update] , :constraints => catalogRoutesConstraintsIncludingJson
+  # :show and :update are for backwards-compatibility with catalog_url named routes
+  resources :catalog, :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
+
+  get "catalog/:id/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text', :constraints => catalogRoutesConstraints
+  get "catalog/:id/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/, :constraints => catalogRoutesConstraints
+  get "catalog/:id/document/", :to => 'catalog#document', :as => 'catalog_document_api', :constraints => catalogRoutesConstraints
+  get "catalog/:id/annotations", :to => 'catalog#annotations', :as => 'catalog_annotations', :constraints => catalogRoutesConstraints
+  post 'catalog/:id/annotations', :to => 'catalog#upload_annotation', :constraints => catalogRoutesConstraints
 
   post 'catalog/download_items', :to => 'catalog#download_items', :as => 'catalog_download_items_api'
   #get 'catalog/download_annotation/:id', :to => 'catalog#download_annotation', :as => 'catalog_download_annotation'
