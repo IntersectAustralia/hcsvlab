@@ -207,10 +207,22 @@ Then /^the (JSON )?response should be:$/ do |json, input|
     expected = input
     actual = last_response.body
   end
-  if self.respond_to?(:should)
-    actual.should == expected
+
+  if (json.present?)
+    result = JsonCompare.get_diff(actual, expected)
+    if self.respond_to?(:should)
+      #actual.should == expected
+      result.should be_empty, "\n expected: #{expected} \n got: #{actual} \n"
+    else
+      #assert_equal actual, response
+      assert_true result.empty?, "\n expected: #{expected} \n got: #{actual} \n"
+    end
   else
-    assert_equal actual, response
+    if self.respond_to?(:should)
+      actual.should == expected
+    else
+      assert_equal actual, response
+    end
   end
 end
 
