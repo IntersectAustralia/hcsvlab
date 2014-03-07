@@ -2,6 +2,8 @@
 require 'blacklight/catalog'
 require 'yaml'
 require "#{Rails.root}/lib/item/download_items_helper.rb"
+require 'net/http'
+require 'uri'
 
 class CatalogController < ApplicationController
 
@@ -352,6 +354,9 @@ class CatalogController < ApplicationController
     end
   end
 
+  #
+  #
+  #
   def search
     request.format = 'json'
     metadataSearchParam = params[:metadata]
@@ -387,6 +392,9 @@ class CatalogController < ApplicationController
     end
   end
 
+  #
+  #
+  #
   def annotations
     bench_start = Time.now
     if Item.where(id: params[:id]).count != 0
@@ -415,6 +423,9 @@ class CatalogController < ApplicationController
     Rails.logger.debug("Time for retrieving annotations for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
   end
 
+  #
+  #
+  #
   def annotation_context
     @predefinedProperties = collect_predefined_context_properties()
 
@@ -433,6 +444,9 @@ class CatalogController < ApplicationController
 
   end
 
+  #
+  #
+  #
   def primary_text
     bench_start = Time.now
     begin
@@ -452,6 +466,9 @@ class CatalogController < ApplicationController
     end
   end
 
+  #
+  #
+  #
   def document
     begin
       doc = Document.find_and_load_from_solr({:file_name=>params[:filename].to_s, item: params[:id]}).first
@@ -500,7 +517,9 @@ class CatalogController < ApplicationController
     end
   end
 
+  #
   # when a request for /catalog/BAD_SOLR_ID is made, this method is executed...
+  #
   def invalid_solr_id_error
     respond_to do |format|
       format.html { flash[:error] = "Sorry, you have requested a document that doesn't exist."
@@ -547,8 +566,6 @@ class CatalogController < ApplicationController
     @nameMappings
   end
 
-  #
-  #
   #
   # API command:
   #               curl -H "X-API-KEY:<api_key>" -H "Accept: application/json" -F file=@<path_to_file> <host>/catalog/:id/annotations
@@ -609,8 +626,6 @@ class CatalogController < ApplicationController
   end
 
   #
-  #
-  #
   # API command:
   #             curl -H "X-API-KEY:<key>" -H "Accept: application/json" <host>/catalog/download_annotation/<annotation_id>
   #def download_annotation
@@ -638,6 +653,61 @@ class CatalogController < ApplicationController
   #
   #end
 
+  #
+  # This method expose the triple store endpoint. Previous sending the request to sesame
+  # we validate that the user has read access to the collection.
+  #
+  def sparqlQuery
+    request.format = 'json'
+
+    # First will validate the parameters. 'collection' and 'query' are both required
+    query = params[:query]
+    collectionName = params[:collection].to_s.downcase
+    if (!collectionName.present? || !query.present?)
+      respond_to do |format|
+        format.json { render :json => {:error => "Parameters 'collection' and 'query' are required."}.to_json, :status => 412 and return}
+      end
+      return
+    end
+
+    # Retrieve the collection from Fedora
+    collection = Collection.find_by_short_name(collectionName).to_a.first
+    if (collection.nil?)
+      respond_to do |format|
+        format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return}
+      end
+    end
+
+    # Verify if the user has at least read access to the collection
+    if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
+      authorization_error(Exception.new("You are not authorized to access this resource."))
+      return
+    end
+
+    # Create the URL for the sesame endpoint.
+    params = { query:query }
+    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collection.flat_name}")
+    uri.query = URI.encode_www_form(params)
+
+    # Send the request to the sparql endpoint.
+    req = Net::HTTP::Get.new(uri)
+    req.add_field("accept", "application/json")
+    res = Net::HTTP.new(uri.host, uri.port).start do |http|
+      http.request(req)
+    end
+
+    # If sesame returns an error, then we show the error received by sesame
+    if (!res.is_a?(Net::HTTPSuccess))
+      respond_to do |format|
+        format.json { render :json => {:error => res.body}.to_json, :status => res.code and return}
+      end
+    else
+      # Otherwise we send the response as json format.
+      respond_to do |format|
+        format.json { render :json => res.body.to_s and return}
+      end
+    end
+  end
 
   private
 

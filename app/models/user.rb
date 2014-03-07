@@ -184,6 +184,11 @@ class User < ActiveRecord::Base
   # that permission, if false then look for that permission or better.
   #
   def has_agreement_to_collection?(collection, accessType, exact=false)
+    # if the user is the owner of the collection, then he/she does have access.
+    if (collection.flat_ownerEmail.eql?(self.email))
+      return true
+    end
+
     if exact
       group_names = ["#{collection.flat_short_name}-#{accessType}"]
     else

@@ -220,7 +220,7 @@ Then /^the (JSON )?response should have (\d+) user uploaded annotations$/ do |js
   else
     actual = last_response.body
   end
-
+  # this regular expression matches '<UUID>/<UUID>'
   matches = actual.to_s.scan(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/)
 
   if self.respond_to?(:should)

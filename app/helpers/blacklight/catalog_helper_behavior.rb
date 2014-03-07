@@ -187,7 +187,7 @@ module Blacklight::CatalogHelperBehavior
         # When we create the json metadata from the solr processor, we need to do the following work around
         # to have access to routes URL methods
         parameters = default_url_options.merge({format: :json})
-        primary_text = Rails.application.routes.url_helpers.catalog_primary_text_url(document[:id], parameters)
+        primary_text = Rails.application.routes.url_helpers.catalog_primary_text_url(document[:handle], parameters)
       end
     else
       primary_text = "No primary text found"
