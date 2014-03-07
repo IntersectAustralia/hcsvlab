@@ -376,7 +376,7 @@ namespace :deploy do
     # First show the branches and tags to decide from where are we going to deploy
     require 'colorize'
     default_tag = 'HEAD'
-    run "cd $GALAXY_HOME && git pull origin master"
+    run "cd $GALAXY_HOME && #{try_sudo} git fetch --all"
     availableLocalBranches = capture("cd $GALAXY_HOME && git branch").split (/\r?\n/)
     availableLocalBranches.map! { |s|  "(local) " + s.strip}
 
@@ -398,8 +398,8 @@ namespace :deploy do
 
 
     # Once we chose the branch/tag, we setup up it in the local repository.
-    run "cd $GALAXY_HOME && git pull origin master"
-    run "cd $GALAXY_HOME && git reset --hard #{tag}"
+    run "cd $GALAXY_HOME && #{try_sudo} git fetch --all"
+    run "cd $GALAXY_HOME && #{try_sudo} git reset --hard #{tag}"
 
   end
 
