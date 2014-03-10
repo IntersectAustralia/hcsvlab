@@ -508,7 +508,7 @@ DEPENDENCIES
   hydra-head (~> 6.0.0)
   jettywrapper
   jquery-rails (= 2.3.0)
-  json-compare (~> 0.1.8)
+  json-compare (= 0.1.8)
   json-ld
   json_pure (= 1.8.0)
   jsonpath

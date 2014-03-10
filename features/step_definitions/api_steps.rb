@@ -1,3 +1,5 @@
+require "#{Rails.root}/lib/json-compare/orderless_json_comparer.rb"
+
 Then /^I should get a (\d+) response code$/ do |status|
   last_response.status.should == status.to_i
 end
@@ -209,7 +211,7 @@ Then /^the (JSON )?response should be:$/ do |json, input|
   end
 
   if (json.present?)
-    result = JsonCompare.get_diff(actual, expected)
+    result = OrderlessJsonCompare.get_diff(actual, expected)
     if self.respond_to?(:should)
       #actual.should == expected
       result.should be_empty, "\n expected: #{expected} \n got: #{actual} \n"

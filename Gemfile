@@ -69,7 +69,7 @@ group :test do
   gem "poltergeist"
   gem "selenium-webdriver"
   gem 'spreewald'
-  gem "json-compare", "~> 0.1.8"
+  gem "json-compare", '0.1.8'
 end
 
 gem "jsonpath"
