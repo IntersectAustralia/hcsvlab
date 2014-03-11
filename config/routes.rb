@@ -23,6 +23,8 @@ HcsvlabWeb::Application.routes.draw do
   get "catalog/:id/document/", :to => 'catalog#document', :as => 'catalog_document_api', :constraints => catalogRoutesConstraints
   get "catalog/:id/annotations", :to => 'catalog#annotations', :as => 'catalog_annotations', :constraints => catalogRoutesConstraints
   post 'catalog/:id/annotations', :to => 'catalog#upload_annotation', :constraints => catalogRoutesConstraints
+  get "catalog/:id/annotations/properties", :to => 'catalog#annotation_properties', :as => 'catalog_annotation_properties'
+  get "catalog/:id/annotations/types", :to => 'catalog#annotation_types', :as => 'catalog_annotation_types'
 
   post 'catalog/download_items', :to => 'catalog#download_items', :as => 'catalog_download_items_api'
   #get 'catalog/download_annotation/:id', :to => 'catalog#download_annotation', :as => 'catalog_download_annotation'

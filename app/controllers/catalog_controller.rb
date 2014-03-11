@@ -404,7 +404,13 @@ class CatalogController < ApplicationController
       @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
 
       if !@item.datastreams["annotationSet1"].nil?
-        @anns, @annotates_document = query_annotations(@item, @document, params[:type], params[:label])
+        begin
+          @anns, @annotates_document = query_annotations(@item, @document, params[:type], params[:label])
+        rescue Exception => e
+          respond_to do |format|
+            format.json { render :json => {:error => "error in query parameters"}.to_json, :status => 400 }
+          end
+        end
 
         respond_to do |format|
             format.json {}
@@ -423,9 +429,52 @@ class CatalogController < ApplicationController
     Rails.logger.debug("Time for retrieving annotations for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
   end
 
-  #
-  #
-  #
+  def annotation_properties
+    request.format = 'json'
+    begin
+      @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
+
+      if !@item.datastreams["annotationSet1"].nil?
+        @properties = query_annotation_properties(@item)
+
+        respond_to do |format|
+            format.json {}
+        end
+        return
+      end
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      Rails.logger.error(e.backtrace.join("\n"))
+      # Fall through to return Not Found
+    end
+    respond_to do |format|
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+    end
+  end
+
+  def annotation_types
+    request.format = 'json'
+    begin
+      @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
+
+      if !@item.datastreams["annotationSet1"].nil?
+        @types = query_annotation_types(@item)
+
+        respond_to do |format|
+            format.json {}
+        end
+        return
+      end
+    rescue Exception => e
+      Rails.logger.error(e.message)
+      Rails.logger.error(e.backtrace.join("\n"))
+      # Fall through to return Not Found
+    end
+    respond_to do |format|
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+    end
+  end
+
   def annotation_context
     @predefinedProperties = collect_predefined_context_properties()
 
@@ -872,14 +921,57 @@ class CatalogController < ApplicationController
   #
   def query_annotations(item, solr_document, type, label)
     item_short_identifier = item.flat_handle.split(":").last
-    corpus = solr_document[MetadataHelper::short_form(MetadataHelper::COLLECTION)].first
+    corpus = item.collection.flat_name
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(corpus)
 
+    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{item.collection.flat_name}/namespaces")
+
+    # Send the request to the sparql endpoint.
+    req = Net::HTTP::Get.new(uri)
+    req.add_field("accept", "application/json")
+    res = Net::HTTP.new(uri.host, uri.port).start do |http|
+      http.request(req)
+    end
+
+    # If sesame returns an error, then we show the error received by sesame
+    if (!res.is_a?(Net::HTTPSuccess))
+      Rails.logger.error(res.body)
+      raise Exception.new
+    else
+      namespaces = Hash[JSON.parse(res.body)["results"]["bindings"].collect { |entry| [entry["prefix"]["value"], entry["namespace"]["value"]]}]
+    end
+
+    prefixes = ""
+    namespaces.each do |k, v|
+      prefixes << "PREFIX #{k}:<#{v}>\n"
+    end
+
+    filters = ""
+    user_params.each do |key, value|
+      # key must be a uri, if it is add filter to query
+      unless literal_sparql_key(key)
+        filters << "FILTER( EXISTS { ?anno #{sparql_item(key)} #{sparql_item(value)} } || EXISTS { ?loc #{sparql_item(key)} #{sparql_item(value)} } "
+        # If searching for non-uri term, we need to search for terms both inclosed in quotes and without
+        filters << "|| EXISTS { ?anno #{sparql_item(key)} #{sparql_item(value)} } || EXISTS { ?loc #{sparql_item(key)} #{sparql_item(value)} } ".gsub("'", "") if literal_sparql_key(value)
+        filters << ")\n"
+      else
+        Rails.logger.error("Invalid sparql query subject, must be a URI")
+        raise Exception.new
+      end
+    end
+
+    type_and_label = ""
+    if type.present?
+      type_and_label << "?anno dada:type #{sparql_item(type.to_s.strip)} .\n"
+    end
+    if label.present?
+      type_and_label << "?anno cp:val #{sparql_item(label.to_s.strip)} .\n"
+    end
+
     query = """
-      PREFIX dada:<http://purl.org/dada/schema/0.2#>
-      PREFIX dc: <http://purl.org/dc/terms/>
+      #{prefixes}
       PREFIX cp:<#{(SPARQL_QUERY_PREFIXES[corpus]['corpus_prefix'] unless SPARQL_QUERY_PREFIXES[corpus].nil?).to_s}>
       SELECT *
       WHERE {
@@ -887,20 +979,16 @@ class CatalogController < ApplicationController
         ?annoCol dada:annotates ?identifier .
         ?anno dada:partof ?annoCol .
         ?anno a dada:Annotation .
+        #{type_and_label}
         OPTIONAL { ?anno cp:val ?label . }
         OPTIONAL { ?anno dada:type ?type . }
         OPTIONAL {
           ?anno dada:targets ?loc .
           OPTIONAL { ?loc ?property ?value . }
         }
+        #{filters unless filters.empty?}
+      }
     """
-    if type.present?
-      query << "?anno dada:type '" + CGI.escape(type).to_s.strip + "' ."
-    end
-    if label.present?
-      query << "?anno cp:val '" + CGI.escape(label).to_s.strip + "' ."
-    end
-    query << "}"
 
     solution = repo.sparql_query(query)
 
@@ -917,7 +1005,6 @@ class CatalogController < ApplicationController
         predefinedPropertiesMap[value[:@id].to_s] = key
       end
     }
-
 
     solution.each do |aSolution|
 
@@ -953,6 +1040,80 @@ class CatalogController < ApplicationController
     end
 
     return {commonProperties: commonProperties, annotations: hash}, annotates_document
+  end
+
+  #
+  # Gets a list of annotation types for the give item
+  #
+  def query_annotation_types(item)
+    types = []
+    item_short_identifier = item.flat_handle.split(":").last
+
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repo = server.repository(item.collection.flat_name)
+
+    query = """
+        PREFIX dada:<http://purl.org/dada/schema/0.2#>
+        PREFIX dc: <http://purl.org/dc/terms/>
+        SELECT *
+        WHERE {
+            ?identifier dc:identifier '#{item_short_identifier}'.
+            ?annoCol dada:annotates ?identifier .
+            ?anno dada:partof ?annoCol .
+            ?anno a dada:Annotation .
+            ?anno dada:type ?type .
+        }
+    """
+
+    sols = repo.sparql_query(query)
+    sols = sols.select(:type).distinct
+    
+    sols.each do |sol|
+        types.push(sol[:type].to_s)
+    end
+    types
+  end
+
+  #
+  # Gets a list of annotation properties for the give item
+  #
+  def query_annotation_properties(item)
+    properties = []
+    item_short_identifier = item.flat_handle.split(":").last
+
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repo = server.repository(item.collection.flat_name)
+
+    query = """
+        PREFIX dada:<http://purl.org/dada/schema/0.2#>
+        PREFIX dc: <http://purl.org/dc/terms/>
+        SELECT ?property
+        WHERE { 
+            {
+                ?identifier dc:identifier '#{item_short_identifier}'.
+                ?annoCol dada:annotates ?identifier .
+                ?anno dada:partof ?annoCol .
+                ?anno a dada:Annotation .
+                ?anno ?property ?value .
+            }
+            UNION {
+                ?identifier dc:identifier '#{item_short_identifier}'.
+                ?annoCol dada:annotates ?identifier .
+                ?anno dada:partof ?annoCol .
+                ?anno a dada:Annotation .
+                ?anno dada:targets ?loc .
+                ?loc ?property ?value .
+            }
+        }
+    """
+
+    sols = repo.sparql_query(query)
+    props = sols.select(:property).distinct
+
+    props.each do |sol|
+        properties.push(sol[:property].to_s)
+    end
+    properties
   end
 
   #
@@ -1017,6 +1178,36 @@ class CatalogController < ApplicationController
 
     avoid_context << "http://rdfs.org/sioc/types#"
     avoid_context
+  end
+
+  def user_params
+    return params.except(:format, :action, :controller, :id, :type, :label, :api_key)
+  end
+
+  def sparql_item(item)
+    if uri? item
+      return "<#{item}>"
+    elsif item.include? ":"
+      return item
+    else
+      return "'#{item}'"
+    end
+  end
+
+  def literal_sparql_key(item)
+    if uri? item or item.include? ":"
+        return false
+    end
+    return true
+  end
+
+  def uri?(string)
+    uri = URI.parse(string)
+    %w( http https ).include?(uri.scheme)
+  rescue URI::BadURIError
+    false
+  rescue URI::InvalidURIError
+    false
   end
 
 end

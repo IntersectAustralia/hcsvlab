@@ -69,6 +69,12 @@ module NavigationHelpers
       when /^the catalog annotations page for "(.*)"$/
         catalog_annotations_path($1, options)
 
+      when /^the catalog annotation properties page for "(.*)"$/
+        catalog_annotation_properties_path($1, options)
+
+      when /^the catalog annotation types page for "(.*)"$/
+        catalog_annotation_types_path($1, options)
+
       when /^the catalog primary text page for "(.*)"$/
         catalog_primary_text_path($1, options)
 
