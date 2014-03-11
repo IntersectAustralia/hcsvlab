@@ -28,11 +28,11 @@ module JsonCompare
 
       # the rest of the larger array
       if inters == old_array_length
-        (inters..new_array_length).each do |n|
+        (inters..new_array_length-1).each do |n|
           result[:append][n] = new_array[n]
         end
       else
-        (inters..old_array_length).each do |n|
+        (inters..old_array_length-1).each do |n|
           result[:remove][n] = old_array[n]
         end
       end

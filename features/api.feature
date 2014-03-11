@@ -150,6 +150,7 @@ Feature: Browsing via API
       | $..['cooee:register']           | Private Written                                           |
       | $..['cooee:texttype']           | Private Correspondence                                    |
       | $..['bibo:pages']               | 10-11                                                     |
+      | $..['hcsvlab:sparqlEndpoint']   | http://localhost:8984/openrdf-sesame/repositories/cooee   |
       | $..['hcsvlab:annotations_url']  | http://example.org/catalog/cooee:1-001/annotations.json   |
       | $..['hcsvlab:primary_text_url'] | http://example.org/catalog/cooee:1-001/primary_text.json  |
 
@@ -173,6 +174,7 @@ Feature: Browsing via API
       | $..['austalk:prototype']        | 11_1                                                                |
       | $..['austalk:session']          | 1                                                                   |
       | $..['austalk:version']          | 1.6                                                                 |
+      | $..['hcsvlab:sparqlEndpoint']   | http://localhost:8984/openrdf-sesame/repositories/austalk           |
       | $..['hcsvlab:primary_text_url'] | No primary text found                                               |
     And the JSON response should not have
       | json_path                       | text                                                                |
@@ -822,7 +824,7 @@ Feature: Browsing via API
     Then I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"Parameters 'collection' and 'query' are required."}
+    {"error":"Parameter 'collection' or SERVICE keyword in query is required."}
     """
 
   Scenario: Send sparql query without specifying the query.
@@ -837,7 +839,7 @@ Feature: Browsing via API
     Then I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"Parameters 'collection' and 'query' are required."}
+    {"error":"Parameter 'query' is required."}
     """
 
   Scenario: Send sparql query to a collection I have no access.
@@ -850,6 +852,18 @@ Feature: Browsing via API
       | collection  | query                       |
       | austlit     | select * where {?s ?p ?o}   |
     Then I should get a 403 response code
+
+  Scenario: Send sparql query to a collection I have no access by using the service keyword.
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | collection | query                                                                                                                            |
+      | cooee      | select * where {SERVICE <http://localhost:8984/openrdf-sesame/repositories/austlit> {?s <http://purl.org/dc/terms/isPartOf> ?o}} |
+    Then I should get a 403 response code
+
 
   Scenario: Send sparql query to a collection that does not exists.
     When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
@@ -891,6 +905,36 @@ Feature: Browsing via API
     }
     """
 
+  Scenario: Send sparql query to retrieve an item identifier by using Service keyword
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | accessType  |
+      | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | query                                                                                                                                                                             |
+      | select * where {SERVICE <http://localhost:8984/openrdf-sesame/repositories/cooee> {<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/identifier> ?o}}  |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "head":{
+        "vars":[
+          "o"
+        ]
+      },
+      "results":{
+        "bindings":[
+          {
+            "o":{
+              "type":"literal",
+              "value":"1-001"
+            }
+          }
+        ]
+      }
+    }
+    """
+
   Scenario: Send sparql query to retrieve all items' collection name
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "cooee:1-002" with id "hcsvlab:2"
@@ -898,7 +942,7 @@ Feature: Browsing via API
       | collectionName  | accessType  |
       | cooee           | read        |
     When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection | query                                                                                                        |
+      | collection | query                                                      |
       | cooee      | select * where {?s <http://purl.org/dc/terms/isPartOf> ?o} |
     Then I should get a 200 response code
     And the JSON response should be:
@@ -931,6 +975,77 @@ Feature: Browsing via API
               "type":"uri",
               "value":"http://ns.ausnc.org.au/corpora/cooee"
             }
+          }
+        ]
+      }
+    }
+    """
+
+  Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using Service keyword
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | collection | query                                                                                                                                                                          |
+      | cooee      | SELECT * {{<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/isPartOf> ?o} UNION {SERVICE <http://localhost:8984/openrdf-sesame/repositories/austlit> {<http://ns.ausnc.org.au/corpora/austlit/items/adaessa.xml> <http://purl.org/dc/terms/isPartOf> ?o}}} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "head":{
+        "vars":[
+          "o"
+        ]
+      },
+      "results":{
+        "bindings":[
+          {
+            "o":{
+              "type":"uri",
+              "value":"http://ns.ausnc.org.au/corpora/cooee"
+            }
+          },
+          {
+            "o":{
+              "type":"uri",
+              "value":"http://ns.ausnc.org.au/corpora/austlit"
+            }
+          }
+        ]
+      }
+    }
+    """
+
+  Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using wrong Service with Silent keyword
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+      | collection | query                                                                                                                                                                          |
+      | cooee      | SELECT ?o {{<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/isPartOf> ?o} UNION {SERVICE SILENT <http://localhost:8984/openrdf-sesame/repositories/notexists> {?s ?p ?o}}} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "head":{
+        "vars":[
+          "o"
+        ]
+      },
+      "results":{
+        "bindings":[
+          {
+            "o":{
+              "type":"uri",
+              "value":"http://ns.ausnc.org.au/corpora/cooee"
+            }
+          },
+          {
+            "1":{}
           }
         ]
       }

@@ -715,7 +715,11 @@ module Blacklight::BlacklightHelperBehavior
     uri = buildURI(collection_id, 'rdfMetadata')
     graph = RDF::Graph.load(uri)
 
+    collectionName = Collection.find_and_load_from_solr({id:collection_id}).first.flat_name
+
     fields = graph.statements.map { |i| {collection_label(MetadataHelper::short_form(i.predicate)) => collection_value(graph, i.predicate)} }.uniq
+    fields << {'sparql endpoint'=>"#{SESAME_CONFIG["url"].to_s}/repositories/#{collectionName}"}
+    fields
   end
 
   def collection_label(key)

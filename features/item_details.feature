@@ -22,29 +22,30 @@ Feature: Displaying Items
     And I should see "Documents"
     And I should see link "eng" to "http://www-01.sil.org/iso639-3/documentation.asp?id=eng"
     And I should see fields displayed
-      | field                                     | value                                 |
-      | Collection                                | cooee                                 |
-      | Created                                   | 10/11/1791                            |
-      | Collection                                | cooee                                 |
-      | Word Count                                | 924                                   |
-      | Mode                                      | unspecified                           |
-      | Speech Style                              | unspecified                           |
-      | Interactivity                             | unspecified                           |
-      | Communication Context                     | unspecified                           |
-      | Discourse Type                            | letter                                |
-      | Discourse Type                            | unspecified                           |
-      | Language (ISO 639-3 Code)                 | eng                                   |
-      | Audience                                  | unspecified                           |
-      | Documents                                 | 1-001#Original, 1-001#Raw, 1-001#Text |
-      | Type                                      | Original, Raw, Text                   |
-      | Extent                                    | 5126, 5126, 4960                      |
-      | register                                  | Private Written                       |
-      | texttype                                  | Private Correspondence                |
-      | http_ns_ausnc_org_au_schemas_localityName | New_South_Wales                       |
-      | source                                    | Niall, 1998                           |
-      | pages                                     | 10-11                                 |
-      | speaker                                   | 1-001addressee, 1-001author           |
-      | Date Group                                | 1790 - 1799                           |
+      | field                                     | value                                                   |
+      | Collection                                | cooee                                                   |
+      | Created                                   | 10/11/1791                                              |
+      | Collection                                | cooee                                                   |
+      | Word Count                                | 924                                                     |
+      | Mode                                      | unspecified                                             |
+      | Speech Style                              | unspecified                                             |
+      | Interactivity                             | unspecified                                             |
+      | Communication Context                     | unspecified                                             |
+      | Discourse Type                            | letter                                                  |
+      | Discourse Type                            | unspecified                                             |
+      | Language (ISO 639-3 Code)                 | eng                                                     |
+      | Audience                                  | unspecified                                             |
+      | Documents                                 | 1-001#Original, 1-001#Raw, 1-001#Text                   |
+      | Type                                      | Original, Raw, Text                                     |
+      | Extent                                    | 5126, 5126, 4960                                        |
+      | register                                  | Private Written                                         |
+      | texttype                                  | Private Correspondence                                  |
+      | http_ns_ausnc_org_au_schemas_localityName | New_South_Wales                                         |
+      | source                                    | Niall, 1998                                             |
+      | pages                                     | 10-11                                                   |
+      | speaker                                   | 1-001addressee, 1-001author                             |
+      | Date Group                                | 1790 - 1799                                             |
+      | SPARQL endpoint                           | http://localhost:8984/openrdf-sesame/repositories/cooee |
     And I should not see "Development Extras"
 
   Scenario: Verify presence of every faceted field

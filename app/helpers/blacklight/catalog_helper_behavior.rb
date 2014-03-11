@@ -2,6 +2,7 @@
 module Blacklight::CatalogHelperBehavior
 
   HCSVLAB_PREFIX = "hcsvlab"
+  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
 
   # Pass in an RSolr::Response (or duck-typed similar) object,
   # it translates to a Kaminari-paginatable
@@ -145,6 +146,7 @@ module Blacklight::CatalogHelperBehavior
         metadataHash[key] = render_document_show_field_value(document, :field => solr_fname)
       end
     end
+
     do_not_display = {'id' => nil,
                       'timestamp' => nil,
                       MetadataHelper::short_form(MetadataHelper::RDF_TYPE) + '_tesim' => nil,
@@ -267,6 +269,9 @@ module Blacklight::CatalogHelperBehavior
     #  end
     #end
 
+    #Add SPARQL endpoint
+    collectionName = Array(document[MetadataHelper::short_form(MetadataHelper::COLLECTION)]).first
+    metadataHash["#{HCSVLAB_PREFIX}:sparqlEndpoint"] = "#{SESAME_CONFIG["url"].to_s}/repositories/#{collectionName}"
 
 
     itemInfo = ItemInfo.new

@@ -63,6 +63,10 @@
         %dd.blacklight= format_duplicates(v)
       - else
         %dd.blacklight= format_value(v)
+  %dt{:class => "blacklight-sparql_endpoint"}
+    = "SPARQL endpoint"
+  %dd{:class => "blacklight-sparql_endpoint"}
+    = raw @itemInfo.metadata['hcsvlab:sparqlEndpoint'].to_s
 
 - if Rails.env.development?
   %h3
