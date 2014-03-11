@@ -32,7 +32,7 @@ Feature: Collections
     And I should see "Is Part Of: Australian National Corpus - http://www.ausnc.org.au "
     And I should see "Language: eng"
     And I should see "Owner: University of Queensland. "
-    And I should see "sparql endpoint: http://localhost:8984/openrdf-sesame/repositories/austlit"
+    And I should see "SPARQL Endpoint: http://localhost:8984/openrdf-sesame/repositories/austlit"
     And I should not see "Back to Licence Agreements"
 
   @javascript
@@ -49,5 +49,5 @@ Feature: Collections
     And I should see "Extent: 1353 text samples, 2,000,000 words "
     And I should see "Language: eng"
     And I should see "Owner: None. Individual owner is Clemens Fritz. "
-    And I should see "sparql endpoint: http://localhost:8984/openrdf-sesame/repositories/cooee"
+    And I should see "SPARQL Endpoint: http://localhost:8984/openrdf-sesame/repositories/cooee"
     And I should not see "Back to Licence Agreements"
