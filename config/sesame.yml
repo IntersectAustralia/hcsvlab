@@ -3,14 +3,14 @@ development:
 test: &TEST
   url: http://localhost:8984/openrdf-sesame
 qa:
-  url: http://localhost:8080/openrdf-sesame
+  url: http://ic2-hcsvlab-test4-vm.intersect.org.au:8080/openrdf-sesame
 qa2:
-  url: http://localhost:8080/openrdf-sesame
+  url: http://ic2-hcsvlab-qa2-vm.intersect.org.au:8080/openrdf-sesame
 staging:
-  url: http://localhost:8080/openrdf-sesame
+  url: http://ic2-hcsvlab-staging1-vm.intersect.org.au:8080/openrdf-sesame
 staging2:
-  url: http://localhost:8080/openrdf-sesame
+  url: http://ic2-hcsvlab-staging2-vm.intersect.org.au:8080/openrdf-sesame
 production:
-  url: http://localhost:8080/openrdf-sesame
+  url: http://hcsvlab-prod-webapp.intersect.org.au:8080/openrdf-sesame
 cucumber:
   <<: *TEST
