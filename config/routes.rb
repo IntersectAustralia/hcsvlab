@@ -11,12 +11,13 @@ HcsvlabWeb::Application.routes.draw do
   get "catalog/searchable_fields", :to => 'catalog#searchable_fields', :as => 'catalog_searchable_fields'
   get 'catalog/sparql', :to => 'catalog#sparqlQuery', :as => 'catalog_sparqlQuery'
 
-  Blacklight.add_routes(self)
 
   # We need to override this routes defined by the method 'Blacklight.add_routes' in order to add the constraints.
-  resources :solr_document,  :path => 'catalog', :controller => 'catalog', :only => [:show, :update] , :constraints => catalogRoutesConstraintsIncludingJson
+  resources :solr_document,  :path => 'catalog', :controller => 'catalog', :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
   # :show and :update are for backwards-compatibility with catalog_url named routes
   resources :catalog, :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
+
+  Blacklight.add_routes(self)
 
   get "catalog/:id/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text', :constraints => catalogRoutesConstraints
   get "catalog/:id/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/, :constraints => catalogRoutesConstraints

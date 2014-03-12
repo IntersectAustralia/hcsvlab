@@ -1,0 +1,21 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://ns.ausnc.org.au/corpora/rirusyd/items/A_x1.5m_z0.5m> a ausnc:AusNCObject ;
+    ausnc:Creator "Densil Cabrera" ;
+    ausnc:document <http://ns.ausnc.org.au/corpora/rirusyd/source/A_x1.5m_z0.5m#Audio> ;
+    dc:identifier "A_x1.5m_z0.5m" ;
+    dc:isPartOf corpus:rirusyd ;
+    dc:source "Densil Cabrera, The University of Sydney" ;
+    dc:title "A Furnished Office Binaural Room Impulse Response source 1.5m horizontal distance, 0.5m elevation" .
+
+<http://ns.ausnc.org.au/corpora/rirusyd/source/A_x1.5m_z0.5m#Audio> a foaf:Document ;
+    dc:extent 383300 ;
+    dc:identifier "A_x1.5m_z0.5m.wav" ;
+    dc:source <file:///data_hcsvlab/rirusyd/A_x1.5m_z0.5m.wav> ;
+    dc:title "A_x1.5m_z0.5m#Audio" ;
+    dc:type "Audio" .
+

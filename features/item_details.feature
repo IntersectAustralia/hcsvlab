@@ -11,6 +11,7 @@ Feature: Displaying Items
       | collectionName  | accessType  |
       | cooee           | read        |
       | custom          | read        |
+      | rirusyd         | read        |
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
 
@@ -71,3 +72,21 @@ Feature: Displaying Items
       | Discourse Type                            | singing                               |
       | Language (ISO 639-3 Code)                 | eng                                   |
       | Type                                      | Original, Raw, Text                   |
+
+  Scenario: Verify items with special characters in its id (1 dot, 2 underscores)
+    Given I ingest "rirusyd:A_x3m_z0.34m" with id "hcsvlab:1"
+    Given I am on the catalog page for "rirusyd:A_x3m_z0.34m"
+    Then I should see "rirusyd:A_x3m_z0.34m"
+    And I should see fields displayed
+      | field          | value                 |
+      | Identifier     | A_x3m_z0.34m          |
+      | Creator        | Densil Cabrera        |
+
+  Scenario: Verify items with special characters in its id (2 dots, 2 underscores)
+    Given I ingest "rirusyd:A_x1.5m_z0.5m" with id "hcsvlab:1"
+    Given I am on the catalog page for "rirusyd:A_x1.5m_z0.5m"
+    Then I should see "rirusyd:A_x1.5m_z0.5m"
+    And I should see fields displayed
+      | field          | value                 |
+      | Identifier     | A_x1.5m_z0.5m         |
+      | Creator        | Densil Cabrera        |
