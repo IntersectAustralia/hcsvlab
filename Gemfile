@@ -122,7 +122,6 @@ gem 'json-ld'
 gem 'sparql'
 
 gem 'request_exception_handler'
-gem 'will_paginate'
 
 # Capistrano stuff
 gem 'rvm-capistrano'
