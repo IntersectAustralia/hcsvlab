@@ -3,6 +3,8 @@ module MetricCalculator
   REGISTERED_USERS_METRIC_NAME = "Number of registered users with role 'researcher'"
   TOTAL_RESEARCHER_VISITS_METRIC_NAME = "Total number of visits by users with role 'researcher'"
   TOTAL_DURATION_RESEARCHER_VISITS_METRIC_NAME = "Total duration of use by users with role 'researcher' (minutes)"
+  TOTAL_SEARCHES_MERIC_NAME = "Total number of searches made"
+  TRIPLESTORE_SEARCHES_MERIC_NAME = "Total number of triplestore searches made"
 
   #
   # get an array containing all the metrics
@@ -12,6 +14,8 @@ module MetricCalculator
     self.add_registered_users_metrics(metrics)
     self.add_total_researcher_visits_metrics(metrics)
     self.add_total_duration_researcher_visits_metrics(metrics)
+    self.add_total_searches_metrics(metrics)
+    self.add_triplestore_searches_metrics(metrics)
     return metrics
   end
 
@@ -23,6 +27,8 @@ module MetricCalculator
     self.add_latest_registered_users_metric(metrics)
     self.add_latest_total_researcher_visits_metric(metrics)
     self.add_latest_total_duration_researcher_visits_metric(metrics)
+    self.add_latest_total_searches_metric(metrics)
+    self.add_latest_triplestore_searches_metric(metrics)
     return metrics.sort_by { |item| item[:metric] }
   end
 
@@ -92,6 +98,54 @@ module MetricCalculator
       sessions.each {|s| value += s.duration}
       cumulative += value
       metrics.push( {:metric => TOTAL_DURATION_RESEARCHER_VISITS_METRIC_NAME, :week_ending => week.strftime("%d/%m/%Y"), :value => (value/60).round(2), :cumulative_value => (cumulative/60).round(2)} )
+      week += 1.week
+    end
+  end
+
+  def self.add_latest_total_searches_metric(metrics)
+    week = Time.now.end_of_week(start_day = :saturday)
+    value = UserSearch.joins(:user).where('user_searches.search_time < ? and user_searches.search_time > ? and user_searches.search_type = ?',
+      week.utc, week.utc - 1.week, SearchType::MAIN_SEARCH).count
+    metrics.push( {:metric => TOTAL_SEARCHES_MERIC_NAME, :week_ending => week, :value => value} )
+  end
+
+  def self.add_total_searches_metrics(metrics)
+    unless UserSearch.first.nil?
+      week = UserSearch.order(:search_time).first.search_time.end_of_week(start_day = :saturday)
+    else
+      return
+    end
+
+    cumulative = 0
+    while week < Date.today + 1.week
+      value = UserSearch.joins(:user).where('user_searches.search_time < ? and user_searches.search_time > ? and user_searches.search_type = ?',
+        week.utc, week.utc - 1.week, SearchType::MAIN_SEARCH).count
+      cumulative += value
+      metrics.push( {:metric => TOTAL_SEARCHES_MERIC_NAME, :week_ending => week.strftime("%d/%m/%Y"), :value => value, :cumulative_value => cumulative} )
+      week += 1.week
+    end
+  end
+
+  def self.add_latest_triplestore_searches_metric(metrics)
+    week = Time.now.end_of_week(start_day = :saturday)
+    value = UserSearch.joins(:user).where('user_searches.search_time < ? and user_searches.search_time > ? and user_searches.search_type = ?',
+      week.utc, week.utc - 1.week, SearchType::TRIPLESTORE_SEARCH).count
+    metrics.push( {:metric => TRIPLESTORE_SEARCHES_MERIC_NAME, :week_ending => week, :value => value} )
+  end
+
+  def self.add_triplestore_searches_metrics(metrics)
+    unless UserSearch.first.nil?
+      week = UserSearch.order(:search_time).first.search_time.end_of_week(start_day = :saturday)
+    else
+      return
+    end
+
+    cumulative = 0
+    while week < Date.today + 1.week
+      value = UserSearch.joins(:user).where('user_searches.search_time < ? and user_searches.search_time > ? and user_searches.search_type = ?',
+        week.utc, week.utc - 1.week, SearchType::TRIPLESTORE_SEARCH).count
+      cumulative += value
+      metrics.push( {:metric => TRIPLESTORE_SEARCHES_MERIC_NAME, :week_ending => week.strftime("%d/%m/%Y"), :value => value, :cumulative_value => cumulative} )
       week += 1.week
     end
   end

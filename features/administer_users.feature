@@ -171,6 +171,13 @@ Feature: Administer users
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
       | 14_DAYS_AGO  | 60                  |
+    And "researcher1@intersect.org.au" has the following past searches
+      | search_time | type        | 
+      | 0_DAYS_AGO  | main        |
+      | 0_DAYS_AGO  | main        |
+      | 0_DAYS_AGO  | main        |
+      | 0_DAYS_AGO  | triplestore |
+      | 14_DAYS_AGO | main        |
     And "researcher2@intersect.org.au" has the following past sessions
       | sign_in_time | duration_in_minutes |
       | 0_DAYS_AGO   | 30                  |
@@ -183,6 +190,8 @@ Feature: Administer users
       | Metric                                                          | Value |
       | Number of registered users with role 'researcher'               | 2     |
       | Total duration of use by users with role 'researcher' (minutes) | 50.0  |
+      | Total number of searches made                                   | 3     |
+      | Total number of triplestore searches made                       | 1     |
       | Total number of visits by users with role 'researcher'          | 3     |
 
   Scenario: Download metrics CSV
@@ -198,6 +207,13 @@ Feature: Administer users
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
       | 14_DAYS_AGO  | 60                  |
+    And "researcher1@intersect.org.au" has the following past searches
+      | search_time | type        | 
+      | 0_DAYS_AGO  | main        |
+      | 0_DAYS_AGO  | main        |
+      | 0_DAYS_AGO  | main        |
+      | 0_DAYS_AGO  | triplestore |
+      | 14_DAYS_AGO | main        |
     And "researcher2@intersect.org.au" has the following past sessions
       | sign_in_time | duration_in_minutes |
       | 0_DAYS_AGO   | 30                  |
@@ -209,11 +225,18 @@ Feature: Administer users
     """
     metric,week_ending,value,cumulative_value
     Number of registered users with role 'researcher'
+    2,2
     Total number of visits by users with role 'researcher'
-    Total duration of use by users with role 'researcher' (minutes)
     1,1
     2,3
     3,6
+    Total number of searches made
+    1,1
+    0,1
+    3,4
+    Total number of triplestore searches made
+    1,1
+    Total duration of use by users with role 'researcher' (minutes)
     60.0,60.0
     60.0,120.0
     50.0,170.0

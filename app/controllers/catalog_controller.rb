@@ -270,6 +270,11 @@ class CatalogController < ApplicationController
   # override default index method
   def index
     begin
+      if params[:q].present? or params[:f].present? or params[:metadata].present?
+        search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::MAIN_SEARCH)
+        search.user = current_user
+        search.save
+      end
       metadataSearchParam = params[:metadata]
       if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
         if (metadataSearchParam.include?(":"))
@@ -359,6 +364,9 @@ class CatalogController < ApplicationController
   #
   def search
     request.format = 'json'
+    search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::MAIN_SEARCH)
+    search.user = current_user
+    search.save
     metadataSearchParam = params[:metadata]
     if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
       if (metadataSearchParam.include?(":"))
@@ -719,6 +727,10 @@ class CatalogController < ApplicationController
         format.json { render :json => {:error => "Parameter 'query' is required."}.to_json, :status => 412 and return}
       end
     end
+
+    search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::TRIPLESTORE_SEARCH)
+    search.user = current_user
+    search.save
 
     # In a sparql query the user can specify the keyword SERVICE in order
     # to make a query in a particular repository.

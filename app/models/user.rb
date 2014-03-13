@@ -8,6 +8,7 @@ class User < ActiveRecord::Base
 
   belongs_to :role
   has_many :user_sessions
+  has_many :user_searches
   has_many :item_lists
   has_many :user_licence_agreements
   has_many :user_licence_requests
