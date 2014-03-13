@@ -198,7 +198,7 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "cooee:something" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
     Then the JSON response should be:
     """
@@ -663,6 +663,64 @@ Feature: Browsing via API
     When I make a JSON request for the catalog annotations page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
+  Scenario: Get annotation properties for an item
+    Given I ingest "cooee:1-002" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    When I make a JSON request for the catalog annotation properties page for "cooee:1-002" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "item_url": "http://example.org/catalog/cooee:1-002",
+      "annotation_properties": [
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "http://ns.ausnc.org.au/schemas/cooee/val",
+        "http://purl.org/dada/schema/0.2#partof",
+        "http://purl.org/dada/schema/0.2#targets",
+        "http://purl.org/dada/schema/0.2#type",
+        "http://purl.org/dada/schema/0.2#end",
+        "http://purl.org/dada/schema/0.2#start"
+      ]
+    }
+    """
+
+  Scenario: Get annotation properties for an item that doesn't have annotations
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
+    When I make a JSON request for the catalog annotation properties page for "auslit:adaessa" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+
+  Scenario: Get annotations properties for item that doesn't exist
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON request for the catalog annotation properties page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+
+  Scenario: Get annotation types for an item
+    Given I ingest "cooee:1-002" with id "hcsvlab:1"
+    Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
+    When I make a JSON request for the catalog annotation types page for "cooee:1-002" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "item_url": "http://example.org/catalog/cooee:1-002",
+      "annotation_types": [
+        "phonetic"
+      ]
+    }
+    """
+
+  Scenario: Get annotation types for an item that doesn't have annotations
+    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
+    When I make a JSON request for the catalog annotation types page for "auslit:adaessa" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+
+  Scenario: Get annotations types for item that doesn't exist
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    When I make a JSON request for the catalog annotation types page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 404 response code
+
   Scenario: Get specific annotations for item by label
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
@@ -718,6 +776,48 @@ Feature: Browsing via API
         }
       ]
     }
+    """
+
+  Scenario: Get annotations for item using extra properties
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with params
+      | dada:start | dada:targets                                             |
+      | 2460       | http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1L |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "@context": "http://example.org/schema/json-ld",
+      "commonProperties": {
+        "hcsvlab:annotates": "http://example.org/catalog/cooee:1-001/primary_text.json"
+      },
+      "hcsvlab:annotations": [
+        {
+          "@id": "http://ns.ausnc.org.au/corpora/cooee/annotation/1-001/1",
+          "type": "ellipsis",
+          "@type": "TextAnnotation",
+          "end": "2460",
+          "start": "2460"
+        }
+      ]
+    }
+    """
+
+  Scenario: Get annotations for item using invalid property
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+    When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with params
+      | property |
+      | test     |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"error in query parameters"}
     """
 
   Scenario: Get annotations for item including a user uploaded one
