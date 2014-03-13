@@ -1,0 +1,21 @@
+@prefix RIRUSYD: <http://ns.ausnc.org.au/corpus/RIRUSYD/RIRUSYD> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix marcrel: <http://www.loc.gov/loc.terms/relators/> .
+
+
+RIRUSYD:
+	a dcmitype:Collection ;
+    dc:title "Room Impulse Responses from Acoustics Research Group, The University of Sydney" ;
+    dcterms:alternative "RIRUSYD" ;
+	dcterms:abstract "Various measured room impulse responses, some using an omnidirectional microphone, some using a binaural microphone (either KEMAR, B&K4100 or B&K4128C). Oral-binaural impulse responses are measured from the mouth to ears of the one head and torso simulator. Rooms range from very small to very large. Some measurements are made in the one room, at different distances from source, and sometimes different sound absorptive treatment." ;
+    dcterms:itemType "Measured room impulse responses" ;
+	dc:creator "Densil Cabrera" ;
+    dcterms:contributor "Densil Cabrera, Doheon Lee, Manuj Yadav, Luis Miranda Jofre, Ralph Collins.";
+    dcterms:extent "892" ;
+	marcrel:OWN "The University of Sydney" ;
+    dc:subject "120104" ;
+	dcterms:accessRights "Creative commons" ;        
+	dcterms:language "eng" ;
+	.

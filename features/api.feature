@@ -198,7 +198,7 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
+    When I make a JSON request for the catalog page for "cooee:something" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
     Then the JSON response should be:
     """
