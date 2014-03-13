@@ -673,13 +673,34 @@ Feature: Browsing via API
     {
       "item_url": "http://example.org/catalog/cooee:1-002",
       "annotation_properties": [
-        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "http://ns.ausnc.org.au/schemas/cooee/val",
-        "http://purl.org/dada/schema/0.2#partof",
-        "http://purl.org/dada/schema/0.2#targets",
-        "http://purl.org/dada/schema/0.2#type",
-        "http://purl.org/dada/schema/0.2#end",
-        "http://purl.org/dada/schema/0.2#start"
+        {
+          "uri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "shortened_uri": "rdf:type"
+        },
+        {
+          "uri": "http://ns.ausnc.org.au/schemas/cooee/val",
+          "shortened_uri": "ns1:val"
+        },
+        {
+          "uri": "http://purl.org/dada/schema/0.2#partof",
+          "shortened_uri": "dada:partof"
+        },
+        {
+          "uri": "http://purl.org/dada/schema/0.2#targets",
+          "shortened_uri": "dada:targets"
+        },
+        {
+          "uri": "http://purl.org/dada/schema/0.2#type",
+          "shortened_uri": "dada:type"
+        },
+        {
+          "uri": "http://purl.org/dada/schema/0.2#end",
+          "shortened_uri": "dada:end"
+        },
+        {
+          "uri": "http://purl.org/dada/schema/0.2#start",
+          "shortened_uri": "dada:start"
+        }
       ]
     }
     """

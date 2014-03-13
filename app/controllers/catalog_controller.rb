@@ -926,22 +926,7 @@ class CatalogController < ApplicationController
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(corpus)
 
-    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{item.collection.flat_name}/namespaces")
-
-    # Send the request to the sparql endpoint.
-    req = Net::HTTP::Get.new(uri)
-    req.add_field("accept", "application/json")
-    res = Net::HTTP.new(uri.host, uri.port).start do |http|
-      http.request(req)
-    end
-
-    # If sesame returns an error, then we show the error received by sesame
-    if (!res.is_a?(Net::HTTPSuccess))
-      Rails.logger.error(res.body)
-      raise Exception.new
-    else
-      namespaces = Hash[JSON.parse(res.body)["results"]["bindings"].collect { |entry| [entry["prefix"]["value"], entry["namespace"]["value"]]}]
-    end
+    namespaces = RdfNamespace.get_namespaces(item.collection.flat_name)
 
     prefixes = ""
     namespaces.each do |k, v|
@@ -1110,8 +1095,11 @@ class CatalogController < ApplicationController
     sols = repo.sparql_query(query)
     props = sols.select(:property).distinct
 
+    namespaces = RdfNamespace.get_namespaces(item.collection.flat_name)
     props.each do |sol|
-        properties.push(sol[:property].to_s)
+        entry = {:uri => sol[:property].to_s}
+        entry[:shortened_uri] = RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) if RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) != entry[:uri]
+        properties.push(entry)
     end
     properties
   end
