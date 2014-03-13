@@ -157,3 +157,34 @@ Feature: Administer users
     And I should see "Total duration of use by users with role 'researcher' in the last week is 0 hours"
     And I should see "Average frequency of use per week by users with role 'researcher' is 0 total number of visits."
     And I should see "Average duration of use per week by users with role 'researcher' is 0 hours per user"
+
+  Scenario: View metrics table
+    Given I am on the admin page
+    And I have users
+      | email                        | first_name | last_name |
+      | researcher1@intersect.org.au | Researcher | One       |
+      | researcher2@intersect.org.au | Researcher | Two       |
+    And "researcher1@intersect.org.au" has role "researcher"
+    And "researcher2@intersect.org.au" has role "researcher"
+    And "researcher1@intersect.org.au" has the following past sessions
+      | sign_in_time | duration_in_minutes |
+      | 0_DAYS_AGO   | 10                  |
+      | 7_DAYS_AGO   | 30                  |
+      | 14_DAYS_AGO  | 60                  |
+    And "researcher2@intersect.org.au" has the following past sessions
+      | sign_in_time | duration_in_minutes |
+      | 0_DAYS_AGO   | 30                  |
+      | 0_DAYS_AGO   | 10                  |
+      | 7_DAYS_AGO   | 30                  |
+    And I click "View Metrics"
+    Then I should be on the view metrics page
+    And I should see "Metrics"
+    And I should see "metrics" table with
+      | Metric                                                          | Value | Cumulative Value |
+      | Number of registered users with role 'researcher'               | 2     | 2                |
+      | Total number of visits by users with role 'researcher'          | 3     | 6                |
+      | Total duration of use by users with role 'researcher' (minutes) | 50.0  | 170.0            |
+      | Total number of visits by users with role 'researcher'          | 2     | 3                |
+      | Total duration of use by users with role 'researcher' (minutes) | 60.0  | 120.0            |
+      | Total number of visits by users with role 'researcher'          | 1     | 1                |
+      | Total duration of use by users with role 'researcher' (minutes) | 60.0  | 60.0             |

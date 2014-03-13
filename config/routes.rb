@@ -126,6 +126,8 @@ HcsvlabWeb::Application.routes.draw do
         end
       end
 
+      get "metrics", :to => 'admin#metrics', :as => 'view_metrics'
+
     end
   end
 end

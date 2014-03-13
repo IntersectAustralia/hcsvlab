@@ -120,6 +120,9 @@ module NavigationHelpers
       when /^the licence requests page$/
         user_licence_requests_path(options)
 
+      when /^the view metrics page$/
+        view_metrics_admin_index_path(options)
+
 
 
 # Add more mappings here.

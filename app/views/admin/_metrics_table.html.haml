@@ -1,0 +1,15 @@
+%table#metrics.table.table-condensed
+  %thead
+    %tr
+      %th.metric Metric
+      %th.week_ending Week Ending
+      %th.value Value
+      %th.cumulative_value Cumulative Value
+  %tbody
+    - @metrics.each do |metric|
+      %tr
+        %td= metric[:metric]
+        %td= metric[:week_ending].strftime("%d/%m/%Y")
+        %td= metric[:value]
+        %td= metric[:cumulative]
+= will_paginate @metrics
