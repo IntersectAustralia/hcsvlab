@@ -8,7 +8,7 @@ cooee:
  corpus_prefix: http://ns.ausnc.org.au/schemas/cooee/
 
 gcsause:
- corpus_prefix: http://ns.ausnc.org.au/schemas/http://ns.ausnc.org.au/schemas/gcsause//
+ corpus_prefix: http://ns.ausnc.org.au/schemas/gcsause/
 
 ace:
  corpus_prefix: http://ns.ausnc.org.au/schemas/ace/
