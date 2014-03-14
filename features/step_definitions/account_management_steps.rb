@@ -83,3 +83,14 @@ Given(/^"(.*?)" has the following past sessions$/) do |email, table|
     s.save
   end
 end
+
+Given(/^"(.*?)" has the following past searches$/) do |email, table|
+  user = User.find_by_email(email)
+  table.hashes.each do |row|
+    days_ago = row[:search_time].scan(/\d/).join('')
+    s = UserSearch.new(:search_time => days_ago.to_i.days.ago)
+    s.search_type = row[:type]
+    s.user = user
+    s.save
+  end
+end
