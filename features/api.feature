@@ -933,30 +933,15 @@ Feature: Browsing via API
   #### SPARQL ENDPOINT TESTS                                                                             ####
   ###########################################################################################################
 
-  Scenario: Send sparql query without specifying the collection.
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
-    Given I have user "researcher1@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | query                       |
-      | select * where {?s ?p ?o}   |
-    Then I should get a 412 response code
-    And the JSON response should be:
-    """
-    {"error":"Parameter 'collection' or SERVICE keyword in query is required."}
-    """
-
   Scenario: Send sparql query without specifying the query.
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection  |
-      | cooee       |
+    When I make a JSON request for the catalog sparql page for collection "cooee" with the API token for "researcher1@intersect.org.au" with params
+      | query  |
+      |        |
     Then I should get a 412 response code
     And the JSON response should be:
     """
@@ -969,27 +954,31 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection  | query                       |
-      | austlit     | select * where {?s ?p ?o}   |
+    When I make a JSON request for the catalog sparql page for collection "austlit" with the API token for "researcher1@intersect.org.au" with params
+      | query                       |
+      | select * where {?s ?p ?o}   |
     Then I should get a 403 response code
 
-  Scenario: Send sparql query to a collection I have no access by using the service keyword.
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
-    Given I have user "researcher1@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection | query                                                                                                                            |
-      | cooee      | select * where {SERVICE <http://localhost:8984/openrdf-sesame/repositories/austlit> {?s <http://purl.org/dc/terms/isPartOf> ?o}} |
-    Then I should get a 403 response code
+
+#
+# In the near future we might allow the SERVICE keyword in the query. I'll leave this test for that purpose
+#
+#  Scenario: Send sparql query to a collection I have no access by using the service keyword.
+#    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+#    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+#    Given I have user "researcher1@intersect.org.au" with the following groups
+#      | collectionName  | accessType  |
+#      | cooee           | read        |
+#    When I make a JSON request for the catalog sparql page for collection "cooee" with the API token for "researcher1@intersect.org.au" with params
+#      | query                                                                                                                            |
+#      | select * where {SERVICE <http://localhost:8984/openrdf-sesame/repositories/austlit> {?s <http://purl.org/dc/terms/isPartOf> ?o}} |
+#    Then I should get a 403 response code
 
 
   Scenario: Send sparql query to a collection that does not exists.
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection  | query                      |
-      | notExists   | select * where {?s ?p ?o}  |
+    When I make a JSON request for the catalog sparql page for collection "notExists" with the API token for "researcher1@intersect.org.au" with params
+      | query                      |
+      | select * where {?s ?p ?o}  |
     Then I should get a 404 response code
     And the JSON response should be:
     """
@@ -1001,9 +990,9 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection | query                                                                                                        |
-      | cooee      | select * where {<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/identifier> ?o} |
+    When I make a JSON request for the catalog sparql page for collection "cooee" with the API token for "researcher1@intersect.org.au" with params
+      | query                                                                                                        |
+      | select * where {<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/identifier> ?o} |
     Then I should get a 200 response code
     And the JSON response should be:
     """
@@ -1025,36 +1014,39 @@ Feature: Browsing via API
       }
     }
     """
-
-  Scenario: Send sparql query to retrieve an item identifier by using Service keyword
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I have user "researcher1@intersect.org.au" with the following groups
-      | accessType  |
-      | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | query                                                                                                                                                                             |
-      | select * where {SERVICE <http://localhost:8984/openrdf-sesame/repositories/cooee> {<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/identifier> ?o}}  |
-    Then I should get a 200 response code
-    And the JSON response should be:
-    """
-    {
-      "head":{
-        "vars":[
-          "o"
-        ]
-      },
-      "results":{
-        "bindings":[
-          {
-            "o":{
-              "type":"literal",
-              "value":"1-001"
-            }
-          }
-        ]
-      }
-    }
-    """
+#
+#
+# In the near future we might allow the SERVICE keyword in the query. I'll leave this test for that purpose
+#
+#  Scenario: Send sparql query to retrieve an item identifier by using Service keyword
+#    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+#    Given I have user "researcher1@intersect.org.au" with the following groups
+#      | accessType  |
+#      | read        |
+#    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
+#      | query                                                                                                                                                                             |
+#      | select * where {SERVICE <http://localhost:8984/openrdf-sesame/repositories/cooee> {<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/identifier> ?o}}  |
+#    Then I should get a 200 response code
+#    And the JSON response should be:
+#    """
+#    {
+#      "head":{
+#        "vars":[
+#          "o"
+#        ]
+#      },
+#      "results":{
+#        "bindings":[
+#          {
+#            "o":{
+#              "type":"literal",
+#              "value":"1-001"
+#            }
+#          }
+#        ]
+#      }
+#    }
+#    """
 
   Scenario: Send sparql query to retrieve all items' collection name
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
@@ -1062,9 +1054,9 @@ Feature: Browsing via API
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection | query                                                      |
-      | cooee      | select * where {?s <http://purl.org/dc/terms/isPartOf> ?o} |
+    When I make a JSON request for the catalog sparql page for collection "cooee" with the API token for "researcher1@intersect.org.au" with params
+      | query                                                      |
+      | select * where {?s <http://purl.org/dc/terms/isPartOf> ?o} |
     Then I should get a 200 response code
     And the JSON response should be:
     """
@@ -1102,73 +1094,90 @@ Feature: Browsing via API
     }
     """
 
-  Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using Service keyword
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
-    Given I have user "researcher1@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
-      | austlit         | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection | query                                                                                                                                                                          |
-      | cooee      | SELECT * {{<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/isPartOf> ?o} UNION {SERVICE <http://localhost:8984/openrdf-sesame/repositories/austlit> {<http://ns.ausnc.org.au/corpora/austlit/items/adaessa.xml> <http://purl.org/dc/terms/isPartOf> ?o}}} |
-    Then I should get a 200 response code
-    And the JSON response should be:
-    """
-    {
-      "head":{
-        "vars":[
-          "o"
-        ]
-      },
-      "results":{
-        "bindings":[
-          {
-            "o":{
-              "type":"uri",
-              "value":"http://ns.ausnc.org.au/corpora/cooee"
-            }
-          },
-          {
-            "o":{
-              "type":"uri",
-              "value":"http://ns.ausnc.org.au/corpora/austlit"
-            }
-          }
-        ]
-      }
-    }
-    """
-
   Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using wrong Service with Silent keyword
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    When I make a JSON request for the catalog sparql page with the API token for "researcher1@intersect.org.au" with params
-      | collection | query                                                                                                                                                                          |
-      | cooee      | SELECT ?o {{<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/isPartOf> ?o} UNION {SERVICE SILENT <http://localhost:8984/openrdf-sesame/repositories/notexists> {?s ?p ?o}}} |
-    Then I should get a 200 response code
+    When I make a JSON request for the catalog sparql page for collection "cooee" with the API token for "researcher1@intersect.org.au" with params
+      | query                                                                                                                                                                          |
+      | SELECT ?o {{<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/isPartOf> ?o} UNION {SERVICE SILENT <http://localhost:8984/openrdf-sesame/repositories/notexists> {?s ?p ?o}}} |
+    Then I should get a 412 response code
     And the JSON response should be:
     """
-    {
-      "head":{
-        "vars":[
-          "o"
-        ]
-      },
-      "results":{
-        "bindings":[
-          {
-            "o":{
-              "type":"uri",
-              "value":"http://ns.ausnc.org.au/corpora/cooee"
-            }
-          },
-          {
-            "1":{}
-          }
-        ]
-      }
-    }
+    {"error":"Service keyword is forbidden in queries."}
     """
+
+#
+# In the near future we might allow the SERVICE keyword in the query. I'll leave these 2 tests for that purpose
+#
+#  Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using Service keyword
+#    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+#    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+#    Given I have user "researcher1@intersect.org.au" with the following groups
+#      | collectionName  | accessType  |
+#      | cooee           | read        |
+#      | austlit         | read        |
+#    When I make a JSON request for the catalog sparql page for collection "cooee" with the API token for "researcher1@intersect.org.au" with params
+#      | query                                                                                                                                                                          |
+#      | SELECT * {{<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/isPartOf> ?o} UNION {SERVICE <http://localhost:8984/openrdf-sesame/repositories/austlit> {<http://ns.ausnc.org.au/corpora/austlit/items/adaessa.xml> <http://purl.org/dc/terms/isPartOf> ?o}}} |
+#    Then I should get a 200 response code
+#    And the JSON response should be:
+#    """
+#    {
+#      "head":{
+#        "vars":[
+#          "o"
+#        ]
+#      },
+#      "results":{
+#        "bindings":[
+#          {
+#            "o":{
+#              "type":"uri",
+#              "value":"http://ns.ausnc.org.au/corpora/cooee"
+#            }
+#          },
+#          {
+#            "o":{
+#              "type":"uri",
+#              "value":"http://ns.ausnc.org.au/corpora/austlit"
+#            }
+#          }
+#        ]
+#      }
+#    }
+#    """
+
+#  Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using wrong Service with Silent keyword
+#    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+#    Given I have user "researcher1@intersect.org.au" with the following groups
+#      | collectionName  | accessType  |
+#      | cooee           | read        |
+#    When I make a JSON request for the catalog sparql page for collection "cooee" with the API token for "researcher1@intersect.org.au" with params
+#      | query                                                                                                                                                                          |
+#      | SELECT ?o {{<http://ns.ausnc.org.au/corpora/cooee/items/1-001> <http://purl.org/dc/terms/isPartOf> ?o} UNION {SERVICE SILENT <http://localhost:8984/openrdf-sesame/repositories/notexists> {?s ?p ?o}}} |
+#    Then I should get a 200 response code
+#    And the JSON response should be:
+#    """
+#    {
+#      "head":{
+#        "vars":[
+#          "o"
+#        ]
+#      },
+#      "results":{
+#        "bindings":[
+#          {
+#            "o":{
+#              "type":"uri",
+#              "value":"http://ns.ausnc.org.au/corpora/cooee"
+#            }
+#          },
+#          {
+#            "1":{}
+#          }
+#        ]
+#      }
+#    }
+#    """

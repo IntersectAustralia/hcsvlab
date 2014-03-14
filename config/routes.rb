@@ -10,7 +10,7 @@ HcsvlabWeb::Application.routes.draw do
 
   get "catalog/search", :to => 'catalog#search', :as => 'catalog_search'
   get "catalog/searchable_fields", :to => 'catalog#searchable_fields', :as => 'catalog_searchable_fields'
-  get 'catalog/sparql', :to => 'catalog#sparqlQuery', :as => 'catalog_sparqlQuery'
+  get 'sparql/:collection', :to => 'catalog#sparqlQuery', :as => 'catalog_sparqlQuery'
 
 
   # We need to override this routes defined by the method 'Blacklight.add_routes' in order to add the constraints.
