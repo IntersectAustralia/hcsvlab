@@ -183,6 +183,10 @@ Feature: Administer users
       | 0_DAYS_AGO   | 30                  |
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
+    And "researcher1@intersect.org.au" has item lists
+      | name  |
+      | Test  |
+      | Test2 |
     And I click "View Metrics"
     Then I should be on the view metrics page
     And I should see "Metrics"
@@ -190,6 +194,7 @@ Feature: Administer users
       | Metric                                                          | Value |
       | Number of registered users with role 'researcher'               | 2     |
       | Total duration of use by users with role 'researcher' (minutes) | 50.0  |
+      | Total number of item lists created                              | 2     |
       | Total number of searches made                                   | 3     |
       | Total number of triplestore searches made                       | 1     |
       | Total number of visits by users with role 'researcher'          | 3     |
@@ -219,6 +224,10 @@ Feature: Administer users
       | 0_DAYS_AGO   | 30                  |
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
+    And "researcher1@intersect.org.au" has item lists
+      | name  |
+      | Test  |
+      | Test2 |
     And I click "View Metrics"
     And I click "Download all weeks as CSV"
     Then I should get a CSV file called "metrics.csv" with the following metrics:
@@ -239,4 +248,6 @@ Feature: Administer users
     60.0,60.0
     60.0,120.0
     50.0,170.0
+    Total number of item lists created
+    2,2
     """

@@ -5,6 +5,7 @@ module MetricCalculator
   TOTAL_DURATION_RESEARCHER_VISITS_METRIC_NAME = "Total duration of use by users with role 'researcher' (minutes)"
   TOTAL_SEARCHES_MERIC_NAME = "Total number of searches made"
   TRIPLESTORE_SEARCHES_MERIC_NAME = "Total number of triplestore searches made"
+  ITEM_LISTS_METRIC_NAME = "Total number of item lists created"
 
   #
   # get an array containing all the metrics
@@ -16,6 +17,7 @@ module MetricCalculator
     self.add_total_duration_researcher_visits_metrics(metrics)
     self.add_total_searches_metrics(metrics)
     self.add_triplestore_searches_metrics(metrics)
+    self.add_item_list_metrics(metrics)
     return metrics
   end
 
@@ -29,6 +31,7 @@ module MetricCalculator
     self.add_latest_total_duration_researcher_visits_metric(metrics)
     self.add_latest_total_searches_metric(metrics)
     self.add_latest_triplestore_searches_metric(metrics)
+    self.add_latest_item_list_metric(metrics)
     return metrics.sort_by { |item| item[:metric] }
   end
 
@@ -59,7 +62,7 @@ module MetricCalculator
   end
 
   def self.add_total_researcher_visits_metrics(metrics)
-    results = UserSession.joins(:user).where('users.role_id = ?', Role.find_by_name(Role::RESEARCHER_ROLE)).group_by {|u| u.sign_in_time.end_of_week}
+    results = UserSession.joins(:user).where('users.role_id = ?', Role.find_by_name(Role::RESEARCHER_ROLE)).group_by {|s| s.sign_in_time.end_of_week}
     results = Hash[results.sort]
     cumulative = 0
     results.each do |week, number|
@@ -80,7 +83,7 @@ module MetricCalculator
   end
 
   def self.add_total_duration_researcher_visits_metrics(metrics)
-    results = UserSession.joins(:user).where('users.role_id = ?', Role.find_by_name(Role::RESEARCHER_ROLE)).group_by {|u| u.sign_in_time.end_of_week}
+    results = UserSession.joins(:user).where('users.role_id = ?', Role.find_by_name(Role::RESEARCHER_ROLE)).group_by {|s| s.sign_in_time.end_of_week}
     results = Hash[results.sort]
     cumulative = 0
     results.each do |week, number|
@@ -100,7 +103,7 @@ module MetricCalculator
   end
 
   def self.add_total_searches_metrics(metrics)
-    results = UserSearch.joins(:user).where('user_searches.search_type = ?', SearchType::MAIN_SEARCH).group_by {|u| u.search_time.end_of_week}
+    results = UserSearch.joins(:user).where('user_searches.search_type = ?', SearchType::MAIN_SEARCH).group_by {|s| s.search_time.end_of_week}
     results = Hash[results.sort]
     cumulative = 0
     results.each do |week, number|
@@ -119,13 +122,31 @@ module MetricCalculator
   end
 
   def self.add_triplestore_searches_metrics(metrics)
-    results = UserSearch.joins(:user).where('user_searches.search_type = ?', SearchType::TRIPLESTORE_SEARCH).group_by {|u| u.search_time.end_of_week}
+    results = UserSearch.joins(:user).where('user_searches.search_type = ?', SearchType::TRIPLESTORE_SEARCH).group_by {|s| s.search_time.end_of_week}
     results = Hash[results.sort]
     cumulative = 0
     results.each do |week, number|
       value = number.count
       cumulative += value
       metrics.push( {:metric => TRIPLESTORE_SEARCHES_MERIC_NAME, :week_ending => week.strftime("%d/%m/%Y"), :value => value, :cumulative_value => cumulative} )
+    end
+  end
+
+
+  def self.add_latest_item_list_metric(metrics)
+    week = Time.now.end_of_week
+    value = ItemList.where('created_at < ? and created_at > ?', week, week - 1.week).count
+    metrics.push( {:metric => ITEM_LISTS_METRIC_NAME, :week_ending => week, :value => value} )
+  end
+
+  def self.add_item_list_metrics(metrics)
+    results = ItemList.all.group_by {|il| il.created_at.end_of_week}
+    results = Hash[results.sort]
+    cumulative = 0
+    results.each do |week, number|
+      value = number.count
+      cumulative += value
+      metrics.push( {:metric => ITEM_LISTS_METRIC_NAME, :week_ending => week.strftime("%d/%m/%Y"), :value => value, :cumulative_value => cumulative} )
     end
   end
 
