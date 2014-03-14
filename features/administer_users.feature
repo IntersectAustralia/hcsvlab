@@ -220,7 +220,7 @@ Feature: Administer users
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
     And I click "View Metrics"
-    And I click "Download as CSV"
+    And I click "Download all weeks as CSV"
     Then I should get a CSV file called "metrics.csv" with the following metrics:
     """
     metric,week_ending,value,cumulative_value
@@ -232,7 +232,6 @@ Feature: Administer users
     3,6
     Total number of searches made
     1,1
-    0,1
     3,4
     Total number of triplestore searches made
     1,1
