@@ -1,9 +1,14 @@
 HcsvlabWeb::Application.configure do
 
+  # replace this with your tracker code
+  GA.tracker = "UA-49040235-2"
+
   # TODO: set your own correct URL for action mailer
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
   
   config.galaxy_url = 'http://localhost:8081/root'
+  #config.galaxy_url = 'http://sp.hcsvlab.qa.intersect.org.au:8081/galaxy/root'
+  #config.galaxy_url = 'http://130.220.208.112/root'
 
   # Base directory where user contributed annotations will be stored
   config.user_annotations_location = "/data/contributed_annotations/"
@@ -43,4 +48,7 @@ HcsvlabWeb::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  # Allow webrick to accept '{}' chars in query string
+  URI::DEFAULT_PARSER = URI::Parser.new(:UNRESERVED => URI::REGEXP::PATTERN::UNRESERVED + '{}')
 end
