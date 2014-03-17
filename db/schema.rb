@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140313030321) do
+ActiveRecord::Schema.define(:version => 20140317042527) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -73,12 +73,22 @@ ActiveRecord::Schema.define(:version => 20140313030321) do
     t.string   "item_identifier"
     t.boolean  "shareable"
     t.string   "file_location"
+    t.string   "annotationCollectionId"
     t.datetime "created_at",             :null => false
     t.datetime "updated_at",             :null => false
-    t.string   "annotationCollectionId"
   end
 
   add_index "user_annotations", ["user_id"], :name => "index_user_annotations_on_user_id"
+
+  create_table "user_api_calls", :force => true do |t|
+    t.datetime "request_time"
+    t.boolean  "item_list"
+    t.integer  "user_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "user_api_calls", ["user_id"], :name => "index_user_api_calls_on_user_id"
 
   create_table "user_licence_agreements", :force => true do |t|
     t.string   "group_name"

@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   #This will force a reload when the back button is pressed.
   before_filter :set_cache_buster
   before_filter :default_format_json
+  before_filter :api_check
 
   include ErrorResponseActions
   
@@ -42,6 +43,15 @@ class ApplicationController < ActionController::Base
     if request.headers["HTTP_ACCEPT"].to_s.empty? && 
       params[:format].to_s.empty?
       request.format = "json"
+    end
+  end
+
+  def api_check
+    if request.format == "json"
+      call = UserApiCall.new(:request_time => Time.now)
+      call.item_list = params[:controller] == "item_lists"
+      call.user = current_user
+      call.save
     end
   end
 

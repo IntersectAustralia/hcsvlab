@@ -94,3 +94,14 @@ Given(/^"(.*?)" has the following past searches$/) do |email, table|
     s.save
   end
 end
+
+Given(/^"(.*?)" has the following past api calls$/) do |email, table|
+  user = User.find_by_email(email)
+  table.hashes.each do |row|
+    days_ago = row[:request_time].scan(/\d/).join('')
+    c = UserApiCall.new(:request_time => days_ago.to_i.days.ago)
+    c.item_list = row[:item_list] == "true"
+    c.user = user
+    c.save
+  end
+end
