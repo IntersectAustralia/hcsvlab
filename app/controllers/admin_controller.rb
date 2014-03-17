@@ -8,6 +8,7 @@ class AdminController < ApplicationController
   def metrics
     @metrics = MetricCalculator.get_latest_metrics
 
+    @triplestore_metrics = MetricCalculator.get_triplestore_metrics
     @approved_researcher_count = User.approved_researchers.count
     @total_weekly_visits_count = UserHelper::get_total_weekly_visits
     @total_weekly_duration_count = UserHelper::get_total_weekly_duration

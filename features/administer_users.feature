@@ -158,6 +158,13 @@ Feature: Administer users
     And I should see "Average frequency of use per week by users with role 'researcher' is 0 total number of visits."
     And I should see "Average duration of use per week by users with role 'researcher' is 0 hours per user"
 
+  Scenario: View triplestore counts on metrics page
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And I am on the view metrics page
+    Then I should see "There are 117 triples in the triplestore"
+    Then I should see "There are 3 annotations in the triplestore"
+    Then I should see "There are 2 annotation collections in the triplestore"
+
   Scenario: View metrics table
     Given I am on the admin page
     And I have users
@@ -197,6 +204,7 @@ Feature: Administer users
       | Total number of item lists created                              | 2     |
       | Total number of searches made                                   | 3     |
       | Total number of triplestore searches made                       | 1     |
+      | Total number of uploaded annotation sets                        | 0     |
       | Total number of visits by users with role 'researcher'          | 3     |
 
   Scenario: Download metrics CSV
@@ -228,6 +236,12 @@ Feature: Administer users
       | name  |
       | Test  |
       | Test2 |
+    And I ingest "cooee:1-001" with id "hcsvlab:1"
+    And "georgina@intersect.org.au" has "read" access to collection "cooee"
+    And "georgina@intersect.org.au" has an api token
+    And I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "georgina@intersect.org.au" with JSON params
+      | Name  | Content | Filename                                                | Type                      |
+      | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
     And I click "View Metrics"
     And I click "Download all weeks as CSV"
     Then I should get a CSV file called "metrics.csv" with the following metrics:
@@ -250,4 +264,6 @@ Feature: Administer users
     50.0,170.0
     Total number of item lists created
     2,2
+    Total number of uploaded annotation sets
+    1,1
     """

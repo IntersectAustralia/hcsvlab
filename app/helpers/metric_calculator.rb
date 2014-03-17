@@ -1,11 +1,14 @@
 module MetricCalculator
 
+  SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
+
   REGISTERED_USERS_METRIC_NAME = "Number of registered users with role 'researcher'"
   TOTAL_RESEARCHER_VISITS_METRIC_NAME = "Total number of visits by users with role 'researcher'"
   TOTAL_DURATION_RESEARCHER_VISITS_METRIC_NAME = "Total duration of use by users with role 'researcher' (minutes)"
   TOTAL_SEARCHES_MERIC_NAME = "Total number of searches made"
   TRIPLESTORE_SEARCHES_MERIC_NAME = "Total number of triplestore searches made"
   ITEM_LISTS_METRIC_NAME = "Total number of item lists created"
+  ANNOTATIONS_UPLOADED_METRIC_NAME = "Total number of uploaded annotation sets"
 
   #
   # get an array containing all the metrics
@@ -18,6 +21,7 @@ module MetricCalculator
     self.add_total_searches_metrics(metrics)
     self.add_triplestore_searches_metrics(metrics)
     self.add_item_list_metrics(metrics)
+    self.add_uploaded_annotations_metrics(metrics)
     return metrics
   end
 
@@ -32,7 +36,36 @@ module MetricCalculator
     self.add_latest_total_searches_metric(metrics)
     self.add_latest_triplestore_searches_metric(metrics)
     self.add_latest_item_list_metric(metrics)
+    self.add_latest_uploaded_annotations_metric(metrics)
     return metrics.sort_by { |item| item[:metric] }
+  end
+
+  #
+  # Get all metrics regarding the triplestore and return as a hash
+  #
+  def self.get_triplestore_metrics
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+
+    annotations = 0
+    annotation_collections = 0
+    triples = 0
+    query = """
+    PREFIX dada:<http://purl.org/dada/schema/0.2#>
+    SELECT (count(?ann) as ?anncount) (count(distinct ?ac) as ?account)
+    WHERE { ?ann rdf:type dada:Annotation . ?ann dada:partof ?ac . }
+    """
+    
+    server.each_repository do |repository|
+      unless repository.id == "SYSTEM"
+        solutions = repository.sparql_query(query)
+        solutions.each do |s|
+          annotations += Integer(s[:anncount].value)
+          annotation_collections += Integer(s[:account].value)
+          triples += repository.triples.count
+        end
+      end
+    end
+    return {:annotations => annotations, :annotation_collections => annotation_collections, :triples => triples}
   end
 
 
@@ -147,6 +180,24 @@ module MetricCalculator
       value = number.count
       cumulative += value
       metrics.push( {:metric => ITEM_LISTS_METRIC_NAME, :week_ending => week.strftime("%d/%m/%Y"), :value => value, :cumulative_value => cumulative} )
+    end
+  end
+
+
+  def self.add_latest_uploaded_annotations_metric(metrics)
+    week = Time.now.end_of_week
+    value = UserAnnotation.where('created_at < ? and created_at > ?', week, week - 1.week).count
+    metrics.push( {:metric => ANNOTATIONS_UPLOADED_METRIC_NAME, :week_ending => week, :value => value} )
+  end
+
+  def self.add_uploaded_annotations_metrics(metrics)
+    results = UserAnnotation.all.group_by {|ua| ua.created_at.end_of_week}
+    results = Hash[results.sort]
+    cumulative = 0
+    results.each do |week, number|
+      value = number.count
+      cumulative += value
+      metrics.push( {:metric => ANNOTATIONS_UPLOADED_METRIC_NAME, :week_ending => week.strftime("%d/%m/%Y"), :value => value, :cumulative_value => cumulative} )
     end
   end
 
