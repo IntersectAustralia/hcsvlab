@@ -1,8 +1,5 @@
 HcsvlabWeb::Application.configure do
 
-  # replace this with your tracker code
-  GA.tracker = "UA-49040235-2"
-
   # TODO: set your own correct URL for action mailer
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
   

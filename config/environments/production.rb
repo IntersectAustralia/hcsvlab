@@ -1,7 +1,7 @@
 HcsvlabWeb::Application.configure do
 
   # replace this with your tracker code
-  GA.tracker = "UA-49040235-6"
+  GA.tracker = "UA-49039039-5"
 
   # TODO: set your own correct URL for action mailer
   config.action_mailer.default_url_options = { :host => 'hcsvlab-prod-webapp.intersect.org.au' }
