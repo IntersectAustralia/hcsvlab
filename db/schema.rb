@@ -73,9 +73,9 @@ ActiveRecord::Schema.define(:version => 20140313030321) do
     t.string   "item_identifier"
     t.boolean  "shareable"
     t.string   "file_location"
-    t.string   "annotationCollectionId"
     t.datetime "created_at",             :null => false
     t.datetime "updated_at",             :null => false
+    t.string   "annotationCollectionId"
   end
 
   add_index "user_annotations", ["user_id"], :name => "index_user_annotations_on_user_id"

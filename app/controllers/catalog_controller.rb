@@ -717,6 +717,10 @@ class CatalogController < ApplicationController
   def sparqlQuery
     request.format = 'json'
 
+    search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::TRIPLESTORE_SEARCH)
+    search.user = current_user
+    search.save
+
     # First will validate the parameters. 'collection' and 'query' are both required
     query = params[:query]
     collectionName = params[:collection].to_s.downcase
@@ -728,9 +732,34 @@ class CatalogController < ApplicationController
       end
     end
 
-    search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::TRIPLESTORE_SEARCH)
-    search.user = current_user
-    search.save
+    # Now we are going to forbid the SERVICE keyword in the SPARQL query
+    pattern = /SERVICE/i
+    matchingWords = query.to_enum(:scan, pattern).map { Regexp.last_match }
+    if (!matchingWords.empty?)
+      respond_to do |format|
+        format.json { render :json => {:error => "Service keyword is forbidden in queries."}.to_json, :status => 412 and return}
+      end
+    end
+
+    collection = Collection.find_by_short_name(collectionName).to_a.first
+    if (collection.nil?)
+      respond_to do |format|
+        format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return}
+      end
+    end
+
+    if (!collection.nil?)
+      #Verify if the user has at least read access to the collection
+      if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
+        authorization_error(Exception.new("You are not authorized to access this resource."))
+        return
+      end
+    end
+
+    #
+    # I'll leave this code commented out since in the future we might have to include the
+    # SERVICE keyword and we'll have to validate that.
+    #
 
     # In a sparql query the user can specify the keyword SERVICE in order
     # to make a query in a particular repository.
@@ -738,46 +767,46 @@ class CatalogController < ApplicationController
     # has read access to those specified repositories.
     #
     # Regex will match: SERVICE [SILENT] <HOST_URL>/repositories/<repo_name>
-    pattern = /SERVICE\s+(?:.*\s+)?<#{SESAME_CONFIG["url"]}\/repositories\/(\w+)>/i
-    matchingWords = query.to_enum(:scan, pattern).map { Regexp.last_match }
+    #pattern = /SERVICE\s+(?:.*\s+)?<#{SESAME_CONFIG["url"]}\/repositories\/(\w+)>/i
+    #matchingWords = query.to_enum(:scan, pattern).map { Regexp.last_match }
 
     # At this point we will collect
-    collectionNames = []
-    collectionNames << {name:collectionName, silent:false} if collectionName.present?
-    matchingWords.each do |aMatching|
-      isSilent = !aMatching[0].to_s.match(/SERVICE\s+SILENT/i).nil?
-      collectionNames << {name: aMatching[1], silent:isSilent}
-    end
+    #collectionNames = []
+    #collectionNames << {name:collectionName, silent:false} if collectionName.present?
+    #matchingWords.each do |aMatching|
+    #  isSilent = !aMatching[0].to_s.match(/SERVICE\s+SILENT/i).nil?
+    #  collectionNames << {name: aMatching[1], silent:isSilent}
+    #end
 
-    if (collectionNames.empty?)
-      respond_to do |format|
-        format.json { render :json => {:error => "Parameter 'collection' or SERVICE keyword in query is required."}.to_json, :status => 412 and return}
-      end
-    end
+    #if (collectionNames.empty?)
+    #  respond_to do |format|
+    #    format.json { render :json => {:error => "Parameter 'collection' or SERVICE keyword in query is required."}.to_json, :status => 412 and return}
+    #  end
+    #end
 
-    collections = []
-    collectionNames.each do |aCollectionName|
-      # Retrieve the collection from Fedora
-      collection = Collection.find_by_short_name(aCollectionName[:name]).to_a.first
-      if (collection.nil? && !aCollectionName[:silent])
-        respond_to do |format|
-          format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return}
-        end
-      end
-
-      if (!collection.nil?)
-        # Verify if the user has at least read access to the collection
-        if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
-          authorization_error(Exception.new("You are not authorized to access this resource."))
-          return
-        end
-        collections << collection
-      end
-    end
+    #collections = []
+    #collectionNames.each do |aCollectionName|
+    #  Retrieve the collection from Fedora
+      #collection = Collection.find_by_short_name(aCollectionName[:name]).to_a.first
+      #if (collection.nil? && !aCollectionName[:silent])
+      #  respond_to do |format|
+      #    format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return}
+      #  end
+      #end
+      #
+      #if (!collection.nil?)
+      #  Verify if the user has at least read access to the collection
+        #if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
+        #  authorization_error(Exception.new("You are not authorized to access this resource."))
+        #  return
+        #end
+        #collections << collection
+      #end
+    #end
 
     # Create the URL for the sesame endpoint.
     params = { query:query }
-    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collections.first.flat_name}")
+    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collectionName}")
     uri.query = URI.encode_www_form(params)
 
     # Send the request to the sparql endpoint.

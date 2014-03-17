@@ -132,3 +132,5 @@ gem "capistrano_colors"
 gem 'tinymce-rails'
 gem 'rubyzip', '0.9.9'
 gem 'bagit'
+
+gem 'google-analytics-rails'
