@@ -438,7 +438,6 @@ class CatalogController < ApplicationController
   end
 
   def annotation_properties
-    request.format = 'json'
     begin
       @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
 
@@ -461,7 +460,6 @@ class CatalogController < ApplicationController
   end
 
   def annotation_types
-    request.format = 'json'
     begin
       @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
 

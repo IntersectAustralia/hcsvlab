@@ -190,6 +190,13 @@ Feature: Administer users
       | 0_DAYS_AGO   | 30                  |
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
+    And "researcher1@intersect.org.au" has the following past api calls
+      | request_time | item_list   | 
+      | 0_DAYS_AGO   | true        |
+      | 0_DAYS_AGO   | false       |
+      | 14_DAYS_AGO  | false       |
+    And "georgina@intersect.org.au" has an api token
+    And I make a JSON request for the annotation context page with the API token for "georgina@intersect.org.au"
     And "researcher1@intersect.org.au" has item lists
       | name  |
       | Test  |
@@ -201,6 +208,8 @@ Feature: Administer users
       | Metric                                                          | Value |
       | Number of registered users with role 'researcher'               | 2     |
       | Total duration of use by users with role 'researcher' (minutes) | 50.0  |
+      | Total number of API calls                                       | 3     |
+      | Total number of item list API calls                             | 1     |
       | Total number of item lists created                              | 2     |
       | Total number of searches made                                   | 3     |
       | Total number of triplestore searches made                       | 1     |
@@ -232,6 +241,13 @@ Feature: Administer users
       | 0_DAYS_AGO   | 30                  |
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
+    And "researcher1@intersect.org.au" has the following past api calls
+      | request_time | item_list   | 
+      | 0_DAYS_AGO   | true        |
+      | 0_DAYS_AGO   | false       |
+      | 14_DAYS_AGO  | false       |
+    And "georgina@intersect.org.au" has an api token
+    And I make a JSON request for the annotation context page with the API token for "georgina@intersect.org.au"
     And "researcher1@intersect.org.au" has item lists
       | name  |
       | Test  |
@@ -265,5 +281,10 @@ Feature: Administer users
     Total number of item lists created
     2,2
     Total number of uploaded annotation sets
+    1,1
+    Total number of API calls
+    1,1
+    3,4
+    Total number of item list API calls
     1,1
     """
