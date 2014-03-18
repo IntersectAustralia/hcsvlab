@@ -58,6 +58,8 @@ HcsvlabWeb::Application.routes.draw do
         get 'frequency_search'
         get 'download_config_file'
         get 'download_item_list'
+        post 'share'
+        post 'unshare'
       end
   end
 

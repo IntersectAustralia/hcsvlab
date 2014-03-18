@@ -181,6 +181,27 @@ class ItemListsController < ApplicationController
     redirect_to item_lists_path
   end
 
+  #
+  #
+  #
+  def share
+    @item_list.share
+
+    flash[:notice] = "Item list #{@item_list.name} is shared. Any user in the application will be able to see it."
+    redirect_to @item_list
+  end
+
+  #
+  #
+  #
+  def unshare
+    @item_list.unshare
+
+    flash[:notice] = "Item list #{@item_list.name} is not being shared anymore."
+    redirect_to @item_list
+  end
+
+
   def concordance_search
     result = @item_list.doConcordanceSearch(params[:concordance_search_for])
 

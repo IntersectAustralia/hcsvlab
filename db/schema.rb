@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140313030321) do
+ActiveRecord::Schema.define(:version => 20140317231930) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(:version => 20140313030321) do
     t.string   "name",       :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.boolean  "shared"
   end
 
   create_table "item_metadata_field_name_mappings", :force => true do |t|

@@ -10,16 +10,37 @@ class ItemList < ActiveRecord::Base
   CONCORDANCE_PRE_POST_CHUNK_SIZE = 7
 
   belongs_to :user
-  attr_accessible :name, :id, :user_id
+  attr_accessible :name, :id, :user_id, :shared
 
   validates :name, presence: true
   validates_length_of :name, :maximum => 255 , message:"Name is too long (maximum is 255 characters)"
 
+  before_save :default_values
   #
   # Class variables for information about Solr
   #
   @@solr_config = nil
   @@solr = nil
+
+  def shared?
+    return self.shared || false
+  end
+
+  #
+  #
+  #
+  def share
+    self.shared=true
+    self.save!
+  end
+
+  #
+  #
+  #
+  def unshare
+    self.shared=false
+    self.save!
+  end
 
   #
   # Get the documents ids from given search parameters
@@ -315,6 +336,15 @@ class ItemList < ActiveRecord::Base
 
     highlighting
   end
+
+  #
+  # Assign the default values for the unassigned properties
+  #
+  def default_values
+    self.shared ||= false
+    nil
+  end
+
 
   #
   # Initialise the connection to Solr

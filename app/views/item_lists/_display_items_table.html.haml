@@ -15,6 +15,11 @@
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
           %li
             = link_to("Download as ZIP", {:controller => "item_lists", :action => "show", :format=>"zip"}, :method => 'GET', :id => params[:id].to_i, :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);')
+          %li
+            - if (@item_list.shared?)
+              = link_to("Stop Sharing", {:controller => "item_lists", :action => "unshare"}, :method => 'POST', :id => params[:id].to_i)
+            -else
+              = link_to("Share", {:controller => "item_lists", :action => "share"}, :method => 'POST', :id => params[:id].to_i)
       - if (@document_list.empty?)
       - else
         = render 'catalog/paginate_compact'
