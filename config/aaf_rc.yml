@@ -1,0 +1,55 @@
+common: &common
+  # this is to map attributes as described in http://aaf.edu.au/technical/aaf-core-attributes/
+  # to their respective field in the database
+  # uncomment them if need be
+  user-mapping:
+    cn: ""
+    displayname: ""
+    edupersontargetedid: ""
+    edupersonscopedaffiliation: ""
+    edupersonprincipalname: ""
+    mail: email
+    givenname: first_name
+    surname: last_name
+
+development:
+  <<: *common
+  hostname: https://hcsvlab.intersect.org.au
+  secret_token: gj5UZGGP.o"7BX}1,Ajv7hRC0M5^+ZTb
+  aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/cJR0-7A6ewM1au76
+
+qa:
+  <<: *common
+  hostname: https://ic2-hcsvlab-test4-vm.intersect.org.au
+  secret_token: PH*.0_G9}&76~ZNFnC`MZI0Vl;[.os}k
+  aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/jID_N7c61CfH2rsC
+
+qa2:
+  <<: *common
+  hostname: https://ic2-hcsvlab-qa2-vm.intersect.org.au
+  secret_token: ;zH/h.MHgfOke+e0c_Ee}z8gqWl{gDsa
+  aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/jUQmxk9qcXuOW5sr
+
+staging:
+  <<: *common
+  hostname: https://ic2-hcsvlab-staging1-vm.intersect.org.au
+  secret_token: ''-YE>=Am`I-Zr6X8NmYEyVI9]Z]8ly;
+  aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/Hv34WWNKkb7iHcjy
+
+staging2:
+  <<: *common
+  hostname: https://ic2-hcsvlab-staging2-vm.intersect.org.au
+  secret_token: WIutz=Ww|nONNb)RG,Om0]Hnb<+$]zal
+  aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/-5BJ_gIDu3bOye7v
+
+test:
+  <<: *common
+  hostname: https://hcsvlab.intersect.org.au
+  secret_token: gj5UZGGP.o"7BX}1,Ajv7hRC0M5^+ZTb
+  aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/cJR0-7A6ewM1au76
+
+production:
+  <<: *common
+  hostname: hostname.com
+  secret_token: REPLACE_ME
+  aaf_rc_login_url: https://rapid.aaf.edu.au/jwt/authnrequest/research/REPLACE_ME

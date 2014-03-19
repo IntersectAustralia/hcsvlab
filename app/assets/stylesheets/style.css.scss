@@ -1293,6 +1293,36 @@ border: 1px solid #BCBCBC;
   font-family:monospace
 }
 
+/* AAF Login Button ///////////
+/////////////////////////////*/
+
+.btn.aaf {
+    padding: 5px 10px;
+    font-weight: normal;
+    font-size: 0.875em;
+    line-height: 18px;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    border: 1px solid #424f5b;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    display: -moz-inline-stack;
+    display: inline-block;
+    zoom: 1;
+    *display: inline;
+    vertical-align: top;
+    background: #424f5b url("/images/aaf.png") right no-repeat;
+    padding-right: 36px;
+}
+
+.btn.aaf:hover {
+    background: #495663 url("/images/aaf.png") right no-repeat;
+    border: 1px solid #495663;
+}
+
 /* SHAME ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////*/
 
@@ -1309,4 +1339,3 @@ border: 1px solid #BCBCBC;
 .metadata-input {
   width: 190px;
 }
-

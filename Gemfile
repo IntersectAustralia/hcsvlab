@@ -134,3 +134,8 @@ gem 'rubyzip', '0.9.9'
 gem 'bagit'
 
 gem 'google-analytics-rails'
+
+gem 'json-jwt'
+gem 'devise_aaf_rc_authenticatable', :git => 'https://github.com/IntersectAustralia/devise_aaf_rc_authenticatable'
+
+gem 'keepass-password-generator'

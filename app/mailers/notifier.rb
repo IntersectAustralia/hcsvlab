@@ -74,4 +74,13 @@ class Notifier < ActionMailer::Base
           :subject => PREFIX + "Reset password instructions")
   end
 
+  def notify_aaf_user_approval_and_password(user, password)
+    @user = user
+    @password = password
+    mail( :to => @user.email,
+          :from => APP_CONFIG['account_request_user_status_email_sender'],
+          :reply_to => APP_CONFIG['account_request_user_status_email_sender'],
+          :subject => PREFIX + "Your access request has been approved")
+  end
+
 end

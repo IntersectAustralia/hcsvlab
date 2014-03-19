@@ -1,19 +1,16 @@
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
+  # ==> AAF Rapid Connect Configuration
+  config.aaf_rc_logger = true
+  config.aaf_rc_create_user = true
+  config.aaf_rc_config = "#{Rails.root}/config/aaf_rc.yml"
+
   # http://stackoverflow.com/questions/580314/overriding-a-module-method-from-a-gem-in-rails/1852448#1852448
   # verifies password before checking if account is active
   Devise::Models::Authenticatable.module_eval do
     def valid_for_authentication?
-      if block_given?
-        if yield
-          active_for_authentication? ? true : inactive_message
-        else
-          false
-        end
-      else
-        active_for_authentication? ? true : inactive_message
-      end
+      active_for_authentication? ? true : inactive_message
     end
   end
 

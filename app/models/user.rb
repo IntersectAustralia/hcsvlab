@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
 # Connects this user object to Blacklights Bookmarks. 
   include Blacklight::User
   # Include devise modules
-  devise :database_authenticatable, :registerable, :lockable, :recoverable, :trackable, :validatable, :timeoutable, :token_authenticatable
+  devise :database_authenticatable, :registerable, :lockable, :recoverable, :trackable, :validatable, :timeoutable, :token_authenticatable, :aaf_rc_authenticatable
 
   belongs_to :role
   has_many :user_sessions
@@ -44,6 +44,20 @@ class User < ActiveRecord::Base
     super && approved?
   end
 
+  def aaf_logged_in?(aaf_email)
+    aaf_email.present? && self.email.eql?(aaf_email)
+  end
+
+  def aaf_rc_before_save
+    self.status = "U"
+    generate_temp_password
+    self.aaf_registered = true
+  end
+
+  def after_aaf_rc_authentication
+    raise Exception.new('Unauthorized') unless approved?
+  end
+
   # Override Devise method so that user is actually notified right after the third failed attempt.
   def attempts_exceeded?
     self.failed_attempts >= self.class.maximum_attempts
@@ -77,6 +91,12 @@ class User < ActiveRecord::Base
 
     clean_up_passwords
     result
+  end
+
+  # Generates and sets user password
+  def generate_temp_password
+    password = KeePass::Password.generate('uldsA{5}', :remove_lookalikes => true)
+    self.reset_password!(password, password)
   end
 
   # Override devise method that resets a forgotten password, so we can clear locks on reset
@@ -133,7 +153,12 @@ class User < ActiveRecord::Base
     save!(:validate => false)
 
     # send an email to the user
-    Notifier.notify_user_of_approved_request(self).deliver
+    if self.aaf_registered
+      generate_temp_password
+      Notifier.notify_aaf_user_approval_and_password(self, password).deliver
+    else
+      Notifier.notify_user_of_approved_request(self).deliver
+    end
   end
 
   def reject_access_request
