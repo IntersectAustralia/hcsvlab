@@ -83,4 +83,12 @@ class Notifier < ActionMailer::Base
           :subject => PREFIX + "Your access request has been approved")
   end
 
+  def notify_user_that_reset_password_was_requested(email)
+    @email = email
+    mail( :to => email,
+          :from => APP_CONFIG['account_request_user_status_email_sender'],
+          :reply_to => APP_CONFIG['account_request_user_status_email_sender'],
+          :subject => PREFIX + "Reset Password Request")
+  end
+
 end
