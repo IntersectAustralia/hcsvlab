@@ -342,33 +342,33 @@ def doGetItemDocuments(benchmarkInformation, type)
 
     res = sendRequest(:get, URI(retrievedItems["items"].first).path)
     item = JSON.parse(res.body)
-    item["documents"].each do |aDocument|
+    item["hcsvlab:documents"].each do |aDocument|
       next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
       startTime = Time.now
-      res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      res = sendRequest(:get, URI(aDocument["hcsvlab:url"]).path, {}, {"Accept"=>"application/octet-stream"})
       timeInSecs = (Time.now.to_f - startTime.to_f)
       benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
     end
 
     res = sendRequest(:get, URI(retrievedItems["items"][retrievedItems["items"].length/2]).path)
     item = JSON.parse(res.body)
-    item["documents"].each do |aDocument|
+    item["hcsvlab:documents"].each do |aDocument|
       next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
       startTime = Time.now
-      res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      res = sendRequest(:get, URI(aDocument["hcsvlab:url"]).path, {}, {"Accept"=>"application/octet-stream"})
       timeInSecs = (Time.now.to_f - startTime.to_f)
       benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
     end
 
     res = sendRequest(:get, URI(retrievedItems["items"].last).path)
     item = JSON.parse(res.body)
-    item["documents"].each do |aDocument|
+    item["hcsvlab:documents"].each do |aDocument|
       next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
       startTime = Time.now
-      res = sendRequest(:get, URI(aDocument["url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      res = sendRequest(:get, URI(aDocument["hcsvlab:url"]).path, {}, {"Accept"=>"application/octet-stream"})
       timeInSecs = (Time.now.to_f - startTime.to_f)
       benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
     end

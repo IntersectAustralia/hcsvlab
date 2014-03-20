@@ -120,9 +120,9 @@ begin
     #}
 
     # GETTING ALL DOCUMENTS
-    aItemJsonResponse['documents'].each do |aDocument|
+    aItemJsonResponse['hcsvlab:documents'].each do |aDocument|
 
-      doc_uri = URI(aDocument['url'])
+      doc_uri = URI(aDocument['hcsvlab:url'])
 
       req = Net::HTTP::Get.new(doc_uri)
       req['X-API-KEY'] = KEY
@@ -138,12 +138,12 @@ begin
       totalDocumentsSize = totalDocumentsSize + res.body.size.to_f
       totalDocumentsTime = totalDocumentsTime + ((bench_end.to_f - bench_start.to_f)*1000)
 
-      if (!infoPerDocType.has_key?(aDocument['type']))
+      if (!infoPerDocType.has_key?(aDocument['hcsvlab:type']))
         infoPerDocType[aDocument['type']] = {amount: 0, totalFileSize: 0, timeDownloading: 0}
       end
-      infoPerDocType[aDocument['type']][:amount] = infoPerDocType[aDocument['type']][:amount] + 1
-      infoPerDocType[aDocument['type']][:totalFileSize] = infoPerDocType[aDocument['type']][:totalFileSize] + res.body.size.to_f
-      infoPerDocType[aDocument['type']][:timeDownloading] = infoPerDocType[aDocument['type']][:timeDownloading] + (bench_end.to_f - bench_start.to_f)
+      infoPerDocType[aDocument['hcsvlab:type']][:amount] = infoPerDocType[aDocument['hcsvlab:type']][:amount] + 1
+      infoPerDocType[aDocument['hcsvlab:type']][:totalFileSize] = infoPerDocType[aDocument['hcsvlab:type']][:totalFileSize] + res.body.size.to_f
+      infoPerDocType[aDocument['hcsvlab:type']][:timeDownloading] = infoPerDocType[aDocument['hcsvlab:type']][:timeDownloading] + (bench_end.to_f - bench_start.to_f)
 
     end
   end
