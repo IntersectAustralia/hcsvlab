@@ -1,6 +1,10 @@
 class ApplicationController < ActionController::Base
+  rescue_from DeviseAafRcAuthenticatable::AafRcException do |exception|
+    render :text => exception, :status => 500
+  end
 
   prepend_before_filter :get_api_key
+  prepend_before_filter :retrieve_aaf_credentials
   #This will force a reload when the back button is pressed.
   before_filter :set_cache_buster
   before_filter :default_format_json
@@ -31,6 +35,10 @@ class ApplicationController < ActionController::Base
     if request.headers["X-API-KEY"]
       params[:api_key] = request.headers["X-API-KEY"]
     end
+  end
+
+  def retrieve_aaf_credentials
+    @aaf_credentials = session['attributes'] || {}
   end
 
   def set_cache_buster

@@ -7,3 +7,33 @@
 = link_to "Sign Up", new_user_registration_path, :class => "button"
 &nbsp;&nbsp;&nbsp;
 = link_to "Forgot your password?", new_user_password_path, :class => "button"
+%br
+%br
+.container
+  - if @aaf_credentials[:mail].present?
+    .control-group
+      .controls
+        %small
+          Note: You are logged in via AAF as
+          %strong #{@aaf_credentials[:mail]}
+          ,
+          - if User.find_by_email(@aaf_credentials[:mail])
+            but your HCS vLab account request is pending approval.
+          - else
+            but you have not registered an account with HCS vLab.
+          %br
+          %br
+          You may log in with a different account above or sign out of AAF.
+          %br
+          %br
+        = link_to "← Sign out", destroy_user_session_path, :class => "btn aaf"
+  - else
+    .control-group
+      .controls
+        = link_to "Log in via AAF →", aaf_new_user_session_path, :class => "btn aaf"
+    .control-group
+      .controls
+        %small
+          Note: This will take you to the AAF (Australian Access Federation) login page.
+          %br
+          If you are not yet authorised to use HCS vLab you will need to wait for the admin to approve your user.
