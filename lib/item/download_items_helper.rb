@@ -27,26 +27,26 @@ module Item::DownloadItemsHelper
     #
     #
     #
-    def createAndRetrieveZipPath(itemsId, &block)
-      get_zip_with_documents_and_metadata_powered(itemsId)
+    def createAndRetrieveZipPath(itemHandles, &block)
+      get_zip_with_documents_and_metadata_powered(itemHandles)
     end
 
     #
     #
     #
-    def createAndRetrieveWarcPath(itemsId, url, &block)
-      get_warc_with_documents_and_metadata(itemsId, url, &block)
+    def createAndRetrieveWarcPath(itemHandles, url, &block)
+      get_warc_with_documents_and_metadata(itemHandles, url, &block)
     end
 
     private
 
     #
-    # Creates a WARC file containing all the documents and metadata for the items listed in 'itemsId'.
+    # Creates a WARC file containing all the documents and metadata for the items listed in 'itemHandles'.
     #
-    def get_warc_with_documents_and_metadata(itemsId, url, &block)
-      if (!itemsId.nil? and !itemsId.empty?)
+    def get_warc_with_documents_and_metadata(itemHandles, url, &block)
+      if (!itemHandles.nil? and !itemHandles.empty?)
         begin
-          info = verifyItemsPermissionsAndExtractMetadata(itemsId)
+          info = verifyItemsPermissionsAndExtractMetadata(itemHandles)
 
           valids = info[:valids]
           invalids = info[:invalids]
@@ -192,14 +192,14 @@ module Item::DownloadItemsHelper
     #
 
     #
-    # Creates a ZIP file containing all the documents and metadata for the items listed in 'itemsId'.
+    # Creates a ZIP file containing all the documents and metadata for the items listed in 'itemHandles'.
     # The returned format respect the BagIt format (http://en.wikipedia.org/wiki/BagIt)
     #
-    def get_zip_with_documents_and_metadata_powered(itemsId)
-      if (!itemsId.nil? and !itemsId.empty?)
+    def get_zip_with_documents_and_metadata_powered(itemHandles)
+      if (!itemHandles.nil? and !itemHandles.empty?)
         begin
 
-          info = verifyItemsPermissionsAndExtractMetadata(itemsId)
+          info = verifyItemsPermissionsAndExtractMetadata(itemHandles)
 
           valids = info[:valids]
           invalids = info[:invalids]
@@ -252,14 +252,14 @@ module Item::DownloadItemsHelper
     #
     #
     #
-    def verifyItemsPermissionsAndExtractMetadata(itemsId,batch_group=50)
+    def verifyItemsPermissionsAndExtractMetadata(itemHandles,batch_group=50)
       valids = []
       invalids = []
       metadata = {}
 
-      itemsId.in_groups_of(batch_group, false) do |groupOfItemsId|
+      itemHandles.in_groups_of(batch_group, false) do |groupOfItemHandles|
         # create disjunction condition with the items Ids
-        condition = groupOfItemsId.map{|itemId| "id:\"#{itemId.gsub(":", "\:")}\""}.join(" OR ")
+        condition = groupOfItemHandles.map{|itemHandle| "handle:\"#{itemHandle.gsub(":", "\:")}\""}.join(" OR ")
 
         params = {}
         params[:q] = condition
@@ -267,7 +267,7 @@ module Item::DownloadItemsHelper
 
         (response, document_list) = get_search_results params
         document_list.each do |aDoc|
-          valids << aDoc[:id]
+          valids << aDoc[:handle]
           begin
             jsonMetadata = JSON.parse(aDoc['json_metadata'])
           rescue
@@ -279,10 +279,7 @@ module Item::DownloadItemsHelper
           metadata[aDoc[:id]][:metadata] = jsonMetadata
         end
 
-
-
-        #valids += document_list.map{|aDoc| aDoc.id}.flatten
-        invalids += groupOfItemsId - valids
+        invalids += groupOfItemHandles - valids
 
       end
 

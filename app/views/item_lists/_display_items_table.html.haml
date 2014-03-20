@@ -6,8 +6,9 @@
           Item List Actions
           %span.caret
         %ul.dropdown-menu
-          %li
-            = link_to("Clear Item List", {:controller => "item_lists", :action => "clear"}, :method => 'POST', :id => params[:id].to_i)
+          - if (@item_list.user_id == current_user.id)
+            %li
+              = link_to("Clear Item List", {:controller => "item_lists", :action => "clear"}, :method => 'POST', :id => params[:id].to_i)
           %li
             = link_to("Use Item List in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
           %li
@@ -15,11 +16,12 @@
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
           %li
             = link_to("Download as ZIP", {:controller => "item_lists", :action => "show", :format=>"zip"}, :method => 'GET', :id => params[:id].to_i, :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);')
-          %li
-            - if (@item_list.shared?)
-              = link_to("Stop Sharing", {:controller => "item_lists", :action => "unshare"}, :method => 'POST', :id => params[:id].to_i)
-            -else
-              = link_to("Share", {:controller => "item_lists", :action => "share"}, :method => 'POST', :id => params[:id].to_i)
+          - if (@item_list.user_id == current_user.id)
+            %li
+              - if (@item_list.shared?)
+                = link_to("Stop Sharing", {:controller => "item_lists", :action => "unshare"}, :method => 'POST', :id => params[:id].to_i)
+              -else
+                = link_to("Share", {:controller => "item_lists", :action => "share"}, :method => 'POST', :id => params[:id].to_i)
       - if (@document_list.empty?)
       - else
         = render 'catalog/paginate_compact'
@@ -31,6 +33,14 @@
         %a.close{"data-dismiss" => "alert", :href => "#"} ×
     - else
       = render 'galaxy_link', :title => "Use Item List in Galaxy "
+      - if (!@message.nil?)
+        %span{class:"label label-warning", :style=>"display:block; text-align:center"}
+          =@message
+          ="This is because you do not have access to the applicable Collections. "
+          %br
+          = "To gain access to more Collections, visit the "
+          = link_to "Licence Agreements", account_licence_agreements_path
+          = " page."
       = render_document_index nil, {}, {:showCheckbox => false, :itemViewList => params[:id]}
       = render 'results_pagination'
   .modal.hide.fade.in{:id => "get_r_script","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}

@@ -70,6 +70,15 @@ class Ability
     ############################################################
 
     can :manage, ItemList, :user_id => user.id
+    can :read, ItemList do |itemList|
+      itemList.shared?
+    end
+    can :frequency_search, ItemList do |itemList|
+      itemList.shared?
+    end
+    can :concordance_search, ItemList do |itemList|
+      itemList.shared?
+    end
 
     ############################################################
     ##          PERMISSIONS OVER COLLECTIONS                  ##

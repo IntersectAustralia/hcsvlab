@@ -306,3 +306,11 @@ end
 When /^I hover over "([^"]*)"$/ do |text|
   find(:xpath, "//a[contains(text(),'#{text}')]").hover
 end
+
+Then /^I should (not )?have the link "([^"]*)"/ do |negation, text|
+  if (negation)
+    page.should_not have_selector(:link_or_button, text)
+  else
+    page.should have_selector(:link_or_button, text)
+  end
+end

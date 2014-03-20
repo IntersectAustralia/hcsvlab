@@ -109,6 +109,20 @@ Feature: Browsing via API
     And the JSON response should have "$..name" with the text "Test 1"
     And the JSON response should have "$..name" with the text "Test 2"
 
+  Scenario: Get item lists for researcher
+    Given "data_owner@intersect.org.au" has item lists
+      | name     | shared |
+      | Shared 1 | true   |
+    When I make a JSON request for the item lists page with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should have "$.own..num_items" with a length of 2
+    And the JSON response should have "$.own..name" with a length of 2
+    And the JSON response should have "$.own..name" with the text "Test 1"
+    And the JSON response should have "$.own..name" with the text "Test 2"
+    And the JSON response should have "$.shared..name" with a length of 1
+    And the JSON response should have "$.shared..name" with the text "Shared 1"
+
+
   Scenario: Get item lists for researcher with no item lists
     Given I have users
       | email                        | first_name | last_name |

@@ -13,7 +13,7 @@ module FrequencySearchHelper
     def executeFrequencySearchOnSimpleTerm(query, facet, itemList)
       bench_start = Time.now
 
-      handles = itemList.get_item_handles()
+      handles = itemList.getItemsHandlesThatTheCurrentUserHasAccess()
 
       params = {}
       params[:'facet.field'] = facet
@@ -177,7 +177,7 @@ module FrequencySearchHelper
     def executeFrequencySearchOnComplexTerm(query, facet, itemList)
       bench_start = Time.now
 
-      handles = itemList.get_item_handles()
+      handles = itemList.getItemsHandlesThatTheCurrentUserHasAccess()
 
       params = {}
       params[:'facet.field'] = facet

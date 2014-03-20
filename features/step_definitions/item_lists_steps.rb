@@ -7,14 +7,14 @@ end
 
 When /^the item list "(.*)" should have (\d+) item(?:s)?$/ do |list_name, number|
   list = ItemList.find_by_name(list_name)
-  list.get_item_ids.count.should eq(number.to_i)
+  list.get_item_handles.count.should eq(number.to_i)
 end
 
-When /^the item list "(.*)" should contain ids$/ do |list_name, table|
+When /^the item list "(.*)" should contain handles$/ do |list_name, table|
   list = ItemList.find_by_name(list_name)
-  ids = list.get_item_ids
+  handles = list.get_item_handles
   table.hashes.each do |attributes|
-    ids.include?(attributes[:pid]).should eq(true)
+    handles.include?(attributes[:handle]).should eq(true)
   end
 end
 
@@ -28,11 +28,13 @@ And /^I follow the delete icon for item list "(.*)"$/ do |list_name|
   find("#delete_item_list_#{list.id}").click
 end
 
-When /^concordance search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
+Then /^concordance search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
   list = ItemList.find_by_name(list_name)
+  list.setCurrentUser(@current_user)
+  list.setCurrentAbility(Ability.new(@current_user))
   result = list.doConcordanceSearch(term)
   highlightings = result[:highlighting]
-  totalMatches = table.hashes.length
+  totalMatches = highlightings.inject(0) {|sum, highlighting| sum + highlighting[1][:matches].length}
   countMatches = 0
   table.hashes.each do |attributes|
     requestedMatch = attributes[:textBefore].strip()
@@ -56,20 +58,29 @@ When /^concordance search for "(.*)" in item list "(.*)" should show this result
   countMatches.should eq(totalMatches)
 end
 
-When /^concordance search for "(.*)" in item list "(.*)" should show not matches found message$/ do |term, list_name|
+Then /^concordance search for "(.*)" in item list "(.*)" should show not matches found message$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
+  list.setCurrentUser(@current_user)
+  list.setCurrentAbility(Ability.new(@current_user))
+
   result = list.doConcordanceSearch(term)
   result[:matching_docs].should eq(0)
 end
 
-When /^concordance search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
+Then /^concordance search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
+  list.setCurrentUser(@current_user)
+  list.setCurrentAbility(Ability.new(@current_user))
+
   result = list.doConcordanceSearch(term)
   result[:error].empty?.should eq(false)
 end
 
-When /^frequency search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
+Then /^frequency search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
   list = ItemList.find_by_name(list_name)
+  list.setCurrentUser(@current_user)
+  list.setCurrentAbility(Ability.new(@current_user))
+
   field = find_field("Facet")
   result = list.doFrequencySearch(term, field.value)
 
@@ -77,12 +88,18 @@ When /^frequency search for "(.*)" in item list "(.*)" should show this results$
     result[:status].should eq("OK")
     result[:data][attributes[:facetValue]].should_not eq (nil)
     result[:data][attributes[:facetValue]][:num_docs].to_s.should eq(attributes[:matchingDocuments])
+    result[:data][attributes[:facetValue]][:total_docs].to_s.should eq(attributes[:totalDocs])
     result[:data][attributes[:facetValue]][:num_occurrences].to_s.should eq(attributes[:termOccurrences])
+    result[:data][attributes[:facetValue]][:total_words].to_s.should eq(attributes[:totalWords])
+
   end
 end
 
-When /^frequency search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
+Then /^frequency search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
+  list.setCurrentUser(@current_user)
+  list.setCurrentAbility(Ability.new(@current_user))
+
   field = find_field("Facet")
   result = list.doFrequencySearch(term, field.value)
   result[:status].should eq("INPUT_ERROR")

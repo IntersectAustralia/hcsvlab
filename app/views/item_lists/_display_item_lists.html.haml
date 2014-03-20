@@ -1,8 +1,6 @@
 .sidenav.static.span3
   %h4 Item List
   %ul.nav
-    - @userItemLists = current_user.item_lists
-    - @userItemLists.sort! { |a,b| a.name.downcase <=> b.name.downcase }
     - if (@userItemLists.empty?)
       %li
         %h5{} Empty
@@ -10,12 +8,24 @@
       - @userItemLists.each do |itemList|
         - selectedClass="active" if (itemList.id == (params[:id].to_i))
         %li{ :class => selectedClass }
+          -if (itemList.shared?)
+            %i{:class=>"icon-globe", :style=>"float:left; margin:11px 5px 0 0"}
           =link_to item_list_path(itemList) do
-            -if (itemList.shared?)
-              S
             =itemList.name
             =link_to(itemList, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Item List "'+ itemList.name + '"?\', event));', :id => "delete_item_list_#{itemList.id}", :class => "delete") do
               %i{:class=>"icon-trash"}
+
+  %h4 Shared Item List
+  %ul.nav
+    - if (@sharedItemLists.empty?)
+      %li
+        %h5{} Empty
+    -else
+      - @sharedItemLists.each do |itemList|
+        - selectedClass="active" if (itemList.id == (params[:id].to_i))
+        %li{ :class => selectedClass }
+          =link_to item_list_path(itemList) do
+            =itemList.name
 
 :javascript
   function confirmDelete(text, event) {

@@ -5,6 +5,8 @@ class ItemList < ActiveRecord::Base
   include Blacklight::Configurable
   include Blacklight::SolrHelper
   include FrequencySearchHelper
+  include ActiveSupport::Rescuable
+  include Hydra::Controller::ControllerBehavior
 
   FIXNUM_MAX = 2147483647
   CONCORDANCE_PRE_POST_CHUNK_SIZE = 7
@@ -22,12 +24,23 @@ class ItemList < ActiveRecord::Base
   @@solr_config = nil
   @@solr = nil
 
+  #
+  # This variable are needed by Hydra Access Control
+  #
+  @current_user = nil
+  @current_ability = nil
+
+
+  # Indicate Hydra to add access control to the SOLR requests
+  self.solr_search_params_logic += [:add_access_controls_to_solr_params]
+  self.solr_search_params_logic += [:exclude_unwanted_models]
+
   def shared?
     return self.shared || false
   end
 
   #
-  #
+  # This method set the item list as shared
   #
   def share
     self.shared=true
@@ -35,7 +48,7 @@ class ItemList < ActiveRecord::Base
   end
 
   #
-  #
+  # This method set the item list as not shared
   #
   def unshare
     self.shared=false
@@ -69,25 +82,6 @@ class ItemList < ActiveRecord::Base
   end
 
   #
-  # Get the list of Item ids which this ItemList contains.
-  # Return an array of Strings.
-  #
-  def get_item_ids
-    get_solr_connection()
-
-    handles = get_item_handles()
-
-    condition = handles.map{|handle| "handle:\"#{handle.gsub(":", "\:")}\""}.join(" OR ")
-    params = {:q=>condition, :fl=>"id"}
-    solrResponse = @@solr.post('select', params: params)
-
-    # Now extract the ids from the response
-    ids = solrResponse["response"]["docs"].map { |thingy| thingy["id"] }
-
-    return ids.sort
-  end
-
-  #
   # Get the list of Item handles which this ItemList contains.
   # Return an array of Strings.
   #
@@ -114,6 +108,8 @@ class ItemList < ActiveRecord::Base
     handles = get_item_handles()
 
     if (!handles.empty?)
+      validItems = validateItems(handles)
+
       params = {:start => startValue, :rows => rows}
       document_list, response = SearchUtils.retrieveDocumentsFromSolr(params, handles)
     else
@@ -226,7 +222,7 @@ class ItemList < ActiveRecord::Base
     # do matching only in the text. search for "dog," results in "dog", but search for "dog-fighter" results in "dog-fighter"
     search_for = term.match(/(\w+([-]?\w+)?)/i).to_s
 
-    handles = get_item_handles()
+    handles = getItemsHandlesThatTheCurrentUserHasAccess()
 
     params = {}
     params[:q] = "{!qf=full_text pf=''}#{search_for}"
@@ -284,7 +280,57 @@ class ItemList < ActiveRecord::Base
     result
   end
 
+  #
+  # This method will return the list of item handles for which the current user
+  # has at least read access rights.
+  #
+  def getItemsHandlesThatTheCurrentUserHasAccess
+    validItems = []
+
+    handles = get_item_handles()
+    if (!handles.empty?)
+      validItems = validateItems(handles)
+    end
+
+    validItems
+  end
+
+  #
+  #
+  #
+  def setCurrentUser(currentUser)
+    @current_user = currentUser
+  end
+
+  #
+  #
+  #
+  def setCurrentAbility(currentAbility)
+    @current_ability = currentAbility
+  end
+
   private
+
+  #
+  # This method will filter the item handles for which the current user has no granted access
+  #
+  def validateItems (handles, batch_group =50)
+    valids = []
+    handles.in_groups_of(batch_group, false) do |groupOfItemsHandle|
+      # create disjunction condition with the items Ids
+      condition = groupOfItemsHandle.map{|itemHandle| "handle:\"#{itemHandle.gsub(":", "\:")}\""}.join(" OR ")
+
+      params = {}
+      params[:q] = condition
+      params[:rows] = FIXNUM_MAX
+
+      (response, document_list) = get_search_results params
+      document_list.each do |aDoc|
+        valids << aDoc[:handle]
+      end
+    end
+    valids
+  end
 
   #
   # Process the documents returned in the concordance search, it highlights the searched term and
@@ -345,6 +391,13 @@ class ItemList < ActiveRecord::Base
     nil
   end
 
+  #
+  # blacklight uses this method to get the SOLR connection.
+  #
+  def blacklight_solr
+    get_solr_connection
+    @@solr
+  end
 
   #
   # Initialise the connection to Solr
@@ -354,5 +407,19 @@ class ItemList < ActiveRecord::Base
       @@solr_config = Blacklight.solr_config
       @@solr        = RSolr.connect(@@solr_config)
     end
+  end
+
+  #
+  # This method is required by  Hydra Access Control
+  #
+  def current_user
+    @current_user
+  end
+
+  #
+  # This method is required by  Hydra Access Control
+  #
+  def current_ability
+    @current_ability
   end
 end

@@ -11,11 +11,19 @@ class ItemListsController < ApplicationController
   before_filter :validate_id_parameter
   load_and_authorize_resource
 
+  # This method will inject currentUser and currentAbility to the instance of ItemList
+  # Those values are required by Hydra Access Control.
+  before_filter :inject_user_and_ability_to_item_list
+  before_filter :setUserAndSharedItemLists, only: [:index, :show, :concordance_search, :frequency_search]
+
   FIXNUM_MAX = 2147483647
 
   # Set itemList tab as current selected
   set_tab :itemList
 
+  #
+  #
+  #
   def index
     if (session[:profiler])
       @profiler = session[:profiler]
@@ -23,6 +31,9 @@ class ItemListsController < ApplicationController
     end
   end
 
+  #
+  #
+  #
   def show
     if (session[:profiler])
       @profiler = session[:profiler]
@@ -33,6 +44,11 @@ class ItemListsController < ApplicationController
       format.html {
         @response = @item_list.get_items(params[:page], params[:per_page])
         @document_list = @response["response"]["docs"]
+
+        itemsWithAccessRights = @item_list.getItemsHandlesThatTheCurrentUserHasAccess()
+        if (@response['response']['numFound'] > itemsWithAccessRights.size)
+          @message = "You only have access to #{itemsWithAccessRights.size} out of #{@response['response']['numFound']} Items in this shared Item List."
+        end
 
         if current_user.authentication_token.nil? #generate auth token if one doesn't already exist
           current_user.reset_authentication_token!
@@ -45,30 +61,33 @@ class ItemListsController < ApplicationController
         @document_list = @response["response"]["docs"]
       }
       format.zip {
-        if @item_list.get_item_ids.length == 0
+        if @item_list.get_item_handles.length == 0
           flash[:error] = "No items in the item list you are trying to download"
           redirect_to @item_list and return
         end
         
         # Get the items of the item list
-        itemsId = @item_list.get_item_ids
+        itemsHandles = @item_list.get_item_handles
 
-        download_as_zip(itemsId, "#{@item_list.name}.zip")
+        download_as_zip(itemsHandles, "#{@item_list.name}.zip")
       }
       format.warc {
-        if @item_list.get_item_ids.length == 0
+        if @item_list.get_item_handles.length == 0
           flash[:error] = "No items in the item list you are trying to download"
           redirect_to @item_list and return
         end
 
         # Get the items of the item list
-        itemsId = @item_list.get_item_ids
+        itemsHandles = @item_list.get_item_handles
 
-        download_as_warc(itemsId, "#{@item_list.name}.warc")
+        download_as_warc(itemsHandles, "#{@item_list.name}.warc")
       }
     end
   end
-  
+
+  #
+  #
+  #
   def create
     if request.format == 'json' and request.post?
       name = params[:name]
@@ -131,6 +150,9 @@ class ItemListsController < ApplicationController
     end
   end
 
+  #
+  #
+  #
   def add_items
     if params[:add_all_items] == "true"
       documents = @item_list.getAllItemsFromSearch(params[:query_params])
@@ -153,6 +175,9 @@ class ItemListsController < ApplicationController
     redirect_to @item_list
   end
 
+  #
+  # This method with remove all the items in an item list but it will not remove the item list
+  #
   def clear
     bench_start = Time.now
     removed_set = @item_list.clear
@@ -165,6 +190,9 @@ class ItemListsController < ApplicationController
     redirect_to @item_list
   end
 
+  #
+  # This method with remove an item list from the system
+  #
   def destroy
     bench_start = Time.now
 
@@ -182,7 +210,7 @@ class ItemListsController < ApplicationController
   end
 
   #
-  #
+  # This method with set an item list a shared
   #
   def share
     @item_list.share
@@ -192,7 +220,7 @@ class ItemListsController < ApplicationController
   end
 
   #
-  #
+  # This method with set an item list a not shared
   #
   def unshare
     @item_list.unshare
@@ -201,7 +229,9 @@ class ItemListsController < ApplicationController
     redirect_to @item_list
   end
 
-
+  #
+  #
+  #
   def concordance_search
     result = @item_list.doConcordanceSearch(params[:concordance_search_for])
 
@@ -216,6 +246,9 @@ class ItemListsController < ApplicationController
 
   end
 
+  #
+  #
+  #
   def frequency_search
     result = @item_list.doFrequencySearch(params[:frequency_search_for], params[:facet])
     if (result[:error].nil? or result[:error].empty?)
@@ -231,14 +264,14 @@ class ItemListsController < ApplicationController
   #
   #
   #
-  def download_as_zip(itemsId, file_name)
+  def download_as_zip(itemHandles, file_name)
     begin
       cookies.delete("download_finished")
 
       bench_start = Time.now
 
       # Creates a ZIP file containing the documents and item's metadata
-      zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
+      zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemHandles) do |aDoc|
         @itemInfo = create_display_info_hash(aDoc)
         renderer = Rabl::Renderer.new('catalog/show', @itemInfo, { :format => 'json', :view_path => 'app/views', :scope => self })
         itemMetadata = renderer.render
@@ -250,7 +283,7 @@ class ItemListsController < ApplicationController
                 :disposition => 'attachment',
                 :filename => file_name
 
-      Rails.logger.debug("Time for downloading metadata and documents for #{itemsId.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+      Rails.logger.debug("Time for downloading metadata and documents for #{itemHandles.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
       cookies["download_finished"] = {value:"true", expires: 1.minute.from_now}
       return
 
@@ -272,7 +305,7 @@ class ItemListsController < ApplicationController
   #
   #
   #
-  def download_as_warc(itemsId, file_name)
+  def download_as_warc(itemHandles, file_name)
     begin
       cookies.delete("download_finished")
 
@@ -281,7 +314,7 @@ class ItemListsController < ApplicationController
       dont_show = Set.new(Item.development_only_fields)
 
       # Creates a WARC file containing the documents and item's metadata
-      archive_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveWarcPath(itemsId, request.original_url) do |aDoc|
+      archive_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveWarcPath(itemHandles, request.original_url) do |aDoc|
         @document = aDoc
         itemMetadata = {}
         keys = aDoc.keys
@@ -296,7 +329,7 @@ class ItemListsController < ApplicationController
                 :disposition => 'attachment',
                 :filename => file_name
 
-      Rails.logger.debug("Time for downloading metadata and documents for #{itemsId.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+      Rails.logger.debug("Time for downloading metadata and documents for #{itemHandles.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
       cookies["download_finished"] = {value:"true", expires: 1.minute.from_now}
       return
 
@@ -315,6 +348,9 @@ class ItemListsController < ApplicationController
     end
   end
 
+  #
+  #
+  #
   def add_item_to_item_list(item_list, documents_handles)
     item_list.add_items(documents_handles) unless item_list.nil?
   end
@@ -328,4 +364,25 @@ class ItemListsController < ApplicationController
     end
   end
 
+  #
+  # This method will inject currentUser and currentAbility to the instance of ItemList
+  # Those values are required by Hydra Access Control.
+  #
+  def inject_user_and_ability_to_item_list
+    if (!@item_list.nil?)
+      @item_list.setCurrentUser(current_user)
+      @item_list.setCurrentAbility(current_ability)
+    end
+  end
+
+  #
+  # This method will set the current user owned item list and also the shared ones
+  #
+  def setUserAndSharedItemLists
+    @userItemLists = current_user.item_lists
+    @userItemLists.sort! { |a,b| a.name.downcase <=> b.name.downcase }
+
+    @sharedItemLists = ItemList.where('shared = ? AND user_id != ?', true, current_user.id)
+    @sharedItemLists.sort! { |a,b| a.name.downcase <=> b.name.downcase }
+  end
 end

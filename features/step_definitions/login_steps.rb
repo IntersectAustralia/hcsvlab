@@ -35,6 +35,7 @@ Given /^I am logged in as "([^"]*)"$/ do |email|
   fill_in("user_email", :with => email)
   fill_in("user_password", :with => "Pas$w0rd")
   click_button("Log in")
+  @current_user = User.find_by_email(email)
 end
 
 Given /^I am logged out$/ do

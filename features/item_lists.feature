@@ -8,15 +8,17 @@ Feature: Managing Item Lists
     Given I ingest "cooee:1-002" with id "hcsvlab:2"
     Given I have the usual roles and permissions
     Given I have users
-      | email                       | first_name | last_name |
-      | researcher@intersect.org.au | Researcher | One       |
+      | email                         | first_name | last_name |
+      | researcher@intersect.org.au   | Researcher | One       |
+      | researcher1@intersect.org.au  | Researcher | One       |
     Given I have user "researcher@intersect.org.au" with the following groups
       | collectionName  | accessType  |
       | cooee           | read        |
-    And "researcher@intersect.org.au" has role "researcher"
-    And I am logged in as "researcher@intersect.org.au"
-    And I have done a search with collection "cooee"
-    And I should see the applied facet "Collection" with the value "cooee"
+    Given "researcher@intersect.org.au" has role "researcher"
+    Given "researcher1@intersect.org.au" has role "researcher"
+    Given I am logged in as "researcher@intersect.org.au"
+    Given I have done a search with collection "cooee"
+    Then I should see the applied facet "Collection" with the value "cooee"
     And I should get exactly 2 results
     And I should see "1 - 2 of 2"
 
@@ -55,14 +57,13 @@ Feature: Managing Item Lists
     And I fill in "Name" with "Add All Test"
     And I press "Create List"
     And I wait 5 seconds
-    And Save a screenshot with name "tmp/test1.png"
     And I should be on the item list page for "Add All Test"
     And I should see "Item list created successfully"
     And the item list "Add All Test" should have 2 items
-    And the item list "Add All Test" should contain ids
-      | pid       |
-      | hcsvlab:1 |
-      | hcsvlab:2 |
+    And the item list "Add All Test" should contain handles
+      | handle      |
+      | cooee:1-001 |
+      | cooee:1-001 |
     And I am on the item list page for "Add All Test"
     And I should see "1 - 2 of 2"
 
@@ -101,6 +102,20 @@ Feature: Managing Item Lists
     And I am on the item list page for "Test 1"
     And I should see "You are not authorised to access this page"
 
+  Scenario: Accessing other user's shared Item Lists
+    Given I have users
+      | email                  | first_name | last_name |
+      | other@intersect.org.au | Researcher | One       |
+    And "other@intersect.org.au" has role "researcher"
+    And "other@intersect.org.au" has item lists
+      | name   | shared |
+      | Test 1 | true   |
+    And the item list "Test 1" has items cooee:1-001, cooee:1-002
+    And the item list "Test 1" should have 2 items
+    And I am on the item list page for "Test 1"
+    And I should see "cooee:1-001"
+    And I should see "cooee:1-002"
+
   Scenario: Clearing an Item List
     And "researcher@intersect.org.au" has item lists
       | name       |
@@ -122,6 +137,60 @@ Feature: Managing Item Lists
     And the item list "Delete Test" should have 2 items
     And I follow the delete icon for item list "Delete Test"
     And I should see "Item list Delete Test deleted successfully"
+
+  Scenario: User should be able to share his own item lists
+    Given "researcher@intersect.org.au" has item lists
+      | name       |
+      | Share Test |
+    Given the item list "Share Test" has items cooee:1-001, cooee:1-002
+    When I am on the item list page for "Share Test"
+    Then the item list "Share Test" should have 2 items
+    And I should have the link "Share"
+
+  Scenario: Sharing an Item List
+    And "researcher@intersect.org.au" has item lists
+      | name       |
+      | Share Test |
+    And the item list "Share Test" has items cooee:1-001, cooee:1-002
+    And I am on the item list page for "Share Test"
+    And the item list "Share Test" should have 2 items
+    And I follow "Share"
+    And I should see "Item list Share Test is shared. Any user in the application will be able to see it."
+
+  Scenario: Stop sharing an Item List
+    And "researcher@intersect.org.au" has item lists
+      | name       | shared |
+      | Share Test | true   |
+    And the item list "Share Test" has items cooee:1-001, cooee:1-002
+    And I am on the item list page for "Share Test"
+    And the item list "Share Test" should have 2 items
+    And I follow "Stop Sharing"
+    And I should see "Item list Share Test is not being shared anymore."
+
+  Scenario: Stop sharing an Item List should no be possible for item list that does not belong to me
+    Given "researcher1@intersect.org.au" has item lists
+      | name       | shared |
+      | Share Test | true   |
+    Given the item list "Share Test" has items cooee:1-001, cooee:1-002
+    When I am on the item list page for "Share Test"
+    Then the item list "Share Test" should have 2 items
+    And I should not have the link "Stop Sharing"
+
+  Scenario: User should see a message when he has no access right to every item in the shared item list
+    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
+    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | cooee           | read        |
+      | austlit         | read        |
+    Given "researcher1@intersect.org.au" has item lists
+      | name       | shared |
+      | Share Test | true   |
+    Given the item list "Share Test" has items cooee:1-001, cooee:1-002, austlit:adaessa, austlit:bolroma
+    When I am on the item list page for "Share Test"
+    Then the item list "Share Test" should have 4 items
+    And I should see "You only have access to 2 out of 4 Items in this shared Item List. This is because you do not have access to the applicable Collections. To gain access to more Collections, visit the Licence Agreements page."
+
 
 #TODO check output maybe?
 
