@@ -28,12 +28,12 @@ qa2:
   <<: *common
   hostname: https://ic2-hcsvlab-qa2-vm.intersect.org.au
   secret_token: ;zH/h.MHgfOke+e0c_Ee}z8gqWl{gDsa
-  aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/jUQmxk9qcXuOW5sr
+  aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/uqw-VB7mtW-0BzaE
 
 staging:
   <<: *common
   hostname: https://ic2-hcsvlab-staging1-vm.intersect.org.au
-  secret_token: ''-YE>=Am`I-Zr6X8NmYEyVI9]Z]8ly;
+  secret_token: "''-YE>=Am`I-Zr6X8NmYEyVI9]Z]8ly;"
   aaf_rc_login_url: https://rapid.test.aaf.edu.au/jwt/authnrequest/research/Hv34WWNKkb7iHcjy
 
 staging2:
