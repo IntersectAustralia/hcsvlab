@@ -16,8 +16,8 @@ Feature: Reset forgotten password
     And I should be on the login page
     And "georgina@intersect.org.au" should receive an email
     When I open the email
-    Then I should see "Someone has requested a link to change your password on the HCSVLAB site, and you can do this through the link below." in the email body
-    When I follow "Change my password" in the email
+    Then I should see "Someone has requested a link to change your password on the HCS vLab website. You can do this through the link below." in the email body
+    When I click the first link in the email
     Then I should see "Change Your Password"
     When I fill in "Password" with "Pass.456"
     And I fill in "Password confirmation" with "Pass.456"
@@ -73,7 +73,7 @@ Feature: Reset forgotten password
     When I request a reset for "georgina@intersect.org.au"
     And "georgina@intersect.org.au" should receive an email
     And I open the email
-    And I follow "Change my password" in the email
+    When I click the first link in the email
     And I fill in "Password" with "Pass.456"
     And I fill in "Password confirmation" with "Pass.123"
     And I press "Change Your Password"
@@ -84,7 +84,7 @@ Feature: Reset forgotten password
     When I request a reset for "georgina@intersect.org.au"
     And "georgina@intersect.org.au" should receive an email
     And I open the email
-    And I follow "Change my password" in the email
+    When I click the first link in the email
     And I fill in "Password" with "Pass"
     And I fill in "Password confirmation" with "Pass"
     And I press "Change Your Password"
@@ -95,14 +95,14 @@ Feature: Reset forgotten password
     When I request a reset for "georgina@intersect.org.au"
     And "georgina@intersect.org.au" should receive an email
     And I open the email
-    And I follow "Change my password" in the email
+    When I click the first link in the email
     And I fill in "Password" with "Pass.456"
     And I fill in "Password confirmation" with "Pass.456"
     And I press "Change Your Password"
     Then I should see "Your password was changed successfully. You are now signed in."
     When I follow "Logout"
     And I open the email
-    And I follow "Change my password" in the email
+    When I click the first link in the email
     And I fill in "Password" with "Pass.000"
     And I fill in "Password confirmation" with "Pass.000"
     And I press "Change Your Password"

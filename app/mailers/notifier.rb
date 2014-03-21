@@ -91,4 +91,15 @@ class Notifier < ActionMailer::Base
           :subject => PREFIX + "Reset Password Request")
   end
 
+  # send password reset instructions
+  def reset_password_instructions(user)
+    @user = user
+    mail(:to => @user.email,
+         :from => APP_CONFIG['account_request_user_status_email_sender'],
+         :reply_to => APP_CONFIG['account_request_user_status_email_sender'],
+         :subject => "#{PREFIX}Reset password instructions",
+         :tag => 'password-reset',
+         :content_type => "text/html")
+  end
+
 end
