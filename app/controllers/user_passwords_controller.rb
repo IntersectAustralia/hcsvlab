@@ -13,8 +13,7 @@ class UserPasswordsController < Devise::PasswordsController
       user = User.find_all_by_email(params[resource_name][:email])
 
       if (user.empty?)
-        flash[:error] = "Invalid email."
-        redirect_to new_user_password_path and return
+        Notifier.notify_user_that_reset_password_was_requested(params[resource_name][:email]).deliver
       end
 
       set_flash_message(:notice, :send_paranoid_instructions) if is_navigational_format?

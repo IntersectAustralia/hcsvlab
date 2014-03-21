@@ -25,6 +25,18 @@ Feature: Reset forgotten password
     Then I should see "Your password was changed successfully. You are now signed in."
     And I should be able to log in with "georgina@intersect.org.au" and "Pass.456"
 
+  Scenario: Reset forgotten password for not registered user.
+    Given I am on the home page
+    When I follow "Forgot your password?"
+    And I fill in "Email" with "notuser@intersect.org.au"
+    And I press "Send me reset password instructions"
+    Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
+    And I should be on the login page
+    And "notuser@intersect.org.au" should receive an email
+    When I open the email
+    Then I should see "HCSVLAB - Reset Password Request" in the email subject
+    Then I should see "Someone has requested a link to change your password on the HCS vLab website (http://localhost:3000/). Unfortunately the email address entered, notuser@intersect.org.au, is not registered with the system. Please enter the email address originally used to sign up for an account. You can do this through the link below." in the email body
+
   Scenario: Deactivated user gets an email saying they can't reset their password
     Given I have a deactivated user "deac@intersect.org.au"
     When I request a reset for "deac@intersect.org.au"
@@ -49,13 +61,6 @@ Feature: Reset forgotten password
     Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
     And I should be on the login page
     But "spam@intersect.org.au" should receive no emails
-
-  Scenario: Non existent user trying to request a reset just sees default message but doesn't get email (so we don't reveal which users exist)
-    Given I am on the home page
-    When I request a reset for "noexist@intersect.org.au"
-    Then I should see "Invalid email."
-    And I should be on the forgot password page
-    But "noexist@intersect.org.au" should receive no emails
 
   Scenario: Error displayed if email left blank
     Given I am on the home page
