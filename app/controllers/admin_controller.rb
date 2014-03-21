@@ -20,9 +20,11 @@ class AdminController < ApplicationController
     metrics = MetricCalculator.get_metrics
 
     file = Tempfile.new("newfile")
-    file.puts metrics.first.keys.to_csv
-    metrics.each do |metric|
-      file.puts metric.values.join(",")
+    unless metrics.empty?
+      file.puts metrics.first.keys.to_csv
+      metrics.each do |metric|
+        file.puts metric.values.join(",")
+      end
     end
     file.close
     send_file file.path, :filename => "metrics.csv", :disposition => "attachment"
