@@ -31,6 +31,28 @@
 <% onload_text = "$('input#q').focus();" if params[:q].to_s.empty? and params[:f].to_s.empty? and params[:id].nil? %>
 <body onload="<%= onload_text %>" class="<%= render_body_class %>">
 
+<% if (!Rails.env.production?) %>
+  <!-- TOP RIGHT RIBBON: START COPYING HERE -->
+  <div class="github-fork-ribbon-wrapper right">
+    <div class="github-fork-ribbon">
+      <a href="">
+        <%= Rails.env%>
+      </a>
+    </div>
+  </div>
+  <!-- TOP RIGHT RIBBON: END COPYING HERE -->
+
+  <!-- TOP LEFT RIBBON: START COPYING HERE -->
+  <div class="github-fork-ribbon-wrapper left">
+    <div class="github-fork-ribbon">
+      <a href="">
+        <%= Rails.env%>
+      </a>
+    </div>
+  </div>
+  <!-- TOP LEFT RIBBON: END COPYING HERE -->
+<% end %>
+
 <%= render :partial => 'shared/header_navbar' %>
 
 <div id="ajax-modal" class="modal hide fade" tabindex="-1"></div>
