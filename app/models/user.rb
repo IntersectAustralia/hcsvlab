@@ -67,7 +67,7 @@ class User < ActiveRecord::Base
   def send_reset_password_instructions
     if approved?
       generate_reset_password_token!
-      ::Devise.mailer.reset_password_instructions(self).deliver
+      Notifier.reset_password_instructions(self).deliver
     else
       if pending_approval? or deactivated?
         Notifier.notify_user_that_they_cant_reset_their_password(self).deliver
