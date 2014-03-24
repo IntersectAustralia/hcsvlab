@@ -10,7 +10,15 @@ Devise.setup do |config|
   # verifies password before checking if account is active
   Devise::Models::Authenticatable.module_eval do
     def valid_for_authentication?
-      active_for_authentication? ? true : inactive_message
+      if block_given?
+        if yield
+          active_for_authentication? ? true : inactive_message
+        else
+          false
+        end
+      else
+        active_for_authentication? ? true : inactive_message
+      end
     end
   end
 
