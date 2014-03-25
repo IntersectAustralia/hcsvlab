@@ -57,7 +57,7 @@ Feature: Locking out users after multiple failed password attempts
     Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
     And "shuqian@intersect.org.au" should receive an email
     When I open the email
-    Then I should see "Someone has requested a link to change your password on the HCSVLAB site, and you can do this through the link below." in the email body
+    Then I should see "Someone has requested a link to change your password on the HCS vLab website. You can do this through the link below." in the email body
     When I follow "Change my password" in the email
     Then I should see "Change Your Password"
     When I fill in "Password" with "Pass.456"
