@@ -1,4 +1,4 @@
-= link_to 'Back to Item Details', catalog_path, :class => "btn"
+= link_to 'Back to Item Details', catalog_path([params[:collection], params[:itemId]]), :class => "btn"
     
 .btn-group.pull-right
   -# %button#tier_title.hider.btn{'data-hide-selector' => "#tier_list"}

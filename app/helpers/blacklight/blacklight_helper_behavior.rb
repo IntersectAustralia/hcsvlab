@@ -485,10 +485,12 @@ module Blacklight::BlacklightHelperBehavior
   # catalog_path accepts a HashWithIndifferentAccess object. The solr query params are stored in the session,
   # so we only need the +counter+ param here. We also need to know if we are viewing to document as part of search results.
   def link_literal_to_document(doc, label, opts={:counter => nil, :results_view => true})
+    collectionName = Array(doc[MetadataHelper.short_form(MetadataHelper::COLLECTION)]).first
+    itemIdentifier = doc[:handle].split(':').last
     if !opts[:itemViewList].nil?
-      link_to label, solr_document_path(doc[:handle], :il => opts[:itemViewList])
+      link_to label, solr_document_path([collectionName, itemIdentifier], :il => opts[:itemViewList])
     else
-      link_to label, catalog_url(doc[:handle]), {:'data-counter' => opts[:counter]}.merge(opts.reject { |k, v| [:label, :counter, :results_view].include? k })
+      link_to label, catalog_url([collectionName, itemIdentifier]), {:'data-counter' => opts[:counter]}.merge(opts.reject { |k, v| [:label, :counter, :results_view].include? k })
     end
   end
 
@@ -590,13 +592,27 @@ module Blacklight::BlacklightHelperBehavior
 
 
   def link_to_previous_document(previous_document)
-    link_to_unless previous_document.nil?, raw(t('views.pagination.previous')), previous_document, :class => "previous", :rel => 'prev', :'data-counter' => session[:search][:counter].to_i - 1 do
-      content_tag :span, raw(t('views.pagination.previous')), :class => 'previous'
+    if (!previous_document.nil?)
+      collectionName = Array(previous_document[MetadataHelper.short_form(MetadataHelper::COLLECTION)]).first
+      itemIdentifier = previous_document[:handle].split(':').last
+
+      link_to catalog_url([collectionName, itemIdentifier]), :class => "previous", :rel => 'prev', :'data-counter' => session[:search][:counter].to_i - 1 do
+        content_tag :span, raw(t('views.pagination.previous')), :class => 'previous'
+      end
+    else
+      content_tag :span, raw(t('views.pagination.previous')), :class => 'next'
     end
   end
 
   def link_to_next_document(next_document)
-    link_to_unless next_document.nil?, raw(t('views.pagination.next')), next_document, :class => "next", :rel => 'next', :'data-counter' => session[:search][:counter].to_i + 1 do
+    if (!next_document.nil?)
+      collectionName = Array(next_document[MetadataHelper.short_form(MetadataHelper::COLLECTION)]).first
+      itemIdentifier = next_document[:handle].split(':').last
+
+      link_to catalog_url([collectionName, itemIdentifier]), :class => "next", :rel => 'next', :'data-counter' => session[:search][:counter].to_i + 1 do
+        content_tag :span, raw(t('views.pagination.next')), :class => 'next'
+      end
+    else
       content_tag :span, raw(t('views.pagination.next')), :class => 'next'
     end
   end

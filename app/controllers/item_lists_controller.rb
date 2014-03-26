@@ -101,7 +101,7 @@ class ItemListsController < ApplicationController
           @item_list = item_lists[0]
           new_item_list = false
         end
-        ids = params[:items].collect { |x| File.basename(x) }
+        ids = params[:items].collect { |x| "#{File.basename(File.split(x).first)}:#{File.basename(x)}" }
         addItemsResult = add_item_to_item_list(@item_list, ids)
         added_set = addItemsResult[:addedItems]
         if new_item_list

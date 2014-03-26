@@ -67,19 +67,29 @@ module NavigationHelpers
         catalog_index_path(options)
 
       when /^the catalog annotations page for "(.*)"$/
-        catalog_annotations_path($1, options)
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        catalog_annotations_path(collectionName, itemIdentifier, options)
 
       when /^the catalog annotation properties page for "(.*)"$/
-        catalog_annotation_properties_path($1, options)
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        catalog_annotation_properties_path(collectionName, itemIdentifier, options)
 
       when /^the catalog annotation types page for "(.*)"$/
-        catalog_annotation_types_path($1, options)
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        catalog_annotation_types_path(collectionName, itemIdentifier, options)
 
       when /^the catalog primary text page for "(.*)"$/
-        catalog_primary_text_path($1, options)
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        catalog_primary_text_path(collectionName, itemIdentifier, options)
 
       when /^the catalog page for "(.*)"$/
-        catalog_path($1, options)
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        catalog_path([collectionName, itemIdentifier], options)
 
       when /^the catalog sparql page for collection "(.*)"$/
         catalog_sparqlQuery_path($1, options)
@@ -106,7 +116,9 @@ module NavigationHelpers
         account_licence_agreements_path(options)
 
       when /^the document content page for file "(.*)" for item "(.*)"$/
-        catalog_document_path($2, $1, options)
+        collectionName = $2.split(':').first
+        itemIdentifier = $2.split(':').last
+        catalog_document_path(collectionName, itemIdentifier, $1, options)
 
       when /^the admin page$/
         admin_index_path(options)
@@ -115,7 +127,9 @@ module NavigationHelpers
         search_history_path(options)
 
       when /^the eopas page for item "(.*)"$/
-        eopas_path($1, options)
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        eopas_path(collectionName, itemIdentifier, options)
 
       when /^the licence requests page$/
         user_licence_requests_path(options)

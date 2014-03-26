@@ -180,16 +180,20 @@ module Blacklight::CatalogHelperBehavior
       end
     end
 
+    collectionName = Array(document[MetadataHelper::short_form(MetadataHelper::COLLECTION)]).first
+    itemIdentifier = document[:handle].split(':').last
+
+
     # Prepare document PRIMARY_TEXT_URL information
     solr_item = Item.find_and_load_from_solr({id: document[:id]}).first
     if solr_item.hasPrimaryText?
       begin
-        primary_text = catalog_primary_text_url(document[:handle], format: :json)
+        primary_text = catalog_primary_text_url(collectionName, format: :json)
       rescue NoMethodError => e
         # When we create the json metadata from the solr processor, we need to do the following work around
         # to have access to routes URL methods
         parameters = default_url_options.merge({format: :json})
-        primary_text = Rails.application.routes.url_helpers.catalog_primary_text_url(document[:handle], parameters)
+        primary_text = Rails.application.routes.url_helpers.catalog_primary_text_url(collectionName, itemIdentifier, parameters)
       end
     else
       primary_text = "No primary text found"
@@ -208,12 +212,12 @@ module Blacklight::CatalogHelperBehavior
         #URL
         if values.has_key?(MetadataHelper::SOURCE)
           begin
-            documentHash[:"#{HCSVLAB_PREFIX}:url"] = catalog_document_url(document.handle, filename: values[MetadataHelper::IDENTIFIER])
+            documentHash[:"#{HCSVLAB_PREFIX}:url"] = catalog_document_url(collectionName, filename: values[MetadataHelper::IDENTIFIER])
           rescue NoMethodError => e
             # When we create the json metadata from the solr processor, we need to do the following work around
             # to have access to routes URL methods
             parameters = default_url_options.merge({filename: values[MetadataHelper::IDENTIFIER]})
-            documentHash[:"#{HCSVLAB_PREFIX}:url"] = Rails.application.routes.url_helpers.catalog_document_url(document[:handle], parameters)
+            documentHash[:"#{HCSVLAB_PREFIX}:url"] = Rails.application.routes.url_helpers.catalog_document_url(collectionName, itemIdentifier, parameters)
           end
         else
           documentHash[:"#{HCSVLAB_PREFIX}:url"] = values[MetadataHelper::IDENTIFIER]
@@ -270,31 +274,33 @@ module Blacklight::CatalogHelperBehavior
     #end
 
     #Add SPARQL endpoint
-    collectionName = Array(document[MetadataHelper::short_form(MetadataHelper::COLLECTION)]).first
-    metadataHash["#{HCSVLAB_PREFIX}:sparqlEndpoint"] = "#{SESAME_CONFIG["url"].to_s}/repositories/#{collectionName}"
+    begin
+      metadataHash["#{HCSVLAB_PREFIX}:sparqlEndpoint"] = catalog_sparqlQuery_url(collectionName)
+    rescue NoMethodError => e
+      metadataHash["#{HCSVLAB_PREFIX}:sparqlEndpoint"] = Rails.application.routes.url_helpers.catalog_sparqlQuery_url(collectionName, default_url_options)
+    end
 
 
     itemInfo = ItemInfo.new
     begin
-      itemInfo.catalog_url = catalog_url(document[:handle])
+      itemInfo.catalog_url = catalog_url([collectionName, itemIdentifier])
     rescue NoMethodError => e
       # When we create the json metadata from the solr processor, we need to do the following work around
       # to have access to routes URL methods
-      itemInfo.catalog_url = Rails.application.routes.url_helpers.catalog_url(document[:handle], default_url_options)
+
+      itemInfo.catalog_url = Rails.application.routes.url_helpers.catalog_url([collectionName, itemIdentifier], default_url_options)
     end
     itemInfo.metadata = metadataHash
     itemInfo.primary_text_url = primary_text
     begin
       unless solr_item.annotation_set.empty?
-        #itemInfo.annotations = {main_annotation_url: catalog_annotations_url(document[:id], format: :json)}
-        itemInfo.annotations_url = catalog_annotations_url(document[:handle], format: :json)
+        itemInfo.annotations_url = catalog_annotations_url(collectionName, format: :json)
       end
     rescue NoMethodError => e
       # When we create the json metadata from the solr processor, we need to do the following work around
       # to have access to routes URL methods
       parameters = default_url_options.merge({format: :json})
-      #itemInfo.annotations =  Rails.application.routes.url_helpers.catalog_annotations_url(document[:id], parameters)
-      itemInfo.annotations_url = Rails.application.routes.url_helpers.catalog_annotations_url(document[:handle], parameters)
+      itemInfo.annotations_url = Rails.application.routes.url_helpers.catalog_annotations_url(collectionName, itemIdentifier, parameters)
     end
     #if (!userAnnotationsData.empty?)
     #  itemInfo.annotations = {} if itemInfo.annotations.nil?

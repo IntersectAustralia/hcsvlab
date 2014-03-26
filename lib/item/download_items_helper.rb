@@ -54,7 +54,7 @@ module Item::DownloadItemsHelper
 
           fileNamesByItem = {}
           metadata.each_pair do |key, value|
-            handle = value[:metadata]['metadata']['handle'].gsub(':', '_')
+            handle = value[:metadata]['metadata']['handle']
             files = value[:files].map {|filename| filename.to_s.gsub(/(^file:(\/)+)/, "/")}
             fileNamesByItem[key] = {handle: handle, files: files}
           end
@@ -140,15 +140,17 @@ module Item::DownloadItemsHelper
         metadata  = info[:metadata] || {}
 
         indexable_text_document = (filenames.select {|f| f.include? "-plain.txt"}).empty? ? "" : (filenames.select {|f| f.include? "-plain.txt"})[0]
+        collectionName = info[:handle].split(':').first
+        itemIdentifier = info[:handle].split(':').last
         if File.exist?(indexable_text_document)
           title = indexable_text_document.split('/').last
-          warc.add_record_from_file(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{info[:handle]}/document/#{title}"}), indexable_text_document)
+          warc.add_record_from_file(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{collectionName}/#{itemIdentifier}/document/#{title}"}), indexable_text_document)
         elsif indexable_text_document.blank?
           logger.warn("No primary (plaintext) document found for Item #{itemId}")
-          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{info[:handle]}"}))
+          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{collectionName}/#{itemIdentifier}"}))
         else
           logger.warn("Document file #{indexable_text_document} does not exist (part of Item #{itemId}")
-          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{info[:handle]}"}))
+          warc.add_record_metadata(metadata.merge({"WARC-Type" => "response", "WARC-Record-ID" => "#{base_url}catalog/#{collectionName}/#{itemIdentifier}"}))
         end
       end
     end
@@ -176,7 +178,7 @@ module Item::DownloadItemsHelper
 
         (response, document_list) = get_search_results params
         document_list.each do |aDoc|
-          handle = aDoc['handle'].gsub(":", "_")
+          handle = aDoc['handle']
           itemId = aDoc['id']
           fileNamesByItem[itemId][:handle] = handle
 

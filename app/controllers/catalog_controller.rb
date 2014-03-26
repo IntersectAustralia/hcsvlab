@@ -325,6 +325,10 @@ class CatalogController < ApplicationController
     if Item.where(id: params[:id]).count != 0
       @response, @document = get_solr_response_for_doc_id
 
+      # For some reason blacklight stopped to fullfill the counter value in the session since we changed
+      # the item url to use /catalog/:collection/:itemId. So will set this in here.
+      session[:search][:counter] = params[:counter] if params[:counter].present?
+
       #By now we are not going to show user uploaded annotation in the webapp
       #solr_item = Item.find_and_load_from_solr({id: @document[:id]}).first
       #@has_main_annotation = !solr_item.annotation_set.empty?
@@ -591,7 +595,7 @@ class CatalogController < ApplicationController
   def download_items
     if (params[:items].present?)
 
-      itemsId = params[:items].collect { |x| File.basename(x) }
+      itemHandles = params[:items].collect { |x| "#{File.basename(File.split(x).first)}:#{File.basename(x)}" }
 
       respond_to do |format|
         format.warc {
@@ -599,7 +603,7 @@ class CatalogController < ApplicationController
           #download_as_warc(itemsId)clear
         }
         format.any {
-          download_as_zip(itemsId, "items.zip")
+          download_as_zip(itemHandles, "items.zip")
         }
       end
     else
@@ -623,23 +627,22 @@ class CatalogController < ApplicationController
 
   #
   # API command:
-  #               curl -H "X-API-KEY:<api_key>" -H "Accept: application/json" -F file=@<path_to_file> <host>/catalog/:id/annotations
+  #               curl -H "X-API-KEY:<api_key>" -H "Accept: application/json" -F file=@<path_to_file> <host>/catalog/:collection/:itemId/annotations
   def upload_annotation
     uploaded_file = params[:file]
-    id = params[:id]
+    item_handler = "#{params[:collection]}:#{params[:itemId]}"
 
     # Validate item. This line will also validate that the user has permission for adding
     # the annotation in that item.
-    item = Item.find_and_load_from_solr({id: id.to_s})
+    item = Item.find_and_load_from_solr({handle: item_handler.to_s})
     if item.empty?
       respond_to do |format|
         format.json {
-          render :json => {:error => "No Item with id '#{id}' exists."}.to_json, :status => 412
+          render :json => {:error => "No Item with handle '#{item_handler}' exists."}.to_json, :status => 412
           return
         }
       end
     end
-    item_handler = item.first[:handle].first
 
     if (!uploaded_file.is_a? ActionDispatch::Http::UploadedFile)
       render :json => {:error => "Error in file parameter."}.to_json, :status => 412
@@ -870,12 +873,12 @@ class CatalogController < ApplicationController
   #
   #
   #
-  def download_as_zip(itemsId, file_name)
+  def download_as_zip(itemHandles, file_name)
     begin
       bench_start = Time.now
 
       # Creates a ZIP file containing the documents and item's metadata
-      zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemsId) do |aDoc|
+      zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemHandles) do |aDoc|
         @itemInfo = create_display_info_hash(aDoc)
 
         renderer = Rabl::Renderer.new('catalog/show', @itemInfo, { :format => 'json', :view_path => 'app/views', :scope => self })
@@ -888,7 +891,7 @@ class CatalogController < ApplicationController
                 :disposition => 'attachment',
                 :filename => file_name
 
-      Rails.logger.debug("Time for downloading metadata and documents for #{itemsId.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+      Rails.logger.debug("Time for downloading metadata and documents for #{itemHandles.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
       return
 
     rescue Exception => e
@@ -921,11 +924,15 @@ class CatalogController < ApplicationController
   end
 
   #
-  #
+  # This method will collect the :collection and :itemId parameters and will try to obtain the
+  # sequential identifier.
   #
   def retrieve_and_set_item_id
-    if (params[:id].present?)
-      item = Item.find_and_load_from_solr({handle:params[:id]})
+    handle = nil
+    handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
+
+    if (!handle.nil?)
+      item = Item.find_and_load_from_solr({handle:handle})
       if (!item.present?)
         respond_to do |format|
           format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return}
@@ -1049,17 +1056,17 @@ class CatalogController < ApplicationController
       end
     end
 
-
+    itemIdentifier = @item.handle.first.split(':').last
     # hacky way to find the "primary" document, need to make this standard in RDF
     if !@item.primary_text.content.nil?
-      annotates_document = "#{catalog_primary_text_url(@item.handle, format: :json)}"
+      annotates_document = catalog_primary_text_url(@item.collection.flat_name, format: :json)
     else
       uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
       documents = item_documents(@document, uris)
       if(documents.present?)
-        annotates_document = "#{catalog_document_url(@document.id, documents.first[MetadataHelper::IDENTIFIER])}"
+        annotates_document = catalog_document_url(@item.collection.flat_name, documents.first[MetadataHelper::IDENTIFIER])
       else
-        annotates_document = "#{catalog_url(@item)}"
+        annotates_document = catalog_url([@item.collection.flat_name, itemIdentifier])
       end
     end
 
@@ -1208,7 +1215,7 @@ class CatalogController < ApplicationController
   end
 
   def user_params
-    return params.except(:format, :action, :controller, :id, :type, :label, :api_key)
+    return params.except(:format, :action, :controller, :id, :collection, :itemId, :type, :label, :api_key)
   end
 
   def sparql_item(item)

@@ -132,8 +132,11 @@ class TranscriptsController < ApplicationController
   #
   #
   def retrieve_and_set_item_id
-    if (params[:id].present?)
-      item = Item.find_and_load_from_solr({handle:params[:id]})
+    handle = nil
+    handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
+
+    if (!handle.nil?)
+      item = Item.find_and_load_from_solr({handle:handle})
       if (!item.present?)
         respond_to do |format|
           format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a record that doesn't exist.")) and return}

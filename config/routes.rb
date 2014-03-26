@@ -1,8 +1,7 @@
 HcsvlabWeb::Application.routes.draw do
   # This constraint specify that we are going to accept any character except '/' for an item id.
   catalogRoutesConstraints = {:id => /[^\/]+/}
-  #catalogRoutesConstraintsIncludingJson = {:id => /[^\/]+[^(?<!\.json)$]/}
-  catalogRoutesConstraintsIncludingJson = {:id => /(?:(?!\.json|\/).)+/i}
+  catalogRoutesConstraintsIncludingJson = {:itemId => /(?:(?!\.json|\/).)+/i}
 
   root :to => "catalog#index"
 
@@ -12,21 +11,23 @@ HcsvlabWeb::Application.routes.draw do
   get "catalog/searchable_fields", :to => 'catalog#searchable_fields', :as => 'catalog_searchable_fields'
   get 'sparql/:collection', :to => 'catalog#sparqlQuery', :as => 'catalog_sparqlQuery'
 
-
   # We need to override this routes defined by the method 'Blacklight.add_routes' in order to add the constraints.
-  resources :solr_document,  :path => 'catalog', :controller => 'catalog', :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
+  #resources :solr_document,  :path => 'catalog', :controller => 'catalog', :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
   # :show and :update are for backwards-compatibility with catalog_url named routes
-  resources :catalog, :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
+  #resources :catalog, :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
 
-  Blacklight.add_routes(self)
+  match 'catalog/:collection/:itemId', :controller => 'catalog', :action => 'show', :conditions => { :method => :get } , :constraints => catalogRoutesConstraintsIncludingJson
+  match 'catalog/:collection/:itemId', :controller => 'catalog', :action => 'update', :conditions => { :method => :put } , :constraints => catalogRoutesConstraintsIncludingJson
 
-  get "catalog/:id/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text', :constraints => catalogRoutesConstraints
-  get "catalog/:id/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/, :constraints => catalogRoutesConstraints
-  get "catalog/:id/document/", :to => 'catalog#document', :as => 'catalog_document_api', :constraints => catalogRoutesConstraints
-  get "catalog/:id/annotations", :to => 'catalog#annotations', :as => 'catalog_annotations', :constraints => catalogRoutesConstraints
-  post 'catalog/:id/annotations', :to => 'catalog#upload_annotation', :constraints => catalogRoutesConstraints
-  get "catalog/:id/annotations/properties", :to => 'catalog#annotation_properties', :as => 'catalog_annotation_properties', :constraints => catalogRoutesConstraints
-  get "catalog/:id/annotations/types", :to => 'catalog#annotation_types', :as => 'catalog_annotation_types', :constraints => catalogRoutesConstraints
+  Hcsvlab_Blacklight::Routes.new(self, {}).draw
+
+  get "catalog/:collection/:itemId/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text', :constraints => catalogRoutesConstraints
+  get "catalog/:collection/:itemId/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/, :constraints => catalogRoutesConstraints
+  get "catalog/:collection/:itemId/document/", :to => 'catalog#document', :as => 'catalog_document_api', :constraints => catalogRoutesConstraints
+  get "catalog/:collection/:itemId/annotations", :to => 'catalog#annotations', :as => 'catalog_annotations', :constraints => catalogRoutesConstraints
+  post 'catalog/:collection/:itemId/annotations', :to => 'catalog#upload_annotation', :constraints => catalogRoutesConstraints
+  get "catalog/:collection/:itemId/annotations/properties", :to => 'catalog#annotation_properties', :as => 'catalog_annotation_properties', :constraints => catalogRoutesConstraints
+  get "catalog/:collection/:itemId/annotations/types", :to => 'catalog#annotation_types', :as => 'catalog_annotation_types', :constraints => catalogRoutesConstraints
 
   post 'catalog/download_items', :to => 'catalog#download_items', :as => 'catalog_download_items_api'
   #get 'catalog/download_annotation/:id', :to => 'catalog#download_annotation', :as => 'catalog_download_annotation'
@@ -64,7 +65,7 @@ HcsvlabWeb::Application.routes.draw do
   end
 
   # resources :media_items, :transcripts
-  match '/eopas/:id' => 'transcripts#show', :as => 'eopas', :constraints => catalogRoutesConstraints
+  match '/eopas/:collection/:itemId' => 'transcripts#show', :as => 'eopas', :constraints => catalogRoutesConstraints
 
   match 'schema/json-ld' => 'catalog#annotation_context', :as => 'annotation_context'
   resources :issue_reports, :only => [:new, :create] do

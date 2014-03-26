@@ -18,7 +18,7 @@
     - elsif type == "Video"
     - elsif type == "Audio"
       %audio{:controls => "", :style => "width:450px"}
-        %source{:src => "/catalog/#{document[:id]}/document/#{doc[MetadataHelper::IDENTIFIER]}"}
+        %source{:src => "/catalog/#{document[:handle].split(':').first}/#{document[:handle].split(':').last}/document/#{doc[MetadataHelper::IDENTIFIER]}"}
         %embed{:height => "50", :src => doc[MetadataHelper::SOURCE], :width => "100"}
 
       %div{class:"eopas_message"}
@@ -99,7 +99,7 @@
         %tr
           - if values.has_key?(MetadataHelper::SOURCE)
             %td
-              %a{:href => "/catalog/#{document[:handle]}/document/#{values[MetadataHelper::IDENTIFIER]}"}= values[MetadataHelper::IDENTIFIER]
+              %a{:href => "/catalog/#{document[:handle].split(':').first}/#{document[:handle].split(':').last}/document/#{values[MetadataHelper::IDENTIFIER]}"}= values[MetadataHelper::IDENTIFIER]
           - else
             %td= values[MetadataHelper::IDENTIFIER]
           - if values.has_key?(MetadataHelper::TYPE)
@@ -119,7 +119,7 @@
             - field = "unknown"
           %td= field
   - if eopas_viewable? params[:id]
-    = link_to('View in EOPAS', eopas_path, class: 'btn')
+    = link_to('View in EOPAS', eopas_path(document[:handle].split(':').first, document[:handle].split(':').last), class: 'btn')
 
 -# User uploaded annotations will no be shown by now
 -#%h3

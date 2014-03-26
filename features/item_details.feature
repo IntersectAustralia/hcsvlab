@@ -46,7 +46,7 @@ Feature: Displaying Items
       | pages                                     | 10-11                                                   |
       | speaker                                   | 1-001addressee, 1-001author                             |
       | Date Group                                | 1790 - 1799                                             |
-      | SPARQL endpoint                           | http://localhost:8984/openrdf-sesame/repositories/cooee |
+      | SPARQL endpoint                           | http://www.example.com/sparql/cooee                     |
     And I should not see "Development Extras"
 
   Scenario: Verify presence of every faceted field

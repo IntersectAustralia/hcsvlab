@@ -10,7 +10,7 @@
       - @highlighting.each do |key, value|
         %h3
           %span
-            =link_to value[:title], solr_document_path(value[:title])
+            =link_to value[:title], solr_document_path([value[:title].split(':').first, value[:title].split(':').last])
             %small= "Found " + pluralize(value[:matches].size, 'match')
         %table.table.table-condensed.concordanceTable
           - value[:matches].each do |m|
