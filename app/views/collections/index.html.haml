@@ -3,6 +3,7 @@
   - if (!params[:id].nil?)
     = render :file => '/collections/show'
   - else
-    %h2 Select a collection to view
+    %h2 Select a collection to view general information about that collection
+    %p In order to access the data for a particular collection, you will need to agree to the licence for that collection.
 = render 'shared/nectar_attribution'
 = render 'shared/modal_waiting_panel'
