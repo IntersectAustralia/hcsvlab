@@ -44,7 +44,7 @@
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
           - coll = Collection.find_by_short_name(document[solr_fname])[0]
           - if !coll.nil?
-            = link_to(format_duplicates(document[solr_fname]), collection_path(coll))
+            = link_to(format_duplicates(document[solr_fname]), collection_path(coll.short_name))
           - else
             = render_document_show_field_value document, :field => solr_fname
       - elsif solr_fname == 'DC_type_facet'

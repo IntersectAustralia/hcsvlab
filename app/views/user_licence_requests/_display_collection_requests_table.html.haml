@@ -28,7 +28,7 @@
             .modal-footer
               %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
       - else
-        %td= link_to request.request.flat_name, collection_path(request.request)
+        %td= link_to request.request.flat_name, collection_path(request.request.flat_name)
       %td
         = link_to "Approve", approve_request_user_licence_request_path(request), :method => :put, :id => "approve_#{request.id}", :class => "btn btn-primary btn-mini"
 

@@ -488,9 +488,9 @@ module Blacklight::BlacklightHelperBehavior
     collectionName = Array(doc[MetadataHelper.short_form(MetadataHelper::COLLECTION)]).first
     itemIdentifier = doc[:handle].split(':').last
     if !opts[:itemViewList].nil?
-      link_to label, solr_document_path([collectionName, itemIdentifier], :il => opts[:itemViewList])
+      link_to label, solr_document_path(collectionName, itemIdentifier, :il => opts[:itemViewList])
     else
-      link_to label, catalog_url([collectionName, itemIdentifier]), {:'data-counter' => opts[:counter]}.merge(opts.reject { |k, v| [:label, :counter, :results_view].include? k })
+      link_to label, catalog_url(collectionName, itemIdentifier), {:'data-counter' => opts[:counter]}.merge(opts.reject { |k, v| [:label, :counter, :results_view].include? k })
     end
   end
 
@@ -596,7 +596,7 @@ module Blacklight::BlacklightHelperBehavior
       collectionName = Array(previous_document[MetadataHelper.short_form(MetadataHelper::COLLECTION)]).first
       itemIdentifier = previous_document[:handle].split(':').last
 
-      link_to catalog_url([collectionName, itemIdentifier]), :class => "previous", :rel => 'prev', :'data-counter' => session[:search][:counter].to_i - 1 do
+      link_to catalog_url(collectionName, itemIdentifier), :class => "previous", :rel => 'prev', :'data-counter' => session[:search][:counter].to_i - 1 do
         content_tag :span, raw(t('views.pagination.previous')), :class => 'previous'
       end
     else
@@ -609,7 +609,7 @@ module Blacklight::BlacklightHelperBehavior
       collectionName = Array(next_document[MetadataHelper.short_form(MetadataHelper::COLLECTION)]).first
       itemIdentifier = next_document[:handle].split(':').last
 
-      link_to catalog_url([collectionName, itemIdentifier]), :class => "next", :rel => 'next', :'data-counter' => session[:search][:counter].to_i + 1 do
+      link_to catalog_url(collectionName, itemIdentifier), :class => "next", :rel => 'next', :'data-counter' => session[:search][:counter].to_i + 1 do
         content_tag :span, raw(t('views.pagination.next')), :class => 'next'
       end
     else
@@ -734,7 +734,7 @@ module Blacklight::BlacklightHelperBehavior
     collectionName = Collection.find_and_load_from_solr({id:collection_id}).first.flat_name
 
     fields = graph.statements.map { |i| {collection_label(MetadataHelper::short_form(i.predicate)) => collection_value(graph, i.predicate)} }.uniq
-    fields << {'SPARQL Endpoint'=>"#{SESAME_CONFIG["url"].to_s}/repositories/#{collectionName}"}
+    fields << {'SPARQL Endpoint' => catalog_sparqlQuery_url(collectionName)}
     fields
   end
 

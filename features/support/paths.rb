@@ -89,7 +89,7 @@ module NavigationHelpers
       when /^the catalog page for "(.*)"$/
         collectionName = $1.split(':').first
         itemIdentifier = $1.split(':').last
-        catalog_path([collectionName, itemIdentifier], options)
+        catalog_path(collectionName, itemIdentifier, options)
 
       when /^the catalog sparql page for collection "(.*)"$/
         catalog_sparqlQuery_path($1, options)
@@ -104,7 +104,7 @@ module NavigationHelpers
         licences_path(options)
 
       when /^the collection page for "(.*)"$/
-        collection_path(Collection.find_by_short_name($1), options)
+        collection_path($1, options)
 
       when /^the collection page for id "(.*)"$/
         collection_path($1, options)

@@ -287,7 +287,7 @@ Feature: Browsing via API
     And the JSON response should have "$..collection_name" with the text "cooee"
 
   Scenario: Access collection details via the API for non-existant collection
-    Given I make a JSON request for the collection page for id "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
+    Given I make a JSON request for the collection page for "non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
     And the JSON response should be:
     """

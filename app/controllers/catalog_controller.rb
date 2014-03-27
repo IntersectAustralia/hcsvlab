@@ -1066,7 +1066,7 @@ class CatalogController < ApplicationController
       if(documents.present?)
         annotates_document = catalog_document_url(@item.collection.flat_name, documents.first[MetadataHelper::IDENTIFIER])
       else
-        annotates_document = catalog_url([@item.collection.flat_name, itemIdentifier])
+        annotates_document = catalog_url(@item.collection.flat_name, itemIdentifier)
       end
     end
 

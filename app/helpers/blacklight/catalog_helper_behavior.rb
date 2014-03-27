@@ -283,12 +283,12 @@ module Blacklight::CatalogHelperBehavior
 
     itemInfo = ItemInfo.new
     begin
-      itemInfo.catalog_url = catalog_url([collectionName, itemIdentifier])
+      itemInfo.catalog_url = catalog_url(collectionName, itemIdentifier)
     rescue NoMethodError => e
       # When we create the json metadata from the solr processor, we need to do the following work around
       # to have access to routes URL methods
 
-      itemInfo.catalog_url = Rails.application.routes.url_helpers.catalog_url([collectionName, itemIdentifier], default_url_options)
+      itemInfo.catalog_url = Rails.application.routes.url_helpers.catalog_url(collectionName, itemIdentifier, default_url_options)
     end
     itemInfo.metadata = metadataHash
     itemInfo.primary_text_url = primary_text

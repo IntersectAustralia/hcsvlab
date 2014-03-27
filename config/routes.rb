@@ -7,19 +7,24 @@ HcsvlabWeb::Application.routes.draw do
 
   get "version", :to => "application#version"
 
+  get "/", :to => 'catalog#index', :as => 'catalog_index'
   get "catalog/search", :to => 'catalog#search', :as => 'catalog_search'
   get "catalog/searchable_fields", :to => 'catalog#searchable_fields', :as => 'catalog_searchable_fields'
   get 'sparql/:collection', :to => 'catalog#sparqlQuery', :as => 'catalog_sparqlQuery'
 
-  # We need to override this routes defined by the method 'Blacklight.add_routes' in order to add the constraints.
-  #resources :solr_document,  :path => 'catalog', :controller => 'catalog', :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
   # :show and :update are for backwards-compatibility with catalog_url named routes
-  #resources :catalog, :only => [:show, :update], :constraints => catalogRoutesConstraintsIncludingJson
+  get 'catalog/:collection/:itemId', :to => 'catalog#show', :as => "catalog", :constraints => catalogRoutesConstraintsIncludingJson
+  put 'catalog/:collection/:itemId', :to => 'catalog#update', :as => "catalog", :constraints => catalogRoutesConstraintsIncludingJson
+  get 'catalog/:collection/:itemId', :to => 'catalog#show', :as => "solr_document", :constraints => catalogRoutesConstraintsIncludingJson
+  put 'catalog/:collection/:itemId', :to => 'catalog#update', :as => "solr_document", :constraints => catalogRoutesConstraintsIncludingJson
 
-  match 'catalog/:collection/:itemId', :controller => 'catalog', :action => 'show', :conditions => { :method => :get } , :constraints => catalogRoutesConstraintsIncludingJson
-  match 'catalog/:collection/:itemId', :controller => 'catalog', :action => 'update', :conditions => { :method => :put } , :constraints => catalogRoutesConstraintsIncludingJson
+  # Collection definitions
+  get "catalog", :to => 'collections#index', :as => 'collections'
+  get "catalog/:id", :to => 'collections#show', :as => 'collection'
 
-  Hcsvlab_Blacklight::Routes.new(self, {}).draw
+  # In /config/initializers/blacklight_routes.rb we are overriding one of the methods of this class
+  Blacklight::Routes.new(self, :except => [:solr_document]).draw
+
 
   get "catalog/:collection/:itemId/primary_text", :to => 'catalog#primary_text', :as => 'catalog_primary_text', :constraints => catalogRoutesConstraints
   get "catalog/:collection/:itemId/document/:filename", :to => 'catalog#document', :as => 'catalog_document', :format => false, :filename => /.*/, :constraints => catalogRoutesConstraints
@@ -31,6 +36,7 @@ HcsvlabWeb::Application.routes.draw do
 
   post 'catalog/download_items', :to => 'catalog#download_items', :as => 'catalog_download_items_api'
   #get 'catalog/download_annotation/:id', :to => 'catalog#download_annotation', :as => 'catalog_download_annotation'
+
 
   HydraHead.add_routes(self)
   
@@ -71,8 +77,6 @@ HcsvlabWeb::Application.routes.draw do
   resources :issue_reports, :only => [:new, :create] do
   end
 
-  resources :collections, :only => [:index, :show], :path => "/collections" do
-  end
 
   resources :admin, :only => [:index] do
     collection do

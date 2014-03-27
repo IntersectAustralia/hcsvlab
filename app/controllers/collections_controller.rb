@@ -1,24 +1,26 @@
 class CollectionsController < ApplicationController
   before_filter :authenticate_user!
-  load_and_authorize_resource
+  #load_and_authorize_resource
 
   set_tab :collection
 
   PER_PAGE_RESULTS = 20
 
+  #
+  #
+  #
   def index
-
-    collection = Collection.all.select{|c| can? :discover, c}
-
-    @collections = collection.sort_by { |coll| coll.flat_short_name}
+    @collections = getCollectionsIHaveAccess()
   end
 
+  #
+  #
+  #
   def show
-    collection = Collection.all.select{|c| can? :discover, c}
-    @collections = collection.sort_by { |coll| coll.flat_short_name}
+    @collections = getCollectionsIHaveAccess()
 
     begin
-      @collection = Collection.find(params[:id])
+      @collection = Array(Collection.find_by_short_name(params[:id])).first
     rescue Exception => e
       #error handled below
     end
@@ -38,6 +40,9 @@ class CollectionsController < ApplicationController
   def new
   end
 
+  #
+  #
+  #
   def add_licence_to_collection
     collection = Collection.find(params[:collection_id])
     licence = Licence.find (params[:licence_id])
@@ -48,6 +53,9 @@ class CollectionsController < ApplicationController
     redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
   end
 
+  #
+  #
+  #
   def change_collection_privacy
     collection = Collection.find(params[:id])
     private = params[:privacy]
@@ -60,6 +68,9 @@ class CollectionsController < ApplicationController
     redirect_to licences_path
   end
 
+  #
+  #
+  #
   def revoke_access
     collection = Collection.find(params[:id])
     UserLicenceRequest.where(:request_id => collection.id).destroy_all if collection.private?
@@ -69,6 +80,14 @@ class CollectionsController < ApplicationController
   end
 
   private
+
+  #
+  # Retrieve the collections I have access right
+  #
+  def getCollectionsIHaveAccess
+    collection = Collection.all.select { |c| can? :discover, c }
+    return collection.sort_by { |coll| coll.flat_short_name }
+  end
 
   #
   # Creates the model for blacklight pagination.

@@ -12,7 +12,6 @@ Feature: Collections
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
 
-  @javascript
   Scenario: View list of collections
     Given I am on the collections page
     Then I should see "Collections"
@@ -20,7 +19,6 @@ Feature: Collections
     And I should see "austlit"
     And I should see "Select a collection to view"
 
-  @javascript
   Scenario: Access collection details from the collections page
     Given I am on the collections page
     And I follow "austlit"
@@ -32,10 +30,9 @@ Feature: Collections
     And I should see "Is Part Of: Australian National Corpus - http://www.ausnc.org.au "
     And I should see "Language: eng"
     And I should see "Owner: University of Queensland. "
-    And I should see "SPARQL Endpoint: http://localhost:8984/openrdf-sesame/repositories/austlit"
+    And I should see "SPARQL Endpoint: http://www.example.com/sparql/austlit"
     And I should not see "Back to Licence Agreements"
 
-  @javascript
   Scenario: Access collection details from item details page
     Given "researcher@intersect.org.au" has "read" access to collection "cooee"
     Given I am on the catalog page for "cooee:1-001"
@@ -49,5 +46,5 @@ Feature: Collections
     And I should see "Extent: 1353 text samples, 2,000,000 words "
     And I should see "Language: eng"
     And I should see "Owner: None. Individual owner is Clemens Fritz. "
-    And I should see "SPARQL Endpoint: http://localhost:8984/openrdf-sesame/repositories/cooee"
+    And I should see "SPARQL Endpoint: http://www.example.com/sparql/cooee"
     And I should not see "Back to Licence Agreements"

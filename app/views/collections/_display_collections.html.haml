@@ -8,5 +8,5 @@
       - @collections.each do |collection|
         - selectedClass="active" if (collection.id == (params[:id]))
         %li{ :class => selectedClass }
-          =link_to collection_path(collection) do
+          =link_to collection_path(collection.short_name) do
             =collection.flat_short_name

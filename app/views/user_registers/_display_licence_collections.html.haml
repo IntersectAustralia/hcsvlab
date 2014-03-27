@@ -16,7 +16,8 @@
         %tr.documentHeadersdf.clearfixsdf
           %td.title
             - if k[:type] == :collection
-              %a{:href => "/collections/#{k[:item].id}?state=#{k[:state_label]}"}= k[:item].flat_name
+              -#%a{:href => "/collections/#{k[:item].id}?state=#{k[:state_label]}"}= k[:item].flat_name
+              = link_to k[:item].flat_name, collection_path(k[:item].flat_name, :state=>k[:state_label])
             - else
               %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection_list#{index}", :role => "button"}=k[:item].flat_name
               .modal.hide.fade.in{:id => "collection_list#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
@@ -29,7 +30,9 @@
                       - k[:item].collections.each do |aCollection|
                         %tr
                           %td
-                            %a{:href => "/collections/#{aCollection.id}?state=#{k[:state_label]}"}= aCollection.flat_name
+                            -#%a{:href => "/collections/#{aCollection.id}?state=#{k[:state_label]}"}= aCollection.flat_name
+                            = link_to aCollection.flat_name, collection_path(aCollection.flat_name, :state=>k[:state_label])
+
                 .modal-footer
                   %a.btn.pull-right{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 
