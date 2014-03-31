@@ -1,5 +1,5 @@
 .sidenav.static.span3
-  %h4 Item List
+  %h4 My Item Lists
   %ul.nav
     - if (@userItemLists.empty?)
       %li
@@ -15,7 +15,7 @@
             =link_to(itemList, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Item List "'+ itemList.name + '"?\', event));', :id => "delete_item_list_#{itemList.id}", :class => "delete") do
               %i{:class=>"icon-trash"}
 
-  %h4 Shared Item List
+  %h4 Shared by Others
   %ul.nav
     - if (@sharedItemLists.empty?)
       %li
