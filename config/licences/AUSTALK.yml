@@ -1,50 +1,39 @@
 name: AusTalk Terms of Use
 text: >
-  <p>Terms of Use for the Austalk Corpus for Project Members</p>
+  <p>
+    Terms of Use for the AusTalk Corpus for Project Members
+  </p>
   <br/>
-  <p>The Austalk corpus has been collected by a consortium of Universities
-  and is intended to be made broadly available for research on Australian
-  speech and language. Unfortunately we are still negotiating the terms
-  under which we can release different parts of the data with our legal
-  advisors. The main issue being protecting the privacy of the participants.
-  As a consequence, we cannot yet make the data widely available.</p>
+  <p>
+    The AusTalk corpus has been collected by a consortium of Universities under the Big ASC project, funded by the ARC,
+    and it is intended to be made broadly available for research on Australian speech and language. Unfortunately the
+    terms under which we can release the data more widely are still under negotiation with our legal advisors. Members
+    of the University partners that collected the data are free to use the data, as this was part of the Big ASC project
+    agreement, and there are no restrictions on the use of the data as long as it is for research. However, you must not
+    share or further distribute any data from the AusTalk corpus outside of the Big ASC project partners. This includes
+    the demographic descriptions of participants (meta-data) as well as the audio and video recordings themselves.
+  </p>
   <br/>
-  <p>Members of the University partners that collected the data are
-  free to use the data however; this was part of the original agreement
-  between the partners. There are no restrictions on what you can
-  do with the data as long as you are doing research. Commercial activities
-  with the data may need to be negotiated between the parties (we"re not
-  100% certain of this).</p>
+  <p>
+    It is a condition of use that any annotation or transcription that is done with the AusTalk corpus data should be
+    contributed back to the project for use by others. Any such contribution will be stored in a way that identifies you
+    as the creator.
+  </p>
   <br/>
-  <p>However, as a consequence of the uncertainty around broader distribution
-  of the data you must not share or further distribute any data from
-  the Austalk corpus outside of the partner Universities. This includes
-  the demographic descriptions of participants (meta-data) as well as
-  the audio and video recordings themselves.</p>
+  <p>
+    Attribution
+  </p>
   <br/>
-  <p>Any annotation or transcription that you do for corpus data should be
-  contributed back to the project for use by others. We will store
-  any data you contribute on the server in a way that identifies you
-  as the creator.</p>
+  <p>
+    When you access, use, reproduce, exploit or make reference in publications to the AusTalk Content, you will
+    attribute the ownership of the AusTalk Content to us by referring to the following published paper referenced below
+    or as otherwise notified by us to you:
+  </p>
   <br/>
-  <p>How to access the data</p>
-  <br/>
-  <p>We are working on a more flexible way to identify and download parts
-  of the corpus. Until then, you can get access to the data by mounting
-  the server drive using WebDav. Some instructions are on the Trac wiki:</p>
-  <br/>
-  <p>https://austalk.edu.au/trac/wiki/MountingDataDrive</p>
-  <br/>
-  <p>This is now password protected so you will need to ask Steve Cassidy
-  (steve.cassidy@mq.edu.au) for a username/password for your institution.</p>
-  <br/>
-  <p>Attribution of the AusTalk Corpus</p>
-  <br/>
-  <p>When you access, use, reproduce, exploit or make reference in publications
-  to the AusTalk Content, you will attribute the ownership of the AusTalk Content
-  to us as set out below or as otherwise notified by us to you:</p>
-  <br/>
-  <p>"The AusTalk corpus was collected as part of the Big ASC project (Burnham
-  et al. 2010, The Big Australian Speech Corpus: An Audio-Visual Speech Corpus
-  of Australian English funded by the Australian Research Council (LE100100211)
-  provided under licence (see: https://austalk.edu.au/ for details)."</p>
+  <p>
+    Burnham, D., Estival, D., Fazio, S., Viethen, J. Cox, J., Dale, R., Cassidy, S., Epps, J., Togneri, R., Wagner, M.,
+    Kinoshita, Y., Göcke, R., Arciuli, J., Onslow. M., Lewis, T., Butcher, A., & Hajek, J. (2011) Building an
+    audio-visual corpus of Australian English: large corpus collection with an economical portable and replicable Black
+    Box. Proceedings of 12th Annual Conference of the International Speech Communication Association (Interspeech, 2011),
+    ISSN 1990-9772, pp 841-844.
+  </p>
