@@ -1,6 +1,6 @@
 class Notifier < ActionMailer::Base
 
-  PREFIX = "HCSVLAB - "
+  PREFIX = "#{PROJECT_NAME} - "
 
   def notify_user_of_approved_request(recipient)
     @user = recipient

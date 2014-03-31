@@ -11,8 +11,8 @@ class UserAnnotation < ActiveRecord::Base
 
   SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
 
-  ANNOTATIONS_BASE_URI = "http://hcsvlab.org.au/corpora/"
-  USER_BASE_URI = "http://hcsvlab.org.au/users/"
+  ANNOTATIONS_BASE_URI = "#{PROJECT_BASE_URI}corpora/"
+  USER_BASE_URI = "#{PROJECT_BASE_URI}users/"
 
   #
   # Creates a new user annotations and relates it with the 'user'

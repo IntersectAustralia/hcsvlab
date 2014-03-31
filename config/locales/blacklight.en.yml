@@ -1,7 +1,7 @@
 en:
 
   blacklight:
-    application_name: 'HCS vLab'
+    application_name: "Alveo"
     search_history:
       need_login: 'Please log in to manage and view your search history'
 

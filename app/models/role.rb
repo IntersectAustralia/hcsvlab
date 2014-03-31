@@ -1,6 +1,6 @@
 class Role < ActiveRecord::Base
 
-  SUPERUSER_ROLE = 'hcsvlab-admin'
+  SUPERUSER_ROLE = "hcsvlab-admin"
   RESEARCHER_ROLE = 'researcher'
   DATA_OWNER_ROLE = 'data owner'
 

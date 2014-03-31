@@ -46,7 +46,7 @@ describe UserAnnotation do
       mapResult[RDF::URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")].should eq RDF::URI("http://purl.org/dada/schema/0.2#AnnotationCollection")
       mapResult[RDF::URI("http://purl.org/dc/terms/created")].should_not be nil
       mapResult[RDF::URI("http://purl.org/dada/schema/0.2#annotates")].should eq RDF::URI("http://ns.ausnc.org.au/corpora/cooee/items/1-001")
-      mapResult[RDF::URI("http://purl.org/dc/terms/creator")].should eq RDF::URI("http://hcsvlab.org.au/users/#{Digest::MD5.hexdigest(user.email)}")
+      mapResult[RDF::URI("http://purl.org/dc/terms/creator")].should eq RDF::URI("#{PROJECT_BASE_URI}users/#{Digest::MD5.hexdigest(user.email)}")
 
       # Now we will verify that the annotations in the AnnotationCollection were created successfully and with the
       # correct context.

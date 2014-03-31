@@ -18,9 +18,9 @@
           %strong #{@aaf_credentials[:mail]}
           ,
           - if User.find_by_email(@aaf_credentials[:mail])
-            but your HCS vLab account request is pending approval.
+            ="but your #{PROJECT_NAME} account request is pending approval."
           - else
-            but you have not registered an account with HCS vLab.
+            ="but you have not registered an account with #{PROJECT_NAME}."
           %br
           %br
           You may log in with a different account above or sign out of AAF.
@@ -36,4 +36,4 @@
         %small
           Note: This will take you to the AAF (Australian Access Federation) login page.
           %br
-          If you are not yet authorised to use HCS vLab you will need to wait for the admin to approve your user.
+          ="If you are not yet authorised to use #{PROJECT_NAME} you will need to wait for the admin to approve your user."

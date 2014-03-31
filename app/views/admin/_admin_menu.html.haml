@@ -1,5 +1,5 @@
 .sidenav.static.span3
-  %h4 HCS vLab Admin
+  %h4= "#{PROJECT_NAME} Admin"
   %ul.nav
     - if can?(:read, User)
       %li{ :class => activepath?(users_path) }

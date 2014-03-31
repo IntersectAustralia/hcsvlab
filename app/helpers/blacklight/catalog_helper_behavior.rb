@@ -1,7 +1,6 @@
 # -*- encoding : utf-8 -*-
 module Blacklight::CatalogHelperBehavior
 
-  HCSVLAB_PREFIX = "hcsvlab"
   SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
 
   # Pass in an RSolr::Response (or duck-typed similar) object,
@@ -141,7 +140,7 @@ module Blacklight::CatalogHelperBehavior
       elsif solr_fname == 'DC_type_facet'
         metadataHash[key] = format_duplicates(document[solr_fname])
       elsif solr_fname == 'date_group_facet' or solr_fname == '"full_text'
-        metadataHash[:"#{HCSVLAB_PREFIX}:#{key}"] = render_document_show_field_value(document, :field => solr_fname)
+        metadataHash[:"#{PROJECT_PREFIX_NAME}:#{key}"] = render_document_show_field_value(document, :field => solr_fname)
       else
         metadataHash[key] = render_document_show_field_value(document, :field => solr_fname)
       end
@@ -173,7 +172,7 @@ module Blacklight::CatalogHelperBehavior
         if k == 'DC_type_facet'
           metadataHash[key] = format_duplicates(v)
         elsif k == 'full_text' or k == 'handle'
-          metadataHash[:"#{HCSVLAB_PREFIX}:#{key}"] = format_value(v)
+          metadataHash[:"#{PROJECT_PREFIX_NAME}:#{key}"] = format_value(v)
         else
           metadataHash[key] = format_value(v)
         end
@@ -212,15 +211,15 @@ module Blacklight::CatalogHelperBehavior
         #URL
         if values.has_key?(MetadataHelper::SOURCE)
           begin
-            documentHash[:"#{HCSVLAB_PREFIX}:url"] = catalog_document_url(collectionName, filename: values[MetadataHelper::IDENTIFIER])
+            documentHash[:"#{PROJECT_PREFIX_NAME}:url"] = catalog_document_url(collectionName, filename: values[MetadataHelper::IDENTIFIER])
           rescue NoMethodError => e
             # When we create the json metadata from the solr processor, we need to do the following work around
             # to have access to routes URL methods
             parameters = default_url_options.merge({filename: values[MetadataHelper::IDENTIFIER]})
-            documentHash[:"#{HCSVLAB_PREFIX}:url"] = Rails.application.routes.url_helpers.catalog_document_url(collectionName, itemIdentifier, parameters)
+            documentHash[:"#{PROJECT_PREFIX_NAME}:url"] = Rails.application.routes.url_helpers.catalog_document_url(collectionName, itemIdentifier, parameters)
           end
         else
-          documentHash[:"#{HCSVLAB_PREFIX}:url"] = values[MetadataHelper::IDENTIFIER]
+          documentHash[:"#{PROJECT_PREFIX_NAME}:url"] = values[MetadataHelper::IDENTIFIER]
         end
 
         #Type
@@ -248,7 +247,7 @@ module Blacklight::CatalogHelperBehavior
         else
           field = "unknown"
         end
-        documentHash[:"#{HCSVLAB_PREFIX}:size"] = field.strip!
+        documentHash[:"#{PROJECT_PREFIX_NAME}:size"] = field.strip!
         documentsData << documentHash.clone
       end
     end
@@ -275,9 +274,9 @@ module Blacklight::CatalogHelperBehavior
 
     #Add SPARQL endpoint
     begin
-      metadataHash["#{HCSVLAB_PREFIX}:sparqlEndpoint"] = catalog_sparqlQuery_url(collectionName)
+      metadataHash["#{PROJECT_PREFIX_NAME}:sparqlEndpoint"] = catalog_sparqlQuery_url(collectionName)
     rescue NoMethodError => e
-      metadataHash["#{HCSVLAB_PREFIX}:sparqlEndpoint"] = Rails.application.routes.url_helpers.catalog_sparqlQuery_url(collectionName, default_url_options)
+      metadataHash["#{PROJECT_PREFIX_NAME}:sparqlEndpoint"] = Rails.application.routes.url_helpers.catalog_sparqlQuery_url(collectionName, default_url_options)
     end
 
 
