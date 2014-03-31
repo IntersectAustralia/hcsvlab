@@ -26,8 +26,8 @@
     pointer-events: auto;
 }
 
-.github-fork-ribbon a,
-.github-fork-ribbon a:hover {
+.github-fork-ribbon span,
+.github-fork-ribbon span:hover {
     /* Set the font */
     font: 700 13px "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #fff;
@@ -92,8 +92,8 @@
 }
 
 .github-fork-ribbon-wrapper.right .github-fork-ribbon {
-    top: 42px;
-    right: -43px;
+    top: 20px;
+    right: -70px;
 
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
@@ -103,8 +103,8 @@
 }
 
 .github-fork-ribbon-wrapper.left .github-fork-ribbon {
-    top: 42px;
-    left: -43px;
+    top: 20px;
+    left: -70px;
 
     -webkit-transform: rotate(-45deg);
     -moz-transform: rotate(-45deg);
@@ -115,8 +115,8 @@
 
 
 .github-fork-ribbon-wrapper.left-bottom .github-fork-ribbon {
-    top: 80px;
-    left: -43px;
+    top: 20px;
+    left: -70px;
 
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
@@ -126,8 +126,8 @@
 }
 
 .github-fork-ribbon-wrapper.right-bottom .github-fork-ribbon {
-    top: 80px;
-    right: -43px;
+    top: 20px;
+    right: -70px;
 
     -webkit-transform: rotate(-45deg);
     -moz-transform: rotate(-45deg);
