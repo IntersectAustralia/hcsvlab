@@ -124,7 +124,7 @@ Feature: Managing Item Lists
     And I wait 5 seconds
     And I am on the item list page for "Clear Test"
     And the item list "Clear Test" should have 2 items
-    And I follow "Clear Item List"
+    And I follow "Clear"
     And I should see "2 cleared from item list Clear Test"
 
   Scenario: Deleting an Item List
@@ -200,7 +200,7 @@ Feature: Managing Item Lists
       | Test1 |
     And the item list "Test1" has items cooee:1-001, cooee:1-002, hcsvlab:3
     And I am on the item list page for "Test1"
-    And I follow "Use Item List in Emu/R"
+    And I follow "Use in Emu/R"
     Then I should see "Use Test1 in Emu/R"
     And I should see "Copy the following code into your R environment"
     And I should see "item_list <- client$get_item_list_by_id"
