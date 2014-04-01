@@ -1122,6 +1122,62 @@ Feature: Browsing via API
     {"error":"Service keyword is forbidden in queries."}
     """
 
+  Scenario: Send sparql query to retrieve utf-8 text in Russian
+    Given I ingest "custom:custom1" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | custom          | read        |
+    When I make a JSON request for the catalog sparql page for collection "custom" with the API token for "researcher1@intersect.org.au" with params
+      | query                                                      |
+      | select * where {<http://ns.ausnc.org.au/corpora/austlit/items/custom1.xml> <http://ns.ausnc.org.au/schemas/ausnc_md_model/russian> ?o} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "head":{
+        "vars":["o"]
+      },
+      "results":{
+        "bindings":[
+          {
+            "o":{
+              "type": "literal",
+              "value":"котята"
+            }
+          }
+        ]
+      }
+    }
+    """
+
+  Scenario: Send sparql query to retrieve utf-8 text in Chinese
+    Given I ingest "custom:custom1" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | custom          | read        |
+    When I make a JSON request for the catalog sparql page for collection "custom" with the API token for "researcher1@intersect.org.au" with params
+      | query                                                      |
+      | select * where {<http://ns.ausnc.org.au/corpora/austlit/items/custom1.xml> <http://ns.ausnc.org.au/schemas/ausnc_md_model/chinese> ?o} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "head":{
+        "vars":["o"]
+      },
+      "results":{
+        "bindings":[
+          {
+            "o":{
+              "type": "literal",
+              "value":"双喜/雙喜 shuāngxǐ"
+            }
+          }
+        ]
+      }
+    }
+    """
+
 #
 # In the near future we might allow the SERVICE keyword in the query. I'll leave these 2 tests for that purpose
 #

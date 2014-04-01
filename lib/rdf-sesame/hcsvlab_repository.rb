@@ -44,7 +44,7 @@ module RDF::Sesame
         statements_options = {}
         statements_options[:context] = "<#{context.to_s}>" if !context.nil?
 
-        response = server.post(self.path(:statements, statements_options), data, 'Content-Type' => 'application/x-turtle')
+        response = server.post(self.path(:statements, statements_options), data, 'Content-Type' => 'application/x-turtle;charset=UTF-8')
         raise Exception.new(response.message) unless "204".eql?(response.code)
       end
     end

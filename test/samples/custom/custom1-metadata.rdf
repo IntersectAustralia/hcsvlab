@@ -6,7 +6,7 @@
 @prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://ns.ausnc.org.au/corpora/austlit/items/adaessa.xml> a ausnc:AusNCObject ;
+<http://ns.ausnc.org.au/corpora/austlit/items/custom1.xml> a ausnc:AusNCObject ;
     ausnc:collection "Primary Fiction and Poetry Texts" ;
     ausnc:mode ausnc:spoken ;
     ausnc:speech_style ausnc:spontaneous ;
@@ -18,6 +18,8 @@
     ausnc:communication_setting ausnc:educational ;
     ausnc:audience ausnc:massed ;
     olac:discourse_type olac:singing ;
+    ausnc:russian "котята" ;
+    ausnc:chinese "双喜/雙喜 shuāngxǐ" ;
 
     ausnc:document <http://ns.ausnc.org.au/corpora/austlit/source/custom1#Original>,
         <http://ns.ausnc.org.au/corpora/austlit/source/custom1#Raw>,
