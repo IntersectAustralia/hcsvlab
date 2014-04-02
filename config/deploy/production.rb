@@ -8,3 +8,4 @@ role :db,  'hcsvlab-prod-webapp.intersect.org.au', :primary => true
 set :server_url, "http://app.hcsvlab.org.au/"
 set :galaxy_port, "8081"
 set :galaxy_ga_tracker_id, "UA-49039039-11"
+set :galaxy_smtp_server, "localhost:25"

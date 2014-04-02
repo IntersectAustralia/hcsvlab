@@ -369,6 +369,7 @@ namespace :deploy do
     run "sed -i 's+__GALAXY_PORT__+#{galaxy_port}+g' $GALAXY_HOME/universe_wsgi.ini"
     run "sed -i 's+__TOOL_SHED_URL__+#{galaxy_url + ':' + toolshed_port}+g' $GALAXY_HOME/tool_sheds_conf.xml"
     run "sed -i 's+__HCSVLAB_GA_TRACKER_ID__+#{galaxy_ga_tracker_id}+g' $GALAXY_HOME/universe_wsgi.ini"
+    run "sed -i 's+__HCSVLAB_SMTP_SERVER__+#{galaxy_smtp_server}+g' $GALAXY_HOME/universe_wsgi.ini"
   end
 
   desc "Update galaxy"
