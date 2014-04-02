@@ -1,5 +1,5 @@
 %form.pull-right{ :id => "galaxy_list", :style => "display:none;", :method => "post", :action => Rails.application.config.galaxy_url, :target => "_blank" }
-  %input.btn{ :type => "hidden", :value => "hcsvlab_data_importer", :name => "tool_id" }
+  %input.btn{ :type => "hidden", :value => "alveo_data_importer", :name => "tool_id" }
   %input.btn{ :type => "hidden", :value => item_list_url(@item_list), :name => "item_list" }
   %input.btn{ :type => "hidden", :value => current_user.authentication_token, :name => "api_key" }
   %input.btn{ :type => "hidden", :value => @item_list.name + " (" + Time.now.utc.localtime.strftime('%d/%m/%Y %I:%M:%S %P') + ")", :name => "job_name" }
