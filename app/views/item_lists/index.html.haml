@@ -3,7 +3,8 @@
   - if (!params[:id].nil?)
     = render 'search_form'
   - else
-    %h2 Select a list from which to search
+    %h2 Select an Item List for further processing
+    %span You can construct your own Item List from the Discover interface or modify one of the Item Lists on the left.
   = render 'display_items_table'
 = render 'shared/nectar_attribution'
 = render 'shared/modal_waiting_panel'
