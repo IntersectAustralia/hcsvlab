@@ -76,5 +76,10 @@ module HcsvlabWeb
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    # When I18n.config.enforce_available_locales is true we'll raise an I18n::InvalidLocale exception if the passed locale is unavailable.
+    # The default is set to nil which will display a deprecation error.
+    # If set to false we'll skip enforcing available locales altogether (old behaviour).
+    config.i18n.enforce_available_locales = false
   end
 end
