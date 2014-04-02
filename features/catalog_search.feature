@@ -60,7 +60,7 @@ Feature: Searching for items
     When I expand the facet Search Metadata
     And I fill in "Metadata" with "University OR Romance"
     And I press "search_metadata"
-    Then I should see "blacklight_results" table with
+    Then I should see a table with the following rows in any order:
       | Identifier          | Title                         | Created Date | Type(s)             |
       | austlit:adaessa.xml | Australian Essays 	        | 1886 	       | Original, Raw, Text |
       | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
@@ -71,7 +71,7 @@ Feature: Searching for items
     When I expand the facet Search Metadata
     And I fill in "Metadata" with "Univarsoty~"
     And I press "search_metadata"
-    Then I should see "blacklight_results" table with
+    Then I should see a table with the following rows in any order:
       | Identifier          | Title                         | Created Date | Type(s)             |
       | austlit:adaessa.xml | Australian Essays             | 1886 	       | Original, Raw, Text |
       | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
