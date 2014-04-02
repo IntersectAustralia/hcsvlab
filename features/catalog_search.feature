@@ -17,6 +17,7 @@ Feature: Searching for items
       | cooee           | read        |
       | austlit         | read        |
       | ice             | read        |
+      | custom          | read        |
     And "researcher@intersect.org.au" has role "researcher"
     And "data_owner@intersect.org.au" has role "data_owner"
     And I am logged in as "researcher@intersect.org.au"
@@ -63,6 +64,7 @@ Feature: Searching for items
       | Identifier          | Title                         | Created Date | Type(s)             |
       | austlit:adaessa.xml | Australian Essays 	        | 1886 	       | Original, Raw, Text |
       | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
+      | custom:utf8_test_1  | UTF-8 Test item               | 1986         | Text                |
 
   @javascript
   Scenario: Search for term with tilde in all metadata
@@ -73,6 +75,7 @@ Feature: Searching for items
       | Identifier          | Title                         | Created Date | Type(s)             |
       | austlit:adaessa.xml | Australian Essays             | 1886 	       | Original, Raw, Text |
       | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
+      | custom:utf8_test_1  | UTF-8 Test item               | 1986         | Text                |
 
   @javascript
   Scenario: Search for term with asterisk in all metadata
@@ -209,3 +212,43 @@ Feature: Searching for items
       | RDF Name  | User Name   |
       | rdf:type  | RDF_type    |
       | dc:type   | type        |
+
+  @javascript
+  Scenario: Search using armenian small letter ZHE UTF-8 character in full_text
+    When I fill in "q" with "ժ"
+    And I press "search"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Created Date  | Type(s)     |
+      | custom:utf8_test_1  | 1986          | Text        |
+
+  @javascript
+  Scenario: Search using latin capital letter R UTF-8 character in full_text
+    When I fill in "q" with "Ȓ"
+    And I press "search"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Created Date  | Type(s)     |
+      | custom:utf8_test_1  | 1986          | Text        |
+
+  @javascript
+  Scenario: Search using arabic letter farsi yeh with inverted V UTF-8 character in full_text
+    When I fill in "q" with "ؽ"
+    And I press "search"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Created Date  | Type(s)     |
+      | custom:utf8_test_1  | 1986          | Text        |
+
+  @javascript
+  Scenario: Search using devanagari letter La UTF-8 character in full_text
+    When I fill in "q" with "ल"
+    And I press "search"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Created Date  | Type(s)     |
+      | custom:utf8_test_1  | 1986          | Text        |
+
+  @javascript
+  Scenario: Search using greek small letter Theta UTF-8 character in full_text
+    When I fill in "q" with "θ"
+    And I press "search"
+    Then I should see "blacklight_results" table with
+      | Identifier          | Created Date  | Type(s)     |
+      | custom:utf8_test_1  | 1986          | Text        |

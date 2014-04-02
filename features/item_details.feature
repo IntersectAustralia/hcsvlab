@@ -90,3 +90,13 @@ Feature: Displaying Items
       | field          | value                 |
       | Identifier     | A_x1.5m_z0.5m         |
       | Creator        | Densil Cabrera        |
+
+  Scenario: Verify items with special UTF-8 characters in its metadata
+    Given I ingest "custom:utf8_test_1" with id "hcsvlab:1"
+    Given I am on the catalog page for "custom:utf8_test_1"
+    Then I should see "custom:utf8_test_1"
+    And I should see fields displayed
+      | field          | value                 |
+      | Identifier     | utf8_test_1           |
+      | russian        | котята                |
+      | chinese        | 双喜/雙喜 shuāngxǐ     |

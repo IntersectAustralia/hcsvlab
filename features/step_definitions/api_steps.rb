@@ -220,6 +220,7 @@ Then /^the (JSON )?response should be:$/ do |json, input|
       assert_true result.empty?, "\n expected: #{expected} \n got: #{actual} \n"
     end
   else
+    actual = actual.force_encoding(expected.encoding)
     if self.respond_to?(:should)
       actual.should == expected
     else

@@ -1,0 +1,42 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ns1: <http://ns.ausnc.org.au/schemas/austlit/> .
+@prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://ns.ausnc.org.au/corpora/custom/items/utf8_test_1> a ausnc:AusNCObject ;
+    ausnc:collection "Primary Fiction and Poetry Texts" ;
+    ausnc:mode ausnc:spoken ;
+    ausnc:speech_style ausnc:spontaneous ;
+    ausnc:publication_status ausnc:published ;
+    ausnc:written_mode ausnc:print ;
+    ausnc:interactivity ausnc:interview ;
+    ausnc:communication_context ausnc:face_to_face ;
+    ausnc:communication_medium ausnc:radio ;
+    ausnc:communication_setting ausnc:educational ;
+    ausnc:audience ausnc:massed ;
+    olac:discourse_type olac:singing ;
+    ausnc:russian "котята" ;
+    ausnc:chinese "双喜/雙喜 shuāngxǐ" ;
+
+    ausnc:document <http://ns.ausnc.org.au/corpora/custom/source/utf8_test_1#Text> ;
+    ausnc:itemwordcount 73433 ;
+    ausnc:plaintextversion <http://ns.ausnc.org.au/corpora/custom/source/utf8_test_1#Text> ;
+    ns1:location "Sydney, Australia" ;
+    dc:contributor "Someone" ;
+    dc:created "1986" ;
+    dc:identifier "utf8_test_1" ;
+    dc:isPartOf corpus:custom ;
+    dc:publisher "University of Sydney Library" ;
+    dc:title "UTF-8 Test item" ;
+    olac:language "eng" .
+
+<http://ns.ausnc.org.au/corpora/custom/source/utf8_test_1#Text> a foaf:Document ;
+    dc:extent 413669 ;
+    dc:identifier "utf8_test_1-plain.txt" ;
+    dc:source <file:///data_hcsvlab/test_collections/custom/utf8_test_1-plain.txt> ;
+    dc:title "utf8_test_1#Text" ;
+    dc:type "Text" .
+

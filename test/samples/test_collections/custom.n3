@@ -1,0 +1,26 @@
+@prefix custom: <http://ns.ausnc.org.au/corpus/custom/custom> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix cld: <http://purl.org/cld/terms/> .
+@prefix marcrel: <http://www.loc.gov/loc.terms/relators/> .
+
+custom:
+      a dcmitype:Collection ;
+      dc:title "Corpus Custom" ;
+      dcterms:alternative "CUSTOM" ;
+      dcterms:abstract "Material to be included had to meet with a regional and a temporal criterion. The latter required texts to have been produced between 1788 and 1900 in order to become eligible for COOEE. It was mandatory for a text to have been written in Australia, New Zealand or Norfolk Island. But in a few cases, other localities were allowed. For example, if a person who was a native Australian or who had lived in Australia for a considerable time, wrote a shipboard diary or travelled in other countries." ;
+      dcterms:extent "2,000,000 words" ;
+      dcterms:extent "1353 text samples" ;
+      dcterms:language "eng" ;
+      dcterms:itemType "XML" ;
+      dcterms:itemType "text with tags" ;
+      dcterms:itemFormat "Letters, published materials in book form, historical texts" ;
+      dcterms:temporal "1788-1900" ;
+      dcterms:created "2004" ;
+      cld:dateItemsCreated "1788-1900" ;
+      dc:creator "Clemens Fritz" ;
+      dc:rights "All rights reserved to Clemens Fritz";
+      dcterms:accessRights "See AusNC Terms of Use" ;
+      marcrel:OWN "None. Individual owner is Clemens Fritz." ;
+      .

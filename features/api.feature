@@ -228,6 +228,28 @@ Feature: Browsing via API
     Then I should get a 200 response code
     Then I should get the primary text for "cooee:1-001"
 
+  Scenario: Download primary_text from item with UTF-8 Characters
+    Given I ingest "custom:utf8_test_1" with id "hcsvlab:1"
+    Given I have user "researcher1@intersect.org.au" with the following groups
+      | collectionName  | accessType  |
+      | custom          | read        |
+    When I make a JSON request for the catalog primary text page for "custom:utf8_test_1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the response should be:
+    """
+    This is a file that test this utf-8 characters:
+
+    Ȇ	LATIN CAPITAL LETTER E WITH INVERTED BREVE (U+0206)
+    Ȓ	LATIN CAPITAL LETTER R WITH INVERTED BREVE (U+0212)
+    ʯ	LATIN SMALL LETTER TURNED H WITH FISHHOOK AND TAIL (U+02AF)
+    Ώ	GREEK CAPITAL LETTER OMEGA WITH TONOS (U+038F)
+    θ	GREEK SMALL LETTER THETA (U+03B8)
+    ժ	ARMENIAN SMALL LETTER ZHE (U+056A)
+    ק	HEBREW LETTER QOF (U+05E7)
+    ؽ	ARABIC LETTER FARSI YEH WITH INVERTED V (U+063D)
+    ल	DEVANAGARI LETTER LA (U+0932)
+    """
+
   Scenario: Download primary_text from item that doesn't exist
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I have user "researcher1@intersect.org.au" with the following groups
