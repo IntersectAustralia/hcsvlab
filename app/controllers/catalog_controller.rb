@@ -601,8 +601,7 @@ class CatalogController < ApplicationController
 
       respond_to do |format|
         format.warc {
-          render :json => {:error => "Not Implemented"}.to_json, :status => 501
-          #download_as_warc(itemsId)clear
+          download_as_warc(itemHandles, "items.warc")
         }
         format.any {
           download_as_zip(itemHandles, "items.zip")
@@ -870,45 +869,6 @@ class CatalogController < ApplicationController
       end
     }
     metadataSearchParam
-  end
-
-  #
-  #
-  #
-  def download_as_zip(itemHandles, file_name)
-    begin
-      bench_start = Time.now
-
-      # Creates a ZIP file containing the documents and item's metadata
-      zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemHandles) do |aDoc|
-        @itemInfo = create_display_info_hash(aDoc)
-
-        renderer = Rabl::Renderer.new('catalog/show', @itemInfo, { :format => 'json', :view_path => 'app/views', :scope => self })
-        itemMetadata = renderer.render
-        itemMetadata
-      end
-
-      # Sends the zipped file
-      send_data IO.read(zip_path), :type => 'application/zip',
-                :disposition => 'attachment',
-                :filename => file_name
-
-      Rails.logger.debug("Time for downloading metadata and documents for #{itemHandles.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
-      return
-
-    rescue Exception => e
-      Rails.logger.error(e.message + "\n " + e.backtrace.join("\n "))
-    ensure
-      # Ensure zipped file is removed
-      FileUtils.rm zip_path if !zip_path.nil?
-    end
-    respond_to do |format|
-      format.html {
-        flash[:error] = "Sorry, an unexpected error occur."
-        redirect_to @item_list and return
-      }
-      format.any { render :json => {:error => "Internal Server Error"}.to_json, :status => 500 }
-    end
   end
 
   #

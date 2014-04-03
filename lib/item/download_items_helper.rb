@@ -1,4 +1,87 @@
 module Item::DownloadItemsHelper
+
+  def download_as_zip(itemHandles, file_name)
+    begin
+      cookies.delete("download_finished")
+
+      bench_start = Time.now
+
+      # Creates a ZIP file containing the documents and item's metadata
+      zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemHandles) do |aDoc|
+        @itemInfo = create_display_info_hash(aDoc)
+        renderer = Rabl::Renderer.new('catalog/show', @itemInfo, { :format => 'json', :view_path => 'app/views', :scope => self })
+        itemMetadata = renderer.render
+        itemMetadata
+      end
+
+      # Sends the zipped file
+      send_data IO.read(zip_path), :type => 'application/zip',
+                :disposition => 'attachment',
+                :filename => file_name
+
+      Rails.logger.debug("Time for downloading metadata and documents for #{itemHandles.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+      cookies["download_finished"] = {value:"true", expires: 1.minute.from_now}
+      return
+
+    rescue Exception => e
+      Rails.logger.error(e.message + "\n " + e.backtrace.join("\n "))
+    ensure
+      # Ensure zipped file is removed
+      FileUtils.rm zip_path if !zip_path.nil?
+    end
+    respond_to do |format|
+      format.html {
+        flash[:error] = "Sorry, an unexpected error occur."
+        redirect_to @item_list and return
+      }
+      format.any { render :json => {:error => "Internal Server Error"}.to_json, :status => 500 }
+    end
+  end
+
+
+  def download_as_warc(itemHandles, file_name)
+    begin
+      cookies.delete("download_finished")
+
+      bench_start = Time.now
+
+      dont_show = Set.new(Item.development_only_fields)
+
+      # Creates a WARC file containing the documents and item's metadata
+      archive_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveWarcPath(itemHandles, request.original_url) do |aDoc|
+        @document = aDoc
+        itemMetadata = {}
+        keys = aDoc.keys
+        aDoc.keys.each { |key|
+          itemMetadata[key] = aDoc[key].join(', ') unless dont_show.include?(key)
+        }
+        itemMetadata
+      end
+
+      # Sends the archive file
+      send_data IO.read(archive_path), :type => 'application/warc',
+                :disposition => 'attachment',
+                :filename => file_name
+
+      Rails.logger.debug("Time for downloading metadata and documents for #{itemHandles.length} items: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
+      cookies["download_finished"] = {value:"true", expires: 1.minute.from_now}
+      return
+
+    rescue Exception => e
+      Rails.logger.error(e.message + "\n " + e.backtrace.join("\n "))
+    ensure
+      # Ensure archive file is removed
+      FileUtils.rm archive_path if !archive_path.nil?
+    end
+    respond_to do |format|
+      format.html {
+        flash[:error] = "Sorry, an unexpected error occur."
+        redirect_to @item_list and return
+      }
+      format.any { render :json => {:error => "Internal Server Error"}.to_json, :status => 500 }
+    end
+  end
+
   class DownloadItemsAsArchive
     include Blacklight::Configurable
     include Blacklight::SolrHelper
