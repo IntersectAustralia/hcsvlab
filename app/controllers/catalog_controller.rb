@@ -329,6 +329,8 @@ class CatalogController < ApplicationController
       # the item url to use /catalog/:collection/:itemId. So will set this in here.
       session[:search][:counter] = params[:counter] if params[:counter].present?
 
+      @display_document = get_display_document(@document)
+
       #By now we are not going to show user uploaded annotation in the webapp
       #solr_item = Item.find_and_load_from_solr({id: @document[:id]}).first
       #@has_main_annotation = !solr_item.annotation_set.empty?
@@ -1148,6 +1150,36 @@ class CatalogController < ApplicationController
         properties.push(entry)
     end
     properties
+  end
+
+  #
+  # Get the display document for an item as a hash with id, type and source
+  #
+  def get_display_document(document)
+    item = Item.find(document[:id])
+
+    begin
+      server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+      repository = server.repository(item.collection.flat_name)
+
+      query = RDF::Query.new do
+        pattern [RDF::URI.new(item.flat_uri), MetadataHelper::DISPLAY_DOCUMENT, :display_doc]
+        pattern [:display_doc, MetadataHelper::TYPE, :type]
+        pattern [:display_doc, MetadataHelper::SOURCE, :source]
+        pattern [:display_doc, MetadataHelper::IDENTIFIER, :id]
+      end
+
+      results = repository.query(query)
+
+      results.each do |res|
+        return {:id => res[:id].value, :type => res[:type].value, :source => res[:source].value}
+      end
+
+    rescue => e
+      Rails.logger.error e.inspect
+      Rails.logger.error "Could not connect to triplestore - #{SESAME_CONFIG["url"].to_s}"
+    end
+    return nil
   end
 
   #

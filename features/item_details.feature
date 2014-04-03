@@ -19,7 +19,7 @@ Feature: Displaying Items
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I am on the catalog page for "cooee:1-001"
     Then I should see "cooee:1-001"
-    And I should see "Primary Document"
+    And I should see "Display Document"
     And I should see "Documents"
     And I should see link "eng" to "http://www-01.sil.org/iso639-3/documentation.asp?id=eng"
     And I should see fields displayed
@@ -36,9 +36,9 @@ Feature: Displaying Items
       | Discourse Type                            | unspecified                                             |
       | Language (ISO 639-3 Code)                 | eng                                                     |
       | Audience                                  | unspecified                                             |
-      | Documents                                 | 1-001#Original, 1-001#Raw, 1-001#Text                   |
-      | Type                                      | Original, Raw, Text                                     |
-      | Extent                                    | 5126, 5126, 4960                                        |
+      | Documents                                 | 1-001#Text, 1-001#Original, 1-001#Raw                   |
+      | Type                                      | Text, Original, Raw                                     |
+      | Extent                                    | 4960, 5126, 5126                                        |
       | register                                  | Private Written                                         |
       | texttype                                  | Private Correspondence                                  |
       | http_ns_ausnc_org_au_schemas_localityName | New_South_Wales                                         |
@@ -53,7 +53,7 @@ Feature: Displaying Items
     Given I ingest "custom:custom1" with id "hcsvlab:2"
     Given I am on the catalog page for "custom:custom1"
     Then I should see "custom:custom1"
-    And I should see "Primary Document"
+    And I should see "Display Document"
     And I should see "Documents"
     And I should see link "eng" to "http://www-01.sil.org/iso639-3/documentation.asp?id=eng"
     And I should see fields displayed

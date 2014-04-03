@@ -28,8 +28,8 @@ Feature: Searching for items
     When I have done a search with collection "austlit"
     Then I should see "blacklight_results" table with
       | Identifier          | Type(s)             |
-      | austlit:adaessa.xml | Original, Raw, Text |
-      | austlit:bolroma.xml | Original, Raw, Text |
+      | austlit:adaessa.xml | Text, Original, Raw |
+      | austlit:bolroma.xml | Text, Original, Raw |
 
   Scenario: Must be logged in to see search history
     Given I follow "researcher@intersect.org.au"
@@ -44,7 +44,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
-      | ice:S2B-035 	    | The Money or the Gun 	        | 3/5/94 	   | Text                |
+      | ice:S2B-035         | The Money or the Gun 	        | 3/5/94       | Text                |
 
   @javascript
   Scenario: Search for two simple term in all metadata joined with AND
@@ -53,7 +53,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
-      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
+      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Text, Original, Raw |
 
   @javascript
   Scenario: Search for two simple term in all metadata joined with OR
@@ -62,9 +62,8 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Title                         | Created Date | Type(s)             |
-      | austlit:adaessa.xml | Australian Essays 	        | 1886 	       | Original, Raw, Text |
-      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
-      | custom:utf8_test_1  | UTF-8 Test item               | 1986         | Text                |
+      | austlit:adaessa.xml | Australian Essays             | 1886 	       | Text, Original, Raw |
+      | austlit:bolroma.xml | A Romance of Canvas Town      | 1898 	       | Text, Original, Raw |
 
   @javascript
   Scenario: Search for term with tilde in all metadata
@@ -73,9 +72,9 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Title                         | Created Date | Type(s)             |
-      | austlit:adaessa.xml | Australian Essays             | 1886 	       | Original, Raw, Text |
-      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Original, Raw, Text |
       | custom:utf8_test_1  | UTF-8 Test item               | 1986         | Text                |
+      | austlit:adaessa.xml | Australian Essays             | 1886 	       | Text, Original, Raw |
+      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Text, Original, Raw |
 
   @javascript
   Scenario: Search for term with asterisk in all metadata
@@ -84,7 +83,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
-      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-001         | 10/11/1791   | Text, Original, Raw |
       | cooee:1-002         | 10/11/1791   | Text                |
 
   @javascript
@@ -95,7 +94,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Created Date | Type(s)             |
-      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-001         | 10/11/1791   | Text, Original, Raw |
 
   @javascript
   Scenario: Search for term with field:value in all metadata using solr field name
@@ -106,7 +105,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
-      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-001         | 10/11/1791   | Text, Original, Raw |
       | cooee:1-002         | 10/11/1791   | Text                |
 
   @javascript
@@ -118,7 +117,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
-      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-001         | 10/11/1791   | Text, Original, Raw |
       | cooee:1-002         | 10/11/1791   | Text                |
 
   @javascript
@@ -130,7 +129,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
-      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-001         | 10/11/1791   | Text, Original, Raw |
       | cooee:1-002         | 10/11/1791   | Text                |
 
   @javascript
@@ -142,7 +141,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
-      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-001         | 10/11/1791   | Text, Original, Raw |
       | cooee:1-002         | 10/11/1791   | Text                |
 
   @javascript
@@ -154,7 +153,7 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
-      | cooee:1-001         | 10/11/1791   | Original, Raw, Text |
+      | cooee:1-001         | 10/11/1791   | Text, Original, Raw |
       | cooee:1-002         | 10/11/1791   | Text                |
 
   @javascript
@@ -170,7 +169,7 @@ Feature: Searching for items
     And I wait 3 seconds
     Then I should see "blacklight_results" table with
       | Identifier          | Created Date | Type(s)             |
-      | austlit:adaessa.xml | 1886         | Original, Raw, Text |
+      | austlit:adaessa.xml | 1886         | Text, Original, Raw |
 
   @javascript
   Scenario: Search for term using ranges in all metadata
@@ -179,8 +178,8 @@ Feature: Searching for items
     And I press "search_metadata"
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
-      | austlit:adaessa.xml | Australian Essays             | 1886         | Original, Raw, Text |
-      | austlit:bolroma.xml | A Romance of Canvas Town      | 1898         | Original, Raw, Text |
+      | austlit:adaessa.xml | Australian Essays             | 1886         | Text, Original, Raw |
+      | austlit:bolroma.xml | A Romance of Canvas Town      | 1898         | Text, Original, Raw |
 
   @javascript
   Scenario: The metadata search should not search the full text
@@ -193,7 +192,7 @@ Feature: Searching for items
     #And pause
     Then I should see "blacklight_results" table with
       | Identifier          | Title                         | Created Date | Type(s)             |
-      | austlit:adaessa.xml | Australian Essays             | 1886         | Original, Raw, Text |
+      | austlit:adaessa.xml | Australian Essays             | 1886         | Text, Original, Raw |
     Then I expand the facet Search Metadata
     And I fill in "Metadata" with ""
     And I fill in "q" with:

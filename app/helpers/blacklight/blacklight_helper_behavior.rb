@@ -659,38 +659,18 @@ module Blacklight::BlacklightHelperBehavior
     return config["url"].to_s + "/objects/#{object_id}/datastreams/#{datastream}/content"
   end
 
-  def has_only_text_documents?(document)
-    uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::SOURCE]
-    documents = item_documents(document, uris)
-    text_types = ["Text", "Raw", "Original"]
-    documents.each do |doc|
-      return false unless text_types.include?(doc[MetadataHelper::TYPE].to_s)
-    end
-    return true
-  end
-
-  def has_one_document?(document)
-    uris = [MetadataHelper::IDENTIFIER]
-    documents = item_documents(document, uris)
-    if documents.length == 1
-      return true
-    else
-      return false
-    end
-  end
-
-  def render_primary_text(document)
-    uri = buildURI(document.id, 'primary_text')
+  def render_display_text(source)
     begin
-      text = open(uri).read.strip.force_encoding("UTF-8")
+      text = File.read(source.gsub("file://", "")).strip.force_encoding("UTF-8")
       return "<div class='primary-text'>#{text}</div>"
     rescue => e
-      return render_no_primary_document
+      Rails.logger.error e.message
+      return render_no_display_document
     end
   end
 
-  def render_no_primary_document
-    return "<em>This Item has no primary document</em>"
+  def render_no_display_document
+    return "<em>This Item has no display document</em>"
   end
 
   def item_documents(document, uris)

@@ -37,15 +37,15 @@ Feature: Collection access control
     And I have done a search with collection "austlit"
     And I should see "blacklight_results" table with
       | Identifier      | Type(s)             |
-      | austlit:adaessa | Original, Raw, Text |
-      | austlit:bolroma | Original, Raw, Text |
+      | austlit:adaessa | Text, Original, Raw |
+      | austlit:bolroma | Text, Original, Raw |
 
   @javascript
   Scenario: Data Owner should be able to see the details of his items
     Given I am logged in as "data_owner1@intersect.org.au"
     Given I am on the catalog page for "cooee:1-001"
     Then I should see "cooee:1-001"
-    And I should see "Primary Document"
+    And I should see "Display Document"
     And I should see "Documents"
 
   @javascript
@@ -72,8 +72,8 @@ Feature: Collection access control
     And I have done a search with collection "austlit"
     And I should see "blacklight_results" table with
       | Identifier      | Type(s)             |
-      | austlit:adaessa | Original, Raw, Text |
-      | austlit:bolroma | Original, Raw, Text |
+      | austlit:adaessa | Text, Original, Raw |
+      | austlit:bolroma | Text, Original, Raw |
 
   @javascript
   Scenario: User should not be able to see details of items for which he has discover access
@@ -105,8 +105,8 @@ Feature: Collection access control
     And I have done a search with collection "austlit"
     And I should see "blacklight_results" table with
       | Identifier      | Type(s)             |
-      | austlit:adaessa | Original, Raw, Text |
-      | austlit:bolroma | Original, Raw, Text |
+      | austlit:adaessa | Text, Original, Raw |
+      | austlit:bolroma | Text, Original, Raw |
 
   @javascript
   Scenario: User should be able to see details of items for which he has read access
@@ -119,7 +119,7 @@ Feature: Collection access control
       |cooee      |
     Then I am on the catalog page for "cooee:1-001"
     And I should see "cooee:1-001"
-    And I should see "Primary Document"
+    And I should see "Display Document"
     And I should see "Documents"
 
 #----------- No Access

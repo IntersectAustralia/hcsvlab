@@ -64,6 +64,8 @@ class Item < HcsvlabActiveFedora
      'read_access_person_ssim',
      'edit_access_person_ssim',
      "json_metadata",
-     "score"]
+     "score",
+     MetadataHelper::short_form(MetadataHelper::DISPLAY_DOCUMENT) + '_tesim',
+     MetadataHelper::short_form(MetadataHelper::INDEXABLE_DOCUMENT) + '_tesim']
   end
 end

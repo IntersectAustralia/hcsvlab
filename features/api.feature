@@ -156,7 +156,7 @@ Feature: Browsing via API
       | $..['dc:created']                               | 10/11/1791                                                |
       | $..['dc:identifier']                            | 1-001                                                     |
       | $..['dc:isPartOf']                              | cooee                                                     |
-      | $..['dc:type']                                  | Original, Raw, Text                                       |
+      | $..['dc:type']                                  | Text, Original, Raw                                       |
       | $..['ausnc:itemwordcount']                      | 924                                                       |
       | $..['ausnc:discourse_type']                     | letter                                                    |
       | $..['olac:language']                            | eng                                                       |

@@ -227,7 +227,7 @@ module Blacklight::CatalogHelperBehavior
         if values.has_key?(MetadataHelper::TYPE)
           field = values[MetadataHelper::TYPE]
           field = "unlabelled" if field == ""
-          field = "Plain" if is_cooee && field == type
+          # field = "Plain" if is_cooee && field == type
         else
           field = "unlabelled"
         end

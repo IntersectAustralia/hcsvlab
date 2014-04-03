@@ -152,6 +152,8 @@ public
   COLLECTION = RDF::URI('collection_name_facet') unless const_defined?(:COLLECTION)
   IDENT      = RDF::URI(HCSVLAB_BASE_URI + 'ident') unless const_defined?(:IDENT)
   HAS_LICENCE= RDF::URI('has_licence') unless const_defined?(:HAS_LICENCE)
+  INDEXABLE_DOCUMENT= RDF::URI(HCSVLAB_BASE_URI + 'indexable_document') unless const_defined?(:INDEXABLE_DOCUMENT)
+  DISPLAY_DOCUMENT  = RDF::URI(HCSVLAB_BASE_URI + 'display_document') unless const_defined?(:DISPLAY_DOCUMENT)
 
   #
   # short_form - return a shortened form of the given uri (which will

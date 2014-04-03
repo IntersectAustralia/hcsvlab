@@ -1,35 +1,28 @@
 = render 'shared/modal_waiting_panel'
 
 %h3
-  %span Primary Document
-- uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::SOURCE]
-- documents = item_documents(document, uris)
-- if documents.empty?
-  = raw render_no_primary_document
-- else
-  - if has_one_document?(document)
-    - doc = documents[0]
-    - type = doc[MetadataHelper::TYPE].to_s
-    - if type == "Text"
-      %pre
-        = raw render_primary_text(document)
-    - elsif type == "Image"
-      %img{:src => doc[MetadataHelper::SOURCE], :style => "max-width:50%;"}/
-    - elsif type == "Video"
-    - elsif type == "Audio"
-      %audio{:controls => "", :style => "width:450px"}
-        %source{:src => "/catalog/#{document[:handle].split(':').first}/#{document[:handle].split(':').last}/document/#{doc[MetadataHelper::IDENTIFIER]}"}
-        %embed{:height => "50", :src => doc[MetadataHelper::SOURCE], :width => "100"}
+  %span Display Document
+- if @display_document.nil?
+  = raw render_no_display_document
+- elsif @display_document[:type] == "Text"
+  %pre
+    = raw render_display_text(@display_document[:source])
+- elsif @display_document[:type] == "Image"
+  %img{:src => @display_document[:source], :style => "max-width:50%;"}
+- elsif @display_document[:type] == "Audio"
+  %audio{:controls => "", :style => "width:450px"}
+    %source{:src => "/catalog/#{document[:handle]}/document/#{@display_document[:id]}"}
+    %embed{:height => "50", :src => @display_document[:source], :width => "100"}
 
-      %div{class:"eopas_message"}
-        = showMessageIfCannotPlayFile(doc[MetadataHelper::IDENTIFIER])
-    - else
-      = raw render_no_primary_document
-  - elsif has_only_text_documents?(document)
-    %pre
-      = raw render_primary_text(document)
-  - else
-    = raw render_no_primary_document
+  %div{class:"eopas_message"}
+    = showMessageIfCannotPlayFile(@display_document[:id])
+- elsif @display_document[:type] == "Video"
+  %video{:controls => "", :style => "width:450px"}
+    %source{:src => "/catalog/#{document[:handle]}/document/#{@display_document[:id]}"}
+  %div Note: This video may not play due to the file format and browser configuration
+- else
+  = raw render_no_display_document
+
 %h3
   %span Item Details
 %dl.dl-horizontal.dl-invert
@@ -105,7 +98,7 @@
           - if values.has_key?(MetadataHelper::TYPE)
             - field = values[MetadataHelper::TYPE]
             - field = "unlabelled" if field == ""
-            - field = "Plain" if is_cooee && field == type
+            / - field = "Plain" if is_cooee && field == type
           - else
             - field = "unlabelled"
           %td= sprintf(type_format, field)

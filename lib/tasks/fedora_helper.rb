@@ -191,6 +191,29 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
 
   docs = manifest["files"][File.basename(rdf_file)]["docs"]
 
+  # Create a primary text datastream in the fedora Item for primary text documents
+    begin
+      server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+      repository = server.repository(item.collection.flat_name)
+
+      query = RDF::Query.new do
+        pattern [RDF::URI.new(item.flat_uri), MetadataHelper::INDEXABLE_DOCUMENT, :indexable_doc]
+        pattern [:indexable_doc, MetadataHelper::SOURCE, :source]
+      end
+
+      results = repository.query(query)
+
+      results.each do |res|
+        path = res[:source].value.gsub("file://", "")
+        if File.exists? path and File.file? path
+          item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
+        end
+      end
+    rescue => e
+      Rails.logger.error e.inspect
+      Rails.logger.error "Could not connect to triplestore - #{SESAME_CONFIG["url"].to_s}"
+    end
+
   docs.each do |result|
     identifier = result["identifier"]
     source = result["source"]
@@ -227,16 +250,6 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
         doc.save
         doc_ids << doc.id
 
-        # Create a primary text datastream in the fedora Item for primary text documents
-        path = source.gsub("file:", "")
-        if File.exists? path and File.file? path and STORE_DOCUMENT_TYPES.include? type
-          case type
-            when 'Text'
-              item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
-            else
-              logger.warn "??? Creating a #{type} document for #{path} but not adding it to its Item" unless Rails.env.test?
-          end
-        end
         logger.info "#{type} Document = #{doc.pid.to_s}" unless Rails.env.test?
       rescue Exception => e
         logger.error("Error creating document: #{e.message}")
@@ -246,6 +259,7 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
       doc_ids << existing_doc.first.id
     end
   end
+
   return doc_ids
 end
 

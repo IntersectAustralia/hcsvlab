@@ -2,11 +2,14 @@
 @prefix corpus: <http://ns.ausnc.org.au/corpora/> .
 @prefix dc: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix hcsvlab: <http://hcsvlab.org/vocabulary/> .
 @prefix ns1: <http://ns.ausnc.org.au/schemas/austlit/> .
 @prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://ns.ausnc.org.au/corpora/austlit/items/adaessa.xml> a ausnc:AusNCObject ;
+    hcsvlab:display_document <http://ns.ausnc.org.au/corpora/austlit/source/adaessa#Text> ;
+    hcsvlab:indexable_document <http://ns.ausnc.org.au/corpora/austlit/source/adaessa#Text> ;
     ausnc:collection "Primary Fiction and Poetry Texts" ;
     ausnc:document <http://ns.ausnc.org.au/corpora/austlit/source/adaessa#Original>,
         <http://ns.ausnc.org.au/corpora/austlit/source/adaessa#Raw>,
