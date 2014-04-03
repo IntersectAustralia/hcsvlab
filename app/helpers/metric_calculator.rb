@@ -59,7 +59,7 @@ module MetricCalculator
     WHERE { ?ann rdf:type dada:Annotation . ?ann dada:partof ?ac . }
     """
 
-    server.each_repository do |repository|
+    '''server.each_repository do |repository|
       unless repository.id == "SYSTEM"
         solutions = repository.sparql_query(query)
         solutions.each do |s|
@@ -68,7 +68,7 @@ module MetricCalculator
           triples += repository.triples.count
         end
       end
-    end
+    end'''
     return {:annotations => annotations, :annotation_collections => annotation_collections, :triples => triples}
   end
 

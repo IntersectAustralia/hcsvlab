@@ -158,13 +158,6 @@ Feature: Administer users
     And I should see "Average frequency of use per week by users with role 'researcher' is 0 total number of visits."
     And I should see "Average duration of use per week by users with role 'researcher' is 0 hours per user"
 
-  Scenario: View triplestore counts on metrics page
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    And I am on the view metrics page
-    Then I should see "There are 117 triples in the triplestore"
-    Then I should see "There are 3 annotations in the triplestore"
-    Then I should see "There are 2 annotation collections in the triplestore"
-
   Scenario: View metrics table
     Given I am on the admin page
     And I have users
