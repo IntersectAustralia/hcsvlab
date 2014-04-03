@@ -1147,14 +1147,11 @@ class CatalogController < ApplicationController
   #
   def collect_predefined_context_properties
     predefinedProperties = {}
-    predefinedProperties[:@base] = "http://purl.org/dada/schema/0.2#"
-    predefinedProperties[:annotations] = { :@id => "http://purl.org/dada/schema/0.2#annotations", :@container => "@list" }
     predefinedProperties[:commonProperties] = {:@id => "http://purl.org/dada/schema/0.2#commonProperties"}
     predefinedProperties[:type] = {:@id => "http://purl.org/dada/schema/0.2#type"}
     predefinedProperties[:start] = {:@id => "http://purl.org/dada/schema/0.2#start"}
     predefinedProperties[:end] = {:@id => "http://purl.org/dada/schema/0.2#end"}
     predefinedProperties[:label] = {:@id => "http://purl.org/dada/schema/0.2#label"}
-    predefinedProperties[:annotates] = {:@id => "http://purl.org/dada/schema/0.2#annotates"}
     predefinedProperties[:"#{PROJECT_PREFIX_NAME}"] = { :@id => "#{PROJECT_SCHEMA_LOCATION}" }
 
     predefinedProperties
