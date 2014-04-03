@@ -1,6 +1,6 @@
 <doc>
   <!-- FACETED FIELDS -->
-  <field name="HCSvLab_collection_facet">custom</field>
+  <field name="collection_name_facet">custom</field>
   <field name="date_group_facet">1880 - 1889</field>
   <field name="AUSNC_mode_facet">spoken</field>
   <field name="AUSNC_speech_style_facet">spontaneous</field>
@@ -28,7 +28,7 @@
   <field name="http_ns_ausnc_org_au_schemas_localityName_tesim">New_South_Wales</field>
   <field name="DC_created_tesim">1886</field>
   <field name="DC_identifier_tesim">custom1.xml</field>
-  <field name="HCSvLab_ident">custom:custom1.xml</field>
+  <field name="handle">custom:custom1.xml</field>
   <field name="DC_source_tesim">Niall, 1998</field>
   <field name="PURL_BIBO_pages_tesim">10-11</field>
   <field name="OLAC_speaker_tesim">1-001addressee</field>

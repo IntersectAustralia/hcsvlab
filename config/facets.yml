@@ -1,6 +1,6 @@
 :facets:
   -
-    :name: HCSvLab_collection_facet
+    :name: collection_name_facet
     :label: Collection
     :limit: 2000
     :partial: 'catalog/sorted_facet'

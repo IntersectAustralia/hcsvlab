@@ -107,7 +107,7 @@ end
 Then /^I should get the authentication token json file for "(.*)"$/ do |email|
   user = User.find_by_email!(email)
   page.response_headers['Content-Type'].should == "application/json"
-  page.response_headers['Content-Disposition'].should include("filename=\"hcsvlab_#{user.full_name.downcase.gsub(" ", "_")}_token.json\"")
+  page.response_headers['Content-Disposition'].should include("filename=\"#{PROJECT_PREFIX_NAME}_#{user.full_name.downcase.gsub(" ", "_")}_token.json\"")
   page.response_headers['Content-Disposition'].should include("attachment")
   page.source.should == "{:auth_token=>\"#{user.authentication_token}\"}"
 end

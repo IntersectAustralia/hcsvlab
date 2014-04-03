@@ -40,7 +40,7 @@
       - if solr_fname == 'OLAC_language_facet'
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
           = raw render_language_codes document[solr_fname]
-      - elsif solr_fname == 'HCSvLab_collection_facet'
+      - elsif solr_fname == 'collection_name_facet'
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
           - coll = Collection.find_by_short_name(document[solr_fname])[0]
           - if !coll.nil?

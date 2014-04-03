@@ -18,7 +18,7 @@ Given /^Collections ownership is$/ do |table|
 end
 
 Then /^I should see only the following collections displayed in the facet menu$/ do |table|
-  collectionInFacet = page.all(:xpath, "//div[@id='facets']//div[@class='facet_limit blacklight-hcsvlab_collection_facet']//a[@class='facet_select']", visible: false)
+  collectionInFacet = page.all(:xpath, "//div[@id='facets']//div[@class='facet_limit blacklight-collection_name_facet']//a[@class='facet_select']", visible: false)
   collectionsName = collectionInFacet.map{|c| c.text}
   collectionsName.length.should eq table.hashes.length
   table.hashes.each do |row|
