@@ -6,7 +6,7 @@ Feature: Home page
   Background:
     Given I have the usual roles and permissions
     And I have a user "chrisk@intersect.org.au"
-    And "chrisk@intersect.org.au" has role "hcsvlab-admin"
+    And "chrisk@intersect.org.au" has role "admin"
 
   Scenario: Text is shown when not logged in
     Given I am on the home page

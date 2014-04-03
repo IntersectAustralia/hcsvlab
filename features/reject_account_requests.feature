@@ -6,7 +6,7 @@ Feature: Reject access requests
   Background:
     Given I have the usual roles and permissions
     And I have a user "georgina@intersect.org.au"
-    And "georgina@intersect.org.au" has role "hcsvlab-admin"
+    And "georgina@intersect.org.au" has role "admin"
     And I have access requests
       | email                  | first_name | last_name        |
       | ryan@intersect.org.au  | Ryan       | Braganza         |

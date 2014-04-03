@@ -10,14 +10,14 @@ Feature: Administer users
       | georgina@intersect.org.au | Georgina   | Edwards   |
     And I have the usual roles and permissions
     And I am logged in as "georgina@intersect.org.au"
-    And "georgina@intersect.org.au" has role "hcsvlab-admin"
+    And "georgina@intersect.org.au" has role "admin"
 
   Scenario: View a list of users
     Given "raul@intersect.org.au" is deactivated
     When I am on the list users page
     Then I should see "users" table with
       | First name | Last name | Email                     | Role          | Status      |
-      | Georgina   | Edwards   | georgina@intersect.org.au | hcsvlab-admin | Active      |
+      | Georgina   | Edwards   | georgina@intersect.org.au | admin         | Active      |
       | Raul       | Carrizo   | raul@intersect.org.au     |               | Deactivated |
 
   Scenario: View user details
@@ -41,11 +41,11 @@ Feature: Administer users
     And I am on the list users page
     When I follow "View Details" for "raul@intersect.org.au"
     And I follow "Edit role"
-    And I select "hcsvlab-admin" from "Role"
+    And I select "admin" from "Role"
     And I press "Save"
     Then I should be on the user details page for raul@intersect.org.au
     And I should see "The role for raul@intersect.org.au was successfully updated."
-    And I should see field "Role" with value "hcsvlab-admin"
+    And I should see field "Role" with value "admin"
 
   Scenario: Edit role from list page
     Given "raul@intersect.org.au" has role "researcher"
@@ -62,7 +62,7 @@ Feature: Administer users
     And I am on the list users page
     When I follow "View Details" for "raul@intersect.org.au"
     And I follow "Edit role"
-    And I select "hcsvlab-admin" from "Role"
+    And I select "admin" from "Role"
     And I follow "Back"
     Then I should be on the user details page for raul@intersect.org.au
     And I should see field "Role" with value "researcher"
@@ -94,7 +94,7 @@ Feature: Administer users
     Given I am on the list users page
     When I follow "View Details" for "georgina@intersect.org.au"
     And I follow "Deactivate"
-    Then I should see "You cannot deactivate this account as it is the only account with hcsvlab-admin privileges."
+    Then I should see "You cannot deactivate this account as it is the only account with admin privileges."
     And I should see field "Status" with value "Active"
 
   Scenario: Editing own role has alert
@@ -112,7 +112,7 @@ Feature: Administer users
   Scenario: Count of users with role 'researcher' is shown on user list page
     Given I have 4 active users with role "researcher"
     And I have 2 deactivated users with role "researcher"
-    And I have 3 active users with role "hcsvlab-admin"
+    And I have 3 active users with role "admin"
     When I am on the list users page
     Then I should see "There are 4 registered users with role 'researcher'."
 

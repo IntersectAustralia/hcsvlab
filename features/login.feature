@@ -6,10 +6,10 @@ Feature: Logging In
   Background:
     Given I have roles
       | name          |
-      | hcsvlab-admin |
+      | admin         |
       | Researcher    |
     And I have a user "georgina@intersect.org.au"
-    And "georgina@intersect.org.au" has role "hcsvlab-admin"
+    And "georgina@intersect.org.au" has role "admin"
 
   Scenario: Successful login
     Given I am on the login page

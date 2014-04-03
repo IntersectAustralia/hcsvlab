@@ -35,8 +35,8 @@ describe User do
         User.deactivated_or_approved.should eq([u3,u1, u5])
       end
     end
-    describe "Approved hcsvlab-admins Scope" do
-      it "should return users with hcsvlab-admin role that are approved ordered by email address" do
+    describe "Approved admins Scope" do
+      it "should return users with admin role that are approved ordered by email address" do
         super_role = FactoryGirl.create(:role, :name => Role::SUPERUSER_ROLE)
         other_role = FactoryGirl.create(:role, :name => Role::RESEARCHER_ROLE)
         u1 = FactoryGirl.create(:user, :status => 'A', :role => super_role, :email => "fasdf1@intersect.org.au")
@@ -245,14 +245,14 @@ describe User do
 
   describe "Get superuser emails" do
     it "should find all approved superusers and extract their email address" do
-      super_role = FactoryGirl.create(:role, :name => "hcsvlab-admin")
-      admin_role = FactoryGirl.create(:role, :name => "Admin")
+      super_role = FactoryGirl.create(:role, :name => "admin")
+      researcher_role = FactoryGirl.create(:role, :name => "researcher")
       super_1 = FactoryGirl.create(:user, :role => super_role, :status => "A", :email => "a@intersect.org.au")
       super_2 = FactoryGirl.create(:user, :role => super_role, :status => "U", :email => "b@intersect.org.au")
       super_3 = FactoryGirl.create(:user, :role => super_role, :status => "A", :email => "c@intersect.org.au")
       super_4 = FactoryGirl.create(:user, :role => super_role, :status => "D", :email => "d@intersect.org.au")
       super_5 = FactoryGirl.create(:user, :role => super_role, :status => "R", :email => "e@intersect.org.au")
-      admin = FactoryGirl.create(:user, :role => admin_role, :status => "A", :email => "f@intersect.org.au")
+      researcher = FactoryGirl.create(:user, :role => researcher_role, :status => "A", :email => "f@intersect.org.au")
 
       supers = User.get_superuser_emails
       supers.should eq(["a@intersect.org.au", "c@intersect.org.au"])

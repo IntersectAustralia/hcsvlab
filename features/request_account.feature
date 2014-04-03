@@ -6,7 +6,7 @@ Feature: Request an account
   Background:
     Given I have no users
     Given I have the usual roles and permissions
-    And I have a user "diego.alonso@intersect.org.au" with role "hcsvlab-admin"
+    And I have a user "diego.alonso@intersect.org.au" with role "admin"
 
   @javascript
   Scenario: HCSVLAB-247 - Request account 
@@ -93,7 +93,7 @@ Feature: Request an account
     And I should be on the login page
 
   Scenario: Deactivated supers shouldn't get the email
-    Given I have a user "fred@intersect.org.au" with role "hcsvlab-admin"
+    Given I have a user "fred@intersect.org.au" with role "admin"
     And "fred@intersect.org.au" is deactivated
     And I am on the request account page
     When I fill in the following:

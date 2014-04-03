@@ -6,9 +6,9 @@ Feature: Approve access requests
   Background:
     Given I have roles
       | name          |
-      | hcsvlab-admin |
+      | admin         |
       | Researcher    |
-    And I have a user "georgina@intersect.org.au" with role "hcsvlab-admin"
+    And I have a user "georgina@intersect.org.au" with role "admin"
     And I have access requests
       | email                  | first_name | last_name        |
       | ryan@intersect.org.au  | Ryan       | Braganza         |
@@ -25,7 +25,7 @@ Feature: Approve access requests
   Scenario: Approve an access request from the list page
     Given I am on the access requests page
     When I follow "Approve" for "diego@intersect.org.au"
-    And I select "hcsvlab-admin" from "Role"
+    And I select "admin" from "Role"
     And I press "Approve"
     Then I should see "The access request for diego@intersect.org.au was approved."
     And I should see "access_requests" table with
@@ -41,7 +41,7 @@ Feature: Approve access requests
   Scenario: Cancel out of approving an access request from the list page
     Given I am on the access requests page
     When I follow "Approve" for "diego@intersect.org.au"
-    And I select "hcsvlab-admin" from "Role"
+    And I select "admin" from "Role"
     And I follow "Back"
     Then I should be on the access requests page
     And I should see "access_requests" table with
@@ -63,7 +63,7 @@ Feature: Approve access requests
     Given I am on the access requests page
     When I follow "View Details" for "diego@intersect.org.au"
     And I follow "Approve"
-    And I select "hcsvlab-admin" from "Role"
+    And I select "admin" from "Role"
     And I press "Approve"
     Then I should see "The access request for diego@intersect.org.au was approved."
     And I should see "access_requests" table with
@@ -74,7 +74,7 @@ Feature: Approve access requests
     Given I am on the access requests page
     When I follow "View Details" for "diego@intersect.org.au"
     And I follow "Approve"
-    And I select "hcsvlab-admin" from "Role"
+    And I select "admin" from "Role"
     And I follow "Back"
     Then I should be on the access requests page
     And I should see "access_requests" table with
@@ -101,7 +101,7 @@ Feature: Approve access requests
   Scenario: Approved user should be able to log in
     Given I am on the access requests page
     When I follow "Approve" for "diego@intersect.org.au"
-    And I select "hcsvlab-admin" from "Role"
+    And I select "admin" from "Role"
     And I press "Approve"
     And I am on the home page
     And I follow "Logout"
@@ -110,8 +110,8 @@ Feature: Approve access requests
   Scenario: Approved user roles should be correctly saved
     Given I am on the access requests page
     And I follow "Approve" for "diego@intersect.org.au"
-    And I select "hcsvlab-admin" from "Role"
+    And I select "admin" from "Role"
     And I press "Approve"
     And I am on the list users page
     When I follow "View Details" for "diego@intersect.org.au"
-    And I should see field "Role" with value "hcsvlab-admin"
+    And I should see field "Role" with value "admin"
