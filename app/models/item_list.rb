@@ -199,7 +199,7 @@ class ItemList < ActiveRecord::Base
   # Generate R script for item list
   #
   def getRScript(root_url)
-    return  "library(hcsvlab)\n" +
+    return  "library(alveo)\n" +
             "client <- RestClient(server_uri='#{root_url.chomp("/")}')\n" +
             "item_list <- client$get_item_list_by_id(#{self.id})"
   end
