@@ -11,8 +11,7 @@ class CatalogController < ApplicationController
   SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
   SPARQL_QUERY_PREFIXES = YAML.load_file(Rails.root.join("config", "sparql.yml")) unless defined? SPARQL_QUERY_PREFIXES
 
-  TYPE_LOOKUP = {"http://purl.org/dada/schema/0.2#SecondRegion" => "SecondAnnotation", "http://purl.org/dada/schema/0.2#UTF8Region" => "TextAnnotation"}
-
+  TYPE_LOOKUP = {"SecondRegion" => "SecondAnnotation", "UTF8Region" => "TextAnnotation"}
 
   # Set catalog tab as current selected
   set_tab :catalog
@@ -421,6 +420,8 @@ class CatalogController < ApplicationController
         begin
           @anns, @annotates_document = query_annotations(@item, @document, params[:type], params[:label])
         rescue Exception => e
+          Rails.logger.error(e.message)
+          Rails.logger.error(e.backtrace.join("\n"))
           respond_to do |format|
             format.json { render :json => {:error => "error in query parameters"}.to_json, :status => 400 }
           end
@@ -1007,7 +1008,13 @@ class CatalogController < ApplicationController
       hash[aSolution[:anno].to_s][:type] = aSolution[:type].to_s unless aSolution[:type].nil?
 
       if (RDF.type.to_s.eql? (aSolution[:property].to_s))
-        hash[aSolution[:anno].to_s][:@type] = TYPE_LOOKUP[aSolution[:value].to_s]
+        type = RdfNamespace.get_shortened_uri(aSolution[:value].to_s, namespaces)
+        TYPE_LOOKUP.keys.each do |k|
+          if type.include? k
+            type = type.sub(k, TYPE_LOOKUP[k])
+          end
+        end
+        hash[aSolution[:anno].to_s][:@type] = type
       else
         # If the property URI is predefined in our Json-ld, then we should use the short_name of the URI
         if (predefinedPropertiesMap.has_key?(aSolution[:property].to_s))
@@ -1018,18 +1025,12 @@ class CatalogController < ApplicationController
       end
     end
 
-    itemIdentifier = @item.handle.first.split(':').last
-    # hacky way to find the "primary" document, need to make this standard in RDF
-    if !@item.primary_text.content.nil?
-      annotates_document = catalog_primary_text_url(@item.collection.flat_name, format: :json)
+    display_document = get_display_document(solr_document)
+
+    if !display_document.nil?
+      annotates_document = catalog_document_url(@item.collection.flat_name, filename: display_document[:id])
     else
-      uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
-      documents = item_documents(@document, uris)
-      if(documents.present?)
-        annotates_document = catalog_document_url(@item.collection.flat_name, documents.first[MetadataHelper::IDENTIFIER])
-      else
-        annotates_document = catalog_url(@item.collection.flat_name, itemIdentifier)
-      end
+      annotates_document = catalog_url(@item.collection.flat_name, item_short_identifier)
     end
 
     return {commonProperties: commonProperties, annotations: hash}, annotates_document
@@ -1148,6 +1149,7 @@ class CatalogController < ApplicationController
   def collect_predefined_context_properties
     predefinedProperties = {}
     predefinedProperties[:commonProperties] = {:@id => "http://purl.org/dada/schema/0.2#commonProperties"}
+    predefinedProperties[:dada] = {:@id => "http://purl.org/dada/schema/0.2#"}
     predefinedProperties[:type] = {:@id => "http://purl.org/dada/schema/0.2#type"}
     predefinedProperties[:start] = {:@id => "http://purl.org/dada/schema/0.2#start"}
     predefinedProperties[:end] = {:@id => "http://purl.org/dada/schema/0.2#end"}
