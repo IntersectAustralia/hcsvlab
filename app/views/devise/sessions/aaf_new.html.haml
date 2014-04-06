@@ -1,6 +1,6 @@
 .form-card
   %ul.nav.nav-tabs
-    %li.active
+    %li{ class: activepath_with_loggued_user?(users_path) }
       = link_to "Log in", users_path
     %li{ class: activepath_with_loggued_user?(users_aaf_sign_in_path) }
       = link_to "AAF Log in", users_aaf_sign_in_path
@@ -9,9 +9,8 @@
     %li.pull-right{ class: activepath_with_loggued_user?(new_user_password_path) }
       = link_to "I forgot my password", new_user_password_path
   .content
-    %h2 Please enter your email and password to log in
-    - if @aaf_credentials[:mail].present?
-      .container
+    .container
+      - if @aaf_credentials[:mail].present?
         .control-group
           .controls
             %small
@@ -23,8 +22,19 @@
               - else
                 ="but you have not registered an account with #{PROJECT_NAME}."
               %br
-              You may log in with a different account below or sign out of AAF.
-    = f.input :email, :required => false
-    = f.input :password, :required => false
-    .form-actions
-      = f.submit "Log in", :class => "btn btn-primary"
+              %br
+              You may log in with a different account in the Log In tab or sign out of AAF.
+              %br
+              %br
+            = link_to "← Sign out", destroy_user_session_path, :class => "btn aaf"
+      - else
+        .control-group
+          .controls
+            %medium
+              This will take you to the AAF (Australian Access Federation) login page.
+              %br
+              ="If you are not yet authorised to use #{PROJECT_NAME} you will need to wait for the admin to approve your user."
+        .control-group
+          .controls
+            = link_to "Log in via AAF →", aaf_new_user_session_path, :class => "btn aaf"
+= render 'shared/nectar_attribution'

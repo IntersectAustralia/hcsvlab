@@ -10,6 +10,13 @@ class Devise::SessionsController < DeviseController
     respond_with(resource, serialize_options(resource))
   end
 
+  # GET /resource/aaf_sign_in
+  def aaf_new
+    self.resource = build_resource(nil, :unsafe => true)
+    clean_up_passwords(resource)
+    respond_with(resource, serialize_options(resource))
+  end
+
   # POST /resource/sign_in
   def create
     self.resource = warden.authenticate!(auth_options)
