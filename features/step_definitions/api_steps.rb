@@ -40,6 +40,19 @@ When /^I make a JSON post request for (.*) with the API token for "(.*)" with JS
   post path_to(page_name), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
 end
 
+When /^I make a JSON put request for (.*) with the API token for "(.*)" with JSON params$/ do |page_name, email, table|
+  user = User.find_by_email!(email)
+  hash = table.hashes.first
+  hash.each do |k, v|
+    begin
+      hash[k] = JSON.parse(v)
+    rescue
+      # not a json parameter, ignore
+    end
+  end
+  put path_to(page_name), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
+end
+
 When /^I make a JSON multipart request for (.*) with the API token for "(.*)" with JSON params$/ do |page_name, email, table|
   user = User.find_by_email!(email)
   table = table.hashes

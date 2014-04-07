@@ -179,6 +179,49 @@ class ItemListsController < ApplicationController
   end
 
   #
+  # This method with update and rename the item list
+  #
+  def update
+    if request.format == 'json' and request.put?
+      @item_list = ItemList.find(params[:id])
+      name = params[:name]
+      item_lists = current_user.item_lists.find_by_name(name)
+
+      if (!name.nil? and !name.blank? and !(name.length > 255)) and (item_lists.nil? or @item_list.name == name)
+        @item_list.name = name
+        if @item_list.save
+          render "show" and return
+        end
+      end
+
+      err_message = "couldn't rename item list"
+      err_message = "name too long" if !name.nil? and name.length > 255
+      err_message = "name can't be blank" if name.blank?
+
+      respond_to do |format|
+        format.any { render :json => {:error => err_message}.to_json, :status => 400 }
+      end
+
+    else
+      name = params[:item_list][:name]
+      item_lists = current_user.item_lists.find_by_name(name)
+      if (item_lists.nil? or @item_list.name == name)
+        if @item_list.update_attributes(params[:item_list]) 
+          flash[:notice] = 'Item list renamed successfully'
+          redirect_to @item_list and return
+        end
+        flash[:error] = "Error trying to rename Item list, name too long (max. 255 characters)" if (name.length > 255)
+        flash[:error] = "Error trying to rename Item list, name can't be blank" if (name.blank?)
+        flash[:error] = "Error trying to rename Item list" unless (name.length > 255) or (name.blank?)
+        redirect_to @item_list and return
+      else
+        flash[:error] = "Item list with name '#{name}' already exists."
+        redirect_to @item_list and return
+      end
+    end
+  end
+
+  #
   # This method with remove all the items in an item list but it will not remove the item list
   #
   def clear
