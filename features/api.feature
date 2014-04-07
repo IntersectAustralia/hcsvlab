@@ -593,6 +593,32 @@ Feature: Browsing via API
     {"error":"items parameter not an array"}
     """
 
+  Scenario: Rename an item list via the API
+    Given "researcher1@intersect.org.au" has item lists
+      | name        |
+      | Rename Test |
+    And I make a JSON put request for the item list page for "Rename Test" with the API token for "researcher1@intersect.org.au" with JSON params
+      | name     |
+      | New Name |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"name":"New Name","num_items":0,"items":[]}
+    """
+
+  Scenario: Rename an item list via the API with invalid name
+    Given "researcher1@intersect.org.au" has item lists
+      | name        |
+      | Rename Test |
+    And I make a JSON put request for the item list page for "Rename Test" with the API token for "researcher1@intersect.org.au" with JSON params
+      | name                                                                     |
+      | Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name Long name |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"name too long"}
+    """
+
   Scenario: Download items metadata and files in Zip format including non-existent items
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params

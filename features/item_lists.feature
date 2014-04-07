@@ -116,6 +116,46 @@ Feature: Managing Item Lists
     And I should see "cooee:1-001"
     And I should see "cooee:1-002"
 
+  Scenario: Renaming an item list
+    And "researcher@intersect.org.au" has item lists
+      | name        |
+      | Rename Test |
+    And the item list "Rename Test" has items cooee:1-001
+    And I wait 5 seconds
+    And I am on the item list page for "Rename Test"
+    And I follow "Rename"
+    And I fill in "Name" with "New Name"
+    And I press "Rename Item List"
+    Then I should see "Item list renamed successfully"
+    And I should see "New Name"
+
+    Scenario: Renaming an item list with invalid name
+    And "researcher@intersect.org.au" has item lists
+      | name        |
+      | Rename Test |
+    And the item list "Rename Test" has items cooee:1-001
+    And I wait 5 seconds
+    And I am on the item list page for "Rename Test"
+    And I follow "Rename"
+    And I fill in "Name" with ""
+    And I press "Rename Item List"
+    Then I should see "Error trying to rename Item list, name can't be blank"
+    And I should see "Rename Test"
+
+  Scenario: Renaming an item list to an already existing name
+    And "researcher@intersect.org.au" has item lists
+      | name        |
+      | Rename Test |
+      | Exists Test |
+    And the item list "Rename Test" has items cooee:1-001
+    And I wait 5 seconds
+    And I am on the item list page for "Rename Test"
+    And I follow "Rename"
+    And I fill in "Name" with "Exists Test"
+    And I press "Rename Item List"
+    Then I should see "Item list with name 'Exists Test' already exists."
+    And I should see "Rename Test"
+
   Scenario: Clearing an Item List
     And "researcher@intersect.org.au" has item lists
       | name       |

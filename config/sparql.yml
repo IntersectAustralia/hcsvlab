@@ -30,3 +30,21 @@ austlit:
 
 avozes:
  corpus_prefix: http://ns.ausnc.org.au/schemas/avozes/
+
+qa_art:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/art/
+
+qa_monash:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/monash/
+
+qa_ice:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/ice/
+
+qa_griffith:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/http://ns.ausnc.org.au/schemas/gcsause//
+
+qa_cooee:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/cooee/
+
+qa_braided:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/braidedchannels/

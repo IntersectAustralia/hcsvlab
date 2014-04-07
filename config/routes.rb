@@ -56,7 +56,7 @@ HcsvlabWeb::Application.routes.draw do
     delete "/account/licence_agreements/:id/cancel_request", :to => "user_licence_requests#cancel_request", :as => 'cancel_request'
   end
 
-  resources :item_lists, :only => [:index, :show, :create, :destroy] do
+  resources :item_lists, :only => [:index, :show, :create, :update, :destroy] do
       collection do
         post 'add_items'
       end

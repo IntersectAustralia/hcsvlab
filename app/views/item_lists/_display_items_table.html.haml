@@ -8,6 +8,8 @@
         %ul.dropdown-menu
           - if (@item_list.user_id == current_user.id)
             %li
+              %a{"data-toggle" => "modal", :href => "#rename_item_list", :role => "button"} Rename
+            %li
               = link_to("Clear", {:controller => "item_lists", :action => "clear"}, :method => 'POST', :id => params[:id].to_i)
           %li
             = link_to("Use in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
@@ -67,6 +69,20 @@
           .r_script_content{:readonly => "true"}= @item_list.getRScript(root_url)
     .modal-footer
       %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+
+  .modal.hide.fade.in{:id => "rename_item_list", "aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+      %h3#myModalLabel= "Rename Item List"
+    = form_for @item_list, :url => url_for(:controller => "item_lists", :action => "update") do |f|
+      #rename_item_list_dialog.modal-body
+        %p
+          = f.label :name
+          = f.text_field :name
+      .modal-footer
+        %a.btn.btn-primary.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
+        = f.submit "Rename Item List", class: "btn btn-primary"
+
 
 :javascript
 
