@@ -76,7 +76,7 @@ Feature: Reject access requests
     And I fill in "Email" with "diego@intersect.org.au"
     And I fill in "Password" with "Pas$w0rd"
     And I press "Log in"
-    Then I should see "Your account is not active."
+    Then I should see "Your request for an account has been received. You will receive an email once your request is approved."
     And I should be on the login page
 
   Scenario: Rejected user should be able to apply again

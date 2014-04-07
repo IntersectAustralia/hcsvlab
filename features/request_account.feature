@@ -89,7 +89,7 @@ Feature: Request an account
     When I fill in "Email" with "georgina@intersect.org.au"
     And I fill in "Password" with "paS$w0rd"
     And I press "Log in"
-    Then I should see "Your account is not active."
+    Then I should see "Your request for an account has been received. You will receive an email once your request is approved."
     And I should be on the login page
 
   Scenario: Deactivated supers shouldn't get the email

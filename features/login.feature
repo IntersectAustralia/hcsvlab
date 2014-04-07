@@ -70,7 +70,7 @@ Feature: Logging In
     When I fill in "Email" with "<email>"
     And I fill in "Password" with "<password>"
     And I press "Log in"
-    Then I should see "Your account is not active."
+    Then I should see "Your request for an account has been received. You will receive an email once your request is approved."
   Examples:
     | email                    | password |
     | deact@intersect.org.au   | Pas$w0rd |
