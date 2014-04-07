@@ -1,5 +1,11 @@
+= link_to "Back", catalog_advanced_search_path
+
 %h3
   Searchable metadata fields
+%span
+  ="This table shows all metadata fields in #{PROJECT_NAME}. The left column shows internal field names that can be used in SPARQL"
+  ="queries. The right column shows field names that can be used in search queries."
+%br
 %table.table.table-striped
   %thead
     %tr
@@ -8,7 +14,7 @@
           RDF Name
       %td
         %b
-          User Name
+          Field name for Queries
   %tbody
     -if @nameMappings.empty?
       %tr
@@ -21,5 +27,4 @@
             =aNameMapping[:rdfName]
           %td
             =aNameMapping[:user_friendly_name]
-
 = render 'shared/nectar_attribution'

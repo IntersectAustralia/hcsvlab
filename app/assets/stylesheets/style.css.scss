@@ -233,9 +233,9 @@ border-width: 0 0 0px;
 .info .close:hover { color: #333; opacity: 0.75; }
 
 .info.alert-error {
-background-color: #f2dede;
-border-color: #eed3d7;
-color: #b94a48;
+  background-color: #f2dede;
+  border-color: #eed3d7;
+  color: #b94a48;
 }
 
 /* NAVBAR //////////////////////////////////////////////////////////////////////////////////////////
@@ -1270,13 +1270,58 @@ border: 1px solid #BCBCBC;
 
 #licence_terms_content p { word-wrap: break-word; }
 
+/* ADVANCED SEARCH /////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+.advanced_search .metadata-input-container {
+  padding-left: 0;
+}
+
+.advanced_search p {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+/* ITEM LISTS //////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+.blacklight-item_lists .icon-globe {
+  opacity: 0.15;
+  margin-right: 5px;
+}
+
+.blacklight-item_lists .icon-globe.active {
+  opacity: 0.75;
+}
+
+.blacklight-item_lists .sidenav li a {
+}
+
+
 /* MEDIA QUERIES //////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////*/
 
 @media only screen and (max-width : 1200px) {
-#searchbar input, .metadata-input-container input { width: 140px; }
-#item-list-search { width: 60px; }
+  #searchbar input, .metadata-input-container input { width: 140px; }
+  #item-list-search { width: 60px; }
+  .blacklight-catalog-advanced_search .advanced_search {
+    width: 724px;
+    margin: 0 auto;
+  }
 }
+
+@media (max-width: 979px) and (min-width: 768px) {
+  .blacklight-catalog-advanced_search .advanced_search {
+    width: 724px;
+    margin: 0 auto;
+  }
+}
+
+.blacklight-catalog-advanced_search .advanced_search {
+  width: 724px;
+  margin: 0 auto;
+}
+
 
 
 @media only screen and (max-width : 980px) {
@@ -1297,31 +1342,68 @@ border: 1px solid #BCBCBC;
 /////////////////////////////*/
 
 .btn.aaf {
-    padding: 5px 10px;
-    font-weight: normal;
-    font-size: 0.875em;
-    line-height: 18px;
-    color: white;
-    text-decoration: none;
-    text-align: center;
-    font-family: Helvetica, Arial, sans-serif;
-    border: 1px solid #424f5b;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    display: -moz-inline-stack;
-    display: inline-block;
-    zoom: 1;
-    *display: inline;
-    vertical-align: top;
-    background: #424f5b url("/images/aaf.png") right no-repeat;
-    padding-right: 36px;
+  padding: 5px 10px;
+  width: 160px;
+  text-decoration: none;
+  display: -moz-inline-stack;
+  background: #EFEFEF url("/images/aaf.png") 160px no-repeat;
+  padding-right: 36px;
+  text-align: left;
 }
 
-.btn.aaf:hover {
-    background: #495663 url("/images/aaf.png") right no-repeat;
-    border: 1px solid #495663;
+.btn-lg  {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.33;
 }
+
+
+/* SOLR SYNTAX PAGE */
+.solr_syntax {
+  font: small Verdana, Helvetica, sans-serif;
+  font-size: 90%;
+  display: block;
+  font-family: monospace;
+  white-space: pre;
+  margin: 1em 0px;
+}
+
+.solr_syntax div {
+  display: block;
+}
+
+.solr_syntax h2 {
+  font-size: 140%;
+  margin: 1em 0px 0.8em 0px;
+  padding: 0px;
+  font-weight: bold;
+}
+
+.solr_syntax p {
+  line-height: 120%;
+  text-align: left;
+  margin-top: .5em;
+  margin-bottom: 1em;
+  display: block;
+  -webkit-margin-before: 1em;
+  -webkit-margin-after: 1em;
+  -webkit-margin-start: 0px;
+  -webkit-margin-end: 0px;
+}
+
+.solr_syntax .boxed { background-color: #E5E4D9;}
+
+.solr_syntax .code {
+  border-color: #a5b6c6;
+}
+
+.solr_syntax pre.code {
+  margin-left: 2em;
+  margin-right: 2em;
+  padding: 0.5em;
+  background-color: #f0f0f0;
+}
+
 
 /* SHAME ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////*/

@@ -1,0 +1,48 @@
+<%= form_tag search_action_url, :method => :get, :class => 'search-query-form form-inline clearfix advanced_search' do %>
+  <%= hidden_field :search_field, "all_fields"%>
+  <%= search_as_hidden_fields(:omit_keys => [:q, :qt, :page, :metadata]).html_safe %>
+  <div>
+    <h2>Search in Metadata</h2>
+    <div class="input-append input-block-level metadata-input-container">
+      <label for="metadata" class="hide-text"><%= t('blacklight.search.form.all_metadata') %></label>
+      <%= text_field_tag :metadata, params[:metadata], :placeholder => t('blacklight.search.form.all_metadata'), :class => "search_q q", :style => "width:100%;",  :id => "metadata" %>
+      <button type="submit" class="btn search-btn" id="search_metadata">
+        <i class="icon-search"></i>
+      </button>
+    </div>
+  </div>
+  <br>
+  <div>
+    <p>This form allows you to search for items using the full query language.  Your query will match against metadata terms on each item and the result will be a list of matching items.</p>
+    <p>
+      Searches are made using the Apache Lucene/Solr syntax. This syntax allows you to identify specific fields to search
+      (see <%= link_to "Searchable fields", catalog_searchable_fields_path %>), perform boolean queries, use term modifiers
+      (e.g. wildcards, fuzzy, proximity and range), use parentheses to group clauses and more. For more information about
+      the search syntax refer to the <a href="http://lucene.apache.org/core/2_9_4/queryparsersyntax.html" target="_solr_syntax">Solr Query syntax page</a>.
+    </p>
+    <div>
+      <ul>
+        <strong>Search query examples:</strong>
+        <li>collection_name:cooee AND created:1788 AND full_text:"Port Jackson"</li>
+        <li>collection_name:ace OR (full_text:sydney AND full_text:scandal*)</li>
+      </ul>
+    </div>
+  </div>
+<% end %>
+<% if @document_list.present?%>
+  <div id="content" style="width: 98%;">
+    <h3 class="hide-text top-content-title"><%= t('blacklight.search.search_results_header') %></h3>
+    <% @page_title = t('blacklight.search.title', :application_name => application_name) %>
+    <% extra_head_content << render_opensearch_response_metadata.html_safe %>
+    <%= render :partial => 'did_you_mean' %>
+    <%= render :partial => 'constraints' %>
+    <%= render 'sort_and_per_page' %>
+    <h2 class="hide-text"><%= t('blacklight.search.search_results') %></h2>
+    <%= render_document_index %>
+    <%= render 'results_pagination' %>
+  </div>
+<% end %>
+
+<%= render 'shared/nectar_attribution' %>
+<%= render 'shared/profiler' %>
+

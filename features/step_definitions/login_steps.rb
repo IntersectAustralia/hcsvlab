@@ -77,7 +77,7 @@ end
 And /^I request a reset for "([^"]*)"$/ do |email|
   set_html_request
   visit path_to("the home page")
-  click_link "Forgot your password?"
+  click_link "I forgot my password"
   fill_in "Email", :with => email
   click_button "Send me reset password instructions"
 end

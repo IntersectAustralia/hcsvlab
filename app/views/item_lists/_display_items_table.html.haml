@@ -34,7 +34,7 @@
     - else
       = render 'galaxy_link', :title => "Use Item List in Galaxy "
       - if (!@message.nil?)
-        %span{class:"alert alert-info", :style=>"display:block; text-align:center"}
+        %span{class:"info alert-info", :style=>"display:block; text-align:center"}
           =@message
           ="This is because you do not have access to the following collections: #{@missing_collections}."
           = "To gain access to more Collections, visit the "

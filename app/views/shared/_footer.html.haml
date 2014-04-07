@@ -1,10 +1,11 @@
-.row-fluid.clearfix.environment
-  .span12
-    - if Rails.env.development?
-      #dev
-      %p= "#{PROJECT_NAME} Env: Development."
-    - else
-      %p 
-        Developed by Intersect Australia Ltd.  Version: 
-        = render 'shared/tag'
+- if !Rails.env.test?
+  .row-fluid.clearfix.environment
+    .span12
+      - if Rails.env.development?
+        #dev
+        %p= "#{PROJECT_NAME} Env: Development."
+      - else
+        %p
+          Developed by Intersect Australia Ltd.  Version:
+          = render 'shared/tag'
   

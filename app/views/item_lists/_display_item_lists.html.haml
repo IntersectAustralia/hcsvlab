@@ -8,9 +8,11 @@
       - @userItemLists.each do |itemList|
         - selectedClass="active" if (itemList.id == (params[:id].to_i))
         %li{ :class => selectedClass }
-          -if (itemList.shared?)
-            %i{:class=>"icon-globe", :style=>"float:left; margin:11px 5px 0 0"}
           =link_to item_list_path(itemList) do
+            -if (itemList.shared?)
+              %i.icon-globe.active
+            -else
+              %i.icon-globe
             =itemList.name
             =link_to(itemList, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Item List "'+ itemList.name + '"?\', event));', :id => "delete_item_list_#{itemList.id}", :class => "delete") do
               %i{:class=>"icon-trash"}

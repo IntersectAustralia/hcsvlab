@@ -208,9 +208,9 @@ Feature: Searching for items
     Given I reindex all
     Given I am on the searchable fields page
     Then I should see a table with the following rows in any order:
-      | RDF Name  | User Name   |
-      | rdf:type  | RDF_type    |
-      | dc:type   | type        |
+      | RDF Name  | Field name for Queries   |
+      | rdf:type  | RDF_type                 |
+      | dc:type   | type                     |
 
   @javascript
   Scenario: Search using armenian small letter ZHE UTF-8 character in full_text

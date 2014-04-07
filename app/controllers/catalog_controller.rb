@@ -318,6 +318,20 @@ class CatalogController < ApplicationController
   end
 
   #
+  #
+  #
+  def advanced_search
+
+  end
+
+  #
+  #
+  #
+  def advanced_search_syntax
+
+  end
+
+  #
   # override default show method to allow for json response
   #
   def show
@@ -444,6 +458,9 @@ class CatalogController < ApplicationController
     Rails.logger.debug("Time for retrieving annotations for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
   end
 
+  #
+  #
+  #
   def annotation_properties
     begin
       @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
@@ -466,6 +483,9 @@ class CatalogController < ApplicationController
     end
   end
 
+  #
+  #
+  #
   def annotation_types
     begin
       @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
@@ -488,6 +508,9 @@ class CatalogController < ApplicationController
     end
   end
 
+  #
+  #
+  #
   def annotation_context
     @predefinedProperties = collect_predefined_context_properties()
 
@@ -624,6 +647,7 @@ class CatalogController < ApplicationController
     ItemMetadataFieldNameMapping.all.each do |aNameMapping|
       @nameMappings << {rdfName: aNameMapping['rdf_name'], user_friendly_name: aNameMapping['user_friendly_name']}
     end
+    @nameMappings.sort!{ |x,y| x[:user_friendly_name].downcase <=> y[:user_friendly_name].downcase }
     @nameMappings
   end
 

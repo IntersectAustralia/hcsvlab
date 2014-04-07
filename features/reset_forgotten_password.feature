@@ -9,7 +9,7 @@ Feature: Reset forgotten password
   Scenario: Reset forgotten password
     Given I have a user "georgina@intersect.org.au"
     And I am on the home page
-    When I follow "Forgot your password?"
+    When I follow "I forgot my password"
     And I fill in "Email" with "georgina@intersect.org.au"
     And I press "Send me reset password instructions"
     Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
@@ -27,7 +27,7 @@ Feature: Reset forgotten password
 
   Scenario: Reset forgotten password for not registered user.
     Given I am on the home page
-    When I follow "Forgot your password?"
+    When I follow "I forgot my password"
     And I fill in "Email" with "notuser@intersect.org.au"
     And I press "Send me reset password instructions"
     Then I should see "If the email address you entered was the one previously used to sign up for an account, then you will receive an email with instructions about how to reset your password in a few minutes."
@@ -66,7 +66,7 @@ Feature: Reset forgotten password
     Given I am on the home page
     When I request a reset for ""
     Then I should see "Email can't be blank"
-    And I should see "Forgot Your Password?"
+    And I should see "I forgot my password"
 
   Scenario: New password and confirmation must match
     Given I have a user "georgina@intersect.org.au"

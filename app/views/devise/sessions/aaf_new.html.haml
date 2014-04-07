@@ -26,7 +26,7 @@
               You may log in with a different account in the Log In tab or sign out of AAF.
               %br
               %br
-            = link_to "← Sign out", destroy_user_session_path, :class => "btn aaf"
+            = link_to "← Sign out", destroy_user_session_path, :class => "btn btn-primary aaf"
       - else
         .control-group
           .controls
@@ -36,5 +36,6 @@
               ="If you are not yet authorised to use #{PROJECT_NAME} you will need to wait for the admin to approve your user."
         .control-group
           .controls
-            = link_to "Log in via AAF →", aaf_new_user_session_path, :class => "btn aaf"
+            = link_to "Log in via AAF →", aaf_new_user_session_path, :class => "btn btn-lg aaf"
+
 = render 'shared/nectar_attribution'

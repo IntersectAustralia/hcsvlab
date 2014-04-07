@@ -8,8 +8,9 @@ HcsvlabWeb::Application.routes.draw do
   get "version", :to => "application#version"
 
   get "/", :to => 'catalog#index', :as => 'catalog_index'
-  get "catalog/search", :to => 'catalog#search', :as => 'catalog_search'
+  get "catalog/advanced_search", :to => 'catalog#advanced_search', :as => 'catalog_advanced_search'
   get "catalog/searchable_fields", :to => 'catalog#searchable_fields', :as => 'catalog_searchable_fields'
+  get "catalog/search", :to => 'catalog#search', :as => 'catalog_search'
   get 'sparql/:collection', :to => 'catalog#sparqlQuery', :as => 'catalog_sparqlQuery'
 
   # :show and :update are for backwards-compatibility with catalog_url named routes
