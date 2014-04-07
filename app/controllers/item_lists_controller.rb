@@ -47,6 +47,9 @@ class ItemListsController < ApplicationController
 
         itemsWithAccessRights = @item_list.getItemsHandlesThatTheCurrentUserHasAccess()
         if (@response['response']['numFound'] > itemsWithAccessRights.size)
+          all_collections = @response["facet_counts"]["facet_fields"]["collection_name_facet"].select.each_with_index { |value, i| i.even? }
+          collections_with_permission = itemsWithAccessRights.collect { |item| item.split(":")[0]}.uniq
+          @missing_collections = all_collections.select { |coll| coll if !collections_with_permission.include? coll }.join(",")
           @message = "You only have access to #{itemsWithAccessRights.size} out of #{@response['response']['numFound']} Items in this shared Item List."
         end
 

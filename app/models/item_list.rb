@@ -110,7 +110,7 @@ class ItemList < ActiveRecord::Base
     if (!handles.empty?)
       validItems = validateItems(handles)
 
-      params = {:start => startValue, :rows => rows}
+      params = {:start => startValue, :rows => rows, "facet.field" => "collection_name_facet"}
       document_list, response = SearchUtils.retrieveDocumentsFromSolr(params, handles)
     else
       response = {}

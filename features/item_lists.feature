@@ -189,7 +189,7 @@ Feature: Managing Item Lists
     Given the item list "Share Test" has items cooee:1-001, cooee:1-002, austlit:adaessa, austlit:bolroma
     When I am on the item list page for "Share Test"
     Then the item list "Share Test" should have 4 items
-    And I should see "You only have access to 2 out of 4 Items in this shared Item List. This is because you do not have access to the applicable Collections. To gain access to more Collections, visit the Licence Agreements page."
+    And I should see "You only have access to 2 out of 4 Items in this shared Item List. This is because you do not have access to the following collections: austlit. To gain access to more Collections, visit the Licence Agreements page."
 
 
 #TODO check output maybe?
