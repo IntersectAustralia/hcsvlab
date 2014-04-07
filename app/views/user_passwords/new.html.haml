@@ -1,11 +1,22 @@
-- title "Forgot Your Password?"
+.form-card
+  %ul.nav.nav-tabs
+    %li{ class: activepath_with_loggued_user?(users_path) }
+      = link_to "Log in", users_path
+    %li{ class: activepath_with_loggued_user?(users_aaf_sign_in_path) }
+      = link_to "AAF Log in", users_aaf_sign_in_path
+    %li{ class: activepath_with_loggued_user?(new_user_registration_path) }
+      = link_to "Sign Up", new_user_registration_path
+    %li.pull-right{ class: activepath_with_loggued_user?(new_user_password_path) }
+      = link_to "I forgot my password", new_user_password_path
+  .content
+    - title "Forgot Your Password?"
 
-%p
-  Please enter the email address previously used to sign up for an account. If an email address is entered other than the one used to sign up for an account, you will not receive instructions for changing your password.
+    %p
+      Please enter the email address previously used to sign up for an account. If an email address is entered other than the one used to sign up for an account, you will not receive instructions for changing your password.
 
-= simple_form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => {:method => :post}) do |f|
-  = render "shared/error_messages", :target => @user
-  = f.input :email
-  .form-actions
-    = f.submit "Send me reset password instructions", :class => "btn btn-primary"
-= render 'shared/nectar_attribution'
+    = simple_form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => {:method => :post}) do |f|
+      = render "shared/error_messages", :target => @user
+      = f.input :email
+      .form-actions
+        = f.submit "Send me reset password instructions", :class => "btn btn-primary"
+    = render 'shared/nectar_attribution'

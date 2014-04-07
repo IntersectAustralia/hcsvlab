@@ -43,6 +43,7 @@ HcsvlabWeb::Application.routes.draw do
   devise_for :users, controllers: {registrations: "user_registers", passwords: "user_passwords"}
 
   devise_scope :user do
+    get "/users/aaf_sign_in", :to => "devise/sessions#aaf_new"
     get "/account/", :to => "user_registers#index" #allow users to edit their own password
     get "/account/edit", :to => "user_registers#edit" #allow users to edit their own password
     get "/account/edit_password", :to => "user_registers#edit_password" #allow users to edit their own password
