@@ -37,6 +37,9 @@ qa_art:
 qa_monash:
  corpus_prefix: http://ns.ausnc.org.au/schemas/monash/
 
+qa_ace:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/ace/
+
 qa_ice:
  corpus_prefix: http://ns.ausnc.org.au/schemas/ice/
 
