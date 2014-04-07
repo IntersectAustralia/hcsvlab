@@ -173,6 +173,10 @@ module Blacklight::CatalogHelperBehavior
           metadataHash[key] = format_duplicates(v)
         elsif k == 'full_text' or k == 'handle'
           metadataHash[:"#{PROJECT_PREFIX_NAME}:#{key}"] = format_value(v)
+        elsif k == MetadataHelper::short_form(MetadataHelper::DISPLAY_DOCUMENT) + "_tesim"
+          metadataHash[:"#{PROJECT_PREFIX_NAME}:display_document"] = format_value(v)
+        elsif k == MetadataHelper::short_form(MetadataHelper::INDEXABLE_DOCUMENT) + "_tesim"
+          metadataHash[:"#{PROJECT_PREFIX_NAME}:indexable_document"] = format_value(v)
         else
           metadataHash[key] = format_value(v)
         end
