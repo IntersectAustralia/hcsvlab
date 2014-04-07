@@ -13,6 +13,9 @@ gcsause:
 ace:
  corpus_prefix: http://ns.ausnc.org.au/schemas/ace/
 
+art:
+ corpus_prefix: http://ns.ausnc.org.au/schemas/art/
+
 ice:
  corpus_prefix: http://ns.ausnc.org.au/schemas/ice/
 
