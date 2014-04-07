@@ -15,15 +15,9 @@
         .control-group
           .controls
             %small
-              Note: You are logged in via AAF as
-              %strong #{@aaf_credentials[:mail]}
-              ,
-              - if User.find_by_email(@aaf_credentials[:mail])
-                ="but your #{PROJECT_NAME} account request is pending approval."
-              - else
-                ="but you have not registered an account with #{PROJECT_NAME}."
+              ="Note: Your AAF credentials (#{@aaf_credentials[:mail]}) have been received."
               %br
-              You may log in with a different account below or sign out of AAF.
+              ="You will receive an email once your request for an account with #{PROJECT_NAME} is approved."
     = f.input :email, :required => false
     = f.input :password, :required => false
     .form-actions

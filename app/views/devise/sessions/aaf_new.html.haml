@@ -14,19 +14,12 @@
         .control-group
           .controls
             %small
-              Note: You are logged in via AAF as
-              %strong #{@aaf_credentials[:mail]}
-              ,
-              - if User.find_by_email(@aaf_credentials[:mail])
-                ="but your #{PROJECT_NAME} account request is pending approval."
-              - else
-                ="but you have not registered an account with #{PROJECT_NAME}."
+              ="Note: Your AAF credentials (#{@aaf_credentials[:mail]}) have been received."
+              %br
+              ="You will receive an email once your request for an account with #{PROJECT_NAME} is approved."
               %br
               %br
-              You may log in with a different account in the Log In tab or sign out of AAF.
-              %br
-              %br
-            = link_to "← Sign out", destroy_user_session_path, :class => "btn btn-primary aaf"
+            = link_to "← Sign out", destroy_user_session_path, :class => "btn btn-lg aaf"
       - else
         .control-group
           .controls
