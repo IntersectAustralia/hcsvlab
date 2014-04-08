@@ -2,7 +2,7 @@
   <%= hidden_field :search_field, "all_fields"%>
   <%= search_as_hidden_fields(:omit_keys => [:q, :qt, :page, :metadata]).html_safe %>
   <div>
-    <h2>Search in Metadata</h2>
+    <h2>Advanced Search</h2>
     <div class="input-append input-block-level metadata-input-container">
       <label for="metadata" class="hide-text"><%= t('blacklight.search.form.all_metadata') %></label>
       <%= text_field_tag :metadata, params[:metadata], :placeholder => t('blacklight.search.form.all_metadata'), :class => "search_q q", :style => "width:100%;",  :id => "metadata" %>
@@ -23,8 +23,8 @@
     <div>
       <ul>
         <strong>Search query examples:</strong>
-        <li>collection_name:cooee AND created:1788 AND full_text:"Port Jackson"</li>
-        <li>collection_name:ace OR (full_text:sydney AND full_text:scandal*)</li>
+        <li style="margin-left: 30px;">collection_name:cooee AND created:1788 AND full_text:"Port Jackson"</li>
+        <li style="margin-left: 30px;">(collection_name:ace OR collection_name:cooee) AND (full_text:sydney AND full_text:scandal*)</li>
       </ul>
     </div>
   </div>

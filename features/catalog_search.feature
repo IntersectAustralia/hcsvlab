@@ -167,7 +167,7 @@ Feature: Searching for items
     """
     And I press "search_metadata"
     And I wait 3 seconds
-    Then I should see "blacklight_results" table with
+    Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
       | austlit:adaessa.xml | 1886         | Text, Original, Raw |
 
@@ -176,7 +176,7 @@ Feature: Searching for items
     When I expand the facet Search Metadata
     And I fill in "Metadata" with "[1810 TO 1899]"
     And I press "search_metadata"
-    Then I should see "blacklight_results" table with
+    Then I should see a table with the following rows in any order:
       | Identifier          | Title                         | Created Date | Type(s)             |
       | austlit:adaessa.xml | Australian Essays             | 1886         | Text, Original, Raw |
       | austlit:bolroma.xml | A Romance of Canvas Town      | 1898         | Text, Original, Raw |
@@ -189,8 +189,7 @@ Feature: Searching for items
     "Francis Adams"
     """
     And I press "search_metadata"
-    #And pause
-    Then I should see "blacklight_results" table with
+    Then I should see a table with the following rows in any order:
       | Identifier          | Title                         | Created Date | Type(s)             |
       | austlit:adaessa.xml | Australian Essays             | 1886         | Text, Original, Raw |
     Then I expand the facet Search Metadata
@@ -200,7 +199,7 @@ Feature: Searching for items
     "Francis Adams"
     """
     And I press "search_metadata"
-    Then I should see "blacklight_results" table with
+    Then I should see a table with the following rows in any order:
       | Identifier          | Title                         | Created Date | Type(s)             |
 
   @javascript
