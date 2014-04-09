@@ -439,7 +439,16 @@ module Blacklight::BlacklightHelperBehavior
 
   # Search History and Saved Searches display
   def link_to_previous_search(params)
-    link_to(raw(render_search_to_s(params)), catalog_index_path(params)).html_safe
+    link_to(raw(render_search_to_s(params) + render_search_to_s_metadata(params)), catalog_index_path(params)).html_safe
+  end
+
+  def render_search_to_s_metadata(params)
+    return "".html_safe if params[:metadata].blank?
+
+    label = ' Metadata'
+
+    render_search_to_s_element(label , params[:metadata] )
+
   end
 
   #
