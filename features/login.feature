@@ -92,3 +92,13 @@ Feature: Logging In
     | deact@intersect.org.au   | pa       |
     | spammer@intersect.org.au | pa       |
     | pending@intersect.org.au | pa       |
+
+  Scenario: Going to sign up then back to login should take you back to the home page
+    Given I am on the home page
+    And I click "New User"
+    And I click "Log in"
+    And I fill in "Email" with "georgina@intersect.org.au"
+    And I fill in "Password" with "Pas$w0rd"
+    And I press "Log in"
+    Then I should see "Logged in successfully."
+    And I should be on the home page

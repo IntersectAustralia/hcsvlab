@@ -1,6 +1,6 @@
 %ul.nav.nav-tabs
   %li{ class: activepath_with_loggued_user?([root_path, new_user_session_path]) }
-    = link_to "Log in", users_path
+    = link_to "Log in", root_path
   %li{ class: activepath_with_loggued_user?(users_aaf_sign_in_path) }
     = link_to "AAF Log in", users_aaf_sign_in_path
   %li{ class: activepath_with_loggued_user?(new_user_registration_path) }
