@@ -1,5 +1,5 @@
 object @collection
-node(:collection_url) { collection_url(@collection) }
+node(:collection_url) { collection_url(@collection.flat_name) }
 node(:collection_name) { @collection.flat_short_name }
 node(:metadata) do
   hash = {}
