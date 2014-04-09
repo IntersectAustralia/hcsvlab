@@ -1,32 +1,25 @@
 .form-card
-  %ul.nav.nav-tabs
-    %li{ class: activepath_with_loggued_user?(users_path) }
-      = link_to "Log in", users_path
-    %li{ class: activepath_with_loggued_user?(users_aaf_sign_in_path) }
-      = link_to "AAF Log in", users_aaf_sign_in_path
-    %li{ class: activepath_with_loggued_user?(new_user_registration_path) }
-      = link_to "Sign Up", new_user_registration_path
-    %li.pull-right{ class: activepath_with_loggued_user?(new_user_password_path) }
-      = link_to "I forgot my password", new_user_password_path
+  = render 'shared/login_tabs'
   .content
     .container
       - if @aaf_credentials[:mail].present?
         .control-group
           .controls
-            %small
-              ="Note: Your AAF credentials (#{@aaf_credentials[:mail]}) have been received."
-              %br
-              ="You will receive an email once your request for an account with #{PROJECT_NAME} is approved."
-              %br
-              %br
+            %medium
+              .div{style:'width: 660px;'}
+                .info.alert-info
+                  %b Note: Your AAF credentials (#{@aaf_credentials[:mail]}) have been received.
+                  %br
+                  %b You will receive an email once your request for an account with #{PROJECT_NAME} is approved.
             = link_to "← Sign out", destroy_user_session_path, :class => "btn btn-lg aaf"
       - else
         .control-group
           .controls
             %medium
-              This will take you to the AAF (Australian Access Federation) login page.
+              %p This will take you to the AAF (Australian Access Federation) login page.
+              %p With AAF you can login using your university or research institution account.
               %br
-              ="If you are not yet authorised to use #{PROJECT_NAME} you will need to wait for your account request to be approved."
+              %p If you are not yet authorised to use #{PROJECT_NAME} you will need to wait for your account request to be approved.
         .control-group
           .controls
             = link_to "Log in via AAF →", aaf_new_user_session_path, :class => "btn btn-lg aaf"

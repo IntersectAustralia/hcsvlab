@@ -1,0 +1,9 @@
+%ul.nav.nav-tabs
+  %li{ class: activepath_with_loggued_user?([root_path, new_user_session_path]) }
+    = link_to "Log in", users_path
+  %li{ class: activepath_with_loggued_user?(users_aaf_sign_in_path) }
+    = link_to "AAF Log in", users_aaf_sign_in_path
+  %li{ class: activepath_with_loggued_user?(new_user_registration_path) }
+    = link_to "New User", new_user_registration_path
+  %li.pull-right{ class: activepath_with_loggued_user?(new_user_password_path) }
+    = link_to "I forgot my password", new_user_password_path

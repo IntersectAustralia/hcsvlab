@@ -1,15 +1,11 @@
 .form-card
-  %ul.nav.nav-tabs
-    %li{ class: activepath_with_loggued_user?(users_path) }
-      = link_to "Log in", root_path
-    %li{ class: activepath_with_loggued_user?(users_aaf_sign_in_path) }
-      = link_to "AAF Log in", users_aaf_sign_in_path
-    %li{ class: activepath_with_loggued_user?(new_user_registration_path) }
-      = link_to "Sign Up", new_user_registration_path
-    %li.pull-right{ class: activepath_with_loggued_user?(new_user_password_path) }
-      = link_to "I forgot my password", new_user_password_path
-  .content
-    %h2 User Sign Up
+  = render 'shared/login_tabs'
+  .content.aaf-signup
+    .info.alert-help
+      = link_to "Sign up via AAF →", aaf_new_user_session_path, :class => "btn btn-lg aaf"
+      %p You can either use your research institution login via AAF or you can sign up for an account.
+  .content.signup
+    %h3{style:'padding: 0 20px;'} User Sign Up
     = simple_form_for(resource, :as => resource_name, :url => registration_path(resource_name)) do |f|
       = render :partial => 'personal_details', :locals  => {:f => f}
       = render :partial => 'account_details', :locals  => {:f => f}

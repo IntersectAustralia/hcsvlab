@@ -1,23 +1,15 @@
 .form-card
-  %ul.nav.nav-tabs
-    %li.active
-      = link_to "Log in", users_path
-    %li{ class: activepath_with_loggued_user?(users_aaf_sign_in_path) }
-      = link_to "AAF Log in", users_aaf_sign_in_path
-    %li{ class: activepath_with_loggued_user?(new_user_registration_path) }
-      = link_to "Sign Up", new_user_registration_path
-    %li.pull-right{ class: activepath_with_loggued_user?(new_user_password_path) }
-      = link_to "I forgot my password", new_user_password_path
+  = render 'shared/login_tabs'
   .content
     %h2 Please enter your email and password to log in
     - if @aaf_credentials[:mail].present?
       .container
-        .control-group
-          .controls
-            %small
-              ="Note: Your AAF credentials (#{@aaf_credentials[:mail]}) have been received."
+        %medium
+          .div{style:'padding: 0 20px; width: 660px;'}
+            .info.alert-info
+              %b Note: Your AAF credentials (#{@aaf_credentials[:mail]}) have been received.
               %br
-              ="You will receive an email once your request for an account with #{PROJECT_NAME} is approved."
+              %b You will receive an email once your request for an account with #{PROJECT_NAME} is approved.
     = f.input :email, :required => false
     = f.input :password, :required => false
     .form-actions

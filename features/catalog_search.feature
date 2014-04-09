@@ -250,3 +250,36 @@ Feature: Searching for items
     Then I should see "blacklight_results" table with
       | Identifier          | Created Date  | Type(s)     |
       | custom:utf8_test_1  | 1986          | Text        |
+
+  @javascript
+  Scenario: Search for two simple term in all metadata joined with AND from Advanced Search
+    When I follow "Advanced search"
+    And I fill in "Metadata" with "University AND Romance"
+    And I press "search_metadata"
+    And Save a screenshot with name "tmp/gg1.png"
+    Then I should see a table with the following rows in any order:
+      | Identifier          | Title                         | Created Date | Type(s)             |
+      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Text, Original, Raw |
+
+  @javascript
+  Scenario: Search for term with tilde in all metadata from Advanced Search
+    When I follow "Advanced search"
+    And I fill in "Metadata" with "Univarsoty~"
+    And I press "search_metadata"
+    And Save a screenshot with name "tmp/gg2.png"
+    Then I should see a table with the following rows in any order:
+      | Identifier          | Title                         | Created Date | Type(s)             |
+      | custom:utf8_test_1  | UTF-8 Test item               | 1986         | Text                |
+      | austlit:adaessa.xml | Australian Essays             | 1886 	       | Text, Original, Raw |
+      | austlit:bolroma.xml | A Romance of Canvas Town 	    | 1898 	       | Text, Original, Raw |
+
+  @javascript
+  Scenario: Search for term with asterisk in all metadata from Advanced Search
+    When I follow "Advanced search"
+    And I fill in "Metadata" with "Correspon*"
+    And I press "search_metadata"
+    And Save a screenshot with name "tmp/gg3.png"
+    Then I should see a table with the following rows in any order:
+      | Identifier          | Created Date | Type(s)             |
+      | cooee:1-001         | 10/11/1791   | Text, Original, Raw |
+      | cooee:1-002         | 10/11/1791   | Text                |
