@@ -4,11 +4,11 @@
       .row-fluid
         = link_to "#{PROJECT_NAME}", root_path, :class => "brand"
         %ul.nav
-          %li{ class: activepath?(root_path) }
+          %li{ class: activepath_fuzzy?("catalog") }
             = link_to "Discover", root_path
-          %li{ class: activepath_fuzzy?(item_lists_path) }
+          %li{ class: activepath_fuzzy?("item_lists") }
             = link_to "Item Lists", item_lists_path
-          %li{class: activepath_fuzzy?(collections_path) }
+          %li{class: activepath_fuzzy?("collections") }
             = link_to "Collections", collections_path
         %ul.nav.pull-right
           = render :partial => '/user_util_links'

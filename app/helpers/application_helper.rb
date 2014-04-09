@@ -33,7 +33,9 @@ module ApplicationHelper
 
   # helper class for tabs, adds 'active' class when on the input path
   def activepath?(test_path)
-    return 'active' if (request.path == test_path and !current_user.nil?)
+    Array(test_path).each do |path|
+      return 'active' if (request.path == path and !current_user.nil?)
+    end
   end
 
   # helper class for tabs, adds 'active' class when on the input path
@@ -46,7 +48,8 @@ module ApplicationHelper
   def activepath_fuzzy?(test_path)
     isActive = false
     Array(test_path).each do |param|
-      isActive = isActive || request.path.include?(param)
+      currentController = Rails.application.routes.recognize_path(request.original_url)[:controller]
+      isActive = isActive || currentController == param
     end
 
     return 'active' if isActive
