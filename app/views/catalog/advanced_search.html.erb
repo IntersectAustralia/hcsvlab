@@ -2,6 +2,9 @@
   <%= hidden_field :search_field, "all_fields"%>
   <%= search_as_hidden_fields(:omit_keys => [:q, :qt, :page, :metadata]).html_safe %>
   <div>
+    <%= link_to "Back", root_path, :class=>"btn" %>
+    <br>
+    <br>
     <h2>Advanced Search</h2>
     <div class="input-append input-block-level metadata-input-container">
       <label for="metadata" class="hide-text"><%= t('blacklight.search.form.all_metadata') %></label>
