@@ -370,7 +370,10 @@ li > .dropdown-menu {
   padding: 0 0 10px 0;
 }
 
-#facets ul#searchbar { padding: 15px 14px; background-color: #E1E1E1; }
+#facets ul#searchbar {
+  padding: 15px 14px 10px 14px;
+  background-color: #E1E1E1;
+}
 
 #facets li, .sidenav.static li {
   position: relative;
@@ -1350,6 +1353,7 @@ border: 1px solid #BCBCBC;
   padding-right: 36px;
   text-align: left;
 }
+
 
 .btn-lg  {
   padding: 10px 16px;
