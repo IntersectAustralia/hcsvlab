@@ -19,7 +19,7 @@
 - elsif @display_document[:type] == "Video"
   %video{:controls => "", :style => "width:450px"}
     %source{:src => "/catalog/#{document[:handle].sub(":", "/")}/document/#{@display_document[:id]}"}
-  %div Note: This video may not play due to the file format and browser configuration
+  %div Note: This video may not play due to the file format and browser configuration, but you can still download this video from the 'Documents' section below
 - else
   = raw render_no_display_document
 
