@@ -11,7 +11,7 @@
   %img{:src => @display_document[:source], :style => "max-width:50%;"}
 - elsif @display_document[:type] == "Audio" or @display_document[:type] == "MP3"
   %audio{:controls => "", :style => "width:450px"}
-    %source{:src => "/catalog/#{document[:handle]}/document/#{@display_document[:id]}"}
+    %source{:src => "/catalog/#{document[:handle].sub(":", "/")}/document/#{@display_document[:id]}"}
     %embed{:height => "50", :src => @display_document[:source], :width => "100"}
 
   %div{class:"eopas_message"}
