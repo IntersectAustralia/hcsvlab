@@ -48,8 +48,12 @@ module ApplicationHelper
   def activepath_fuzzy?(test_path)
     isActive = false
     Array(test_path).each do |param|
-      currentController = Rails.application.routes.recognize_path(request.original_url)[:controller]
-      isActive = isActive || currentController == param
+      begin
+        currentController = Rails.application.routes.recognize_path(request.original_url)[:controller]
+        isActive = isActive || currentController == param
+      rescue
+        isActive = false
+      end
     end
 
     return 'active' if isActive
