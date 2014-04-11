@@ -1,6 +1,6 @@
 HcsvlabWeb::Application.routes.draw do
   # This constraint specify that we are going to accept any character except '/' for an item id.
-  catalogRoutesConstraints = {:id => /[^\/]+/}
+  catalogRoutesConstraints = {:itemId => /[^\/]+/}
   catalogRoutesConstraintsIncludingJson = {:itemId => /(?:(?!\.json|\/).)+/i}
 
   root :to => "catalog#index"
