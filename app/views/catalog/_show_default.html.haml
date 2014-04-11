@@ -111,8 +111,12 @@
           - else
             - field = "unknown"
           %td= field
-  - if eopas_viewable? params[:id]
-    = link_to('View in EOPAS', eopas_path(document[:handle].split(':').first, document[:handle].split(':').last), class: 'btn')
+  -# By now we are going to restrict the following 2 lines to be present only in testing since the method eopas_viewable?'
+  -#is consuming a lot of memory. Once this method is refactored we can uncomment the following 2 lines.
+  - if Rails.env.test?
+    - if eopas_viewable? params[:id]
+      = link_to('View in EOPAS', eopas_path(document[:handle].split(':').first, document[:handle].split(':').last), class: 'btn')
+
 
 -# User uploaded annotations will no be shown by now
 -#%h3

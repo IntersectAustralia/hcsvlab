@@ -9,6 +9,24 @@ module EopasHelper
     transcription = nil
     doc_count = 0
     media_count = 0
+
+
+    # This code is consuming a lot of memory since is loading the whole content of each document
+    # in memory just to decide the mimeType of it. Following some changes I would do to this code:
+
+    # 1) Change line
+    #       item = Item.find(id)
+    #    by
+    #       item = Item.find_and_load_from_solr({id:id})
+    # This prevent ActiveFedora to bring every single datastream for the item
+
+    # 2) Instead of loading the content in memory to detect the mimeType, we could use this line:
+    #     mimeType = document.mime_type.first
+    # 3) Finally, given the mimeType we need to check whether it is Audio or Video.
+    #
+    # 4) In the case of the transcript file, we need to load the content in memory to decide which type of
+    #    transcript are we using, but that is not a problem, in general are very small text files.
+
     item = Item.find(id)
     item.documents.each do |document|
       file_name = document.file_name[0]
