@@ -56,7 +56,7 @@ def sendRequest(method, relative_url, params = {}, req_header = {})
     req[key] = value
   end
 
-  res = Net::HTTP.start(requestUri.hostname, requestUri.port, read_timeout:HTTP_READ_TIMEOUT) {|http|
+  res = Net::HTTP.start(requestUri.hostname, requestUri.port, read_timeout:HTTP_READ_TIMEOUT, :use_ssl => true, :verify_mode => OpenSSL::SSL::VERIFY_NONE) {|http|
     http.request(req)
   }
 
@@ -236,7 +236,7 @@ def doGetItemsInItemListBenchmark(benchmarkInformation)
 
   res = sendRequest(:get, ITEM_LISTS_URL)
   itemLists = JSON.parse(res.body)
-  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+  filteredAndSortedItemLists = itemLists["own"].select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
 
 
   startTime = Time.now
@@ -269,7 +269,7 @@ def doGetItemMetadataBenchmark(benchmarkInformation)
 
   res = sendRequest(:get, ITEM_LISTS_URL)
   itemLists = JSON.parse(res.body)
-  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+  filteredAndSortedItemLists = itemLists["own"].select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
 
   res = sendRequest(:get, URI(filteredAndSortedItemLists.first["item_list_url"]).path)
   response = JSON.parse(res.body)
@@ -305,7 +305,7 @@ def doGetItemPrimaryTextBenchmark(benchmarkInformation)
 
   res = sendRequest(:get, ITEM_LISTS_URL)
   itemLists = JSON.parse(res.body)
-  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+  filteredAndSortedItemLists = itemLists["own"].select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
 
   res = sendRequest(:get, URI(filteredAndSortedItemLists.first["item_list_url"]).path)
   response = JSON.parse(res.body)
@@ -342,33 +342,33 @@ def doGetItemDocuments(benchmarkInformation, type)
 
     res = sendRequest(:get, URI(retrievedItems["items"].first).path)
     item = JSON.parse(res.body)
-    item["hcsvlab:documents"].each do |aDocument|
+    item["alveo:documents"].each do |aDocument|
       next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
       startTime = Time.now
-      res = sendRequest(:get, URI(aDocument["hcsvlab:url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      res = sendRequest(:get, URI(aDocument["alveo:url"]).path, {}, {"Accept"=>"application/octet-stream"})
       timeInSecs = (Time.now.to_f - startTime.to_f)
       benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
     end
 
     res = sendRequest(:get, URI(retrievedItems["items"][retrievedItems["items"].length/2]).path)
     item = JSON.parse(res.body)
-    item["hcsvlab:documents"].each do |aDocument|
+    item["alveo:documents"].each do |aDocument|
       next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
       startTime = Time.now
-      res = sendRequest(:get, URI(aDocument["hcsvlab:url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      res = sendRequest(:get, URI(aDocument["alveo:url"]).path, {}, {"Accept"=>"application/octet-stream"})
       timeInSecs = (Time.now.to_f - startTime.to_f)
       benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
     end
 
     res = sendRequest(:get, URI(retrievedItems["items"].last).path)
     item = JSON.parse(res.body)
-    item["hcsvlab:documents"].each do |aDocument|
+    item["alveo:documents"].each do |aDocument|
       next unless (aDocument["dc:type"].eql?(type) or ("Text".eql?(type) and "Plain".eql?(aDocument["dc:type"])))
 
       startTime = Time.now
-      res = sendRequest(:get, URI(aDocument["hcsvlab:url"]).path, {}, {"Accept"=>"application/octet-stream"})
+      res = sendRequest(:get, URI(aDocument["alveo:url"]).path, {}, {"Accept"=>"application/octet-stream"})
       timeInSecs = (Time.now.to_f - startTime.to_f)
       benchmarkInformation[:get_item_documents] << {type: aDocument["dc:type"], fileSizeInBytes: res.body.length, timeInSecs: timeInSecs}
     end
@@ -389,7 +389,7 @@ def doGetItemAnnotationsBenchmark(benchmarkInformation)
 
   res = sendRequest(:get, ITEM_LISTS_URL)
   itemLists = JSON.parse(res.body)
-  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+  filteredAndSortedItemLists = itemLists["own"].select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
 
   res = sendRequest(:get, URI(filteredAndSortedItemLists.last["item_list_url"]).path)
   response = JSON.parse(res.body)
@@ -422,7 +422,7 @@ def doGetItemListInZipFormat(benchmarkInformation)
 
   res = sendRequest(:get, ITEM_LISTS_URL)
   itemLists = JSON.parse(res.body)
-  filteredAndSortedItemLists = itemLists.select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
+  filteredAndSortedItemLists = itemLists["own"].select{|e| e["name"].match(/^#{ITEM_LIST_NAME_PREFIX}\d+$/).present?}.sort_by {|hsh| hsh["num_items"]}
 
   begin
     startTime = Time.now
