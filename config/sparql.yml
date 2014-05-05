@@ -51,3 +51,6 @@ qa_cooee:
 
 qa_braided:
  corpus_prefix: http://ns.ausnc.org.au/schemas/braidedchannels/
+
+qa_md: 
+ corpus_prefix: http://ns.ausnc.org.au/schemas/mitcheldelbridge/
