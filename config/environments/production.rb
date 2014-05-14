@@ -3,10 +3,9 @@ HcsvlabWeb::Application.configure do
   # replace this with your tracker code
   GA.tracker = "UA-49039039-5"
 
-  # TODO: set your own correct URL for action mailer
-  config.action_mailer.default_url_options = { :host => 'hcsvlab-prod-webapp.intersect.org.au' }
+  config.action_mailer.default_url_options = { :host => 'app.alveo.edu.au' }
   
-  config.galaxy_url = 'http://hcsvlab-prod-galaxy.intersect.org.au/root'
+  config.galaxy_url = 'http://galaxy.alveo.edu.au/root'
 
   # Base directory where user contributed annotations will be stored
   config.user_annotations_location = "/data/contributed_annotations/"

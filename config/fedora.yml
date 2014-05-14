@@ -2,7 +2,7 @@ development:
   user: fedoraAdmin
   password: fedoraAdmin
   url: http://127.0.0.1:8983/fedora
-test: &TEST  
+test: &TEST
   user: fedoraAdmin
   password: fedoraAdmin
   url: http://127.0.0.1:8984/fedora-test
@@ -25,6 +25,6 @@ staging2:
 production:
   user: fedoraAdmin
   password: fedoraAdmin
-  url: http://hcsvlab-prod-webapp.intersect.org.au:8080/fedora
+  url: http://app.alveo.edu.au:8080/fedora
 cucumber:
   <<: *TEST
