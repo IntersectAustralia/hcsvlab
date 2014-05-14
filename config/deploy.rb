@@ -535,8 +535,9 @@ after 'multistage:ensure' do
   set :shared_files, %W(
     config/environments/#{stage}.rb
     config/deploy/#{stage}.rb
-    config/broker.yml 
-    config/database.yml 
+    config/aaf_rc.yml
+    config/broker.yml
+    config/database.yml
     config/fedora.yml 
     config/hcsvlab-web_config.yml 
     config/linguistics.yml 
