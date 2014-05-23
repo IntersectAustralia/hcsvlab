@@ -740,7 +740,7 @@ Feature: Browsing via API
           "shortened_uri": "rdf:type"
         },
         {
-          "uri": "http://purl.org/dada/schema/0.2#label,
+          "uri": "http://purl.org/dada/schema/0.2#label",
           "shortened_uri": "dada:label"
         },
         {
