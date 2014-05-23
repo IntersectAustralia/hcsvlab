@@ -740,8 +740,8 @@ Feature: Browsing via API
           "shortened_uri": "rdf:type"
         },
         {
-          "uri": "http://ns.ausnc.org.au/schemas/cooee/val",
-          "shortened_uri": "ns1:val"
+          "uri": "http://purl.org/dada/schema/0.2#label,
+          "shortened_uri": "dada:label"
         },
         {
           "uri": "http://purl.org/dada/schema/0.2#partof",
