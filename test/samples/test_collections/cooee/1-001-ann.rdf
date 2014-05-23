@@ -18,7 +18,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://ns.ausnc.org.au/corpora/cooee/annotation/0> a dada:Annotation ;
-    ns1:val "11" ;
+    dada:label "11" ;
     dada:partof <http://ns.ausnc.org.au/corpora/cooee/annotation/47b2599c-32b4-404d-8234-3d73923c77bd> ;
     dada:targets <http://ns.ausnc.org.au/corpora/cooee/annotation/0L> ;
     dada:type "pageno" .

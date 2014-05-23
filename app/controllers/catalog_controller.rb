@@ -9,7 +9,6 @@ class CatalogController < ApplicationController
 
   FIXNUM_MAX = 2147483647
   SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env] unless defined? SESAME_CONFIG
-  SPARQL_QUERY_PREFIXES = YAML.load_file(Rails.root.join("config", "sparql.yml")) unless defined? SPARQL_QUERY_PREFIXES
 
   TYPE_LOOKUP = {"SecondRegion" => "SecondAnnotation", "UTF8Region" => "TextAnnotation"}
 
@@ -985,12 +984,11 @@ class CatalogController < ApplicationController
       type_and_label << "?anno dada:type #{sparql_item(type.to_s.strip)} .\n"
     end
     if label.present?
-      type_and_label << "?anno cp:val #{sparql_item(label.to_s.strip)} .\n"
+      type_and_label << "?anno dada:label #{sparql_item(label.to_s.strip)} .\n"
     end
 
     query = """
       #{prefixes}
-      PREFIX cp:<#{(SPARQL_QUERY_PREFIXES[corpus]['corpus_prefix'] unless SPARQL_QUERY_PREFIXES[corpus].nil?).to_s}>
       SELECT *
       WHERE {
         ?identifier dc:identifier '#{item_short_identifier}'.
@@ -998,7 +996,7 @@ class CatalogController < ApplicationController
         ?anno dada:partof ?annoCol .
         ?anno a dada:Annotation .
         #{type_and_label}
-        OPTIONAL { ?anno cp:val ?label . }
+        OPTIONAL { ?anno dada:label ?label . }
         OPTIONAL { ?anno dada:type ?type . }
         OPTIONAL {
           ?anno dada:targets ?loc .
