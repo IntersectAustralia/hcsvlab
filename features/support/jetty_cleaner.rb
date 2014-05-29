@@ -32,6 +32,8 @@ Before do |scenario|
 
     if (shouldCleanBeforeScenario)
       clear_jetty
+      $alreadyIngested = false
+
     end
   else
     clear_jetty
