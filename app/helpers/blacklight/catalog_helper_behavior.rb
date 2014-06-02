@@ -186,7 +186,6 @@ module Blacklight::CatalogHelperBehavior
     collectionName = Array(document[MetadataHelper::short_form(MetadataHelper::COLLECTION)]).first
     itemIdentifier = document[:handle].split(':').last
 
-
     # Prepare document PRIMARY_TEXT_URL information
     solr_item = Item.find_and_load_from_solr({id: document[:id]}).first
     if solr_item.hasPrimaryText?
@@ -206,6 +205,7 @@ module Blacklight::CatalogHelperBehavior
     documentsData = []
     uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
     documents = item_documents(document, uris)
+    namespaces = RdfNamespace.get_namespaces(solr_item.collection.flat_name)
 
     if documents.present?
       is_cooee = document[MetadataHelper::short_form(MetadataHelper::COLLECTION)][0] == "cooee"
@@ -252,6 +252,38 @@ module Blacklight::CatalogHelperBehavior
           field = "unknown"
         end
         documentHash[:"#{PROJECT_PREFIX_NAME}:size"] = field.strip!
+
+        #Other fields
+        begin
+          server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+          repo = server.repository(solr_item.collection.flat_name)
+
+          query = """
+            PREFIX dc:<http://purl.org/dc/terms/>
+            PREFIX ausnc:<http://ns.ausnc.org.au/schemas/ausnc_md_model/>
+
+            select * where {
+              <#{solr_item.flat_uri}> ausnc:document ?doc .
+              ?doc dc:identifier '#{values[MetadataHelper::IDENTIFIER]}' .
+              ?doc ?property ?value
+            }
+          """
+
+          sols = repo.sparql_query(query)
+
+          fields_to_hide = [MetadataHelper::SOURCE]
+          sols.each do |sol|
+            if !fields_to_hide.include? sol[:property]
+              prop = RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces)
+              documentHash[:"#{prop}"] = sol[:value].to_s
+            end
+          end
+
+        rescue => e
+          Rails.logger.error e.inspect
+          Rails.logger.error "Could not get document details for #{values[MetadataHelper::IDENTIFIER]}"
+        end
+
         documentsData << documentHash.clone
       end
     end

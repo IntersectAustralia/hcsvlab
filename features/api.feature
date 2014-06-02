@@ -167,6 +167,8 @@ Feature: Browsing via API
       | $..["alveo:sparqlEndpoint"]                     | http://example.org/sparql/cooee                           |
       | $..["alveo:annotations_url"]                    | http://example.org/catalog/cooee/1-001/annotations.json   |
       | $..["alveo:primary_text_url"]                   | http://example.org/catalog/cooee/1-001/primary_text.json  |
+      | $..["alveo:documents"][0]["dc:extent"]          | 4960                                                      |
+      | $..["alveo:documents"][2]["dc:title"]           | 1-001#Raw                                                 |
 
   Scenario: Get item details for austalk item
     Given I ingest "austalk:1_1014_1_11_001" with id "hcsvlab:1"
@@ -176,23 +178,25 @@ Feature: Browsing via API
     When I make a JSON request for the catalog page for "austalk:1_1014_1_11_001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should have
-      | json_path                                       | text                                                                |
-      | $..['dc:created']                               | Fri Sep 09 14:18:48 2011                                            |
-      | $..['dc:identifier']                            | 1_1014_1_11_001                                                     |
-      | $..['dc:isPartOf']                              | 1_1014_1_11                                                         |
-      | $..['dc:type']                                  | Audio                                                               |
-      | $..['olac:speaker']                             | 1_1014                                                              |
-      | $..['austalk:component']                        | 11                                                                  |
-      | $..['austalk:componentName']                    | calibration                                                         |
-      | $..['austalk:prompt']                           | Turn right 90  (face right wall)  2                                 |
-      | $..['austalk:prototype']                        | 11_1                                                                |
-      | $..['austalk:session']                          | 1                                                                   |
-      | $..['austalk:version']                          | 1.6                                                                 |
-      | $..["alveo:sparqlEndpoint"]                     | http://example.org/sparql/austalk                                   |
-      | $..["alveo:primary_text_url"]                   | No primary text found                                               |
+      | json_path                                                     | text                                                                |
+      | $..['dc:created']                                             | Fri Sep 09 14:18:48 2011                                            |
+      | $..['dc:identifier']                                          | 1_1014_1_11_001                                                     |
+      | $..['dc:isPartOf']                                            | 1_1014_1_11                                                         |
+      | $..['dc:type']                                                | Audio                                                               |
+      | $..['olac:speaker']                                           | 1_1014                                                              |
+      | $..['austalk:component']                                      | 11                                                                  |
+      | $..['austalk:componentName']                                  | calibration                                                         |
+      | $..['austalk:prompt']                                         | Turn right 90  (face right wall)  2                                 |
+      | $..['austalk:prototype']                                      | 11_1                                                                |
+      | $..['austalk:session']                                        | 1                                                                   |
+      | $..['austalk:version']                                        | 1.6                                                                 |
+      | $..["alveo:sparqlEndpoint"]                                   | http://example.org/sparql/austalk                                   |
+      | $..["alveo:primary_text_url"]                                 | No primary text found                                               |
+      | $..["alveo:documents"][0]["http://ns.austalk.edu.au/channel"] | ch6-speaker16                                                       |
+      | $..["alveo:documents"][0]["http://ns.austalk.edu.au/version"] | 1                                                                   |
     And the JSON response should not have
-      | json_path                                       | text                                                                |
-      | $..["alveo:annotations_url']                    | http://example.org/catalog/austalk/1_1014_1_11_001/annotations.json |
+      | json_path                                                     | text                                                                |
+      | $..["alveo:annotations_url']                                  | http://example.org/catalog/austalk/1_1014_1_11_001/annotations.json |
 
   Scenario: Get item details should not return fields used for authorization
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
