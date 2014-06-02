@@ -212,6 +212,13 @@ namespace :deploy do
 
   end
 
+  task :configure do
+    configure_activemq
+    configure_fedora
+    configure_solr
+    configure_tomcat6
+  end
+
   # Helper task which re-creates the database
   task :refresh_db, :roles => :db do
     require 'colorize'
@@ -287,7 +294,7 @@ namespace :deploy do
 
   desc "Start the Tomcat 6 server"
   task :start_tomcat6, :roles => :app do
-  
+
     run "cd ${CATALINA_HOME} && nohup bin/startup.sh > nohup_tomcat.out 2>&1", :env => {'RAILS_ENV' => stage}
   end
 
@@ -538,8 +545,8 @@ after 'multistage:ensure' do
     config/aaf_rc.yml
     config/broker.yml
     config/database.yml
-    config/fedora.yml 
-    config/hcsvlab-web_config.yml 
-    config/linguistics.yml 
+    config/fedora.yml
+    config/hcsvlab-web_config.yml
+    config/linguistics.yml
     config/solr.yml)
 end

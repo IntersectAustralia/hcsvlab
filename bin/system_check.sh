@@ -59,7 +59,7 @@ if [ "$aqm_status" == "200" ]
 then
   echo "+ ActiveMQ is listening on port 8161 (status= $aqm_status)"
 else
-  echo "- WARN: It looks like ActiveMQ is not runningi (status= $aqm_status)"
+  echo "- WARN: It looks like ActiveMQ is not running (status= $aqm_status)"
   RET_STATUS=1
 fi
 

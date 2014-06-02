@@ -1,11 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.17'
-
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
-
-# gem 'sqlite3'
+gem 'rails', '3.2.18'
 gem 'pg'
 
 # Gems used only for assets and not required
@@ -14,29 +9,10 @@ group :assets do
   gem 'sass-rails',   '~> 3.2.3'
   gem 'coffee-rails', '~> 3.2.1'
   gem "therubyracer"
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  # gem 'therubyracer', :platforms => :ruby
-
   gem 'uglifier', '>= 1.0.3'
 end
 
 gem "jquery-rails", "2.3.0"
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.0.0'
-
-# To use Jbuilder templates for JSON
-# gem 'jbuilder'
-
-# Use unicorn as the app server
-# gem 'unicorn'
-
-# Deploy with Capistrano
-# gem 'capistrano'
-
-# To use debugger
-# gem 'debugger'
-    
-
 
 group :development, :test do
   gem "rspec-rails"
@@ -50,6 +26,7 @@ group :development, :test do
 end
 
 group :development do
+  gem "bundler-audit"
   gem 'xray-rails'
   gem 'pry'
   gem 'pry-rails'
@@ -77,12 +54,10 @@ gem "jsonpath"
 gem 'zeroclipboard-rails'
 gem "haml"
 gem "haml-rails"
-# gem "bootstrap-sass"
 gem "simple_form"
 gem "devise"
 gem "email_spec", :group => :test
 gem "cancan"
-
 
 # blacklight and hydra gems
 gem 'blacklight'
@@ -125,8 +100,6 @@ gem 'request_exception_handler'
 
 # Capistrano stuff
 gem 'rvm-capistrano'
-# gem "capistrano-ext"
-# gem "capistrano"
 gem "capistrano_colors"
 
 gem 'tinymce-rails'
