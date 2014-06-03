@@ -14,8 +14,12 @@ test:
   default_data_owner: data_owner@intersect.org.au
 
 production:
-  <<: *defaults
+  password_reset_email_sender: steve.cassidy@mq.edu.au
+  account_request_user_status_email_sender: steve.cassidy@mq.edu.au
+  account_request_admin_notification_sender: steve.cassidy@mq.edu.au
   default_data_owner: steve.cassidy@mq.edu.au
+  licence_access_request_notification_sender: steve.cassidy@mq.edu.au
+  licence_access_request_response_sender: steve.cassidy@mq.edu.au
 
 qa:
   <<: *defaults
