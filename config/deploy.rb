@@ -15,7 +15,7 @@ set :default_stage, "qa"
 set :rpms, "openssl openssl-devel curl-devel httpd-devel apr-devel apr-util-devel zlib zlib-devel libxml2 libxml2-devel libxslt libxslt-devel libffi mod_ssl mod_xsendfile"
 set :shared_children, shared_children + %w(log_archive)
 set :shell, '/bin/bash'
-set :rvm_ruby_string, 'ruby-2.0.0-p0@hcsvlab'
+set :rvm_ruby_string, 'ruby-2.0.0-p481@hcsvlab'
 set :rvm_type, :user
 
 # Deploy using copy for now

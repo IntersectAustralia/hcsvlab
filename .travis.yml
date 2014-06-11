@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - "2.0.0-p0"
+  - "2.0.0-p481"
 before_script:
   - psql -c "create user hcsvlab with password 'hcsvlab';" -U postgres
   - psql -c 'alter user hcsvlab with superuser;' -U postgres
