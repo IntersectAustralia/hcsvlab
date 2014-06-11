@@ -198,8 +198,8 @@ namespace :fedora do
     num = response["response"]["numFound"]
     chunks = (num/50)+1
     start_row = 0
-    num.times do |chunk|
-      logger.info "Investigating item set " + (chunk+1).to_s + " of " + num.to_s
+    chunks.times do |chunk|
+      logger.info "Investigating item set " + (chunk+1).to_s + " of " + chunks.to_s
       response = solr_af_core.get 'select', :params => {:q => 'active_fedora_model_ssi:Item', :fl => 'id', :sort => 'id asc', :start => start_row, :rows => 50}
       response["response"]["docs"].each do |doc|
         res = @solr.get 'select',  :params => {:q => 'id:'+doc["id"], :rows => 5}

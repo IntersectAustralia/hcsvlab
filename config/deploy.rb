@@ -294,7 +294,7 @@ namespace :deploy do
 
   desc "Start the Tomcat 6 server"
   task :start_tomcat6, :roles => :app do
-
+  
     run "cd ${CATALINA_HOME} && nohup bin/startup.sh > nohup_tomcat.out 2>&1", :env => {'RAILS_ENV' => stage}
   end
 
@@ -361,7 +361,7 @@ namespace :deploy do
   end
 
   desc "Stop ActiveMQ"
-  task :stop_activemq, :roles => :app do
+  task :stop_activemq, :roles => :app, :on_error => :continue do
     run "cd $ACTIVEMQ_HOME && bin/activemq stop", :env => {'RAILS_ENV' => stage}
   end
 
@@ -545,8 +545,8 @@ after 'multistage:ensure' do
     config/aaf_rc.yml
     config/broker.yml
     config/database.yml
-    config/fedora.yml
-    config/hcsvlab-web_config.yml
-    config/linguistics.yml
+    config/fedora.yml 
+    config/hcsvlab-web_config.yml 
+    config/linguistics.yml 
     config/solr.yml)
 end

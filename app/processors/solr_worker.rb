@@ -174,6 +174,8 @@ private
     parent = parent_object(object)
     if parent.nil?
       index_item(object)
+    else
+      info("Solr_Worker", "No parent object for #{object}")
     end
   end
 
