@@ -120,7 +120,7 @@ def update_item_from_file(item, manifest)
   item.save!
   logger.info "Updated item = " + item.pid.to_s
   stomp_client = Stomp::Client.open "stomp://localhost:61613"
-  reindex_item(item, stomp_client)
+  reindex_item_to_solr(item.id, stomp_client)
   item
 end
 

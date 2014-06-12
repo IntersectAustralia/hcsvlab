@@ -156,7 +156,7 @@ namespace :fedora do
     logger.info "rake fedora:reindex_one item=#{item_id}"
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    reindex_item_by_id(item_id, stomp_client)
+    reindex_item_to_solr(item_id, stomp_client)
     stomp_client.close
   end
 
@@ -181,7 +181,7 @@ namespace :fedora do
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     objects.each do |obj|
-      reindex_item_by_id(obj["id"], stomp_client)
+      reindex_item_to_solr(obj["id"], stomp_client)
     end
     stomp_client.close
 
@@ -215,7 +215,7 @@ namespace :fedora do
       solr_records = solr_reponse["response"]["docs"].collect { |s| s["id"] }
       missing_ids = fedora_records - solr_records
       missing_ids.each do |missing_id|
-        reindex_item_by_id(missing_id, stomp_client)
+        reindex_item_to_solr(missing_id, stomp_client)
       end
       start_row+=CHUNK_SIZE
     end
@@ -241,7 +241,7 @@ namespace :fedora do
     chunks.times do |chunk|
       response = @solr.get 'select', :params => {:fl => 'id', :sort => 'id asc', :start => start_row, :rows => CHUNK_SIZE}
       response["response"]["docs"].each do |doc|
-        reindex_item_by_id(doc["id"], stomp_client)
+        reindex_item_to_solr(doc["id"], stomp_client)
       end
       start_row+=CHUNK_SIZE
     end
@@ -418,16 +418,9 @@ namespace :fedora do
 
   end
 
-
-  def reindex_item(item, stomp_client)
-    logger.info "Reindexing item: #{item.id}"
-    # item.update_index
-    stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item.id}")
-  end
-
-
-  def reindex_item_by_id(item_id, stomp_client)
-    reindex_item(Item.find(item_id), stomp_client)
+  def reindex_item_to_solr(item_id, stomp_client)
+    logger.info "Reindexing item: #{item_id}"
+    stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
   end
 
   def check_corpus(corpus_dir)
