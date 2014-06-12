@@ -57,51 +57,9 @@ set(:deploy_to) { "#{user_home}/#{application}" }
 
 default_run_options[:pty] = true
 
-namespace :server_setup do
-  task :rpm_install, :roles => :app do
-    run "#{try_sudo} yum install -y #{rpms}"
-  end
-  namespace :filesystem do
-    task :dir_perms, :roles => :app do
-      run "[[ -d #{deploy_to} ]] || #{try_sudo} mkdir #{deploy_to}"
-      run "#{try_sudo} chown -R #{user}.#{group} #{deploy_to}"
-      run "#{try_sudo} chmod 0711 #{user_home}"
-    end
+# Extra capistrano tasks
+Dir["config/recipes/*.rb"].each {|file| load file }
 
-    task :mkdir_db_dumps, :roles => :app do
-      run "#{try_sudo} mkdir -p #{shared_path}/db_dumps"
-      run "#{try_sudo} chown -R #{user}.#{group} #{shared_path}/db_dumps"
-    end
-  end
-  namespace :rvm do
-    task :trust_rvmrc do
-      run "rvm rvmrc trust #{release_path}"
-    end
-  end
-  task :gem_install, :roles => :app do
-    run "gem install bundler passenger:4.0.0.rc6"
-  end
-  task :passenger, :roles => :app do
-    run "passenger-install-apache2-module -a"
-  end
-  namespace :config do
-    task :apache do
-      src = "#{release_path}/config/httpd/#{stage}_rails_#{application}.conf"
-      dest = "/etc/httpd/conf.d/rails_#{application}.conf"
-      run "cmp -s #{src} #{dest} > /dev/null; [ $? -ne 0 ] && #{try_sudo} cp #{src} #{dest} && #{try_sudo} /sbin/service httpd graceful; /bin/true"
-    end
-  end
-  namespace :logging do
-    task :rotation, :roles => :app do
-      src = "#{release_path}/config/#{application}.logrotate"
-      dest = "/etc/logrotate.d/#{application}"
-      run "cmp -s #{src} #{dest} > /dev/null; [ $? -ne 0 ] && #{try_sudo} cp #{src} #{dest}; /bin/true"
-      src = "#{release_path}/config/httpd/httpd.logrotate"
-      dest = "/etc/logrotate.d/httpd"
-      run "cmp -s #{src} #{dest} > /dev/null; [ $? -ne 0 ] && #{try_sudo} cp #{src} #{dest}; /bin/true"
-    end
-  end
-end
 before 'deploy:setup' do
   server_setup.rpm_install
   server_setup.rvm.trust_rvmrc
@@ -269,7 +227,7 @@ namespace :deploy do
   task :start_services, :roles => :app do
     start_activemq
     #start_jetty
-    puts "Waiting 30 seconds for ActiveMQ to start"
+    puts "    Waiting 30 seconds for ActiveMQ to start...".yellow
     sleep(30)
     start_tomcat6
     start_a13g_pollers
@@ -283,176 +241,6 @@ namespace :deploy do
     stop_activemq
   end
 
-  desc "Start the jetty server"
-  task :start_jetty, :roles => :app do
-    run "cd #{current_path} && rake jetty:config", :env => {'RAILS_ENV' => stage}
-    run "cd #{current_path} && nohup rake jetty:start > nohup_jetty.out 2>&1", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Stop the jetty server"
-  task :stop_jetty, :roles => :app do
-    run "cd #{current_path} && rake jetty:stop", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Start the Tomcat 6 server"
-  task :start_tomcat6, :roles => :app do
-  
-    run "cd ${CATALINA_HOME} && nohup bin/startup.sh > nohup_tomcat.out 2>&1", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Configure Tomcat 6"
-  task :configure_tomcat6, :roles => :app do
-    run "cp -p #{current_path}/tomcat_conf/setenv.sh $CATALINA_HOME/bin/", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Configure Fedora"
-  task :configure_fedora, :roles => :app do
-    run "cp -p #{current_path}/fedora_conf/conf/#{stage}/fedora.fcfg $FEDORA_HOME/server/config/", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Configure Solr"
-  task :configure_solr, :roles => :app do
-    run "cp -p #{current_path}/solr_conf/hcsvlab-solr.xml    $CATALINA_HOME/conf/Catalina/localhost/solr.xml", :env => {'RAILS_ENV' => stage}
-    run "cp -p #{current_path}/solr_conf/conf/schema.xml     $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
-    run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
-    run "cp -p #{current_path}/solr_conf/conf/schema.xml     $SOLR_HOME/hcsvlab/solr/hcsvlab-AF-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
-    run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-AF-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Update the HCS vLab Solr core"
-  task :update_solr_core, :roles => :app do
-    # Remove the existing core and webapp
-    run "rm -rf $SOLR_HOME/hcsvlab", :env => {'RAILS_ENV' => stage}
-    run "rm -rf $CATALINA_HOME/webapps/solr/", :env => {'RAILS_ENV' => stage}
-    create_solr_core
-  end
-
-  desc "Create the HCS vLab Solr core"
-  task :create_solr_core, :roles => :app do
-    # Copy the jar files etc that Tomcat will need for Solr 4.3 logging
-    run "cp -rp #{current_path}/solr_conf/lib/ext/* $CATALINA_HOME/lib/", :env => {'RAILS_ENV' => stage}
-    # Copy the solr core diir
-    run "cp -rp #{current_path}/solr_conf/hcsvlab $SOLR_HOME/", :env => {'RAILS_ENV' => stage}
-    # Configure solr
-    configure_solr
-  end
-
-  desc "Stop the Tomcat 6 server"
-  task :stop_tomcat6, :roles => :app do
-    run "cd ${CATALINA_HOME} && bin/shutdown.sh", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Start the a13g pollers"
-  task :start_a13g_pollers, :roles => :app do
-    run "cd #{current_path} && nohup rake a13g:start_pollers > nohup_a13g_pollers.out 2>&1", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Stop the a13g pollers"
-  task :stop_a13g_pollers, :roles => :app do
-    run "cd #{current_path} && rake a13g:stop_pollers", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Start ActiveMQ"
-  task :start_activemq, :roles => :app do
-    run "cd $ACTIVEMQ_HOME && nohup bin/activemq start > nohup_activemq.out 2>&1", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Configure ActiveMQ"
-  task :configure_activemq, :roles => :app do
-    run "cp -p #{current_path}/activemq_conf/activemq.xml $ACTIVEMQ_HOME/conf/", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Stop ActiveMQ"
-  task :stop_activemq, :roles => :app, :on_error => :continue do
-    run "cd $ACTIVEMQ_HOME && bin/activemq stop", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Restart Galaxy"
-  task :restart_galaxy, :roles => :galaxy do
-    run "cd $GALAXY_HOME && ./galaxy restart"
-  end
-
-  desc "Configure Galaxy"
-  task :configure_galaxy, :roles => :galaxy do
-    run "sed -i 's+__HCSVLAB_APP_URL__+#{server_url}+g' $GALAXY_HOME/universe_wsgi.ini"
-    run "sed -i 's+__GALAXY_PORT__+#{galaxy_port}+g' $GALAXY_HOME/universe_wsgi.ini"
-    run "sed -i 's+__TOOL_SHED_URL__+#{galaxy_url + ':' + toolshed_port}+g' $GALAXY_HOME/tool_sheds_conf.xml"
-    run "sed -i 's+__HCSVLAB_GA_TRACKER_ID__+#{galaxy_ga_tracker_id}+g' $GALAXY_HOME/universe_wsgi.ini"
-    run "sed -i 's+__HCSVLAB_SMTP_SERVER__+#{galaxy_smtp_server}+g' $GALAXY_HOME/universe_wsgi.ini"
-  end
-
-  desc "Update galaxy"
-  task :update_galaxy, :roles => :galaxy do
-
-    # First show the branches and tags to decide from where are we going to deploy
-    require 'colorize'
-    default_tag = 'HEAD'
-    run "cd $GALAXY_HOME && #{try_sudo} git fetch --all"
-    availableLocalBranches = capture("cd $GALAXY_HOME && git branch").split (/\r?\n/)
-    availableLocalBranches.map! { |s|  "(local) " + s.strip}
-
-    availableRemoteBranches = capture("cd $GALAXY_HOME && git branch -r").split (/\r?\n/)
-    availableRemoteBranches.map! { |s|  "(remote) " + s.split('/')[-1].strip}
-
-    availableTags = capture("cd $GALAXY_HOME && git tag").split (/\r?\n/)
-
-    puts "Availible tags:".colorize(:yellow)
-    availableTags.each {|s| puts s}
-    puts "Availible branches:".colorize(:yellow)
-    availableLocalBranches.each {|s| puts s}
-    availableRemoteBranches.each {|s| puts s.colorize(:red)}
-
-    tag = Capistrano::CLI.ui.ask "Tag to deploy (make sure to push the branch/tag first) or HEAD?: [#{default_tag}] ".colorize(:yellow)
-    tag = default_tag if tag.empty?
-
-    puts "Deploying brach/tag: #{tag}".colorize(:red)
-
-
-    # Once we chose the branch/tag, we setup up it in the local repository.
-    run "cd $GALAXY_HOME && #{try_sudo} git fetch --all"
-    run "cd $GALAXY_HOME && #{try_sudo} git reset --hard #{tag}"
-
-  end
-
-  desc "Redeploy Galaxy, stops, updates, configures and starts galaxy"
-  task :redeploy_galaxy, :roles => :galaxy do
-    set(:user) { "galaxy" }
-    set :default_shell, '/bin/bash'
-    update_galaxy
-    configure_galaxy
-    restart_galaxy
-    redeploy_galaxy_toolshed
-  end
-
-  desc "Start Galaxy Toolshed"
-  task :start_galaxy_toolshed, :roles => :galaxy do
-    run "cd $GALAXY_HOME && #{try_sudo} service toolshed start", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Stop Galaxy Toolshed"
-  task :stop_galaxy_toolshed, :roles => :galaxy do
-    run "cd $GALAXY_HOME && #{try_sudo} service toolshed stop", :env => {'RAILS_ENV' => stage}
-  end
-
-  desc "Configure Galaxy Toolshed"
-  task :configure_galaxy_toolshed, :roles => :galaxy do
-    toolshed_config = YAML.load_file('config/galaxy_toolshed.yml')[stage.to_s]
-    run "sed -i 's+__TOOLSHED_PORT__+#{toolshed_port}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
-    run "sed -i 's+__USER__+#{toolshed_config["username"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
-    run "sed -i 's+__PASSWORD__+#{toolshed_config["password"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
-    run "sed -i 's+__HOST__+#{toolshed_config["host"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
-    run "sed -i 's+__DATABASE__+#{toolshed_config["database"]}+g' $GALAXY_HOME/tool_shed_wsgi.ini"
-  end
-
-  desc "Redeploy Galaxy toolshed"
-  task :redeploy_galaxy_toolshed, :roles => :galaxy do
-    set(:user) { "galaxy" }
-    set :default_shell, '/bin/bash'
-    stop_galaxy_toolshed
-    configure_galaxy_toolshed
-    start_galaxy_toolshed
-  end
-
   # We need to define our own cleanup task since there is an issue on Capistrano deploy:cleanup task
   #https://github.com/capistrano/capistrano/issues/474
   task :customcleanup, :except => {:no_release => true} do
@@ -460,52 +248,6 @@ namespace :deploy do
       run "ls -1dt #{releases_path}/* | tail -n +#{count + 1} | #{try_sudo} xargs rm -rf"
   end
 
-  namespace :shared_file do
-
-    desc <<-DESC
-      Generate shared file dirs under shared/files dir and then copies files over.
-
-      For example, given:
-        set :shared_files, %w(config/database.yml db/seeds.yml)
-
-      The following directories will be generated:
-        shared/files/config/
-        shared/files/db/
-    DESC
-
-    task :setup, :except => { :no_release => true } do
-      if exists?(:shared_files)
-        dirs = shared_files.map {|f| File.join(shared_file_path, File.dirname(f)) }
-        run "#{try_sudo} mkdir -p #{dirs.join(' ')}"
-        run "#{try_sudo} chmod g+w #{dirs.join(' ')}" if fetch(:group_writable, true)
-        run "#{try_sudo} chown -R #{user}.#{group} #{dirs.join(' ')}"
-
-        servers = find_servers(:no_release => false)
-        servers.each do |server|
-          shared_files.each do |file_path|
-            top.upload(file_path, File.join(shared_file_path, file_path))
-            puts "    Uploaded #{file_path} to #{File.join(shared_file_path, file_path)}"
-          end
-        end
-
-      end
-    end
-    after "deploy:setup", "deploy:shared_file:setup"
-
-    desc <<-DESC
-      Symlink shared files to release path.
-
-      WARNING: It DOES NOT warn you when shared files not exist.  \
-      So symlink will be created even when a shared file does not \
-      exist.
-    DESC
-    task :create_symlink, :except => { :no_release => true } do
-      (shared_files || []).each do |path|
-        run "ln -nfs #{shared_file_path}/#{path} #{release_path}/#{path}"
-      end
-    end
-    after "deploy:finalize_update", "deploy:shared_file:create_symlink"
-  end
 end
 
 namespace :backup do
