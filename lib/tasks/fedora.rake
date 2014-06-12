@@ -190,24 +190,34 @@ namespace :fedora do
   #
   # Consolidate cores by reindexing items found only in the ActiveFedora core
   #
+  CHUNK_SIZE = 50
   task :consolidate_cores => :environment do
     solr_af_core = ActiveFedora::SolrService.instance.conn
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
 
-    response = solr_af_core.get 'select', :params => {:q => 'active_fedora_model_ssi:Item'}
-    num = response["response"]["numFound"]
-    chunks = (num/50)+1
+    corpus = ENV['corpus']
+    if corpus.present?
+      query = "has_model_ssim:info:fedora/afmodel:Item edit_access_group_ssim:#{corpus}-edit"
+    else
+      query = 'has_model_ssim:info:fedora/afmodel:Item'
+    end
+
+    fedora_response = solr_af_core.get 'select', :params => {:q => query}
+    num = fedora_response["response"]["numFound"]
+    chunks = (num/CHUNK_SIZE)+1
     start_row = 0
     chunks.times do |chunk|
       logger.info "Investigating item set " + (chunk+1).to_s + " of " + chunks.to_s
-      response = solr_af_core.get 'select', :params => {:q => 'active_fedora_model_ssi:Item', :fl => 'id', :sort => 'id asc', :start => start_row, :rows => 50}
-      response["response"]["docs"].each do |doc|
-        res = @solr.get 'select',  :params => {:q => 'id:'+doc["id"], :rows => 5}
-        if res["response"]["numFound"].to_i == 0
-          reindex_item_by_id(doc["id"], stomp_client)
-        end
+      fedora_response = solr_af_core.get 'select', :params => {:q => query, :fl => 'id', :sort => 'id asc', :start => start_row, :rows => CHUNK_SIZE}
+      fedora_records = fedora_response["response"]["docs"].collect { |f| f["id"] }
+      fq_query = "id:(" + fedora_records.collect { |item| item.sub(/:/, '\:') }.join(" OR ") +")"
+      solr_reponse = @solr.get 'select', :params => {fq: fq_query, :fl => 'id', rows: CHUNK_SIZE}
+      solr_records = solr_reponse["response"]["docs"].collect { |s| s["id"] }
+      missing_ids = fedora_records - solr_records
+      missing_ids.each do |missing_id|
+        reindex_item_by_id(missing_id, stomp_client)
       end
-      start_row+=50
+      start_row+=CHUNK_SIZE
     end
     stomp_client.close
   end
@@ -226,15 +236,15 @@ namespace :fedora do
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
 
-    chunks = (num/50)+1
+    chunks = (num/CHUNK_SIZE)+1
     start_row = 0
     chunks.times do |chunk|
-      response = @solr.get 'select', :params => {:fl => 'id', :sort => 'id asc', :start => start_row, :rows => 50}
+      response = @solr.get 'select', :params => {:fl => 'id', :sort => 'id asc', :start => start_row, :rows => CHUNK_SIZE}
       response["response"]["docs"].each do |doc|
         reindex_item_by_id(doc["id"], stomp_client)
       end
-      start_row+=50
-    end    
+      start_row+=CHUNK_SIZE
+    end
 
     stomp_client.close
 
@@ -285,11 +295,11 @@ namespace :fedora do
     }
 
     setup_collection_list("AUSNC", licences["AusNC Terms of Use"],
-                           "ace", "art", "austlit", "braidedchannels", "cooee", "gcsause", "ice", "mitcheldelbridge", "monash")
-    setup_collection_list("PARADISEC",  licences["PARADISEC Conditions of Access"],
+                          "ace", "art", "austlit", "braidedchannels", "cooee", "gcsause", "ice", "mitcheldelbridge", "monash")
+    setup_collection_list("PARADISEC", licences["PARADISEC Conditions of Access"],
                           "paradisec", "eopas_test")
     Collection.assign_licence("austalk", licences["AusTalk Terms of Use"])
-    Collection.assign_licence("avozes",  licences["AVOZES Non-commercial (Academic) Licence"])
+    Collection.assign_licence("avozes", licences["AVOZES Non-commercial (Academic) Licence"])
     Collection.assign_licence("clueweb", licences["ClueWeb Terms of Use"])
     Collection.assign_licence("pixar", licences["Creative Commons v3.0 BY-NC-SA"])
     Collection.assign_licence("rirusyd", licences["Creative Commons v3.0 BY-NC-SA"])
@@ -411,7 +421,7 @@ namespace :fedora do
 
   def reindex_item(item, stomp_client)
     logger.info "Reindexing item: #{item.id}"
-    item.update_index
+    # item.update_index
     stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item.id}")
   end
 
@@ -472,7 +482,7 @@ namespace :fedora do
 
     # small hack to handle austalk for the time being, can be fixed up
     # when we look at getting some form of data uniformity
-    if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
+    if query.execute(graph).any? { |r| r.collection == "http://ns.austalk.edu.au/corpus" }
       collection_name = "austalk"
     end
 
@@ -575,7 +585,7 @@ namespace :fedora do
   end
 
   def setup_collection_list(list_name, licence, *collection_names)
-    list = CollectionList.create_public_list(list_name,  licence, *collection_names)
+    list = CollectionList.create_public_list(list_name, licence, *collection_names)
     logger.warning("Didn't create CollectionList #{list_name}") if list.nil?
   end
 end

@@ -175,7 +175,7 @@ private
     if parent.nil?
       index_item(object)
     else
-      info("Solr_Worker", "No parent object for #{object}")
+      debug("Solr_Worker", "isMemberOf value found for #{object}, not indexing.")
     end
   end
 

@@ -269,6 +269,8 @@ namespace :deploy do
   task :start_services, :roles => :app do
     start_activemq
     #start_jetty
+    puts "Waiting 30 seconds for ActiveMQ to start"
+    sleep(30)
     start_tomcat6
     start_a13g_pollers
   end
