@@ -33,12 +33,12 @@ namespace :deploy do
 
   desc "Start the a13g pollers"
   task :start_a13g_pollers, :roles => :app do
-    run "cd #{current_path} && nohup rake a13g:start_pollers > nohup_a13g_pollers.out 2>&1", :env => {'RAILS_ENV' => stage}
+    run "cd #{current_path} && nohup bundle exec rake a13g:start_pollers > nohup_a13g_pollers.out 2>&1", :env => {'RAILS_ENV' => stage}
   end
 
   desc "Stop the a13g pollers"
   task :stop_a13g_pollers, :roles => :app do
-    run "cd #{current_path} && rake a13g:stop_pollers", :env => {'RAILS_ENV' => stage}
+    run "cd #{current_path} && bundle exec rake a13g:stop_pollers", :env => {'RAILS_ENV' => stage}
   end
 
 end
