@@ -32,6 +32,8 @@ group :development do
   gem 'pry-rails'
   gem 'zeus'
   gem 'newrelic_rpm'
+  gem "better_errors"
+  gem "binding_of_caller"
 
   # Deployment tracker
   gem "create_deployment_record", git: 'https://github.com/IntersectAustralia/create_deployment_record.git'

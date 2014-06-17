@@ -115,6 +115,9 @@ module NavigationHelpers
       when /^the licence agreements page$/
         account_licence_agreements_path(options)
 
+      when /^the download api key page$/
+        account_api_key_path
+
       when /^the document content page for file "(.*)" for item "(.*)"$/
         collectionName = $2.split(':').first
         itemIdentifier = $2.split(':').last

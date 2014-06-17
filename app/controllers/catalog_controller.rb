@@ -267,52 +267,60 @@ class CatalogController < ApplicationController
 
   # override default index method
   def index
-    begin
-      if params[:q].present? or params[:f].present? or params[:metadata].present?
-        search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::MAIN_SEARCH)
-        search.user = current_user
-        search.save
-      end
-      metadataSearchParam = params[:metadata]
-      if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
-        if (metadataSearchParam.include?(":"))
-          metadataSearchParam.gsub!(/\sor\s/, " OR ")
-          metadataSearchParam.gsub!(/\sand\s/, " AND ")
-
-          params[:fq] = processMetadataParameters(metadataSearchParam.clone)
-          Rails.logger.debug("Sending metadata search with parametes #{params[:fq]}")
-        else
-          params[:fq] = "all_metadata:(#{metadataSearchParam})"
-        end
-        self.solr_search_params_logic += [:add_metadata_extra_filters]
-      end
-
-      bench_start = Time.now
-      super
-      bench_end = Time.now
-      @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
-      Rails.logger.debug(@profiler.first)
-
-      params.delete(:fq)
-    rescue RSolr::Error::Http => e
-      Rails.logger.debug(e.message)
-      Rails.logger.debug(e.backtrace)
-      flash[:error] = "Sorry, error in search parameters."
-      redirect_to root_url and return
-
-    end
 
     if !current_user.nil?
-      @hasAccessToEveryCollection = true
-      @hasAccessToSomeCollections = false
-      Collection.all.each do |aCollection|
-        #I have access to a collection if I am the owner or if I accepted the licence for that collection
-        hasAccessToCollection = (aCollection.flat_ownerEmail.eql? current_user.email) ||
-                                (current_user.has_agreement_to_collection?(aCollection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE, false))
+      begin
+        if params[:q].present? or params[:f].present? or params[:metadata].present?
+          search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::MAIN_SEARCH)
+          search.user = current_user
+          search.save
+        end
+        metadataSearchParam = params[:metadata]
+        if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
+          if (metadataSearchParam.include?(":"))
+            metadataSearchParam.gsub!(/\sor\s/, " OR ")
+            metadataSearchParam.gsub!(/\sand\s/, " AND ")
 
-        @hasAccessToSomeCollections = @hasAccessToSomeCollections || hasAccessToCollection
-        @hasAccessToEveryCollection = @hasAccessToEveryCollection && hasAccessToCollection
+            params[:fq] = processMetadataParameters(metadataSearchParam.clone)
+            Rails.logger.debug("Sending metadata search with parametes #{params[:fq]}")
+          else
+            params[:fq] = "all_metadata:(#{metadataSearchParam})"
+          end
+          self.solr_search_params_logic += [:add_metadata_extra_filters]
+        end
+
+        bench_start = Time.now
+        super
+        bench_end = Time.now
+        @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
+        Rails.logger.debug(@profiler.first)
+
+        params.delete(:fq)
+        @hasAccessToEveryCollection = true
+        @hasAccessToSomeCollections = false
+        Collection.all.each do |aCollection|
+          #I have access to a collection if I am the owner or if I accepted the licence for that collection
+          hasAccessToCollection = (aCollection.flat_ownerEmail.eql? current_user.email) ||
+              (current_user.has_agreement_to_collection?(aCollection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE, false))
+
+          @hasAccessToSomeCollections = @hasAccessToSomeCollections || hasAccessToCollection
+          @hasAccessToEveryCollection = @hasAccessToEveryCollection && hasAccessToCollection
+        end
+      rescue Errno::ECONNREFUSED => e
+        Rails.logger.debug(e.message)
+        Rails.logger.debug(e.backtrace)
+        raw_data = {
+            :exception => e,
+            :rack_env  => env
+        }
+        WhoopsLogger.log(:rails_exception, raw_data) if WhoopsLogger.config.host
+        redirect_to new_issue_report_path, alert: "Solr is experiencing problems at the moment. The administrators have been informed of the issue."
+      rescue RSolr::Error::Http => e
+        Rails.logger.debug(e.message)
+        Rails.logger.debug(e.backtrace)
+        flash[:error] = "Sorry, error in search parameters."
       end
+
     end
   end
 
