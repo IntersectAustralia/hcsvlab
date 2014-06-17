@@ -73,7 +73,7 @@ When /^I make a (JSON )?request for (.*) with the API token for "(.*)" outside t
   if json.present?
     get path_to(page_name), {:format => :json, :api_key => user.authentication_token}
   else
-    get path_to(page_name), {:format => :html,:api_key => user.authentication_token}
+    get path_to(page_name), {:format => :html, :api_key => user.authentication_token}
   end
 end
 
@@ -129,7 +129,7 @@ end
 # Taken from cucumber-api-steps, as the step definitions weren't getting detected
 
 Then /^the JSON response should (not)?\s?have "([^"]*)" with the text "([^"]*)"$/ do |negative, json_path, text|
-  json    = JSON.parse(last_response.body)
+  json = JSON.parse(last_response.body)
   results = JsonPath.new(json_path).on(json).to_a.map(&:to_s)
   if self.respond_to?(:should)
     if negative.present?
@@ -147,7 +147,7 @@ Then /^the JSON response should (not)?\s?have "([^"]*)" with the text "([^"]*)"$
 end
 
 Then /^the JSON response should (not)?\s?have "([^"]*)"$/ do |negative, json_path|
-  json    = JSON.parse(last_response.body)
+  json = JSON.parse(last_response.body)
   results = JsonPath.new(json_path).on(json).to_a.map(&:to_s)
 
   if self.respond_to?(:should)
@@ -169,7 +169,7 @@ end
 
 Then /^the JSON response should (not)?\s?have$/ do |negative, table|
   table.hashes.each do |hash|
-    json    = JSON.parse(last_response.body)
+    json = JSON.parse(last_response.body)
     json_path = hash[:json_path]
     text = hash[:text]
     results = JsonPath.new(json_path).on(json).to_a.map(&:to_s)
