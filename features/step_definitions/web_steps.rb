@@ -314,3 +314,7 @@ Then /^I should (not )?have the link "([^"]*)"/ do |negation, text|
     page.should have_selector(:link_or_button, text)
   end
 end
+
+Then /^I should see a page with the title: "([^"]*)"$/ do |page_title|
+  expect(page).to have_title page_title
+end

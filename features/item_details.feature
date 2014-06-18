@@ -18,6 +18,7 @@ Feature: Displaying Items
   Scenario: HCSVLAB-272 - Clicking through to a COOEE Item's details
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I am on the catalog page for "cooee:1-001"
+    Then I should see a page with the title: "Alveo - cooee:1-001"
     Then I should see "cooee:1-001"
     And I should see "Display Document"
     And I should see "Documents"
