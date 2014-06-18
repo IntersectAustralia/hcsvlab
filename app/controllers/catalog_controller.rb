@@ -29,7 +29,7 @@ class CatalogController < ApplicationController
   prepend_before_filter :retrieve_and_set_item_id
 
   # These before_filters apply the hydra access controls
-  before_filter :wrapped_enforce_show_permissions, :only=>[:show, :document, :primary_text, :annotations, :upload_annotation]
+  before_filter :wrapped_enforce_show_permissions, :only => [:show, :document, :primary_text, :annotations, :upload_annotation]
   # This applies appropriate access controls to all solr queries
   CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
   # This filters out objects that you want to exclude from search results, like FileAssets
@@ -267,51 +267,63 @@ class CatalogController < ApplicationController
 
   # override default index method
   def index
-    begin
-      if params[:q].present? or params[:f].present? or params[:metadata].present?
-        search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::MAIN_SEARCH)
-        search.user = current_user
-        search.save
-      end
-      metadataSearchParam = params[:metadata]
-      if (!metadataSearchParam.nil? and !metadataSearchParam.empty?)
-        if (metadataSearchParam.include?(":"))
-          metadataSearchParam.gsub!(/\sor\s/, " OR ")
-          metadataSearchParam.gsub!(/\sand\s/, " AND ")
 
-          params[:fq] = processMetadataParameters(metadataSearchParam.clone)
-          Rails.logger.debug("Sending metadata search with parametes #{params[:fq]}")
-        else
-          params[:fq] = "all_metadata:(#{metadataSearchParam})"
+    if current_user
+      begin
+        if params[:q].present? or params[:f].present? or params[:metadata].present?
+          search = UserSearch.new(:search_time => Time.now, :search_type => SearchType::MAIN_SEARCH)
+          search.user = current_user
+          search.save
         end
-        self.solr_search_params_logic += [:add_metadata_extra_filters]
+        metadataSearchParam = params[:metadata]
+        if !metadataSearchParam.nil? and !metadataSearchParam.empty?
+          if metadataSearchParam.include?(":")
+            metadataSearchParam.gsub!(/\sor\s/, " OR ")
+            metadataSearchParam.gsub!(/\sand\s/, " AND ")
+
+            params[:fq] = processMetadataParameters(metadataSearchParam.clone)
+            Rails.logger.debug("Sending metadata search with parametes #{params[:fq]}")
+          else
+            params[:fq] = "all_metadata:(#{metadataSearchParam})"
+          end
+          self.solr_search_params_logic += [:add_metadata_extra_filters]
+        end
+
+        bench_start = Time.now
+        super
+        bench_end = Time.now
+        @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
+        Rails.logger.debug(@profiler.first)
+
+        params.delete(:fq)
+        @hasAccessToEveryCollection = true
+        @hasAccessToSomeCollections = false
+        Collection.all.each do |aCollection|
+          #I have access to a collection if I am the owner or if I accepted the licence for that collection
+          hasAccessToCollection = (aCollection.flat_ownerEmail.eql? current_user.email) ||
+              (current_user.has_agreement_to_collection?(aCollection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE, false))
+
+          @hasAccessToSomeCollections = @hasAccessToSomeCollections || hasAccessToCollection
+          @hasAccessToEveryCollection = @hasAccessToEveryCollection && hasAccessToCollection
+        end
+      rescue Errno::ECONNREFUSED => e
+        Rails.logger.debug(e.message)
+        Rails.logger.debug(e.backtrace)
+        raw_data = {
+            :exception => e,
+            :rack_env => env
+        }
+        WhoopsLogger.log(:rails_exception, raw_data) if WhoopsLogger.config.host
+        redirect_to new_issue_report_path, alert: "Solr is experiencing problems at the moment. The administrators have been informed of the issue."
+      rescue RSolr::Error::Http => e
+        Rails.logger.debug(e.message)
+        Rails.logger.debug(e.backtrace)
+        flash[:error] = "Sorry, error in search parameters."
       end
-
-      bench_start = Time.now
-      super
-      bench_end = Time.now
-      @profiler = ["Time for catalog search with params: f=#{params['f']} q=#{params['q']} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
-      Rails.logger.debug(@profiler.first)
-
-      params.delete(:fq)
-    rescue RSolr::Error::Http => e
-      Rails.logger.debug(e.message)
-      Rails.logger.debug(e.backtrace)
-      flash[:error] = "Sorry, error in search parameters."
-      redirect_to root_url and return
-
-    end
-
-    if !current_user.nil?
-      @hasAccessToEveryCollection = true
-      @hasAccessToSomeCollections = false
-      Collection.all.each do |aCollection|
-        #I have access to a collection if I am the owner or if I accepted the licence for that collection
-        hasAccessToCollection = (aCollection.flat_ownerEmail.eql? current_user.email) ||
-                                (current_user.has_agreement_to_collection?(aCollection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE, false))
-
-        @hasAccessToSomeCollections = @hasAccessToSomeCollections || hasAccessToCollection
-        @hasAccessToEveryCollection = @hasAccessToEveryCollection && hasAccessToCollection
+    else
+      respond_to do |format|
+        format.json { render :nothing => true, :status => 406 }
+        format.html {}
       end
     end
   end
@@ -427,7 +439,7 @@ class CatalogController < ApplicationController
       @response, @document = get_solr_response_for_doc_id
     end
     begin
-      @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
+      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
 
       if !@item.datastreams["annotationSet1"].nil?
         begin
@@ -441,7 +453,7 @@ class CatalogController < ApplicationController
         end
 
         respond_to do |format|
-            format.json {}
+          format.json {}
         end
         return
       end
@@ -451,7 +463,7 @@ class CatalogController < ApplicationController
       # Fall through to return Not Found
     end
     respond_to do |format|
-        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
     bench_end = Time.now
     Rails.logger.debug("Time for retrieving annotations for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
@@ -462,13 +474,13 @@ class CatalogController < ApplicationController
   #
   def annotation_properties
     begin
-      @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
+      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
 
       if !@item.datastreams["annotationSet1"].nil?
         @properties = query_annotation_properties(@item)
 
         respond_to do |format|
-            format.json {}
+          format.json {}
         end
         return
       end
@@ -478,7 +490,7 @@ class CatalogController < ApplicationController
       # Fall through to return Not Found
     end
     respond_to do |format|
-        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
   end
 
@@ -487,13 +499,13 @@ class CatalogController < ApplicationController
   #
   def annotation_types
     begin
-      @item = Item.find_and_load_from_solr({:id=>params[:id]}).first
+      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
 
       if !@item.datastreams["annotationSet1"].nil?
         @types = query_annotation_types(@item)
 
         respond_to do |format|
-            format.json {}
+          format.json {}
         end
         return
       end
@@ -503,7 +515,7 @@ class CatalogController < ApplicationController
       # Fall through to return Not Found
     end
     respond_to do |format|
-        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
   end
 
@@ -516,7 +528,7 @@ class CatalogController < ApplicationController
     avoid_context = collect_restricted_predefined_vocabulary()
 
     @vocab_hash = {}
-    RDF::Vocabulary.each {|vocab|
+    RDF::Vocabulary.each { |vocab|
       if (!avoid_context.include?(vocab.to_uri) and vocab.to_uri.qname.present?)
         prefix = vocab.to_uri.qname.first.to_s
         uri = vocab.to_uri.to_s
@@ -544,7 +556,7 @@ class CatalogController < ApplicationController
     rescue Exception => e
       respond_to do |format|
         format.html { flash[:error] = "Sorry, you have requested a document for an item that doesn't exist."
-                      redirect_to root_path and return }
+        redirect_to root_path and return }
         format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
       end
     end
@@ -555,7 +567,7 @@ class CatalogController < ApplicationController
   #
   def document
     begin
-      doc = Document.find_and_load_from_solr({:file_name=>params[:filename].to_s, item: params[:id]}).first
+      doc = Document.find_and_load_from_solr({:file_name => params[:filename].to_s, item: params[:id]}).first
 
       if (!doc.nil?)
         params[:disposition] = 'Inline'
@@ -564,13 +576,13 @@ class CatalogController < ApplicationController
         # If HTTP_RANGE variable is set, we need to send partial content and tell the browser
         # what fragment of the file we are sending by using the variables Content-Range and
         # Content-Length
-        if(request.headers["HTTP_RANGE"])
+        if (request.headers["HTTP_RANGE"])
           size = doc.datastreams['CONTENT1'].content.size
           bytes = Rack::Utils.byte_ranges(request.headers, size)[0]
           offset = bytes.begin
-          length = bytes.end  - bytes.begin
+          length = bytes.end - bytes.begin
 
-          response.header["Accept-Ranges"] =  "bytes" # Tells the browser that we accept partial content
+          response.header["Accept-Ranges"] = "bytes" # Tells the browser that we accept partial content
           response.header["Content-Range"] = "bytes #{bytes.begin}-#{bytes.end}/#{size}"
           response.header["Content-Length"] = (length+1).to_s
           response.status = :partial_content
@@ -591,13 +603,13 @@ class CatalogController < ApplicationController
       end
     rescue Exception => e
       Rails.logger.error(e.backtrace)
-        # Fall through to return Not Found
+      # Fall through to return Not Found
     end
     respond_to do |format|
-        #format.html { raise ActionController::RoutingError.new('Not Found') }
-        format.html { flash[:error] = "Sorry, you have requested a document that doesn't exist." 
-                      redirect_to catalog_path(params[:id]) and return}
-        format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      #format.html { raise ActionController::RoutingError.new('Not Found') }
+      format.html { flash[:error] = "Sorry, you have requested a document that doesn't exist."
+      redirect_to catalog_path(params[:id]) and return }
+      format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
   end
 
@@ -607,9 +619,9 @@ class CatalogController < ApplicationController
   def invalid_solr_id_error
     respond_to do |format|
       format.html { flash[:error] = "Sorry, you have requested a document that doesn't exist."
-                    params.delete(:id)
-                    redirect_to catalog_path() and return
-                  }
+      params.delete(:id)
+      redirect_to catalog_path() and return
+      }
       format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
   end
@@ -646,7 +658,7 @@ class CatalogController < ApplicationController
     ItemMetadataFieldNameMapping.all.each do |aNameMapping|
       @nameMappings << {rdfName: aNameMapping['rdf_name'], user_friendly_name: aNameMapping['user_friendly_name']}
     end
-    @nameMappings.sort!{ |x,y| x[:user_friendly_name].downcase <=> y[:user_friendly_name].downcase }
+    @nameMappings.sort! { |x, y| x[:user_friendly_name].downcase <=> y[:user_friendly_name].downcase }
     @nameMappings
   end
 
@@ -686,7 +698,7 @@ class CatalogController < ApplicationController
 
         similarUploadedAnnotations.each do |anUploadedAnnotations|
           existingFileMD5 = Digest::MD5.hexdigest(IO.read(anUploadedAnnotations.file_location))
-          if(existingFileMD5.eql?(currentFileContentMD5))
+          if (existingFileMD5.eql?(currentFileContentMD5))
             Rails.logger.debug("File already uploaded: Record id #{anUploadedAnnotations.id}.")
             render :json => {:error => "File already uploaded."}.to_json, :status => 412
             return
@@ -754,7 +766,7 @@ class CatalogController < ApplicationController
     # If the 'query' parameter is no present then we return precondition no met error.
     if (!query.present?)
       respond_to do |format|
-        format.json { render :json => {:error => "Parameter 'query' is required."}.to_json, :status => 412 and return}
+        format.json { render :json => {:error => "Parameter 'query' is required."}.to_json, :status => 412 and return }
       end
     end
 
@@ -763,14 +775,14 @@ class CatalogController < ApplicationController
     matchingWords = query.to_enum(:scan, pattern).map { Regexp.last_match }
     if (!matchingWords.empty?)
       respond_to do |format|
-        format.json { render :json => {:error => "Service keyword is forbidden in queries."}.to_json, :status => 412 and return}
+        format.json { render :json => {:error => "Service keyword is forbidden in queries."}.to_json, :status => 412 and return }
       end
     end
 
     collection = Collection.find_by_short_name(collectionName).to_a.first
     if (collection.nil?)
       respond_to do |format|
-        format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return}
+        format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return }
       end
     end
 
@@ -813,25 +825,25 @@ class CatalogController < ApplicationController
     #collections = []
     #collectionNames.each do |aCollectionName|
     #  Retrieve the collection from Fedora
-      #collection = Collection.find_by_short_name(aCollectionName[:name]).to_a.first
-      #if (collection.nil? && !aCollectionName[:silent])
-      #  respond_to do |format|
-      #    format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return}
-      #  end
-      #end
-      #
-      #if (!collection.nil?)
-      #  Verify if the user has at least read access to the collection
-        #if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
-        #  authorization_error(Exception.new("You are not authorized to access this resource."))
-        #  return
-        #end
-        #collections << collection
-      #end
+    #collection = Collection.find_by_short_name(aCollectionName[:name]).to_a.first
+    #if (collection.nil? && !aCollectionName[:silent])
+    #  respond_to do |format|
+    #    format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return}
+    #  end
+    #end
+    #
+    #if (!collection.nil?)
+    #  Verify if the user has at least read access to the collection
+    #if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
+    #  authorization_error(Exception.new("You are not authorized to access this resource."))
+    #  return
+    #end
+    #collections << collection
+    #end
     #end
 
     # Create the URL for the sesame endpoint.
-    params = { query:query }
+    params = {query: query}
     uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collectionName}")
     uri.query = URI.encode_www_form(params)
 
@@ -845,12 +857,12 @@ class CatalogController < ApplicationController
     # If sesame returns an error, then we show the error received by sesame
     if (!res.is_a?(Net::HTTPSuccess))
       respond_to do |format|
-        format.json { render :json => {:error => res.body}.to_json, :status => res.code and return}
+        format.json { render :json => {:error => res.body}.to_json, :status => res.code and return }
       end
     else
       # Otherwise we send the response as json format.
       respond_to do |format|
-        format.json { render :json => res.body.to_s and return}
+        format.json { render :json => res.body.to_s and return }
       end
     end
   end
@@ -867,7 +879,7 @@ class CatalogController < ApplicationController
     #         word:word~
     #         word
     searchPattern = /(\w+)\s*:\s*([^\s")]+(\s\S+")*|"[^"]*")|(\w+)/i
-    matchingData = metadataSearchParam.to_enum(:scan, searchPattern).map {Regexp.last_match}
+    matchingData = metadataSearchParam.to_enum(:scan, searchPattern).map { Regexp.last_match }
 
     matchingData.each { |m|
       if (m.to_s.include?(':'))
@@ -918,11 +930,11 @@ class CatalogController < ApplicationController
     handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
 
     if (!handle.nil?)
-      item = Item.find_and_load_from_solr({handle:handle})
+      item = Item.find_and_load_from_solr({handle: handle})
       if (!item.present?)
         respond_to do |format|
-          format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return}
-          format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return}
+          format.html { resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return }
+          format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return }
         end
       end
       params[:id] = item.first.id if item.present?
@@ -937,12 +949,12 @@ class CatalogController < ApplicationController
       enforce_show_permissions(opts)
     rescue Hydra::AccessDenied => e
       respond_to do |format|
-        format.html {raise e}
+        format.html { raise e }
         format.any { render :json => {:error => "access-denied"}.to_json, :status => 403 }
       end
     rescue Blacklight::Exceptions::InvalidSolrID => e
       respond_to do |format|
-        format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return}
+        format.html { resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return }
         format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
       end
     end
@@ -987,8 +999,8 @@ class CatalogController < ApplicationController
       type_and_label << "?anno dada:label #{sparql_item(label.to_s.strip)} .\n"
     end
 
-    query = """
-      #{prefixes}
+    query = "" "
+    #{prefixes}
       SELECT *
       WHERE {
         ?identifier dc:identifier '#{item_short_identifier}'.
@@ -1004,7 +1016,7 @@ class CatalogController < ApplicationController
         }
         #{filters unless filters.empty?}
       }
-    """
+    " ""
 
     solution = repo.sparql_query(query)
 
@@ -1068,7 +1080,7 @@ class CatalogController < ApplicationController
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(item.collection.flat_name)
 
-    query = """
+    query = "" "
         PREFIX dada:<http://purl.org/dada/schema/0.2#>
         PREFIX dc: <http://purl.org/dc/terms/>
         SELECT *
@@ -1079,13 +1091,13 @@ class CatalogController < ApplicationController
             ?anno a dada:Annotation .
             ?anno dada:type ?type .
         }
-    """
+    " ""
 
     sols = repo.sparql_query(query)
     sols = sols.select(:type).distinct
-    
+
     sols.each do |sol|
-        types.push(sol[:type].to_s)
+      types.push(sol[:type].to_s)
     end
     types
   end
@@ -1100,7 +1112,7 @@ class CatalogController < ApplicationController
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(item.collection.flat_name)
 
-    query = """
+    query = "" "
         PREFIX dada:<http://purl.org/dada/schema/0.2#>
         PREFIX dc: <http://purl.org/dc/terms/>
         SELECT ?property
@@ -1121,16 +1133,16 @@ class CatalogController < ApplicationController
                 ?loc ?property ?value .
             }
         }
-    """
+    " ""
 
     sols = repo.sparql_query(query)
     props = sols.select(:property).distinct
 
     namespaces = RdfNamespace.get_namespaces(item.collection.flat_name)
     props.each do |sol|
-        entry = {:uri => sol[:property].to_s}
-        entry[:shortened_uri] = RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) if RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) != entry[:uri]
-        properties.push(entry)
+      entry = {:uri => sol[:property].to_s}
+      entry[:shortened_uri] = RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) if RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) != entry[:uri]
+      properties.push(entry)
     end
     properties
   end
@@ -1176,7 +1188,7 @@ class CatalogController < ApplicationController
     predefinedProperties[:start] = {:@id => "http://purl.org/dada/schema/0.2#start"}
     predefinedProperties[:end] = {:@id => "http://purl.org/dada/schema/0.2#end"}
     predefinedProperties[:label] = {:@id => "http://purl.org/dada/schema/0.2#label"}
-    predefinedProperties[:"#{PROJECT_PREFIX_NAME}"] = { :@id => "#{PROJECT_SCHEMA_LOCATION}" }
+    predefinedProperties[:"#{PROJECT_PREFIX_NAME}"] = {:@id => "#{PROJECT_SCHEMA_LOCATION}"}
 
     predefinedProperties
   end
@@ -1243,7 +1255,7 @@ class CatalogController < ApplicationController
 
   def literal_sparql_key(item)
     if uri? item or item.include? ":"
-        return false
+      return false
     end
     return true
   end

@@ -40,10 +40,7 @@ end
 
 Given /^I am logged out$/ do
   set_html_request
-  visit path_to("the login page")
-  fill_in("user_email", :with => email)
-  fill_in("user_password", :with => "Pas$w0rd")
-  click_button("Log in")
+  visit path_to("the logout page")
 end
 
 Given /^I have no users$/ do
