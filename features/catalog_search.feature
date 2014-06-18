@@ -223,9 +223,9 @@ Feature: Searching for items
   Scenario: Search using latin capital letter R UTF-8 character in full_text
     When I fill in "q" with "Ȓ"
     And I press "search"
-    Then I should see "blacklight_results" table with
-      | Identifier          | Created Date  | Type(s)     |
-      | custom:utf8_test_1  | 1986          | Text        |
+    Then I should see a table with the following rows in any order:
+      | Identifier          | Created Date  | Type(s)             |
+      | custom:utf8_test_1  | 1986          | Text                |
 
   @javascript
   Scenario: Search using arabic letter farsi yeh with inverted V UTF-8 character in full_text

@@ -147,7 +147,7 @@ Feature: Searching item lists
     And I press "execute_frequency_search"
     Then frequency search for "can" in item list "Frequency search" should show this results
       | facetValue  | matchingDocuments | totalDocs | termOccurrences | totalWords |
-      | austlit     | 1                 | 1         | 131             | 89728      |
+      | austlit     | 1                 | 1         | 182             | 89728      |
 
   Scenario: Doing a frequency search for words word (what)
     Given I am logged in as "researcher@intersect.org.au"
@@ -163,7 +163,7 @@ Feature: Searching item lists
     And I press "execute_frequency_search"
     Then frequency search for "what" in item list "Frequency search" should show this results
       | facetValue      | matchingDocuments | totalDocs | termOccurrences | totalWords |
-      | 1890 - 1899     | 1                 | 1         | 219             | 89728      |
+      | 1890 - 1899     | 1                 | 1         | 229             | 89728      |
 
   Scenario: Doing a frequency search for words with apostrophes (what's)
     Given I am logged in as "researcher@intersect.org.au"
@@ -217,7 +217,7 @@ Feature: Searching item lists
     And I press "execute_frequency_search"
     Then frequency search for "can" in item list "Frequency search" should show this results
       | facetValue  | matchingDocuments | totalDocs | termOccurrences | totalWords |
-      | austlit     | 1                 | 1         | 131             | 89728      |
+      | austlit     | 1                 | 1         | 182             | 89728      |
       | cooee       | 1                 | 1         | 2               | 924        |
 
   Scenario: Doing a frequency search for simple words (can) in a shared item list with access to 1 of the items in the item list
