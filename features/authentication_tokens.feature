@@ -56,3 +56,19 @@ Feature: Create and manage authentication tokens
     And I am on the download api key page
     And I should see "You need to log in before continuing."
 
+  Scenario: Generate a token while timed out
+    And I am on the home page
+    Then I should see no api token
+    And I am logged out
+    And I am on the generate api key page
+    And I should see "You need to log in before continuing."
+
+  Scenario: Regenerate a token while timed out
+    Given "diego@intersect.org.au" has an api token
+    And I am on the home page
+    Then I should see the api token displayed for user "diego@intersect.org.au"
+    And I am logged out
+    And I am on the generate api key page
+    And I should see "You need to log in before continuing."
+
+

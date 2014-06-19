@@ -118,6 +118,9 @@ module NavigationHelpers
       when /^the download api key page$/
         account_api_key_path
 
+      when /^the generate api key page$/
+        account_generate_token_path
+
       when /^the document content page for file "(.*)" for item "(.*)"$/
         collectionName = $2.split(':').first
         itemIdentifier = $2.split(':').last

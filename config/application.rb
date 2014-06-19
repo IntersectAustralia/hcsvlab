@@ -14,7 +14,7 @@ module HcsvlabWeb
     config.autoload_paths += %W(#{config.root}/app/processors)
     config.autoload_paths += %W( #{config.root}/lib )
     config.autoload_paths += Dir["#{config.root}/lib/rdf/**/"]
-    config.generators do |g|  
+    config.generators do |g|
       g.stylesheets false
       g.test_framework :rspec
       g.fixture_replacement :factory_girl, :dir => "spec/factories"
@@ -49,7 +49,7 @@ module HcsvlabWeb
     config.encoding = "utf-8"
 
     # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password, :password_confirmation]
+    config.filter_parameters += [:password, :password_confirmation, :api_key]
 
     # Enable escaping HTML in JSON.
     config.active_support.escape_html_entities_in_json = true
@@ -67,7 +67,7 @@ module HcsvlabWeb
 
     # Enable the asset pipeline
     config.assets.enabled = true
-    config.assets.precompile += ['eopas.css']    
+    config.assets.precompile += ['eopas.css']
     # Default SASS Configuration, check out https://github.com/rails/sass-rails for details
     config.assets.compress = !Rails.env.development?
 
