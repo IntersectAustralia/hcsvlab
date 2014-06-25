@@ -1,15 +1,15 @@
 require "spec_helper"
 
 describe Notifier do
-  
+
   describe "Email notifications to users should be sent" do
     it "should send mail to user if access request approved" do
       address = 'user@email.org'
       user = FactoryGirl.create(:user, :status => "A", :email => address)
       email = Notifier.notify_user_of_approved_request(user).deliver
-  
+
       # check that the email has been queued for sending
-      ActionMailer::Base.deliveries.empty?.should eq(false) 
+      ActionMailer::Base.deliveries.empty?.should eq(false)
       email.to.should eq([address])
       email.subject.should eq("#{PROJECT_NAME} - Your access request has been approved")
     end
@@ -18,9 +18,9 @@ describe Notifier do
       address = 'user@email.org'
       user = FactoryGirl.create(:user, :status => "A", :email => address)
       email = Notifier.notify_user_of_rejected_request(user).deliver
-  
+
       # check that the email has been queued for sending
-      ActionMailer::Base.deliveries.empty?.should eq(false) 
+      ActionMailer::Base.deliveries.empty?.should eq(false)
       email.to.should eq([address])
       email.subject.should eq("#{PROJECT_NAME} - Your access request has been rejected")
     end
@@ -31,7 +31,7 @@ describe Notifier do
     address = 'user@email.org'
     user = FactoryGirl.create(:user, :status => "U", :email => address)
     User.should_receive(:get_superuser_emails) { ["super1@intersect.org.au", "super2@intersect.org.au"] }
-    email = Notifier.notify_superusers_of_access_request(user).deliver
+    email = user.notify_admin_by_email
 
     # check that the email has been queued for sending
     ActionMailer::Base.deliveries.empty?.should eq(false)
@@ -52,5 +52,5 @@ describe Notifier do
     email.subject.should eq("#{PROJECT_NAME} - An issue has been reported")
     email.to.should eq(["super1@intersect.org.au", "super2@intersect.org.au"])
   end
- 
+
 end

@@ -12,7 +12,7 @@ class UserRegistersController < Devise::RegistrationsController
     build_resource
 
     if resource.save
-      Notifier.notify_superusers_of_access_request(resource).deliver
+      resource.notify_admin_by_email
       if resource.active_for_authentication?
         set_flash_message :notice, :signed_up if is_navigational_format?
         sign_in(resource_name, resource)
