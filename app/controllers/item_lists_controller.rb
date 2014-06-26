@@ -40,6 +40,7 @@ class ItemListsController < ApplicationController
       session.delete(:profiler)
     end
 
+    params[:per_page] = params[:per_page].to_i if params[:per_page].is_a? String
     respond_to do |format|
       format.html {
         @response = @item_list.get_items(params[:page], params[:per_page])
