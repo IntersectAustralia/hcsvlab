@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
-# Connects this user object to Hydra behaviors. 
+# Connects this user object to Hydra behaviors.
   include Hydra::User
-# Connects this user object to Blacklights Bookmarks. 
+# Connects this user object to Blacklights Bookmarks.
   include Blacklight::User
   # Include devise modules
   devise :database_authenticatable, :registerable, :lockable, :recoverable, :trackable, :validatable, :timeoutable, :token_authenticatable, :aaf_rc_authenticatable
@@ -52,6 +52,7 @@ class User < ActiveRecord::Base
     self.status = "U"
     generate_temp_password
     self.aaf_registered = true
+    notify_admin_by_email
   end
 
   def after_aaf_rc_authentication
@@ -310,7 +311,7 @@ class User < ActiveRecord::Base
             :type => :collection_list,
             :state => state,
             :state_label => get_name_for_state(state),
-            :actions => get_actions_for_state(state), 
+            :actions => get_actions_for_state(state),
             :request => request}
   end
 
@@ -323,7 +324,7 @@ class User < ActiveRecord::Base
       request = self.requested_collection(coll.id)
     elsif self.has_requested_collection?(coll.id) and self.requested_collection(coll.id).approved
       state = :approved
-      request = self.requested_collection(coll.id) 
+      request = self.requested_collection(coll.id)
     elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and coll.privacy_status[0] == 'true'
       state = :unapproved
     elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
