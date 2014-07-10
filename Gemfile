@@ -31,7 +31,6 @@ group :development do
   gem 'pry'
   gem 'pry-rails'
   gem 'zeus'
-  gem 'newrelic_rpm'
   gem "better_errors"
   gem "binding_of_caller"
 
@@ -50,6 +49,8 @@ group :test do
   gem 'spreewald'
   gem "json-compare", '0.1.8'
 end
+
+gem 'newrelic_rpm'
 
 gem "jsonpath"
 
