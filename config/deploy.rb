@@ -289,8 +289,10 @@ after 'multistage:ensure' do
     config/aaf_rc.yml
     config/broker.yml
     config/database.yml
-    config/fedora.yml 
-    config/hcsvlab-web_config.yml 
-    config/linguistics.yml 
-    config/solr.yml)
+    config/fedora.yml
+    config/hcsvlab-web_config.yml
+    config/linguistics.yml
+    config/solr.yml
+    config/newrelic.yml
+    )
 end
