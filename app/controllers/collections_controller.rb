@@ -11,6 +11,10 @@ class CollectionsController < ApplicationController
   #
   def index
     @collections = getCollectionsIHaveAccess()
+    respond_to do |format|
+      format.html
+      format.json
+    end
   end
 
   #

@@ -1303,3 +1303,21 @@ Feature: Browsing via API
 #      }
 #    }
 #    """
+
+  Scenario: Use API to get collections list
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "ice:S2B-035" with id "hcsvlab:2"
+    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
+    Given I make a JSON request for the collections page with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "count": 3,
+      "collections":[
+        "cooee",
+        "ice",
+        "austlit"
+      ]
+    }
+    """
