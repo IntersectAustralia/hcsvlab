@@ -252,8 +252,14 @@ class ItemListsController < ApplicationController
     Rails.logger.debug("Time for deleting an Item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
     session[:profiler] = ["Time for deleting an Item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
-    flash[:notice] = "Item list #{name} deleted successfully"
-    redirect_to item_lists_path
+    respond_to do |format|
+      format.html do
+        flash[:notice] = "Item list #{name} deleted successfully"
+        redirect_to item_lists_path
+      end
+
+      format.json { render :json => {:success => "item list #{@item_list.name} deleted successfully"} }
+    end
   end
 
   #
