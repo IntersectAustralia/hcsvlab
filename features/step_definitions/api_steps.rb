@@ -53,6 +53,11 @@ When /^I make a JSON put request for (.*) with the API token for "(.*)" with JSO
   put path_to(page_name), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
 end
 
+When /^I make a JSON delete request for (.*) with the API token for "(.*)"$/ do |page_name, email|
+  user = User.find_by_email!(email)
+  delete path_to(page_name), {:format => :json}, {'X-API-KEY' => user.authentication_token}
+end
+
 When /^I make a JSON multipart request for (.*) with the API token for "(.*)" with JSON params$/ do |page_name, email, table|
   user = User.find_by_email!(email)
   table = table.hashes

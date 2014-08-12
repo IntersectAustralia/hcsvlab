@@ -1313,11 +1313,30 @@ Feature: Browsing via API
     And the JSON response should be:
     """
     {
-      "count": 3,
+      "num_collections": 3,
       "collections":[
         "austlit",
         "cooee",
         "ice"
       ]
     }
+    """
+
+  Scenario: Use API to get collections list, no collections
+    Given I make a JSON request for the collections page with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "num_collections": 0,
+      "collections":[]
+    }
+    """
+
+  Scenario: Use API to delete an item list
+    Given I make a JSON delete request for the item list page for "Test 1" with the API token for "researcher1@intersect.org.au"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"item list Test 1 deleted successfully"}
     """
