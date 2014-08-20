@@ -1315,9 +1315,9 @@ Feature: Browsing via API
     {
       "num_collections": 3,
       "collections":[
-        "austlit",
-        "cooee",
-        "ice"
+        "http://example.org/catalog/austlit",
+        "http://example.org/catalog/cooee",
+        "http://example.org/catalog/ice"
       ]
     }
     """
