@@ -143,6 +143,13 @@ module NavigationHelpers
       when /^the view metrics page$/
         view_metrics_admin_index_path(options)
 
+      when /^the share item list page for "([^"]*)"$/
+        item_list = ItemList.find_by_name($1)
+        share_item_list_path(item_list)
+
+      when /^the unshare item list page for "([^"]*)"$/
+        item_list = ItemList.find_by_name($1)
+        unshare_item_list_path(item_list)
 
 
 # Add more mappings here.

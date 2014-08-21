@@ -1340,3 +1340,20 @@ Feature: Browsing via API
     """
     {"success":"item list Test 1 deleted successfully"}
     """
+
+  Scenario: Share item_list via the API
+    Given I make a JSON post request for the share item list page for "Test 1" with the API token for "researcher1@intersect.org.au" without JSON params
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Item list Test 1 is shared. Any user in the application will be able to see it."}
+    """
+
+  Scenario: Unshare item_list via the API
+    Given I make a JSON post request for the unshare item list page for "Test 1" with the API token for "researcher1@intersect.org.au" without JSON params
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Item list Test 1 is not being shared anymore."}
+    """
+

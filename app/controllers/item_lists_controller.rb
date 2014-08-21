@@ -267,9 +267,17 @@ class ItemListsController < ApplicationController
   #
   def share
     @item_list.share
+    message = "Item list #{@item_list.name} is shared. Any user in the application will be able to see it."
 
-    flash[:notice] = "Item list #{@item_list.name} is shared. Any user in the application will be able to see it."
-    redirect_to @item_list
+    respond_to do |format|
+      format.html do
+        flash[:notice] = message
+        redirect_to @item_list
+      end
+
+      format.json { render :json => {:success => message} }
+    end
+
   end
 
   #
@@ -277,9 +285,17 @@ class ItemListsController < ApplicationController
   #
   def unshare
     @item_list.unshare
+    message = "Item list #{@item_list.name} is not being shared anymore."
 
-    flash[:notice] = "Item list #{@item_list.name} is not being shared anymore."
-    redirect_to @item_list
+    respond_to do |format|
+      format.html do
+        flash[:notice] = message
+        redirect_to @item_list
+      end
+
+      format.json { render :json => {:success => message} }
+    end
+
   end
 
   #
