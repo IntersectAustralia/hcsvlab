@@ -233,8 +233,15 @@ class ItemListsController < ApplicationController
     Rails.logger.debug("Time for clear item list of #{removed_set} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
     session[:profiler] = ["Time for clear item list of #{removed_set} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
-    flash[:notice] = "#{view_context.pluralize(removed_set, "")} cleared from item list #{@item_list.name}"
-    redirect_to @item_list
+    message = "#{view_context.pluralize(removed_set, "")}cleared from item list #{@item_list.name}"
+    respond_to do |format|
+      format.html do
+        flash[:notice] = message
+        redirect_to @item_list
+      end
+
+      format.json { render :json => {:success => message} }
+    end
   end
 
   #

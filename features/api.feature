@@ -4,7 +4,7 @@ Feature: Browsing via API
 
   Background:
     Given I have the usual roles and permissions
-    Given I have users
+    And I have users
       | email                        | first_name | last_name |
       | researcher1@intersect.org.au | Researcher | One       |
       | data_owner@intersect.org.au  | Data_Owner | One       |
@@ -15,6 +15,8 @@ Feature: Browsing via API
       | name   |
       | Test 1 |
       | Test 2 |
+    And I ingest "cooee:1-001" with id "hcsvlab:1"
+    And I ingest "cooee:1-002" with id "hcsvlab:2"
 
   Scenario Outline: Visit pages with an API token OUTSIDE the header and HTML format doesn't authenticate
     When I make a request for <page> with the API token for "researcher1@intersect.org.au" outside the header
@@ -1355,5 +1357,36 @@ Feature: Browsing via API
     And the JSON response should be:
     """
     {"success":"Item list Test 1 is not being shared anymore."}
+    """
+
+  Scenario: Clear item_list via the API, more than one items
+    Given "researcher1@intersect.org.au" has item lists
+      | name       |
+      | Clear Test |
+    And the item list "Clear Test" has items cooee:1-001, cooee:1-002
+    When I make a JSON post request for the clear item list page for "Clear Test" with the API token for "researcher1@intersect.org.au" without JSON params
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"2 cleared from item list Clear Test"}
+    """
+
+  Scenario: Clear item_list via the API, only one item
+    Given "researcher1@intersect.org.au" has item lists
+      | name       |
+      | Clear Test |
+    And the item list "Clear Test" has items cooee:1-001
+    When I make a JSON post request for the clear item list page for "Clear Test" with the API token for "researcher1@intersect.org.au" without JSON params
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"1 cleared from item list Clear Test"}
+    """
+  Scenario: Clear item_list via the API, no item at all
+    When I make a JSON post request for the clear item list page for "Test 1" with the API token for "researcher1@intersect.org.au" without JSON params
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"0 cleared from item list Test 1"}
     """
 

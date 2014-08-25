@@ -151,6 +151,10 @@ module NavigationHelpers
         item_list = ItemList.find_by_name($1)
         unshare_item_list_path(item_list)
 
+      when /^the clear item list page for "([^"]*)"$/
+        item_list = ItemList.find_by_name($1)
+        clear_item_list_path(item_list)
+
 
 # Add more mappings here.
 # Here is an example that pulls values out of the Regexp:
