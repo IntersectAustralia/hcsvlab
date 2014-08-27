@@ -15,8 +15,6 @@ Feature: Browsing via API
       | name   |
       | Test 1 |
       | Test 2 |
-    And I ingest "cooee:1-001" with id "hcsvlab:1"
-    And I ingest "cooee:1-002" with id "hcsvlab:2"
 
   Scenario Outline: Visit pages with an API token OUTSIDE the header and HTML format doesn't authenticate
     When I make a request for <page> with the API token for "researcher1@intersect.org.au" outside the header
@@ -1360,7 +1358,9 @@ Feature: Browsing via API
     """
 
   Scenario: Clear item_list via the API, more than one items
-    Given "researcher1@intersect.org.au" has item lists
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And I ingest "cooee:1-002" with id "hcsvlab:2"
+    And "researcher1@intersect.org.au" has item lists
       | name       |
       | Clear Test |
     And the item list "Clear Test" has items cooee:1-001, cooee:1-002
@@ -1372,7 +1372,8 @@ Feature: Browsing via API
     """
 
   Scenario: Clear item_list via the API, only one item
-    Given "researcher1@intersect.org.au" has item lists
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And "researcher1@intersect.org.au" has item lists
       | name       |
       | Clear Test |
     And the item list "Clear Test" has items cooee:1-001
