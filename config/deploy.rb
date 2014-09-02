@@ -26,6 +26,11 @@ set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
 set :deploy_via, :copy
 set :copy_exclude, [".git/*", "features/*", "spec/*", "test/*"]
 
+# Fix an issue related to net-ssh, see https://github.com/net-ssh/net-ssh/issues/145
+set :ssh_options, {
+  config: false
+}
+
 #version tagging
 set :branch do
   require 'colorize'
