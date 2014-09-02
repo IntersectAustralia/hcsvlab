@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140318230337) do
+ActiveRecord::Schema.define(:version => 20140902040237) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -49,6 +49,16 @@ ActiveRecord::Schema.define(:version => 20140318230337) do
   end
 
   add_index "items_in_item_lists", ["item_list_id"], :name => "index_items_in_item_lists_on_item_list_id"
+
+  create_table "licences", :force => true do |t|
+    t.string   "name"
+    t.text     "text"
+    t.string   "type"
+    t.string   "ownerId"
+    t.string   "ownerEmail"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "roles", :force => true do |t|
     t.string   "name"
