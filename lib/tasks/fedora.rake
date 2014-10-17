@@ -291,7 +291,7 @@ namespace :fedora do
 
     licences = {}
     Licence.all.each { |licence|
-      licences[licence.flat_name] = licence
+      licences[licence.name] = licence
     }
 
     setup_collection_list("AUSNC", licences["AusNC Terms of Use"],

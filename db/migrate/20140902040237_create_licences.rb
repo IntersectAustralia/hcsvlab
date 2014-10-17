@@ -4,9 +4,7 @@ class CreateLicences < ActiveRecord::Migration
       t.string :name
       t.text :text
       t.string :type
-      t.string :ownerId
-      t.string :ownerEmail
-
+      t.references :owner
       t.timestamps
     end
   end

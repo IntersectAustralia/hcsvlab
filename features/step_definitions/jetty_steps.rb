@@ -23,13 +23,13 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
 end
 
 And /^I reindex all$/ do
-    Item.all.each do |anItem|
-      begin
-          Solr_Worker.new.on_message("index #{anItem.pid}")
-      rescue Exception=>e
-        # Do nothing
-      end
+  Item.all.each do |anItem|
+    begin
+      Solr_Worker.new.on_message("index #{anItem.pid}")
+    rescue Exception => e
+      # Do nothing
     end
+  end
 end
 
 
@@ -40,7 +40,7 @@ end
 And /^I have (\d+) licences belonging to "([^"]*)"$/ do |amount, email|
   amount = amount.to_i
 
-  (1..amount).each { | i |
+  (1..amount).each { |i|
     s = sprintf("%02d", i)
     c = Collection.new
     c.uri = "www.example.com/#{s}"

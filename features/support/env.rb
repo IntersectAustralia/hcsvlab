@@ -70,7 +70,7 @@ require 'capybara/poltergeist'
 require 'spreewald/table_steps'
 
 Capybara.register_driver :poltergeist do |app|
-    Capybara::Poltergeist::Driver.new(app, {debug: false})
+  Capybara::Poltergeist::Driver.new(app, {debug: false})
 end
 
 Capybara.register_driver :poltergeist_debug do |app|
@@ -87,8 +87,8 @@ Capybara.javascript_driver = :poltergeist
 #end
 
 def set_html_request
-    begin
-      Capybara.current_session.driver.header 'Accept', 'text/html'
-    rescue
-    end
+  begin
+    Capybara.current_session.driver.header 'Accept', 'text/html'
+  rescue
+  end
 end

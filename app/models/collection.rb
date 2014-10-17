@@ -1,65 +1,19 @@
-include ActiveFedora::DatastreamCollections
 require "#{Rails.root}/lib/solr/solr_helper.rb"
 
-class Collection < HcsvlabActiveFedora
+class Collection < ActiveRecord::Base
   include SolrHelper
 
   # Adds useful methods form managing Item groups
   include Hydra::ModelMixins::RightsMetadata
-
-  has_metadata 'descMetadata', type: Datastream::CollectionMetadata
-  has_metadata 'rdfMetadata', type: ActiveFedora::RdfxmlRDFDatastream
   has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
-  has_many :items, :property => :is_member_of_collection
-  belongs_to :collectionList, :property => :is_part_of
-  belongs_to :licence, :property => :has_licence
+  has_metadata 'rdfMetadata', type: ActiveFedora::RdfxmlRDFDatastream # => link to rdf file
 
-  # uri is the unique id of the collection, e.g. http://ns.ausnc.org.au/corpora/cooee
-  delegate :uri, to: 'descMetadata'
+  has_many :items
+  belongs_to :owner, class_name: "User"
+  belongs_to :collection_list
+  belongs_to :licence
 
-  # short_name is a nice human readable handy-type name, e.g. COOEE
-  delegate :short_name, to: 'descMetadata'
-
-  # data_owner is the e-mail address of the colection's owner.
-  delegate :private_data_owner, to: 'descMetadata'
-
-  delegate :privacy_status, to: 'descMetadata'
-
-
-  # ActiveFedora returns the value as an array, we need the first value
-  def flat_name
-    flat_short_name
-  end
-
-  # ActiveFedora returns the value as an array, we need the first value
-  def flat_short_name
-    self[:short_name].first
-  end
-
-  # ActiveFedora returns the value as an array, we need the first value
-  def flat_uri
-    self[:uri].first
-  end
-
-  # ActiveFedora returns the value as an array, we need the first value
-  def flat_ownerEmail
-    self[:private_data_owner].first
-  end
-
-  # ActiveFedora returns the value as an array, we need the first value
-  def flat_private_data_owner
-    self.flat_ownerEmail
-  end
-
-  # ---------------------------------------
-
-  #
-  # Get the data owner
-  #
-  def data_owner
-    return User.find_by_user_key(private_data_owner)
-  end
 
   #
   # Set the data owner
@@ -75,14 +29,14 @@ class Collection < HcsvlabActiveFedora
     end
 
     email = private_data_owner.first
-    self.set_discover_users([email],self.discover_users)
-    self.set_read_users([email],self.read_users)
-    self.set_edit_users([email],self.edit_users)
+    self.set_discover_users([email], self.discover_users)
+    self.set_read_users([email], self.read_users)
+    self.set_edit_users([email], self.edit_users)
     self.save
 
     self.items.each do |aItem|
-      aItem.set_discover_users([email],aItem.discover_users)
-      aItem.set_read_users([email],aItem.read_users)
+      aItem.set_discover_users([email], aItem.discover_users)
+      aItem.set_read_users([email], aItem.read_users)
       aItem.set_edit_users([email], aItem.edit_users)
       aItem.save
 
@@ -96,13 +50,6 @@ class Collection < HcsvlabActiveFedora
     return self.private_data_owner
   end
 
-
-  #
-  # Find a collection using its uri
-  #
-  def Collection.find_by_uri(uri)
-    return Collection.where(uri: uri).all
-  end
 
   #
   # Find a collection using its short_name
@@ -125,26 +72,12 @@ class Collection < HcsvlabActiveFedora
   end
 
   def setPrivacy(status)
-    self.privacy_status = status
+    self.private = status
     self.save!
   end
 
-  # Query of privacy status
-  def private?
-    self[:privacy_status].first == "true"
-  end
-
-  # Query of privacy status
   def public?
-    self[:privacy_status].first == "false"
-  end
-
-  #
-  # Find collection by the given user that were not assigned to any Collection List
-  #
-  def self.find_by_owner_email_and_unassigned(userEmail)
-    collections = Collection.find(:private_data_owner => userEmail)
-    return collections.select{ |c| c.collectionList.nil? }
+    !private?
   end
 
   #
@@ -169,7 +102,7 @@ class Collection < HcsvlabActiveFedora
     end
 
     collection = array[0]
-    collection.setLicence(licence) unless licence.nil?
+    collection.set_license(licence) unless licence.nil?
 
     Rails.logger.info("Licence #{licence.name} assigned to Collection #{collection.flat_name}") unless licence.nil?
   end

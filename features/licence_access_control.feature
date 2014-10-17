@@ -5,10 +5,10 @@ Feature: Collection access control
   Background:
     Given I have the usual roles and permissions
     Given I have users
-      | email                        | first_name   | last_name |
-      | data_owner1@intersect.org.au | dataOwner1   | One       |
-      | data_owner2@intersect.org.au | dataOwner2   | Two       |
-      | researcher1@intersect.org.au | Researcher   | R         |
+      | email                        | first_name | last_name |
+      | data_owner1@intersect.org.au | dataOwner1 | One       |
+      | data_owner2@intersect.org.au | dataOwner2 | Two       |
+      | researcher1@intersect.org.au | Researcher | R         |
     Given "data_owner1@intersect.org.au" has role "data owner"
     Given "data_owner2@intersect.org.au" has role "data owner"
     Given "researcher1@intersect.org.au" has role "researcher"
@@ -17,9 +17,9 @@ Feature: Collection access control
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given I ingest "auslit:bolroma" with id "hcsvlab:3"
     Given Collections ownership is
-      |collection | ownerEmail                    |
-      |austlit    | data_owner2@intersect.org.au  |
-      |cooee      | data_owner1@intersect.org.au  |
+      | collection | owner_email                  |
+      | austlit    | data_owner2@intersect.org.au |
+      | cooee      | data_owner1@intersect.org.au |
     Given I ingest licences
 
   @javascript
@@ -27,8 +27,8 @@ Feature: Collection access control
     Given I am logged in as "data_owner2@intersect.org.au"
     Given I am on the home page
     Then I should see only the following collections displayed in the facet menu
-      |collection |
-      |austlit    |
+      | collection |
+      | austlit    |
 
   @javascript
   Scenario: Data Owner should be able to see all items of my collections
@@ -60,9 +60,9 @@ Feature: Collection access control
     Given I am logged in as "data_owner2@intersect.org.au"
     Given I am on the home page
     Then I should see only the following collections displayed in the facet menu
-      |collection |
-      |austlit    |
-      |cooee      |
+      | collection |
+      | austlit    |
+      | cooee      |
 
   @javascript
   Scenario: User should see every item in a collection for which he has discover access
@@ -81,9 +81,9 @@ Feature: Collection access control
     Given I am logged in as "data_owner2@intersect.org.au"
     Given I am on the home page
     Then I should see only the following collections displayed in the facet menu
-      |collection |
-      |austlit    |
-      |cooee      |
+      | collection |
+      | austlit    |
+      | cooee      |
     Then I am on the catalog page for "cooee:1-001"
     And I should see "You do not have sufficient access privileges to read this document"
 
@@ -93,9 +93,9 @@ Feature: Collection access control
     Given I am logged in as "data_owner2@intersect.org.au"
     Given I am on the home page
     Then I should see only the following collections displayed in the facet menu
-      |collection |
-      |austlit    |
-      |cooee      |
+      | collection |
+      | austlit    |
+      | cooee      |
 
   @javascript
   Scenario: User should see every item in a collection for which he has read access
@@ -114,9 +114,9 @@ Feature: Collection access control
     Given I am logged in as "data_owner2@intersect.org.au"
     Given I am on the home page
     Then I should see only the following collections displayed in the facet menu
-      |collection |
-      |austlit    |
-      |cooee      |
+      | collection |
+      | austlit    |
+      | cooee      |
     Then I am on the catalog page for "cooee:1-001"
     And I should see "cooee:1-001"
     And I should see "Display Document"

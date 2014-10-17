@@ -28,7 +28,7 @@ And /^The Collection table should have$/ do |table|
         page.should have_xpath("//table[@id='collections']//tr[#{index+1} and @class='groupedCollection']//td[@class='collection']/div[contains(., '#{row[:collection_list]}')]")
       end
 
-      if(row[:licence].empty? or !row[:collection_list].empty?)
+      if (row[:licence].empty? or !row[:collection_list].empty?)
         page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='licence']", :text => row[:licence])
       else
         page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='licence']//button", :text => row[:licence])
@@ -44,34 +44,34 @@ And /^The Collection table should have$/ do |table|
 end
 
 And /^I click Add Licence for the (\d+)(?:|st|nd|rd|th) collection$/ do |position|
-  button = page.find(:xpath,"//table[@id='collections']//tr[#{position}]//td[@class='licence']//button")
+  button = page.find(:xpath, "//table[@id='collections']//tr[#{position}]//td[@class='licence']//button")
 
   button.click
 end
 
 And /^I click Add Licence for the (\d+)(?:|st|nd|rd|th) collection list$/ do |position|
-  button = page.find(:xpath,"//table[@id='collection_lists']//tr[#{position}]//td[@class='licence']//button")
+  button = page.find(:xpath, "//table[@id='collection_lists']//tr[#{position}]//td[@class='licence']//button")
 
   button.click
 end
 And /^I click on the remove icon for the (\d+)(?:|st|nd|rd|th) collection list$/ do |position|
-  link = page.find(:xpath,"//table[@id='collection_lists']//tr[#{position}]//td[@class='actions']//a")
+  link = page.find(:xpath, "//table[@id='collection_lists']//tr[#{position}]//td[@class='actions']//a")
 
   link.click
 end
 
 And /^I click on the privacy remove icon for the (\d+)(?:|st|nd|rd|th) collection list$/ do |position|
-  link = page.find(:xpath,"//table[@id='collection_lists']//tr[#{position}]//td[@class='privacy']//a")
+  link = page.find(:xpath, "//table[@id='collection_lists']//tr[#{position}]//td[@class='privacy']//a")
   link.click
 end
 
 And /^I click on the privacy remove icon for the (\d+)(?:|st|nd|rd|th) collection$/ do |position|
-  link = page.find(:xpath,"//table[@id='collections']//tr[#{position}]//td[@class='privacy']//a")
+  link = page.find(:xpath, "//table[@id='collections']//tr[#{position}]//td[@class='privacy']//a")
   link.click
 end
 
 And /^I click View Licence Terms for the (\d+)(?:|st|nd|rd|th) collection$/ do |position|
-  link = page.find(:xpath,"//table[@id='collections']//tr[#{position}]//td[@class='terms']//a")
+  link = page.find(:xpath, "//table[@id='collections']//tr[#{position}]//td[@class='terms']//a")
 
   link.click
 end
@@ -82,8 +82,8 @@ Given /^User "([^"]*)" has a Collection List called "([^"]*)" containing$/ do |e
   list.name = list_name
 
   user = User.find_by_user_key(email)
-  list.ownerEmail = email
-  list.ownerId    = user.id.to_s
+  list.owner_email = email
+  list.owner_id = user.id.to_s
   list.save!
 
   # Populate it with the collections mentioned in the table
@@ -112,9 +112,9 @@ end
 
 And /^I have added a licence to (private )?Collection "([^"]*)"$/ do |priv, name|
   coll = Collection.find_by_short_name(name).to_a.first
-  coll.setLicence(Licence.first.id)
+  coll.set_license(Licence.first.id)
   if priv
-    coll.setPrivacy('true')
+    coll.set_privacy('true')
   else
     coll.setPrivacy('false')
   end
@@ -122,9 +122,9 @@ end
 
 And /^I have added a licence to (private )?Collection List "([^"]*)"$/ do |priv, name|
   list = CollectionList.find_by_name(name)[0]
-  list.setLicence(Licence.first.id)
+  list.set_license(Licence.first.id)
   if priv
-    list.setPrivacy('true')
+    list.set_privacy('true')
   else
     list.setPrivacy('false')
   end

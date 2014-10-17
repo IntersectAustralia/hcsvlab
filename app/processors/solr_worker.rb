@@ -635,12 +635,7 @@ private
     uri = uri.to_s
     c = Collection.find_by_uri(uri)
     c = Collection.find_by_short_name(last_bit(uri)) if c.size == 0
-    if c.size == 0
-      c = nil
-    else
-      c = c[0]
-    end
-    return c
+    c
   end
 
 

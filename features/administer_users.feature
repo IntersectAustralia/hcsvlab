@@ -16,9 +16,9 @@ Feature: Administer users
     Given "raul@intersect.org.au" is deactivated
     When I am on the list users page
     Then I should see "users" table with
-      | First name | Last name | Email                     | Role          | Status      |
-      | Georgina   | Edwards   | georgina@intersect.org.au | admin         | Active      |
-      | Raul       | Carrizo   | raul@intersect.org.au     |               | Deactivated |
+      | First name | Last name | Email                     | Role  | Status      |
+      | Georgina   | Edwards   | georgina@intersect.org.au | admin | Active      |
+      | Raul       | Carrizo   | raul@intersect.org.au     |       | Deactivated |
 
   Scenario: View user details
     Given "raul@intersect.org.au" has role "researcher"
@@ -172,7 +172,7 @@ Feature: Administer users
       | 7_DAYS_AGO   | 30                  |
       | 14_DAYS_AGO  | 60                  |
     And "researcher1@intersect.org.au" has the following past searches
-      | search_time | type        | 
+      | search_time | type        |
       | 0_DAYS_AGO  | main        |
       | 0_DAYS_AGO  | main        |
       | 0_DAYS_AGO  | main        |
@@ -184,10 +184,10 @@ Feature: Administer users
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
     And "researcher1@intersect.org.au" has the following past api calls
-      | request_time | item_list   | 
-      | 0_DAYS_AGO   | true        |
-      | 0_DAYS_AGO   | false       |
-      | 14_DAYS_AGO  | false       |
+      | request_time | item_list |
+      | 0_DAYS_AGO   | true      |
+      | 0_DAYS_AGO   | false     |
+      | 14_DAYS_AGO  | false     |
     And "georgina@intersect.org.au" has an api token
     And I make a JSON request for the annotation context page with the API token for "georgina@intersect.org.au"
     And "researcher1@intersect.org.au" has item lists
@@ -223,7 +223,7 @@ Feature: Administer users
       | 7_DAYS_AGO   | 30                  |
       | 14_DAYS_AGO  | 60                  |
     And "researcher1@intersect.org.au" has the following past searches
-      | search_time | type        | 
+      | search_time | type        |
       | 0_DAYS_AGO  | main        |
       | 0_DAYS_AGO  | main        |
       | 0_DAYS_AGO  | main        |
@@ -235,10 +235,10 @@ Feature: Administer users
       | 0_DAYS_AGO   | 10                  |
       | 7_DAYS_AGO   | 30                  |
     And "researcher1@intersect.org.au" has the following past api calls
-      | request_time | item_list   | 
-      | 0_DAYS_AGO   | true        |
-      | 0_DAYS_AGO   | false       |
-      | 14_DAYS_AGO  | false       |
+      | request_time | item_list |
+      | 0_DAYS_AGO   | true      |
+      | 0_DAYS_AGO   | false     |
+      | 14_DAYS_AGO  | false     |
     And "georgina@intersect.org.au" has an api token
     And I make a JSON request for the annotation context page with the API token for "georgina@intersect.org.au"
     And "researcher1@intersect.org.au" has item lists
@@ -249,8 +249,8 @@ Feature: Administer users
     And "georgina@intersect.org.au" has "read" access to collection "cooee"
     And "georgina@intersect.org.au" has an api token
     And I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "georgina@intersect.org.au" with JSON params
-      | Name  | Content | Filename                                                | Type                      |
-      | file  |         | test/samples/annotations/upload_annotation_sample.json  | application/octet-stream  |
+      | Name | Content | Filename                                               | Type                     |
+      | file |         | test/samples/annotations/upload_annotation_sample.json | application/octet-stream |
     And I click "View Metrics"
     And I click "Download all weeks as CSV"
     Then I should get a CSV file called "metrics.csv" with the following metrics:

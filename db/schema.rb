@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140902040237) do
+ActiveRecord::Schema.define(:version => 20141013050709) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -20,6 +20,27 @@ ActiveRecord::Schema.define(:version => 20140902040237) do
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
     t.string   "user_type"
+  end
+
+  create_table "collection", :force => true do |t|
+    t.string   "uri"
+    t.text     "text"
+    t.string   "name"
+    t.boolean  "private"
+    t.integer  "owner_id"
+    t.integer  "collection_list_id"
+    t.integer  "license_id"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  create_table "collection_list", :force => true do |t|
+    t.string   "name"
+    t.boolean  "private"
+    t.integer  "license_id"
+    t.integer  "owner_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "item_lists", :force => true do |t|
@@ -54,8 +75,7 @@ ActiveRecord::Schema.define(:version => 20140902040237) do
     t.string   "name"
     t.text     "text"
     t.string   "type"
-    t.string   "ownerId"
-    t.string   "ownerEmail"
+    t.integer  "owner_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end

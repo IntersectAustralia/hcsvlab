@@ -160,7 +160,7 @@ def create_collection_from_file(collection_file, collection_name)
   coll.short_name = collection_name
   coll.privacy_status = "false"
 
-  if Collection.find_by_uri(coll.uri).size != 0
+  if Collection.find_by_uri(coll.uri).present?
     # There is already such a collection in the system
     logger.error "Collection #{collection_name} (#{coll.uri}) already exists in the system - skipping"
     return
@@ -175,7 +175,7 @@ def create_collection_from_file(collection_file, collection_name)
   coll.set_edit_groups(["#{collection_name}-edit"], [])
   # Add complete permission for data_owner
   data_owner = coll.flat_private_data_owner
-  if (!data_owner.nil?)
+  if data_owner.present?
     coll.set_discover_users([data_owner], [])
     coll.set_read_users([data_owner], [])
     coll.set_edit_users([data_owner], [])
@@ -497,7 +497,6 @@ def create_default_licences(rootPath = "config")
       l.name = lic_info['name']
       l.text = lic_info['text']
       l.type = Licence::LICENCE_TYPE_PUBLIC
-      l.label = l.name
 
       l.save!
     rescue Exception => e

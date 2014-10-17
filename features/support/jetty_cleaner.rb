@@ -28,7 +28,7 @@ end
 
 Before do |scenario|
   if scenario.instance_of?(Cucumber::Ast::Scenario)
-    shouldCleanBeforeScenario = scenario.feature_tags.tags.select{|t| "@ingest_qa_collections".eql? t.name.to_s}.empty?
+    shouldCleanBeforeScenario = scenario.feature_tags.tags.select { |t| "@ingest_qa_collections".eql? t.name.to_s }.empty?
 
     if (shouldCleanBeforeScenario)
       clear_jetty

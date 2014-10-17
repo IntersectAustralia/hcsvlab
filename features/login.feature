@@ -5,9 +5,9 @@ Feature: Logging In
 
   Background:
     Given I have roles
-      | name          |
-      | admin         |
-      | Researcher    |
+      | name       |
+      | admin      |
+      | Researcher |
     And I have a user "georgina@intersect.org.au"
     And "georgina@intersect.org.au" has role "admin"
 

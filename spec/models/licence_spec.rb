@@ -19,7 +19,7 @@ describe Licence do
 
       u = FactoryGirl.create(:user, :status => 'A', :email => "test@intersect.org.au")
       l.ownerId = u.id.to_s
-      l.ownerEmail = u.email
+      l.owner_email = u.email
 
       l.save
       pid = l.pid

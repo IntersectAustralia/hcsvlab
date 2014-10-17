@@ -12,13 +12,13 @@ class LicencesController < ApplicationController
 
     bench_start = Time.now
     # gets PUBLIC licences and the user licences.
-    @licences = Licence.find_and_load_from_solr({type: Licence::LICENCE_TYPE_PUBLIC}, opts).to_a.concat(Licence.find_and_load_from_solr({ownerId: current_user.id.to_s}, opts).to_a)
+    @licences = Licence.find_and_load_from_solr({type: Licence::LICENCE_TYPE_PUBLIC}, opts).to_a.concat(Licence.find_and_load_from_solr({owner_id: current_user.id.to_s}, opts).to_a)
 
     # gets the Collections list of the logged user.
-    @collection_lists = CollectionList.find_and_load_from_solr({ownerId: current_user.id.to_s}, opts).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
+    @collection_lists = CollectionList.find_and_load_from_solr({owner_id: current_user.id.to_s}, opts).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
 
     # gets the Collections of the logged user.
-    @collections = Collection.find_and_load_from_solr({private_data_owner: current_user.email}, opts).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
+    @collections = Collection.find_and_load_from_solr({owner_id: current_user.email}, opts).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
     bench_end = Time.now
     @profiler = ["Time for fetching all collections, licences and collection lists took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
@@ -58,14 +58,14 @@ class LicencesController < ApplicationController
       newLicence.text = sanitizedText
       newLicence.type = Licence::LICENCE_TYPE_PRIVATE
       newLicence.ownerId = current_user.id.to_s
-      newLicence.ownerEmail = current_user.email
+      newLicence.owner_email = current_user.email
       newLicence.save!
 
       # Now lets assign the licence to every collection list
-      if (!collectionListId.nil?)
+      if !collectionListId.nil?
         aCollectionList = CollectionList.find(collectionListId)
-        aCollectionList.setLicence(newLicence.id)
-      elsif (!collectionId.nil?)
+        aCollectionList.set_license(newLicence.id)
+      elsif !collectionId.nil?
         aCollection = Collection.find(collectionId)
         aCollection.setLicence(newLicence)
       end
@@ -76,10 +76,10 @@ class LicencesController < ApplicationController
       redirect_to licences_path
     rescue ActiveFedora::RecordInvalid => e
       @params = params
-      if (!collectionListId.nil?)
+      if !collectionListId.nil?
         @CollectionList = CollectionList.find(collectionListId)
       end
-      if (!collectionId.nil?)
+      if !collectionId.nil?
         @Collection = Collection.find(collectionId)
       end
       @errors = e.record.errors.messages

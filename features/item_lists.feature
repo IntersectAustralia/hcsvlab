@@ -8,12 +8,12 @@ Feature: Managing Item Lists
     Given I ingest "cooee:1-002" with id "hcsvlab:2"
     Given I have the usual roles and permissions
     Given I have users
-      | email                         | first_name | last_name |
-      | researcher@intersect.org.au   | Researcher | One       |
-      | researcher1@intersect.org.au  | Researcher | One       |
+      | email                        | first_name | last_name |
+      | researcher@intersect.org.au  | Researcher | One       |
+      | researcher1@intersect.org.au | Researcher | One       |
     Given I have user "researcher@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
+      | collectionName | accessType |
+      | cooee          | read       |
     Given "researcher@intersect.org.au" has role "researcher"
     Given "researcher1@intersect.org.au" has role "researcher"
     Given I am logged in as "researcher@intersect.org.au"
@@ -129,7 +129,7 @@ Feature: Managing Item Lists
     Then I should see "Item list renamed successfully"
     And I should see "New Name"
 
-    Scenario: Renaming an item list with invalid name
+  Scenario: Renaming an item list with invalid name
     And "researcher@intersect.org.au" has item lists
       | name        |
       | Rename Test |
@@ -220,9 +220,9 @@ Feature: Managing Item Lists
     Given I ingest "auslit:adaessa" with id "hcsvlab:3"
     Given I ingest "auslit:bolroma" with id "hcsvlab:4"
     Given I have user "researcher1@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
-      | austlit         | read        |
+      | collectionName | accessType |
+      | cooee          | read       |
+      | austlit        | read       |
     Given "researcher1@intersect.org.au" has item lists
       | name       | shared |
       | Share Test | true   |

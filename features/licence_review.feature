@@ -5,16 +5,16 @@ Feature: Managing Subscriptions to Collections
   Background:
     Given I have the usual roles and permissions
     Given I have users
-      | email                       | first_name   | last_name |
-      | data_owner@intersect.org.au | dataOwner    | One       |
-      | researcher@intersect.org.au | Edmund       | Muir      |
+      | email                       | first_name | last_name |
+      | data_owner@intersect.org.au | dataOwner  | One       |
+      | researcher@intersect.org.au | Edmund     | Muir      |
     Given "data_owner@intersect.org.au" has role "data owner"
     Given "researcher@intersect.org.au" has role "researcher"
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given I ingest licences
     Given Collections ownership is
-      | collection | ownerEmail                  |
+      | collection | owner_email                 |
       | cooee      | data_owner@intersect.org.au |
       | austlit    | data_owner@intersect.org.au |
     And User "data_owner@intersect.org.au" has a Collection List called "List_1" containing
@@ -68,9 +68,9 @@ Feature: Managing Subscriptions to Collections
     And I am logged in as "researcher@intersect.org.au"
     And I am on the licence agreements page
     Then the Review and Acceptance of Licence Terms table should have
-      | title   | collection | owner                       | state        |
-      | List_1  | 1          | data_owner@intersect.org.au | Unapproved   |
-      | austlit | 1          | data_owner@intersect.org.au | Unapproved   |
+      | title   | collection | owner                       | state      |
+      | List_1  | 1          | data_owner@intersect.org.au | Unapproved |
+      | austlit | 1          | data_owner@intersect.org.au | Unapproved |
 
   @javascript
   Scenario: Requesting access to a private collection list
@@ -290,8 +290,8 @@ Feature: Managing Subscriptions to Collections
     And I am logged in as "researcher@intersect.org.au"
     And I am on the licence agreements page
     Then the Review and Acceptance of Licence Terms table should have
-      | title   | collection | owner                       | state        | actions                        |
-      | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+      | title  | collection | owner                       | state        | actions                        |
+      | List_1 | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
     When I click the button in the 1st column of the 1st row of the "collections" table
     And I wait 2 seconds
     And I click "cooee"
@@ -301,8 +301,8 @@ Feature: Managing Subscriptions to Collections
     And I should see "Collection Details"
     When I click "Back to Licence Agreements"
     Then the Review and Acceptance of Licence Terms table should have
-      | title   | collection | owner                       | state        | actions                        |
-      | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
+      | title  | collection | owner                       | state        | actions                        |
+      | List_1 | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
 
   @javascript
   Scenario: Verifying that I can sign up to licence agreements

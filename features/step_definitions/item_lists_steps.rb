@@ -34,7 +34,7 @@ Then /^concordance search for "(.*)" in item list "(.*)" should show this result
   list.setCurrentAbility(Ability.new(@current_user))
   result = list.doConcordanceSearch(term)
   highlightings = result[:highlighting]
-  totalMatches = highlightings.inject(0) {|sum, highlighting| sum + highlighting[1][:matches].length}
+  totalMatches = highlightings.inject(0) { |sum, highlighting| sum + highlighting[1][:matches].length }
   countMatches = 0
   table.hashes.each do |attributes|
     requestedMatch = attributes[:textBefore].strip()

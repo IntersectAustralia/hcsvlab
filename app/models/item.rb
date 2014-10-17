@@ -1,17 +1,14 @@
-include ActiveFedora::DatastreamCollections
-
-class Item < HcsvlabActiveFedora
+class Item < ActiveRecord::Base
 
   # Adds useful methods form managing Item groups
   include Hydra::ModelMixins::RightsMetadata
+  has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
   has_metadata 'descMetadata', type: Datastream::ItemMetadata
 
   has_file_datastream name: 'primary_text', type: ActiveFedora::Datastream
 
   has_datastream :name => 'annotation_set', :type => ActiveFedora::Datastream, :controlGroup => 'E', :prefix => 'annotationSet'
-
-  has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
 
   has_many :documents, :property => :is_member_of
   belongs_to :collection, :property => :is_member_of_collection

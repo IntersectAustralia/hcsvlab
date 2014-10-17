@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
   has_many :user_licence_agreements
   has_many :user_licence_requests
   has_many :user_annotations
+  has_many :collection_lists, inverse_of: :owner
+  has_many :collections, inverse_of: :owner
 
   # Setup accessible attributes (status/approved flags should NEVER be accessible by mass assignment)
   attr_accessible :email, :password, :password_confirmation, :first_name, :last_name
@@ -298,9 +300,9 @@ class User < ActiveRecord::Base
     elsif self.has_requested_collection?(list.id) and self.requested_collection(list.id).approved
       state = :approved
       request = self.requested_collection(list.id)
-    elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.privacy_status[0] == 'true'
+    elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.private?
       state = :unapproved
-    elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.privacy_status[0] == 'false'
+    elsif !self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.public?
       state = :not_accepted
     elsif self.has_agreement_to_collection?(list.collections[0], UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
       state = :accepted
@@ -316,7 +318,7 @@ class User < ActiveRecord::Base
   end
 
   def get_collection_licence_info(coll)
-    if coll.data_owner == self
+    if coll.owner == self
       # I, like, totally data own this collection.
       state = :owner
     elsif self.has_requested_collection?(coll.id) and !self.requested_collection(coll.id).approved
@@ -325,7 +327,7 @@ class User < ActiveRecord::Base
     elsif self.has_requested_collection?(coll.id) and self.requested_collection(coll.id).approved
       state = :approved
       request = self.requested_collection(coll.id)
-    elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and coll.privacy_status[0] == 'true'
+    elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and coll.private?
       state = :unapproved
     elsif !self.has_agreement_to_collection?(coll, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
       state = :not_accepted

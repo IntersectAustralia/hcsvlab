@@ -20,30 +20,30 @@ Feature: Home page
 
   Scenario: Licences Agreement link should appear for users which do not have access to any collection
     Given I have users
-      | email                       | first_name   | last_name |
-      | data_owner@intersect.org.au | dataOwner    | One       |
-      | researcher@intersect.org.au | Researcher   | R         |
+      | email                       | first_name | last_name |
+      | data_owner@intersect.org.au | dataOwner  | One       |
+      | researcher@intersect.org.au | Researcher | R         |
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given Collections ownership is
-      |collection | ownerEmail                    |
-      |austlit    | data_owner@intersect.org.au  |
-      |cooee      | data_owner@intersect.org.au  |
+      | collection | owner_email                 |
+      | austlit    | data_owner@intersect.org.au |
+      | cooee      | data_owner@intersect.org.au |
     Given I am logged in as "researcher@intersect.org.au"
     Given I am on the home page
     Then I should see "Welcome! To gain access to Collections, visit the Licence Agreements page."
 
   Scenario: Licences Agreement link should appear for users which have access to some collection
     Given I have users
-      | email                       | first_name   | last_name |
-      | data_owner@intersect.org.au | dataOwner    | One       |
-      | researcher@intersect.org.au | Researcher   | R         |
+      | email                       | first_name | last_name |
+      | data_owner@intersect.org.au | dataOwner  | One       |
+      | researcher@intersect.org.au | Researcher | R         |
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given Collections ownership is
-      |collection | ownerEmail                    |
-      |austlit    | data_owner@intersect.org.au  |
-      |cooee      | data_owner@intersect.org.au  |
+      | collection | owner_email                 |
+      | austlit    | data_owner@intersect.org.au |
+      | cooee      | data_owner@intersect.org.au |
     Given "researcher@intersect.org.au" has "read" access to collection "cooee"
     Given I am logged in as "researcher@intersect.org.au"
     Given I am on the home page
@@ -51,15 +51,15 @@ Feature: Home page
 
   Scenario: Licences Agreement link should not appear for users which have access to every collection
     Given I have users
-      | email                       | first_name   | last_name |
-      | data_owner@intersect.org.au | dataOwner    | One       |
-      | researcher@intersect.org.au | Researcher   | R         |
+      | email                       | first_name | last_name |
+      | data_owner@intersect.org.au | dataOwner  | One       |
+      | researcher@intersect.org.au | Researcher | R         |
     Given I ingest "cooee:1-001" with id "hcsvlab:1"
     Given I ingest "auslit:adaessa" with id "hcsvlab:2"
     Given Collections ownership is
-      |collection | ownerEmail                    |
-      |austlit    | data_owner@intersect.org.au  |
-      |cooee      | data_owner@intersect.org.au  |
+      | collection | owner_email                 |
+      | austlit    | data_owner@intersect.org.au |
+      | cooee      | data_owner@intersect.org.au |
     Given "researcher@intersect.org.au" has "read" access to collection "austlit"
     Given "researcher@intersect.org.au" has "read" access to collection "cooee"
     Given I am logged in as "researcher@intersect.org.au"

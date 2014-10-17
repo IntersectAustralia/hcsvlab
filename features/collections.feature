@@ -3,9 +3,9 @@ Feature: Collections
   I want to view collections and their details
 
   Background:
-  	Given I ingest "cooee:1-001" with id "hcsvlab:1"
-  	And I ingest "auslit:adaessa" with id "hcsvlab:2"
-  	And I have the usual roles and permissions
+    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    And I ingest "auslit:adaessa" with id "hcsvlab:2"
+    And I have the usual roles and permissions
     And I have users
       | email                       | first_name | last_name |
       | researcher@intersect.org.au | Researcher | One       |
