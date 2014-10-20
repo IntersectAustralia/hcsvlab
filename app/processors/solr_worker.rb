@@ -99,8 +99,9 @@ private
   # is an Item, return nil. This is based on the isMemberOf field in its RELS-EXT
   # datastream.
   #
+  # TODO just use Item.all or Document.all to index
   def parent_object(object)
-    uri = buildURI(object, 'RELS-EXT')
+    # uri = buildURI(object, 'RELS-EXT')
     graph = RDF::Graph.load(uri)
     query = RDF::Query.new({:description => {MetadataHelper::IS_MEMBER_OF => :is_member_of}})
     individual_result = query.execute(graph)
@@ -125,13 +126,13 @@ private
       return
     end 
 
-    basic_results = repository.query(:subject => RDF::URI.new(fed_item.flat_uri))
+    basic_results = repository.query(:subject => RDF::URI.new(fed_item.uri))
 
     extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
     internalUseData = {:documents_path => []}
 
     # Get date group if there is one
-    date_result = repository.query(:subject => RDF::URI.new(fed_item.flat_uri), :predicate => MetadataHelper::CREATED)
+    date_result = repository.query(:subject => RDF::URI.new(fed_item.uri), :predicate => MetadataHelper::CREATED)
     unless date_result.empty?
       date = date_result.first_object
       group = date_group(date)
@@ -149,7 +150,7 @@ private
     end
 
     # Get document info
-    document_results = repository.query(:subject => RDF::URI.new(fed_item.flat_uri), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
+    document_results = repository.query(:subject => RDF::URI.new(fed_item.uri), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
 
     document_results.each { |result|
       document = result.to_hash[:object]
@@ -177,13 +178,6 @@ private
     else
       debug("Solr_Worker", "isMemberOf value found for #{object}, not indexing.")
     end
-  end
-
-  #
-  # Build the URL of a particular datastream of the given Fedora object
-  #
-  def buildURI(object, datastream)
-    return FEDORA_CONFIG["url"].to_s + "/objects/#{object}/datastreams/#{datastream}/content"
   end
 
   #
@@ -246,7 +240,7 @@ private
         unless collection.nil?
           # This is pointing at a collection, so treat it differently
           field = MetadataHelper::COLLECTION
-          value = collection.short_name[0]
+          value = collection.name
           ident_parts[:collection] = value
         end
       elsif binding[:predicate] == MetadataHelper::IDENTIFIER

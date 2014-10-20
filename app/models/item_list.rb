@@ -15,7 +15,7 @@ class ItemList < ActiveRecord::Base
   attr_accessible :name, :id, :user_id, :shared
 
   validates :name, presence: true
-  validates_length_of :name, :maximum => 255 , message:"Name is too long (maximum is 255 characters)"
+  validates_length_of :name, :maximum => 255, message: "Name is too long (maximum is 255 characters)"
 
   before_save :default_values
   #
@@ -35,15 +35,11 @@ class ItemList < ActiveRecord::Base
   self.solr_search_params_logic += [:add_access_controls_to_solr_params]
   self.solr_search_params_logic += [:exclude_unwanted_models]
 
-  def shared?
-    return self.shared || false
-  end
-
   #
   # This method set the item list as shared
   #
   def share
-    self.shared=true
+    self.shared = true
     self.save!
   end
 
@@ -51,7 +47,7 @@ class ItemList < ActiveRecord::Base
   # This method set the item list as not shared
   #
   def unshare
-    self.shared=false
+    self.shared = false
     self.save!
   end
 
@@ -70,13 +66,13 @@ class ItemList < ActiveRecord::Base
     # asking for and ask for them all this time. Sadly, there doesn't appear to be
     # a "give me everything" value for the rows parameter.
     if response["response"]["numFound"] > max_rows
-        params['rows'] = response["response"]["numFound"]
-        response = @@solr.get('select', params: params)
+      params['rows'] = response["response"]["numFound"]
+      response = @@solr.get('select', params: params)
     end
 
     docs = Array.new
     response["response"]["docs"].each do |d|
-      docs.push({id: d['id'], handle:d['handle']})
+      docs.push({id: d['id'], handle: d['handle']})
     end
     return docs
   end
@@ -86,7 +82,7 @@ class ItemList < ActiveRecord::Base
   # Return an array of Strings.
   #
   def get_item_handles
-    handles = ItemsInItemList.find_all_by_item_list_id(self.id).to_a.map {|aRecord| aRecord.item}
+    handles = ItemsInItemList.find_all_by_item_list_id(self.id).to_a.map { |aRecord| aRecord.item }
     return handles.sort
   end
 
@@ -114,12 +110,12 @@ class ItemList < ActiveRecord::Base
       document_list, response = SearchUtils.retrieveDocumentsFromSolr(params, handles)
     else
       response = {}
-      response['response'] = {'numFound'=>0, 'start'=>0, 'docs'=>[]}
+      response['response'] = {'numFound' => 0, 'start' => 0, 'docs' => []}
     end
 
     return response
   end
-  
+
   #
   # Add some Items to this ItemList. The Items should be specified by
   # their ids. Don't add an Item which is already part of this ItemList.
@@ -130,7 +126,7 @@ class ItemList < ActiveRecord::Base
 
     bench_start = Time.now
 
-    adding = Set.new(item_handles.map{ |item_handle| item_handle.to_s })
+    adding = Set.new(item_handles.map { |item_handle| item_handle.to_s })
     adding.subtract(get_item_handles())
 
     # The variable adding now contains only the new ids
@@ -138,7 +134,7 @@ class ItemList < ActiveRecord::Base
     verifiedItemHandles = []
     adding.each { |item_id|
       # Get the specified Item's Solr Document
-      params = {:q=>"handle:#{RSolr.escape(item_id.to_s)}"}
+      params = {:q => "handle:#{RSolr.escape(item_id.to_s)}"}
       response = @@solr.get('select', params: params)
 
       # Check that we got something useful...
@@ -172,7 +168,7 @@ class ItemList < ActiveRecord::Base
 
     return {addedItems: adding, profiler: profiler}
   end
-  
+
   #
   #
   #
@@ -199,9 +195,9 @@ class ItemList < ActiveRecord::Base
   # Generate R script for item list
   #
   def getRScript(root_url)
-    return  "library(alveo)\n" +
-            "client <- RestClient(server_uri='#{root_url.chomp("/")}')\n" +
-            "item_list <- client$get_item_list_by_id(#{self.id})"
+    return "library(alveo)\n" +
+        "client <- RestClient(server_uri='#{root_url.chomp("/")}')\n" +
+        "item_list <- client$get_item_list_by_id(#{self.id})"
   end
 
   #
@@ -318,7 +314,7 @@ class ItemList < ActiveRecord::Base
     valids = []
     handles.in_groups_of(batch_group, false) do |groupOfItemsHandle|
       # create disjunction condition with the items Ids
-      condition = groupOfItemsHandle.map{|itemHandle| "handle:\"#{itemHandle.gsub(":", "\:")}\""}.join(" OR ")
+      condition = groupOfItemsHandle.map { |itemHandle| "handle:\"#{itemHandle.gsub(":", "\:")}\"" }.join(" OR ")
 
       params = {}
       params[:q] = condition
@@ -354,10 +350,10 @@ class ItemList < ActiveRecord::Base
       matchingData.each { |m|
         # get the text preceding the match and extract the last 7 words
         pre = m.pre_match()
-        pre = pre[-[pre.size, charactersChunkSize].min,charactersChunkSize].split(" ").last(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
+        pre = pre[-[pre.size, charactersChunkSize].min, charactersChunkSize].split(" ").last(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
 
         # get the text after the match and extract the first 7 words
-        post = m.post_match()[0,charactersChunkSize].split(" ").first(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
+        post = m.post_match()[0, charactersChunkSize].split(" ").first(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
 
         # since some special character might slip in the match, we do a second match to
         # add color only to the proper text.
@@ -369,7 +365,7 @@ class ItemList < ActiveRecord::Base
         highlightedText = "<span class='highlighting'>#{subMatch.to_s}</span>"
 
         formattedMatch = {}
-        formattedMatch[:textBefore] = pre +  subMatchPre
+        formattedMatch[:textBefore] = pre + subMatchPre
         formattedMatch[:textAfter] = subMatchPost + post
         formattedMatch[:textHighlighted] = highlightedText
 
@@ -405,7 +401,7 @@ class ItemList < ActiveRecord::Base
   def get_solr_connection
     if @@solr_config.nil?
       @@solr_config = Blacklight.solr_config
-      @@solr        = RSolr.connect(@@solr_config)
+      @@solr = RSolr.connect(@@solr_config)
     end
   end
 

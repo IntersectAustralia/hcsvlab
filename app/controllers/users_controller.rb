@@ -99,12 +99,10 @@ class UsersController < ApplicationController
       coll = Collection.find(coll_id)
       @request.request_type = "collection"
       @request.request_id = coll.id
-      @request.owner_email = coll.flat_ownerEmail
     else
       list = CollectionList.find(coll_id)
       @request.request_type = "collection_list"
       @request.request_id = list.id
-      @request.owner_email = list.collections.first.flat_ownerEmail
     end
     @request.approved = false
     @request.save!

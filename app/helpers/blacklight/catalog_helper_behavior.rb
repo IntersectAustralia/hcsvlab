@@ -188,7 +188,7 @@ module Blacklight::CatalogHelperBehavior
 
     # Prepare document PRIMARY_TEXT_URL information
     solr_item = Item.find_and_load_from_solr({id: document[:id]}).first
-    if solr_item.hasPrimaryText?
+    if solr_item.has_primary_text?
       begin
         primary_text = catalog_primary_text_url(collectionName, format: :json)
       rescue NoMethodError => e
@@ -263,7 +263,7 @@ module Blacklight::CatalogHelperBehavior
             PREFIX ausnc:<http://ns.ausnc.org.au/schemas/ausnc_md_model/>
 
             select * where {
-              <#{solr_item.flat_uri}> ausnc:document ?doc .
+              <#{solr_item.uri}> ausnc:document ?doc .
               ?doc dc:identifier '#{values[MetadataHelper::IDENTIFIER]}' .
               ?doc ?property ?value
             }
@@ -328,7 +328,7 @@ module Blacklight::CatalogHelperBehavior
     itemInfo.metadata = metadataHash
     itemInfo.primary_text_url = primary_text
     begin
-      unless solr_item.annotation_set.empty?
+      unless solr_item.annotation_path.empty?
         itemInfo.annotations_url = catalog_annotations_url(collectionName, format: :json)
       end
     rescue NoMethodError => e

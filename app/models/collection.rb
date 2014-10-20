@@ -3,18 +3,12 @@ require "#{Rails.root}/lib/solr/solr_helper.rb"
 class Collection < ActiveRecord::Base
   include SolrHelper
 
-  # Adds useful methods form managing Item groups
-  include Hydra::ModelMixins::RightsMetadata
-  has_metadata :name => "rightsMetadata", :type => Hydra::Datastream::RightsMetadata
-
-  has_metadata 'rdfMetadata', type: ActiveFedora::RdfxmlRDFDatastream # => link to rdf file
-
   has_many :items
   belongs_to :owner, class_name: "User"
   belongs_to :collection_list
   belongs_to :licence
 
-
+ # TODO Refactor
   #
   # Set the data owner
   #

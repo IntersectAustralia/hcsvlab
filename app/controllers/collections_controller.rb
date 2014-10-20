@@ -10,7 +10,7 @@ class CollectionsController < ApplicationController
   #
   #
   def index
-    @collections = getCollectionsIHaveAccess()
+    @collections = getCollectionsIHaveAccess
     respond_to do |format|
       format.html
       format.json
@@ -21,15 +21,11 @@ class CollectionsController < ApplicationController
   #
   #
   def show
-    @collections = getCollectionsIHaveAccess()
+    @collections = getCollectionsIHaveAccess
 
-    begin
-      @collection = Array(Collection.find_by_short_name(params[:id])).first
-    rescue Exception => e
-      #error handled below
-    end
+    @collection = Collection.find_by_name(params[:id])
     respond_to do |format|
-      if @collection.nil? or @collection.flat_short_name.nil?
+      if @collection.nil? or @collection.name.nil?
         format.html { 
             flash[:error] = "Collection does not exist with the given id"
             redirect_to collections_path }
@@ -53,7 +49,7 @@ class CollectionsController < ApplicationController
 
     collection.setLicence(licence)
 
-    flash[:notice] = "Successfully added licence to #{collection.flat_short_name}"
+    flash[:notice] = "Successfully added licence to #{collection.name}"
     redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
   end
 
@@ -88,9 +84,10 @@ class CollectionsController < ApplicationController
   #
   # Retrieve the collections I have access right
   #
+  # TODO REFACTOR
   def getCollectionsIHaveAccess
     collection = Collection.all.select { |c| can? :discover, c }
-    return collection.sort_by { |coll| coll.flat_short_name }
+    return collection.sort_by { |coll| coll.name }
   end
 
   #

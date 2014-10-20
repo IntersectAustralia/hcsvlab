@@ -197,7 +197,7 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
       repository = server.repository(item.collection.flat_name)
 
       query = RDF::Query.new do
-        pattern [RDF::URI.new(item.flat_uri), MetadataHelper::INDEXABLE_DOCUMENT, :indexable_doc]
+        pattern [RDF::URI.new(item.uri), MetadataHelper::INDEXABLE_DOCUMENT, :indexable_doc]
         pattern [:indexable_doc, MetadataHelper::SOURCE, :source]
       end
 
@@ -296,12 +296,11 @@ def look_for_annotations(item, metadata_filename)
   return if annotation_filename == metadata_filename # HCSVLAB-441
 
   if File.exists?(annotation_filename)
-    if(item.named_datastreams["annotation_set"].empty?)
-      item.add_named_datastream('annotation_set', :dsLocation => "file://" + annotation_filename, :mimeType => 'text/plain')
+    if item.annotation_path.empty?
+      item.annotation_path = annotation_filename
       logger.info "Annotation datastream added for #{File.basename(annotation_filename)}" unless Rails.env.test?
     else
-      item.update_named_datastream('annotation_set', :dsid => "annotationSet1", :dsLocation => "file://" + annotation_filename,
-       :mimeType => 'text/plain')
+      item.annotation_path = annotation_filename
       logger.info "Annotation datastream updated for #{File.basename(annotation_filename)}" unless Rails.env.test?
     end
   end

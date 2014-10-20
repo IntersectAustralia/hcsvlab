@@ -108,12 +108,12 @@ class CollectionList < ActiveRecord::Base
 
     # Find the Collections with the given collection_names
     warnings = []
-    missing = collection_names - Collection.where(short_name: collection_names).pluck(:short_name)
-    grouped_in_list = Collection.where(short_name: collection_names).where('license_id is not null')
+    missing = collection_names - Collection.where(name: collection_names).pluck(:name)
+    grouped_in_list = Collection.where(name: collection_names).where('license_id is not null')
     warnings += missing.collect{|cn| "cannot find a Collection called #{cn}" }
-    warnings += grouped_in_list.collect{|cn| "Collection #{cn.short_name} is already part of CollectionList #{cn.licence.name}" }
+    warnings += grouped_in_list.collect{|cn| "Collection #{cn.name} is already part of CollectionList #{cn.licence.name}" }
 
-    to_add = Collection.where(short_name: collection_names, license_id: nil)
+    to_add = Collection.where(name: collection_names, license_id: nil)
 
     unless warnings.empty?
       # There were missing collections.

@@ -1,6 +1,6 @@
 object @collection
-node(:collection_url) { collection_url(@collection.flat_name) }
-node(:collection_name) { @collection.flat_short_name }
+node(:collection_url) { collection_url(@collection.name) }
+node(:collection_name) { @collection.name }
 node(:metadata) do
   hash = {}
   collection_show_fields(@collection.id).each do |field|

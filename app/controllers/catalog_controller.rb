@@ -16,7 +16,6 @@ class CatalogController < ApplicationController
   set_tab :catalog
 
   before_filter :authenticate_user!, :except => [:index, :annotation_context, :searchable_fields]
-  #load_and_authorize_resource
 
   include Blacklight::Catalog
   include Hydra::Controller::ControllerBehavior
@@ -298,6 +297,7 @@ class CatalogController < ApplicationController
         params.delete(:fq)
         @hasAccessToEveryCollection = true
         @hasAccessToSomeCollections = false
+        #TODO REFACTOR
         Collection.all.each do |aCollection|
           #I have access to a collection if I am the owner or if I accepted the licence for that collection
           hasAccessToCollection = (aCollection.flat_ownerEmail.eql? current_user.email) ||
@@ -761,10 +761,10 @@ class CatalogController < ApplicationController
 
     # First will validate the parameters. 'collection' and 'query' are both required
     query = params[:query]
-    collectionName = params[:collection].to_s.downcase
+    collection_name = params[:collection].to_s.downcase
 
     # If the 'query' parameter is no present then we return precondition no met error.
-    if (!query.present?)
+    if query.blank?
       respond_to do |format|
         format.json { render :json => {:error => "Parameter 'query' is required."}.to_json, :status => 412 and return }
       end
@@ -773,14 +773,14 @@ class CatalogController < ApplicationController
     # Now we are going to forbid the SERVICE keyword in the SPARQL query
     pattern = /SERVICE/i
     matchingWords = query.to_enum(:scan, pattern).map { Regexp.last_match }
-    if (!matchingWords.empty?)
+    if matchingWords.present?
       respond_to do |format|
         format.json { render :json => {:error => "Service keyword is forbidden in queries."}.to_json, :status => 412 and return }
       end
     end
 
-    collection = Collection.find_by_short_name(collectionName).to_a.first
-    if (collection.nil?)
+    collection = Collection.find_by_name(collection_name)
+    if collection.nil?
       respond_to do |format|
         format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return }
       end
@@ -844,7 +844,7 @@ class CatalogController < ApplicationController
 
     # Create the URL for the sesame endpoint.
     params = {query: query}
-    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collectionName}")
+    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collection_name}")
     uri.query = URI.encode_www_form(params)
 
     # Send the request to the sparql endpoint.
@@ -964,7 +964,7 @@ class CatalogController < ApplicationController
   # query the annotations for an item and return them along with the "primary" document
   #
   def query_annotations(item, solr_document, type, label)
-    item_short_identifier = item.flat_handle.split(":").last
+    item_short_identifier = item.handle.split(":").last
     corpus = item.collection.flat_name
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
@@ -1075,7 +1075,7 @@ class CatalogController < ApplicationController
   #
   def query_annotation_types(item)
     types = []
-    item_short_identifier = item.flat_handle.split(":").last
+    item_short_identifier = item.handle.split(":").last
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(item.collection.flat_name)
@@ -1107,7 +1107,7 @@ class CatalogController < ApplicationController
   #
   def query_annotation_properties(item)
     properties = []
-    item_short_identifier = item.flat_handle.split(":").last
+    item_short_identifier = item.handle.split(":").last
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(item.collection.flat_name)
@@ -1158,7 +1158,7 @@ class CatalogController < ApplicationController
       repository = server.repository(item.collection.flat_name)
 
       query = RDF::Query.new do
-        pattern [RDF::URI.new(item.flat_uri), MetadataHelper::DISPLAY_DOCUMENT, :display_doc]
+        pattern [RDF::URI.new(item.uri), MetadataHelper::DISPLAY_DOCUMENT, :display_doc]
         pattern [:display_doc, MetadataHelper::TYPE, :type]
         pattern [:display_doc, MetadataHelper::SOURCE, :source]
         pattern [:display_doc, MetadataHelper::IDENTIFIER, :id]

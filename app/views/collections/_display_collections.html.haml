@@ -1,12 +1,11 @@
 .sidenav.static.span3
   %h4 Collections
   %ul.nav
-    - if (@collections.empty?)
+    - if @collections.empty?
       %li
-        %h5{} Empty
+        %h5 Empty
     -else
       - @collections.each do |collection|
         - selectedClass="active" if (collection.id == (params[:id]))
         %li{ :class => selectedClass }
-          =link_to collection_path(collection.short_name) do
-            =collection.flat_short_name
+          = link_to collection.name, collection_path(collection.name)

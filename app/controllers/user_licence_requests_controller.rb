@@ -2,7 +2,7 @@ class UserLicenceRequestsController < ApplicationController
   before_filter :authenticate_user!
 
   def index
-    @requests = UserLicenceRequest.where(:owner_email => current_user.email, :approved => false)
+    @requests = current_user.user_licence_requests.where(approved: false)
   end
 
   def approve_request

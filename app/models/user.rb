@@ -193,7 +193,7 @@ class User < ActiveRecord::Base
   end
 
   def groups
-    return self.user_licence_agreements.map{|a| a.group_name}
+    self.user_licence_agreements.pluck(:group_name)
   end
 
   #
@@ -201,7 +201,7 @@ class User < ActiveRecord::Base
   #
   def add_agreement_to_collection(collection, accessType)
     ula = UserLicenceAgreement.new
-    ula.group_name = "#{collection.flat_short_name}-#{accessType}"
+    ula.group_name = "#{collection.name}-#{accessType}"
     ula.licence_id = collection.licence.id if !collection.licence.nil?
     ula.user = self
     ula.save
@@ -212,46 +212,40 @@ class User < ActiveRecord::Base
   # for the given 'collection'. If 'exact' is true, then it must be exactly
   # that permission, if false then look for that permission or better.
   #
-  def has_agreement_to_collection?(collection, accessType, exact=false)
+  # TODO refactor this
+
+  def has_agreement_to_collection?(collection, access_type, exact=false)
     # if the user is the owner of the collection, then he/she does have access.
     if (collection.flat_ownerEmail.eql?(self.email))
       return true
     end
 
     if exact
-      group_names = ["#{collection.flat_short_name}-#{accessType}"]
+      group_names = ["#{collection.name}-#{access_type}"]
     else
-      group_names = UserLicenceAgreement::type_or_higher(accessType).map { |t|
-        "#{collection.flat_short_name}-#{t}"
+      group_names = UserLicenceAgreement::type_or_higher(access_type).map { |t|
+        "#{collection.name}-#{t}"
       }
     end
 
-    user_licence_agreements.each { |ula|
-      group_names.each { |gn|
-        return true if ula.group_name == gn
-      }
-    }
+    user_licence_agreements.where(group_name: group_names).count > 0
 
-    return false
   end
 
   def has_requested_collection?(id)
-    return true if user_licence_requests.where(:request_id => id).count != 0
-    return false
+    user_licence_requests.where(:request_id => id).count > 0
   end
 
   def requested_collection(id)
-    return user_licence_requests.where(:request_id => id)[0]
+    user_licence_requests.find_by_request_id(id)
   end
 
   #
   # Removes the permission level defined by 'accessType' to the given 'collection'
   #
   def remove_agreement_to_collection(collection, accessType)
-    group_name = "#{collection.flat_short_name}-#{accessType}"
-    ula = UserLicenceAgreement.where(:group_name=>group_name, :user_id=>self.id).first
-
-    ula.delete if !ula.nil?
+    group_name = "#{collection.name}-#{accessType}"
+    self.user_licence_agreements.where(group_name: group_name).delete_all
   end
 
   def accept_licence_request(id)

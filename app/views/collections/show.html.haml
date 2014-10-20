@@ -1,5 +1,5 @@
 %content
-  %h1= @collection.flat_short_name
+  %h1= @collection.name
 
   - unless params[:state].nil?
     = link_to "Back to Licence Agreements", "/account/licence_agreements", :class => "btn"
@@ -8,7 +8,7 @@
   %h3
     %span Collection Details
   %dl.dl-horizontal.dl-invert
-    - collection_show_fields(@collection.id).each do |field|
+    - collection_show_fields(@collection).each do |field|
       %dt
         = field.first[0] + ":"
       %dd
