@@ -3,7 +3,8 @@ class Licence < ActiveRecord::Base
   LICENCE_TYPE_PRIVATE = "PRIVATE"
   LICENCE_TYPE_PUBLIC = "PUBLIC"
 
-  attr_accessible :name, :owner_email, :owner_id, :text, :type
+  attr_accessible :name, :owner_id, :text, :type
+  belongs_to :owner, class_name: 'User'
 
   # Validations
   validates_presence_of :name, message: 'Licence Name can not be blank'

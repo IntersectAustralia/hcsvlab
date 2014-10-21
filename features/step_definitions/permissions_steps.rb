@@ -40,8 +40,7 @@ Given /^I have user "(.*)" with the following groups$/ do |userMail, table|
       l1 = Licence.new
       l1.name = "Licence 1"
       l1.text = "Text Licence 1"
-      l1.ownerId = user.id.to_s
-      l1.owner_email = user.email.to_s
+      l1.owner = user
       l1.save
 
       col.licence = l1

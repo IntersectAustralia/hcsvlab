@@ -18,8 +18,7 @@ describe Licence do
       l.type = Licence::LICENCE_TYPE_PUBLIC
 
       u = FactoryGirl.create(:user, :status => 'A', :email => "test@intersect.org.au")
-      l.ownerId = u.id.to_s
-      l.owner_email = u.email
+      l.owner = u
 
       l.save
       pid = l.pid

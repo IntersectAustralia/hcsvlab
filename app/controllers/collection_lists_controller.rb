@@ -29,7 +29,6 @@ class CollectionListsController < ApplicationController
     if collections.length > 0
       begin
         collection_list = CollectionList.new(params[:collection_list])
-        collection_list.owner_email = current_user.email
         collection_list.owner_id = current_user.id.to_s
         collection_list.save
         add_collections_to_collection_list(collection_list, collections)

@@ -435,13 +435,13 @@ class CatalogController < ApplicationController
   #
   def annotations
     bench_start = Time.now
-    if Item.where(id: params[:id]).count != 0
+    @item = Item.find(params[:id])
+    if @item
       @response, @document = get_solr_response_for_doc_id
     end
     begin
-      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
 
-      if !@item.datastreams["annotationSet1"].nil?
+      if @item.annotation_path.present?
         begin
           @anns, @annotates_document = query_annotations(@item, @document, params[:type], params[:label])
         rescue Exception => e
@@ -474,9 +474,9 @@ class CatalogController < ApplicationController
   #
   def annotation_properties
     begin
-      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
+      @item = Item.find(params[:id])
 
-      if !@item.datastreams["annotationSet1"].nil?
+      if @item.annotation_path.present?
         @properties = query_annotation_properties(@item)
 
         respond_to do |format|
@@ -499,9 +499,10 @@ class CatalogController < ApplicationController
   #
   def annotation_types
     begin
-      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
+      @item = Item.find(params[:id])
 
-      if !@item.datastreams["annotationSet1"].nil?
+      if @item.annotation_path.present?
+
         @types = query_annotation_types(@item)
 
         respond_to do |format|
@@ -523,13 +524,13 @@ class CatalogController < ApplicationController
   #
   #
   def annotation_context
-    @predefinedProperties = collect_predefined_context_properties()
+    @predefinedProperties = collect_predefined_context_properties
 
-    avoid_context = collect_restricted_predefined_vocabulary()
+    avoid_context = collect_restricted_predefined_vocabulary
 
     @vocab_hash = {}
     RDF::Vocabulary.each { |vocab|
-      if (!avoid_context.include?(vocab.to_uri) and vocab.to_uri.qname.present?)
+      if !avoid_context.include?(vocab.to_uri) and vocab.to_uri.qname.present?
         prefix = vocab.to_uri.qname.first.to_s
         uri = vocab.to_uri.to_s
         @vocab_hash[prefix] = {:@id => uri}
@@ -546,7 +547,7 @@ class CatalogController < ApplicationController
   def primary_text
     bench_start = Time.now
     begin
-      item = Item.find_and_load_from_solr({id: params[:id]}).first
+      item = Item.find(params[:id])
 
       response.header["Content-Length"] = item.primary_text.content.length.to_s
       send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
@@ -567,16 +568,17 @@ class CatalogController < ApplicationController
   #
   def document
     begin
-      doc = Document.find_and_load_from_solr({:file_name => params[:filename].to_s, item: params[:id]}).first
+      doc = Document.find_by_file_name_and_item_id(params[:filename], params[:id])
 
-      if (!doc.nil?)
+      if doc.present?
         params[:disposition] = 'Inline'
         params[:disposition].capitalize!
 
         # If HTTP_RANGE variable is set, we need to send partial content and tell the browser
         # what fragment of the file we are sending by using the variables Content-Range and
         # Content-Length
-        if (request.headers["HTTP_RANGE"])
+        if request.headers["HTTP_RANGE"]
+          #TODO how to send file with partial content?
           size = doc.datastreams['CONTENT1'].content.size
           bytes = Rack::Utils.byte_ranges(request.headers, size)[0]
           offset = bytes.begin
@@ -587,17 +589,19 @@ class CatalogController < ApplicationController
           response.header["Content-Length"] = (length+1).to_s
           response.status = :partial_content
 
-          content = doc.datastreams['CONTENT1'].content[offset, length+1]
+          #TODO content?
+          # content = doc.datastreams['CONTENT1'].content[offset, length+1]
         else
-          content = doc.datastreams['CONTENT1'].content
+          #TODO content?
+          # content = doc.datastreams['CONTENT1'].content
           response.header["Content-Length"] = Rack::Utils.bytesize(content).to_s
 
         end
-
-        send_data content,
-                  :disposition => params[:disposition],
-                  :filename => doc.file_name[0].to_s,
-                  :type => doc.datastreams['CONTENT1'].mimeType.to_s
+        send_file doc.file_path, disposition: params[:disposition], type: doc.mime_type
+        # send_data content,
+        #           :disposition => params[:disposition],
+        #           :filename => doc.file_name[0].to_s,
+        #           :type => doc.datastreams['CONTENT1'].mimeType.to_s
 
         return
       end
@@ -671,7 +675,7 @@ class CatalogController < ApplicationController
 
     # Validate item. This line will also validate that the user has permission for adding
     # the annotation in that item.
-    item = Item.find_and_load_from_solr({handle: item_handler.to_s})
+    item = Item.find_by_handle(item_handler)
     if item.empty?
       respond_to do |format|
         format.json {
@@ -681,7 +685,7 @@ class CatalogController < ApplicationController
       end
     end
 
-    if (!uploaded_file.is_a? ActionDispatch::Http::UploadedFile)
+    if !uploaded_file.is_a? ActionDispatch::Http::UploadedFile
       render :json => {:error => "Error in file parameter."}.to_json, :status => 412
       return
     elsif uploaded_file.blank? or uploaded_file.size == 0
@@ -693,7 +697,7 @@ class CatalogController < ApplicationController
       # If we have a file with the same name, for the same item and with the same MD5 checksum will suppose that
       # that file was already uploaded, and hence will reject it.
       similarUploadedAnnotations = UserAnnotation.where(original_filename: uploaded_file.original_filename, item_identifier: item_handler)
-      if (!similarUploadedAnnotations.empty?)
+      if !similarUploadedAnnotations.empty?
         currentFileContentMD5 = Digest::MD5.hexdigest(IO.read(uploaded_file.tempfile))
 
         similarUploadedAnnotations.each do |anUploadedAnnotations|
@@ -786,7 +790,7 @@ class CatalogController < ApplicationController
       end
     end
 
-    if (!collection.nil?)
+    if collection.present?
       #Verify if the user has at least read access to the collection
       if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
         authorization_error(Exception.new("You are not authorized to access this resource."))
@@ -929,9 +933,9 @@ class CatalogController < ApplicationController
     handle = nil
     handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
 
-    if (!handle.nil?)
-      item = Item.find_and_load_from_solr({handle: handle})
-      if (!item.present?)
+    if handle.present?
+      item = Item.find_by_handle(handle)
+      if item.nil?
         respond_to do |format|
           format.html { resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return }
           format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return }

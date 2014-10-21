@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141013050709) do
+ActiveRecord::Schema.define(:version => 20141020015616) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -22,10 +22,20 @@ ActiveRecord::Schema.define(:version => 20141013050709) do
     t.string   "user_type"
   end
 
-  create_table "collection", :force => true do |t|
+  create_table "collection_lists", :force => true do |t|
+    t.string   "name"
+    t.boolean  "private"
+    t.integer  "license_id"
+    t.integer  "owner_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "collections", :force => true do |t|
     t.string   "uri"
     t.text     "text"
     t.string   "name"
+    t.text     "rdf_file_path"
     t.boolean  "private"
     t.integer  "owner_id"
     t.integer  "collection_list_id"
@@ -34,11 +44,12 @@ ActiveRecord::Schema.define(:version => 20141013050709) do
     t.datetime "updated_at",         :null => false
   end
 
-  create_table "collection_list", :force => true do |t|
-    t.string   "name"
-    t.boolean  "private"
-    t.integer  "license_id"
-    t.integer  "owner_id"
+  create_table "documents", :force => true do |t|
+    t.string   "file_name"
+    t.string   "file_path"
+    t.string   "type"
+    t.string   "mime_type"
+    t.integer  "item_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
@@ -61,6 +72,16 @@ ActiveRecord::Schema.define(:version => 20141013050709) do
   end
 
   add_index "item_metadata_field_name_mappings", ["solr_name"], :name => "index_item_metadata_field_name_mappings_on_solr_name", :unique => true
+
+  create_table "items", :force => true do |t|
+    t.string   "uri"
+    t.string   "handle"
+    t.string   "primary_text_path"
+    t.string   "annotation_path"
+    t.integer  "collection_id"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+  end
 
   create_table "items_in_item_lists", :force => true do |t|
     t.integer  "item_list_id"
@@ -134,7 +155,6 @@ ActiveRecord::Schema.define(:version => 20141013050709) do
   create_table "user_licence_requests", :force => true do |t|
     t.string   "request_id"
     t.string   "request_type"
-    t.string   "owner_email"
     t.boolean  "approved"
     t.integer  "user_id"
     t.datetime "created_at",   :null => false

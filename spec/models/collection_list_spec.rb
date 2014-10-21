@@ -36,8 +36,8 @@ describe CollectionList do
   describe "Collection List Licence" do
     it "should persist licence information for a Collection List" do
       u = FactoryGirl.create(:user, :status => 'A', :email => "test@intersect.org.au")
-      c = FactoryGirl.create(:collection_list, :owner_id => u.id.to_s, :owner_email => u.email)
-      l = FactoryGirl.create(:licence, :owner_id => u.id.to_s, :owner_email => u.email)
+      c = FactoryGirl.create(:collection_list, :owner_id => u.id.to_s)
+      l = FactoryGirl.create(:licence, :owner_id => u.id.to_s)
 
       c.licence = l
       c.save
@@ -52,10 +52,10 @@ describe CollectionList do
 
     it "should keep integrity between the Collection's licence" do
       u = FactoryGirl.create(:user, :status => 'A', :email => "test@intersect.org.au")
-      cl = FactoryGirl.create(:collection_list, :owner_id => u.id.to_s, :owner_email => u.email)
+      cl = FactoryGirl.create(:collection_list, :owner_id => u.id.to_s)
       c = FactoryGirl.create(:collection, :private_data_owner => u.id.to_s)
-      l1 = FactoryGirl.create(:licence, :owner_id => u.id.to_s, :owner_email => u.email)
-      l2 = FactoryGirl.create(:licence, :owner_id => u.id.to_s, :owner_email => u.email)
+      l1 = FactoryGirl.create(:licence, :owner_id => u.id.to_s)
+      l2 = FactoryGirl.create(:licence, :owner_id => u.id.to_s)
 
       # Set licence L1 to the Collection
       c.set_license(l1)
@@ -75,9 +75,9 @@ describe CollectionList do
 
     it "should remove Collection's licence when the Collection is removed from the Collection List" do
       u = FactoryGirl.create(:user, :status => 'A', :email => "test@intersect.org.au")
-      cl = FactoryGirl.create(:collection_list, :owner_id => u.id.to_s, :owner_email => u.email)
+      cl = FactoryGirl.create(:collection_list, :owner_id => u.id.to_s)
       c = FactoryGirl.create(:collection, :private_data_owner => u.id.to_s)
-      l1 = FactoryGirl.create(:licence, :owner_id => u.id.to_s, :owner_email => u.email)
+      l1 = FactoryGirl.create(:licence, :owner_id => u.id.to_s)
 
       # Set licence L1 to the Collection List
       cl.set_license(l1.id)

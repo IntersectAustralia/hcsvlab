@@ -7,7 +7,6 @@ class CollectionList < ActiveRecord::Base
   validates_presence_of :name, message: 'Collection List Name can not be blank'
   validates_length_of :name, maximum: 255, message: "Name is too long (maximum is 255 characters)"
   validates_presence_of :owner_id, message: 'Collection List owner id can not be empty'
-  validates_presence_of :owner_email, message: 'Collection List owner email can not be empty'
 
   validate :same_license_integrity_check
 
@@ -132,7 +131,6 @@ class CollectionList < ActiveRecord::Base
     # Do the actual creation and adding
     result = CollectionList.new
     result.name = name
-    result.owner_email = user.email
     result.owner_id = user.id.to_s
     result.private = false
     result.save

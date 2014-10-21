@@ -8,11 +8,11 @@ class LicencesController < ApplicationController
 
   def index
 
-    opts = { rows: 1_000_000_000 } # If that's not more than we have, we'll have issues all over the place
 
     bench_start = Time.now
     # gets PUBLIC licences and the user licences.
-    @licences = Licence.find_and_load_from_solr({type: Licence::LICENCE_TYPE_PUBLIC}, opts).to_a.concat(Licence.find_and_load_from_solr({owner_id: current_user.id.to_s}, opts).to_a)
+    # @licences = Licence.find_and_load_from_solr({type: Licence::LICENCE_TYPE_PUBLIC}, opts).to_a.concat(Licence.find_and_load_from_solr({owner_id: current_user.id.to_s}, opts).to_a)
+    @licences = current_user.licences.find_by_type(Licence::LICENCE_TYPE_PUBLIC)
 
     # gets the Collections list of the logged user.
     @collection_lists = CollectionList.find_and_load_from_solr({owner_id: current_user.id.to_s}, opts).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
@@ -58,7 +58,6 @@ class LicencesController < ApplicationController
       newLicence.text = sanitizedText
       newLicence.type = Licence::LICENCE_TYPE_PRIVATE
       newLicence.ownerId = current_user.id.to_s
-      newLicence.owner_email = current_user.email
       newLicence.save!
 
       # Now lets assign the licence to every collection list

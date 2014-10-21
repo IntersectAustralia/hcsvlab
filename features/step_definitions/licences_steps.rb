@@ -82,8 +82,7 @@ Given /^User "([^"]*)" has a Collection List called "([^"]*)" containing$/ do |e
   list.name = list_name
 
   user = User.find_by_user_key(email)
-  list.owner_email = email
-  list.owner_id = user.id.to_s
+  list.owner = user
   list.save!
 
   # Populate it with the collections mentioned in the table

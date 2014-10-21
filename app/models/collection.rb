@@ -4,7 +4,7 @@ class Collection < ActiveRecord::Base
   include SolrHelper
 
   has_many :items
-  belongs_to :owner, class_name: "User"
+  belongs_to :owner, class_name: 'User'
   belongs_to :collection_list
   belongs_to :licence
 
