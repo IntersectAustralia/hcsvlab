@@ -104,7 +104,7 @@ def update_item_from_file(item, manifest)
   item.label = handle
 
   item.uri = uri
-  item.collection = Collection.find_by_short_name(collection_name).first
+  item.collection = Collection.find_by_name(collection_name).first
 
   item.save!
   logger.info "Updated item = " + item.id.to_s
@@ -143,11 +143,12 @@ end
 def create_collection_from_file(collection_file, collection_name)
   coll = Collection.new
 
-  coll.rdfMetadata.graph.load(collection_file, :format => :ttl, :validate => true)
-  coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s
-  coll.uri = coll.label
+  coll.rdf_file_path = collection_file
+
+  coll.uri = coll.rdf_graph.statements.first.subject.to_s
   coll.name = collection_name
-  coll.privacy_status = "false"
+
+  coll.private = false
 
   if Collection.find_by_uri(coll.uri).present?
     # There is already such a collection in the system
@@ -160,7 +161,7 @@ def create_collection_from_file(collection_file, collection_name)
 
   coll.save!
 
-  logger.info "Collection '#{coll.flat_short_name}' Metadata = #{coll.id}" unless Rails.env.test?
+  logger.info "Collection '#{coll.name}' Metadata = #{coll.id}" unless Rails.env.test?
 end
 
 def look_for_documents(item, corpus_dir, rdf_file, manifest)
@@ -280,7 +281,7 @@ def set_data_owner(collection)
                              }
                          })
 
-  results = query.execute(collection.rdfMetadata.graph)
+  results = query.execute(collection.rdf_graph)
   data_owner = find_system_user(results)
   data_owner = find_default_owner if data_owner.nil?
   if data_owner.nil?
@@ -289,7 +290,8 @@ def set_data_owner(collection)
     logger.warn "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
     logger.info "Setting data owner to #{data_owner.email}"
-    collection.set_data_owner_and_save(data_owner)
+    collection.owner = data_owner
+    collection.save
   end
 end
 
@@ -455,9 +457,10 @@ def create_default_licences(root_path = "config")
       l = Licence.new
       l.name = lic_info['name']
       l.text = lic_info['text']
-      l.type = Licence::LICENCE_TYPE_PUBLIC
+      l.private = false
 
       l.save!
+
     rescue Exception => e
       logger.error "Licence Name: #{l.name[0]} not ingested: #{l.errors.messages.inspect}"
       next

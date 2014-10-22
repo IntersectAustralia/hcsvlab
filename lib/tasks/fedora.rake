@@ -124,7 +124,7 @@ namespace :fedora do
       doc.delete
     }
 
-    Collection.find_by_short_name(corpus).each { |collection|
+    Collection.find_by_name(corpus).each { |collection|
       logger.info "Removing collection object #{collection.id}"
       collection.delete
     }

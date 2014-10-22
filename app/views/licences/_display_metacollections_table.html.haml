@@ -46,7 +46,7 @@
                     %span
                       Not Required
                     = link_to("", change_collection_list_privacy_collection_lists_path(:id => coll_list.id, :privacy => "true"), :method => :put, :class=>"remove")
-              %td.owner= coll_list.flat_ownerEmail
+              %td.owner= coll_list.owner
               %td.licence
                 .css-dropdown
                   %button.dropdown-toggle.btn.btn-mini{ "data-toggle" => "dropdown" }

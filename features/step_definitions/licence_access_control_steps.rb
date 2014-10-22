@@ -1,10 +1,11 @@
 Given /^Collections ownership is$/ do |table|
   # table is a | cooee      | data_owner@intersect.org.au |
   table.hashes.each_with_index do |row|
-    collection = Collection.find_by_short_name(row[:collection]).to_a.first
+    collection = Collection.find_by_name(row[:collection]).to_a.first
     user = User.find_by_email(row[:owner_email])
 
-    collection.set_data_owner_and_save(user)
+    collection.owner = user
+    collection.save
     user.add_agreement_to_collection(collection, UserLicenceAgreement::EDIT_ACCESS_TYPE)
 
     #By now this is not going to work since "our" SOLR core is not being updated
@@ -28,7 +29,7 @@ end
 
 Given /^"(.*)" has "(.*)" access to collection "(.*)"$/ do |userEmail, accessType, collectionName|
   user = User.find_by_email(userEmail)
-  collection = Collection.find_by_short_name(collectionName).to_a.first
+  collection = Collection.find_by_name(collectionName).to_a.first
   case accessType.downcase
     when "discover"
       user.add_agreement_to_collection(collection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)

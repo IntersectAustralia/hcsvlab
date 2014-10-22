@@ -300,7 +300,7 @@ class CatalogController < ApplicationController
         #TODO REFACTOR
         Collection.all.each do |aCollection|
           #I have access to a collection if I am the owner or if I accepted the licence for that collection
-          hasAccessToCollection = (aCollection.flat_ownerEmail.eql? current_user.email) ||
+          hasAccessToCollection = (aCollection.owner.eql? current_user.email) ||
               (current_user.has_agreement_to_collection?(aCollection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE, false))
 
           @hasAccessToSomeCollections = @hasAccessToSomeCollections || hasAccessToCollection

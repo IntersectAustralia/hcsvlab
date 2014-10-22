@@ -15,7 +15,7 @@ describe Licence do
       l = Licence.new
       l.name = "CC Licence " + rnd
       l.text = "Various text outlining terms of the licence"
-      l.type = Licence::LICENCE_TYPE_PUBLIC
+      l.private = false
 
       u = FactoryGirl.create(:user, :status => 'A', :email => "test@intersect.org.au")
       l.owner = u
@@ -26,7 +26,7 @@ describe Licence do
       lic = Licence.find(pid)
       lic.flat_name.should eq "CC Licence " + rnd
       lic.flat_text.should eq "Various text outlining terms of the licence"
-      lic.flat_type.should eq Licence::LICENCE_TYPE_PUBLIC
+      lic.private.should eq false
       lic.flat_ownerId.to_i.should eq u.id
       lic.flat_ownerEmail.should eq "test@intersect.org.au"
     end

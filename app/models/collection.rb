@@ -8,42 +8,6 @@ class Collection < ActiveRecord::Base
   belongs_to :collection_list
   belongs_to :licence
 
- # TODO Refactor
-  #
-  # Set the data owner
-  #
-  def set_data_owner_and_save(user)
-    case user
-      when String
-        self.private_data_owner = user
-      when User
-        self.private_data_owner = user.email
-      else
-        self.private_data_owner = user.to_s
-    end
-
-    email = private_data_owner.first
-    self.set_discover_users([email], self.discover_users)
-    self.set_read_users([email], self.read_users)
-    self.set_edit_users([email], self.edit_users)
-    self.save
-
-    self.items.each do |aItem|
-      aItem.set_discover_users([email], aItem.discover_users)
-      aItem.set_read_users([email], aItem.read_users)
-      aItem.set_edit_users([email], aItem.edit_users)
-      aItem.save
-
-      aItem.documents.each do |aDocument|
-        aDocument.set_discover_users([email], aDocument.discover_users)
-        aDocument.set_read_users([email], aDocument.read_users)
-        aDocument.set_edit_users([email], aDocument.edit_users)
-        aDocument.save
-      end
-    end
-    return self.private_data_owner
-  end
-
   def setCollectionList(collectionList)
     self.collectionList = collectionList
     self.save!
@@ -78,7 +42,7 @@ class Collection < ActiveRecord::Base
   #
   def self.assign_licence(collection_name, licence)
     # Find the collection
-    array = Collection.find_by_short_name(collection_name)
+    array = Collection.find_by_name(collection_name)
     if array.empty?
       Rails.logger.error("Collection.assign_licence: cannot find a collection called #{name}")
       return
@@ -95,4 +59,8 @@ class Collection < ActiveRecord::Base
   # End of Support for adding licences to collections via scripts
   # ---------------------------------------------------------------------------
   #
+
+  def rdf_graph
+    RDF::Graph.load(self.rdf_file_path, :format => :ttl, :validate => true)
+  end
 end

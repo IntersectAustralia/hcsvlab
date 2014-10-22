@@ -26,11 +26,11 @@ end
 Given /^I have user "(.*)" with the following groups$/ do |userMail, table|
   user = User.find_by_email(userMail)
   table.hashes.each do |row|
-    col = Collection.find_by_short_name(row[:collectionName]).first
+    col = Collection.find_by_name(row[:collectionName]).first
 
     if (col.nil?)
       col = Collection.new
-      col.short_name = row[:collectionName]
+      col.name = row[:collectionName]
       col.uri = row[:collectionName]
       col.save
     end

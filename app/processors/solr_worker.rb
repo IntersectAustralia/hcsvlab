@@ -293,7 +293,7 @@ private
     debug("Solr_Worker", "Adding edit Permission field for group with value #{ident_parts[:collection]}-edit")
     ::Solrizer::Extractor.insert_solr_field_value(document, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
     #Create user permission fields
-    data_owner = Collection.find_by_short_name(ident_parts[:collection]).first.flat_private_data_owner
+    data_owner = Collection.find_by_name(ident_parts[:collection]).first.flat_private_data_owner
     if (!data_owner.nil?)
       debug("Solr_Worker", "Adding discover Permission field for user with value #{data_owner}-discover")
       ::Solrizer::Extractor.insert_solr_field_value(document, :'discover_access_person_ssim', "#{data_owner}")
@@ -613,7 +613,7 @@ private
   def find_collection(uri)
     uri = uri.to_s
     c = Collection.find_by_uri(uri)
-    c = Collection.find_by_short_name(last_bit(uri)) if c.size == 0
+    c = Collection.find_by_name(last_bit(uri)) if c.size == 0
     c
   end
 

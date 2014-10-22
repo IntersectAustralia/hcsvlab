@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
   has_many :user_annotations
   has_many :collection_lists, inverse_of: :owner
   has_many :collections, inverse_of: :owner
-  has_many :licences, inverse_of: :owner
+  has_many :licences, inverse_of: :owner, foreign_key: :owner_id
 
   # Setup accessible attributes (status/approved flags should NEVER be accessible by mass assignment)
   attr_accessible :email, :password, :password_confirmation, :first_name, :last_name
@@ -217,7 +217,7 @@ class User < ActiveRecord::Base
 
   def has_agreement_to_collection?(collection, access_type, exact=false)
     # if the user is the owner of the collection, then he/she does have access.
-    if (collection.flat_ownerEmail.eql?(self.email))
+    if (collection.owner.eql?(self.email))
       return true
     end
 

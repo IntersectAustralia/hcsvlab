@@ -709,7 +709,7 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   def collection_show_fields(collection)
-    graph = RDF::Graph.load(collection.rdf_path)
+    graph = RDF::Graph.load(collection.rdf_file_path)
     fields = graph.statements.map { |i| {collection_label(MetadataHelper::short_form(i.predicate)) => collection_value(graph, i.predicate)} }.uniq
     fields << {'SPARQL Endpoint' => catalog_sparqlQuery_url(collection.name)}
     fields

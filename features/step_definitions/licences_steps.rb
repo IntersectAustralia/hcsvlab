@@ -88,7 +88,7 @@ Given /^User "([^"]*)" has a Collection List called "([^"]*)" containing$/ do |e
   # Populate it with the collections mentioned in the table
   ids = []
   table.hashes.each_with_index do |row|
-    collection = Collection.find_by_short_name(row[:collection]).to_a.first
+    collection = Collection.find_by_name(row[:collection]).to_a.first
     ids << collection.id
   end
 
@@ -110,7 +110,7 @@ Then /^the Review and Acceptance of Licence Terms table should have$/ do |table|
 end
 
 And /^I have added a licence to (private )?Collection "([^"]*)"$/ do |priv, name|
-  coll = Collection.find_by_short_name(name).to_a.first
+  coll = Collection.find_by_name(name).to_a.first
   coll.set_license(Licence.first.id)
   if priv
     coll.set_privacy('true')
@@ -150,7 +150,7 @@ And /^I click "([^"]*)" on the (\d+)(?:|st|nd|rd|th) licence dialogue$/ do |name
 end
 
 Given(/^there is a licence request for collection "(.*?)" by "(.*?)"$/) do |collection_name, email|
-  coll = Collection.find_by_short_name(collection_name)[0]
+  coll = Collection.find_by_name(collection_name)[0]
   user = User.find_by_user_key(email)
   req = UserLicenceRequest.new(:request_id => coll.id, :request_type => "collection", :owner_email => coll.flat_ownerEmail, :approved => false)
   req.user = user

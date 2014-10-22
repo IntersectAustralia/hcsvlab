@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141020015616) do
+ActiveRecord::Schema.define(:version => 20141022045851) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -95,10 +95,10 @@ ActiveRecord::Schema.define(:version => 20141020015616) do
   create_table "licences", :force => true do |t|
     t.string   "name"
     t.text     "text"
-    t.string   "type"
     t.integer  "owner_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.boolean  "private"
   end
 
   create_table "roles", :force => true do |t|

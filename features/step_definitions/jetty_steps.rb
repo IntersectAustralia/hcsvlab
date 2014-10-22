@@ -44,7 +44,7 @@ And /^I have (\d+) licences belonging to "([^"]*)"$/ do |amount, email|
     s = sprintf("%02d", i)
     c = Collection.new
     c.uri = "www.example.com/#{s}"
-    c.short_name = "Licence #{s}"
+    c.name = "Licence #{s}"
     c.private_data_owner = email
     c.privacy_status = 'false'
     c.save
