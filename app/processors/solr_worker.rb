@@ -92,23 +92,6 @@ private
   #
 
   #
-  # Find the name of the Fedora object's parent object. In other words, if object
-  # represents a Document, return the id of the Item of which it is a part. If it
-  # is an Item, return nil. This is based on the isMemberOf field in its RELS-EXT
-  # datastream.
-  #
-  # TODO just use Item.all or Document.all to index
-  def parent_object(object)
-    # uri = buildURI(object, 'RELS-EXT')
-    graph = RDF::Graph.load(uri)
-    query = RDF::Query.new({:description => {MetadataHelper::IS_MEMBER_OF => :is_member_of}})
-    individual_result = query.execute(graph)
-
-    return nil if individual_result.size == 0
-    return last_bit(individual_result[0][:is_member_of])
-  end
-
-  #
   # Do the indexing for an Item
   #
   def index_item(object)
@@ -139,8 +122,8 @@ private
 
     # get full text from item
     begin
-      unless fed_item.nil? || fed_item.primary_text.nil?
-        full_text = fed_item.primary_text.content
+      unless fed_item.nil? || fed_item.primary_text_path.nil?
+        full_text = File.open(fed_item.primary_text_path).read
       end 
     rescue
       warning("Solr_Worker", "caught exception fetching full_text for: #{object}")
@@ -613,7 +596,7 @@ private
   def find_collection(uri)
     uri = uri.to_s
     c = Collection.find_by_uri(uri)
-    c = Collection.find_by_name(last_bit(uri)) if c.size == 0
+    c = Collection.find_by_name(last_bit(uri)) if c.nil?
     c
   end
 

@@ -61,6 +61,6 @@ class Collection < ActiveRecord::Base
   #
 
   def rdf_graph
-    RDF::Graph.load(self.rdf_file_path)
+    RDF::Graph.load(self.rdf_file_path, :format => :ttl, :validate => true)
   end
 end

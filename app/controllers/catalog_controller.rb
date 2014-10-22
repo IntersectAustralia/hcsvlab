@@ -939,7 +939,7 @@ class CatalogController < ApplicationController
           format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return }
         end
       end
-      params[:id] = item.first.id if item.present?
+      params[:id] = item.id
     end
   end
 

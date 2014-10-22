@@ -60,11 +60,10 @@ namespace :fedora do
 
     logger.info "rake fedora:clear"
 
-    Document.destroy_all
-    Item.destroy_all
-    Collection.destroy_all
-    CollectionList.destroy_all
-    Licence.destroy_all
+    Document.delete_all
+    Item.delete_all
+    Collection.delete_all
+    CollectionList.delete_all
 
   end
 
@@ -364,7 +363,7 @@ namespace :fedora do
 
         successes[rdf_file] = pid
       rescue => e
-        logger.error "Error! #{e.message}"
+        logger.error "Error! #{e.message}\n#{e.backtrace}"
         errors[rdf_file] = e.message
       end
     end

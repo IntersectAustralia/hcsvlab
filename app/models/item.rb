@@ -8,7 +8,7 @@ class Item < ActiveRecord::Base
   validates :handle, presence: true, uniqueness: {case_sensitive: false}
 
   def has_primary_text?
-    self.primary_text.present?
+    self.primary_text_path.present?
   end
 
   #
