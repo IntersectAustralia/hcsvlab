@@ -62,27 +62,27 @@ namespace :fedora do
     logger.info "Emptying Fedora"
 
     Item.find_each do |item|
-      logger.info "Item #{item.pid.to_s}"
+      logger.info "Item #{item.id.to_s}"
       item.delete
     end
 
     Document.find_each do |doc|
-      logger.info "Document #{doc.pid.to_s}"
+      logger.info "Document #{doc.id.to_s}"
       doc.delete
     end
 
     Collection.find_each do |coll|
-      logger.info "Collection #{coll.pid.to_s}"
+      logger.info "Collection #{coll.id.to_s}"
       coll.delete
     end
 
     CollectionList.find_each do |aCollectionList|
-      logger.info "Collection List #{aCollectionList.pid.to_s}"
+      logger.info "Collection List #{aCollectionList.id.to_s}"
       aCollectionList.delete
     end
 
     Licence.find_each do |aLicence|
-      logger.info "Licence #{aLicence.pid.to_s}"
+      logger.info "Licence #{aLicence.id.to_s}"
       aLicence.delete
     end
 
@@ -120,19 +120,19 @@ namespace :fedora do
 
     logger.info "Removing #{documents.size} Documents"
     documents.each { |doc|
-      logger.info "Removing Document: #{doc.pid}"
+      logger.info "Removing Document: #{doc.id}"
       doc.delete
     }
 
     Collection.find_by_short_name(corpus).each { |collection|
-      logger.info "Removing collection object #{collection.pid}"
+      logger.info "Removing collection object #{collection.id}"
       collection.delete
     }
 
     # Clear all metadata and annotations from the triple store
     server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
     repository = server.repository(corpus)
-    repository.clear() if !repository.nil?
+    repository.clear if repository.present?
 
   end
 
@@ -580,5 +580,14 @@ namespace :fedora do
   def setup_collection_list(list_name, licence, *collection_names)
     list = CollectionList.create_public_list(list_name, licence, *collection_names)
     logger.warning("Didn't create CollectionList #{list_name}") if list.nil?
+  end
+
+  def send_solr_message(command, objectID)
+    info("Fedora_Worker", "sending instruction to Solr_Worker: #{command} #{objectID}")
+    publish :solr_worker, "#{command} #{objectID}"
+    debug("Fedora_Worker", "Cache size: #{@@cache.size}")
+    @@cache.each_pair { |key, value|
+      debug("Fedora_Worker", "   @cache[#{key}] = #{value}")
+    }
   end
 end

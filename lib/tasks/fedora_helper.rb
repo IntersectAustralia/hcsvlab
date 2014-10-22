@@ -40,21 +40,22 @@ def ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection, id)
     item.save!
   end
 
-  # Msg to fedora.apim.update
-  begin
-    client = Stomp::Client.open "stomp://localhost:61613"
-    client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
-    if doc_ids.present?
-      doc_ids.each { |doc_id|
-        client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
-      }
-    end
-  rescue Exception => msg
-    logger.error "Error sending message via stomp: #{msg}"
-  ensure
-    client.close if !client.nil?
-  end
-  return item.pid
+  #REMOVE_ME
+  # # Msg to fedora.apim.update
+  # begin
+  #   client = Stomp::Client.open "stomp://localhost:61613"
+  #   client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
+  #   if doc_ids.present?
+  #     doc_ids.each { |doc_id|
+  #       client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
+  #     }
+  #   end
+  # rescue Exception => msg
+  #   logger.error "Error sending message via stomp: #{msg}"
+  # ensure
+  #   client.close if !client.nil?
+  # end
+  return item.id
 end
 
 def create_item_from_file(corpus_dir, rdf_file, manifest, collection, id=nil)
@@ -79,7 +80,7 @@ def create_item_from_file(corpus_dir, rdf_file, manifest, collection, id=nil)
     if id.nil?
       item = Item.new
     else
-      item = Item.create(pid: id)
+      item = Item.create(id: id)
     end
     item.save!
 
@@ -88,19 +89,7 @@ def create_item_from_file(corpus_dir, rdf_file, manifest, collection, id=nil)
     item.uri = uri
     item.collection = collection
 
-    # Add Groups to the created item
-    item.set_discover_groups(["#{collection_name}-discover"], [])
-    item.set_read_groups(["#{collection_name}-read"], [])
-    item.set_edit_groups(["#{collection_name}-edit"], [])
-    # Add complete permission for data_owner
-    data_owner = item.collection.flat_private_data_owner
-    if (!data_owner.nil?)
-      item.set_discover_users([data_owner], [])
-      item.set_read_users([data_owner], [])
-      item.set_edit_users([data_owner], [])
-    end
-
-    logger.info "Item = #{item.pid} created"
+    logger.info "Item = #{item.id} created"
 
     return item, true
   end
@@ -118,17 +107,17 @@ def update_item_from_file(item, manifest)
   item.collection = Collection.find_by_short_name(collection_name).first
 
   item.save!
-  logger.info "Updated item = " + item.pid.to_s
+  logger.info "Updated item = " + item.id.to_s
   stomp_client = Stomp::Client.open "stomp://localhost:61613"
   reindex_item_to_solr(item.id, stomp_client)
   item
 end
 
 def check_and_create_collection(collection_name, corpus_dir)
-  collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
+  collection = Collection.find_by_name(collection_name)
   if collection.nil?
     create_collection(collection_name, corpus_dir)
-    collection = Collection.find_and_load_from_solr({short_name: collection_name}).first
+    collection = Collection.find_by_name(collection_name)
   end
   return collection
 end
@@ -157,7 +146,7 @@ def create_collection_from_file(collection_file, collection_name)
   coll.rdfMetadata.graph.load(collection_file, :format => :ttl, :validate => true)
   coll.label = coll.rdfMetadata.graph.statements.first.subject.to_s
   coll.uri = coll.label
-  coll.short_name = collection_name
+  coll.name = collection_name
   coll.privacy_status = "false"
 
   if Collection.find_by_uri(coll.uri).present?
@@ -169,21 +158,9 @@ def create_collection_from_file(collection_file, collection_name)
 
   set_data_owner(coll)
 
-  # Add Groups to the created collection
-  coll.set_discover_groups(["#{collection_name}-discover"], [])
-  coll.set_read_groups(["#{collection_name}-read"], [])
-  coll.set_edit_groups(["#{collection_name}-edit"], [])
-  # Add complete permission for data_owner
-  data_owner = coll.flat_private_data_owner
-  if data_owner.present?
-    coll.set_discover_users([data_owner], [])
-    coll.set_read_users([data_owner], [])
-    coll.set_edit_users([data_owner], [])
-  end
-
   coll.save!
 
-  logger.info "Collection '#{coll.flat_short_name}' Metadata = #{coll.pid}" unless Rails.env.test?
+  logger.info "Collection '#{coll.flat_short_name}' Metadata = #{coll.id}" unless Rails.env.test?
 end
 
 def look_for_documents(item, corpus_dir, rdf_file, manifest)
@@ -206,7 +183,7 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
       results.each do |res|
         path = res[:source].value.gsub("file://", "")
         if File.exists? path and File.file? path
-          item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
+          item.primary_text_path = path
         end
       end
     rescue => e
@@ -217,40 +194,26 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
   docs.each do |result|
     identifier = result["identifier"]
     source = result["source"]
+    path = source.gsub("file:", "")
     type = result["type"]
 
     file_name = last_bit(source)
-    existing_doc = Document.find_and_load_from_solr({:file_name => file_name, :item_id => item.id})
+    existing_doc = item.documents.find_by_file_name(file_name)
     if existing_doc.empty?
       # Create a document in fedora
       begin
         doc = Document.new
         doc.file_name = file_name
+        doc.file_path = path
         doc.type      = type
-        doc.mime_type = mime_type_lookup(doc.file_name[0])
-        doc.label     = source
-        doc.add_named_datastream('content', :mimeType => doc.mime_type[0], :dsLocation => source)
+        doc.mime_type = mime_type_lookup(file_name)
         doc.item = item
         doc.item_id = item.id
-
-        # Add Groups to the created document
-        logger.debug "Creating document groups (discover, read, edit)"
-        doc.set_discover_groups(["#{item.collection.flat_short_name}-discover"], [])
-        doc.set_read_groups(["#{item.collection.flat_short_name}-read"], [])
-        doc.set_edit_groups(["#{item.collection.flat_short_name}-edit"], [])
-        # Add complete permission for data_owner
-        data_owner = item.collection.flat_private_data_owner
-        if (!data_owner.nil?)
-          logger.debug "Creating document users (discover, read, edit) with #{data_owner}"
-          doc.set_discover_users([data_owner], [])
-          doc.set_read_users([data_owner], [])
-          doc.set_edit_users([data_owner], [])
-        end
 
         doc.save
         doc_ids << doc.id
 
-        logger.info "#{type} Document = #{doc.pid.to_s}" unless Rails.env.test?
+        logger.info "#{type} Document = #{doc.id.to_s}" unless Rails.env.test?
       rescue Exception => e
         logger.error("Error creating document: #{e.message}")
       end
@@ -265,27 +228,26 @@ end
 
 def update_document(document, item, file_name, identifier, source, type, corpus_dir)
   begin
+    path = source.gsub("file:", "")
+
     document.file_name = file_name
+    document.file_path = path
     document.type      = type
-    document.mime_type = mime_type_lookup(document.file_name[0])
-    document.label     = source
-    document.update_named_datastream('content', :mimeType => document.mime_type[0], :dsid => "CONTENT1", :dsLocation => source)
+    document.mime_type = mime_type_lookup(file_name)
     document.item = item
-    document.item_id = item.id
     document.save
 
     # Create a primary text datastream in the fedora Item for primary text documents
-    path = source.gsub("file:", "")
     logger.info "Path:" + path
     if File.exists? path and File.file? path and STORE_DOCUMENT_TYPES.include? type
       case type
         when 'Text'
-          item.add_file_datastream(File.open(path), {dsid: "primary_text", mimeType: "text/plain"})
+          item.primary_text_path = path
         else
           logger.warn "??? Creating a #{type} document for #{path} but not adding it to its Item" unless Rails.env.test?
       end
     end
-    logger.info "#{type} Document = #{doc.pid.to_s}" unless Rails.env.test?
+    logger.info "#{type} Document = #{doc.id.to_s}" unless Rails.env.test?
   rescue Exception => e
     logger.error("Error creating document: #{e.message}")
   end
@@ -320,9 +282,9 @@ def set_data_owner(collection)
 
   results = query.execute(collection.rdfMetadata.graph)
   data_owner = find_system_user(results)
-  data_owner = find_default_owner() if data_owner.nil?
+  data_owner = find_default_owner if data_owner.nil?
   if data_owner.nil?
-    logger.warn "Cannot determine data owner for collection #{collection.short_name}"
+    logger.warn "Cannot determine data owner for collection #{collection.name}"
   elsif data_owner.cannot_own_data?
     logger.warn "Proposed data owner #{data_owner.email} does not have appropriate permission - ignoring"
   else
@@ -465,30 +427,28 @@ def find_system_user(results)
   results.each { |result|
     next unless result.has_variables?([:person])
     q = result[:person].to_s
-    u = User.find_all_by_email(q)
-    return u[0] if u.size > 0
+    u = User.find_by_email(q)
+    return u if u
   }
-  return nil
+  nil
 end
 
 
 #
 # Find the default data owner
 #
-def find_default_owner()
+def find_default_owner
   logger.debug "looking for default_data_owner in the APP_CONFIG, e-mail is #{APP_CONFIG['default_data_owner']}"
   email = APP_CONFIG["default_data_owner"]
-  u = User.find_all_by_email(email)
-  return u[0] if u.size > 0
-  return nil
+  User.find_by_email(email)
 end
 
 
 #
 # Ingest default set of licences
 #
-def create_default_licences(rootPath = "config")
-  Rails.root.join(rootPath, "licences").children.each do |lic|
+def create_default_licences(root_path = "config")
+  Rails.root.join(root_path, "licences").children.each do |lic|
     lic_info = YAML.load_file(lic)
 
     begin
@@ -502,7 +462,7 @@ def create_default_licences(rootPath = "config")
       logger.error "Licence Name: #{l.name[0]} not ingested: #{l.errors.messages.inspect}"
       next
     else
-      logger.info "Licence '#{l.name[0]}' = #{l.pid}" unless Rails.env.test?
+      logger.info "Licence '#{l.name[0]}' = #{l.id}" unless Rails.env.test?
     end
 
   end

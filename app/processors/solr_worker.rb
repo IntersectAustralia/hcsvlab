@@ -72,7 +72,7 @@ class Solr_Worker < ApplicationProcessor
 
     case command
     when "index"
-      index(object)
+      index_item(object)
     when "delete"
       delete(object)
     else
@@ -163,19 +163,6 @@ private
     }
 
     store_results(object, basic_results, full_text, extras, internalUseData)
-  end
-
-  #
-  # Invoked when we get the "index" command. Determine the type of object it is
-  # and item it accordingly.
-  #
-  def index(object)
-    parent = parent_object(object)
-    if parent.nil?
-      index_item(object)
-    else
-      debug("Solr_Worker", "isMemberOf value found for #{object}, not indexing.")
-    end
   end
 
   #

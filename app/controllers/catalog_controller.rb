@@ -549,9 +549,7 @@ class CatalogController < ApplicationController
     begin
       item = Item.find(params[:id])
 
-      response.header["Content-Length"] = item.primary_text.content.length.to_s
-      send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
-
+      send_file item.primary_text_path
       bench_end = Time.now
       Rails.logger.debug("Time for retrieving primary text for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
     rescue Exception => e

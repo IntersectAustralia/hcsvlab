@@ -44,14 +44,6 @@ class Collection < ActiveRecord::Base
     return self.private_data_owner
   end
 
-
-  #
-  # Find a collection using its short_name
-  #
-  def Collection.find_by_short_name(short_name)
-    return Collection.where(short_name: short_name).all
-  end
-
   def setCollectionList(collectionList)
     self.collectionList = collectionList
     self.save!

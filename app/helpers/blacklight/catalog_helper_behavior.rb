@@ -187,7 +187,7 @@ module Blacklight::CatalogHelperBehavior
     itemIdentifier = document[:handle].split(':').last
 
     # Prepare document PRIMARY_TEXT_URL information
-    solr_item = Item.find_and_load_from_solr({id: document[:id]}).first
+    solr_item = Item.find(document[:id])
     if solr_item.has_primary_text?
       begin
         primary_text = catalog_primary_text_url(collectionName, format: :json)
