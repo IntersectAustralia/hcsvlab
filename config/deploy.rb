@@ -164,7 +164,6 @@ namespace :deploy do
     refresh_db
 
     configure_activemq
-    configure_fedora
     configure_solr
     configure_tomcat6
 
@@ -172,7 +171,6 @@ namespace :deploy do
 
   task :configure do
     configure_activemq
-    configure_fedora
     configure_solr
     configure_tomcat6
   end

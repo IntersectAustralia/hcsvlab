@@ -17,8 +17,6 @@ class TranscriptsController < ApplicationController
   TRANSCRIPT_FIELDS = %w(title date depositor country_code language_code copyright license private
       source source_cache transcript_format participants_attributes description format recorded_on)
 
-  FEDORA_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env] unless const_defined?(:FEDORA_CONFIG)
-  
   def show
     begin
       attributes = document_to_attribues params['id']

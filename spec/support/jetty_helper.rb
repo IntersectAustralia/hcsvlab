@@ -16,13 +16,6 @@ def clear_jetty
     http.request(req)
   end
 
-  # clear Fedora
-  Item.delete_all
-  Document.delete_all
-  Collection.delete_all
-  CollectionList.delete_all
-  Licence.delete_all
-
   # Clear Sesame
   server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
   repositories = server.repositories
@@ -30,15 +23,6 @@ def clear_jetty
     if (!"SYSTEM".eql? repositoryName)
       server.delete(repositories[repositoryName].path)
     end
-  end
-end
-
-#
-# Reserve first 10 for Item testing
-#
-def reserve_fedora_pids
-  (1..10).each do |num|
-    Item.create(pid: "hcsvlab:#{num}")
   end
 end
 

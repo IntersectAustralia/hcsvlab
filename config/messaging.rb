@@ -7,12 +7,8 @@ ActiveMessaging::Gateway.define do |s|
   #s.filter :some_filter, :only=>:orders
   #s.processor_group :group1, :order_processor
  
-  s.destination :fedora_update, '/queue/fedora.apim.update'
-  s.destination :fedora_access, '/queue/fedora.apim.access'
- 
   s.destination :solr_worker, '/queue/hcsvlab.solr.worker'
 
-  s.processor_group :fedora_group, :fedora_worker, :vacuum_cleaner
   s.processor_group :solr_group, :solr_worker
 
 end

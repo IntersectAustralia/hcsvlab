@@ -14,7 +14,7 @@ class CollectionListsController < ApplicationController
 
     begin
       @currentCollectionList = CollectionList.find(params[:id])
-    rescue ActiveFedora::ObjectNotFoundError
+    rescue ActiveRecord::RecordNotFound
       @currentCollectionList = nil
     end
   end
@@ -33,7 +33,7 @@ class CollectionListsController < ApplicationController
         collection_list.save
         add_collections_to_collection_list(collection_list, collections)
         flash[:notice] = 'Collections list created successfully'
-      rescue ActiveFedora::RecordInvalid => e
+      rescue ActiveRecord::RecordInvalid => e
         errors = ""
         e.record.errors.messages.each do |key, value|
           value.each do |value2|

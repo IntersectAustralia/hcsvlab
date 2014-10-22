@@ -828,7 +828,7 @@ class CatalogController < ApplicationController
 
     #collections = []
     #collectionNames.each do |aCollectionName|
-    #  Retrieve the collection from Fedora
+    #  Retrieve the collection
     #collection = Collection.find_by_short_name(aCollectionName[:name]).to_a.first
     #if (collection.nil? && !aCollectionName[:silent])
     #  respond_to do |format|

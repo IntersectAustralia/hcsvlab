@@ -4,14 +4,15 @@ require "#{Rails.root}/spec/support/jetty_helper"
 #make sure jetty is started and clean
 puts 'Ensuring jetty test instance is up...'.yellow
 if Dir.glob("#{Rails.root}/tmp/pids/*jetty.pid").empty?
-  puts "fedora.pid file not found. Make sure hydra-jetty is installed and the #{Rails.env} copy is installed and running".red
+  puts "jetty.pid file not found. Make sure hydra-jetty is installed and the #{Rails.env} copy is installed and running".red
   exit 1
 end
 
 #make sure jetty is set up properly
-output = `diff #{Rails.root}/fedora_conf/conf/test/fedora.fcfg #{Rails.root}/jetty/fedora/test/server/config/fedora.fcfg`
+
+output = `diff #{Rails.root}/solr_conf/conf/schema.xml #{Rails.root}jetty/solr/development-core/conf/schema.xml`
 if output.present?
-  puts "Please run rake jetty:config to set up Fedora".red
+  puts "Please run rake jetty:config to set up Solr".red
   puts output
   exit 1
 end
@@ -19,8 +20,6 @@ puts 'Test jetty ready'.green
 
 `echo '' > #{Rails.root}/log/test.log`
 clear_jetty
-
-reserve_fedora_pids
 
 at_exit do
   clear_jetty

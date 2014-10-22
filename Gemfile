@@ -76,7 +76,6 @@ gem 'daemons'
 gem 'activemessaging'
 
 gem 'solrizer'
-# gem 'solrizer-fedora', "3.0.0.pre1"
 gem 'rsolr'
 gem "xml-simple"
 gem 'nokogiri'

@@ -73,7 +73,7 @@ class LicencesController < ApplicationController
 
       #TODO: This should redirect to
       redirect_to licences_path
-    rescue ActiveFedora::RecordInvalid => e
+    rescue ActiveRecord::RecordInvalid => e
       @params = params
       if !collectionListId.nil?
         @CollectionList = CollectionList.find(collectionListId)
