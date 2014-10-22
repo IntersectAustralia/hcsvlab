@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(:version => 20141022045851) do
   create_table "collection_lists", :force => true do |t|
     t.string   "name"
     t.boolean  "private"
-    t.integer  "license_id"
+    t.integer  "licence_id"
     t.integer  "owner_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(:version => 20141022045851) do
     t.boolean  "private"
     t.integer  "owner_id"
     t.integer  "collection_list_id"
-    t.integer  "license_id"
+    t.integer  "licence_id"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
   end
@@ -47,7 +47,7 @@ ActiveRecord::Schema.define(:version => 20141022045851) do
   create_table "documents", :force => true do |t|
     t.string   "file_name"
     t.string   "file_path"
-    t.string   "type"
+    t.string   "doc_type"
     t.string   "mime_type"
     t.integer  "item_id"
     t.datetime "created_at", :null => false

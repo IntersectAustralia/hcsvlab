@@ -13,7 +13,7 @@ class CreateItemsAndDocuments < ActiveRecord::Migration
     create_table :documents do |t|
       t.string :file_name
       t.string :file_path
-      t.string :type
+      t.string :doc_type
       t.string :mime_type
       t.references :item
       t.timestamps

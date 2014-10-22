@@ -4,10 +4,9 @@
 #
 # 1. The amount of free disk space
 # 2. Whether ActiveMQ is up and on the right ports
-# 3. Fedora is up
-# 4. Solr is up
-# 5. The workers are running
-# 6. The web app is running
+# 3. Solr is up
+# 4. The workers are running
+# 5. The web app is running
 #
 
 RET_STATUS=0

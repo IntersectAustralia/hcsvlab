@@ -97,7 +97,7 @@ class Ability
     # User can edit a collection only if he/she is the owner or if he/she was granted
     # with edit access to that collection
     #can :edit, Collection do |aCollection|
-    #  (user.email.eql? aCollection.flat_ownerEmail) or
+    #  (user.id.eql? aCollection.owner_id) or
     #      ((user.groups & aCollection.edit_groups).length > 0)
     #end
 

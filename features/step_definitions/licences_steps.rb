@@ -111,7 +111,7 @@ end
 
 And /^I have added a licence to (private )?Collection "([^"]*)"$/ do |priv, name|
   coll = Collection.find_by_name(name).to_a.first
-  coll.set_license(Licence.first.id)
+  coll.set_licence(Licence.first.id)
   if priv
     coll.set_privacy('true')
   else
@@ -121,7 +121,7 @@ end
 
 And /^I have added a licence to (private )?Collection List "([^"]*)"$/ do |priv, name|
   list = CollectionList.find_by_name(name)[0]
-  list.set_license(Licence.first.id)
+  list.set_licence(Licence.first.id)
   if priv
     list.set_privacy('true')
   else
@@ -152,7 +152,7 @@ end
 Given(/^there is a licence request for collection "(.*?)" by "(.*?)"$/) do |collection_name, email|
   coll = Collection.find_by_name(collection_name)[0]
   user = User.find_by_user_key(email)
-  req = UserLicenceRequest.new(:request_id => coll.id, :request_type => "collection", :owner_email => coll.flat_ownerEmail, :approved => false)
+  req = UserLicenceRequest.new(:request_id => coll.id, :request_type => "collection", :owner => coll.owner, :approved => false)
   req.user = user
   req.save!
 end
@@ -160,7 +160,7 @@ end
 Given(/^there is a licence request for collection list "(.*?)" by "(.*?)"$/) do |collection_name, email|
   coll = CollectionList.find_by_name(collection_name)[0]
   user = User.find_by_user_key(email)
-  req = UserLicenceRequest.new(:request_id => coll.id, :request_type => "collection_list", :owner_email => coll.flat_ownerEmail, :approved => false)
+  req = UserLicenceRequest.new(:request_id => coll.id, :request_type => "collection_list", :owner => coll.owner, :approved => false)
   req.user = user
   req.save!
 end

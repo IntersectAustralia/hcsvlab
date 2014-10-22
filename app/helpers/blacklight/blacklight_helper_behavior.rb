@@ -682,9 +682,9 @@ module Blacklight::BlacklightHelperBehavior
 
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(fed_item.collection.flat_name)
+      repository = server.repository(fed_item.collection.name)
 
-      raise Exception.new "Repository not found - #{fed_item.collection.flat_name}" if repository.nil?
+      raise Exception.new "Repository not found - #{fed_item.collection.name}" if repository.nil?
 
       document_results = repository.query(:subject => RDF::URI.new(item), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
 
@@ -709,7 +709,7 @@ module Blacklight::BlacklightHelperBehavior
   end
 
   def collection_show_fields(collection)
-    graph = RDF::Graph.load(collection.rdf_file_path)
+    graph = collection.rdf_graph
     fields = graph.statements.map { |i| {collection_label(MetadataHelper::short_form(i.predicate)) => collection_value(graph, i.predicate)} }.uniq
     fields << {'SPARQL Endpoint' => catalog_sparqlQuery_url(collection.name)}
     fields

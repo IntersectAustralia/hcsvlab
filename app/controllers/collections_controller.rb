@@ -64,7 +64,7 @@ class CollectionsController < ApplicationController
       UserLicenceRequest.where(:request_id => collection.id).destroy_all
     end
     private=="true" ? state="requiring approval" : state="not requiring approval"
-    flash[:notice] = "#{collection.flat_name} has been successfully marked as #{state}"
+    flash[:notice] = "#{collection.name} has been successfully marked as #{state}"
     redirect_to licences_path
   end
 
@@ -74,8 +74,8 @@ class CollectionsController < ApplicationController
   def revoke_access
     collection = Collection.find(params[:id])
     UserLicenceRequest.where(:request_id => collection.id).destroy_all if collection.private?
-    UserLicenceAgreement.where("group_name LIKE :prefix", prefix: "#{collection.flat_name}%").destroy_all
-    flash[:notice] = "All access to #{collection.flat_name} has been successfully revoked"
+    UserLicenceAgreement.where("group_name LIKE :prefix", prefix: "#{collection.name}%").destroy_all
+    flash[:notice] = "All access to #{collection.name} has been successfully revoked"
     redirect_to licences_path
   end
 

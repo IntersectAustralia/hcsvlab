@@ -24,11 +24,10 @@ describe Licence do
       pid = l.pid
 
       lic = Licence.find(pid)
-      lic.flat_name.should eq "CC Licence " + rnd
-      lic.flat_text.should eq "Various text outlining terms of the licence"
+      lic.name.should eq "CC Licence " + rnd
+      lic.text.should eq "Various text outlining terms of the licence"
       lic.private.should eq false
-      lic.flat_ownerId.to_i.should eq u.id
-      lic.flat_ownerEmail.should eq "test@intersect.org.au"
+      lic.owner.should eq u
     end
 
   end

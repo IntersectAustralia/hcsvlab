@@ -92,21 +92,21 @@ class ItemList < ActiveRecord::Base
   # Return the response we get from Solr.
   #
   def get_items(start, rows)
-    get_solr_connection()
+    get_solr_connection
 
     rows = 20 if rows.nil?
     if start.nil?
-      startValue = 0
+      start_value = 0
     else
-      startValue = (start.to_i-1)*rows.to_i
+      start_value = (start.to_i-1)*rows.to_i
     end
 
-    handles = get_item_handles()
+    handles = get_item_handles
 
-    if (!handles.empty?)
+    if handles.present?
       validItems = validateItems(handles)
 
-      params = {:start => startValue, :rows => rows, "facet.field" => "collection_name_facet"}
+      params = {:start => start_value, :rows => rows, "facet.field" => "collection_name_facet"}
       document_list, response = SearchUtils.retrieveDocumentsFromSolr(params, handles)
     else
       response = {}

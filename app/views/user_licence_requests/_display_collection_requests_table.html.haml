@@ -13,22 +13,22 @@
       %td= @user.email
       - if request.request.is_a? CollectionList
         %td.name
-          %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection#{index}", :role => "button"}=request.request.flat_name
+          %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection#{index}", :role => "button"}=request.request.name
           .modal.hide.fade.in{:id => "collection#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
             .modal-header
               %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-              %h3#myModalLabel= request.request.flat_name
+              %h3#myModalLabel= request.request.name
             #collection_list_detail_dialog.modal-body{:title => "Licence Terms"}
               #collection_list_detail_content{:readonly => "true"}
                 %table
                   - request.request.collections.each do |aCollection|
                     %tr
                       %td
-                        =aCollection.flat_name
+                        =aCollection.name
             .modal-footer
               %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
       - else
-        %td= link_to request.request.flat_name, collection_path(request.request.flat_name)
+        %td= link_to request.request.name, collection_path(request.request.name)
       %td
         = link_to "Approve", approve_request_user_licence_request_path(request), :method => :put, :id => "approve_#{request.id}", :class => "btn btn-primary btn-mini"
 

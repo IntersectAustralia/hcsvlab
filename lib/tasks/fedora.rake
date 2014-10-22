@@ -59,32 +59,12 @@ namespace :fedora do
   task :clear => :environment do
 
     logger.info "rake fedora:clear"
-    logger.info "Emptying Fedora"
 
-    Item.find_each do |item|
-      logger.info "Item #{item.id.to_s}"
-      item.delete
-    end
-
-    Document.find_each do |doc|
-      logger.info "Document #{doc.id.to_s}"
-      doc.delete
-    end
-
-    Collection.find_each do |coll|
-      logger.info "Collection #{coll.id.to_s}"
-      coll.delete
-    end
-
-    CollectionList.find_each do |aCollectionList|
-      logger.info "Collection List #{aCollectionList.id.to_s}"
-      aCollectionList.delete
-    end
-
-    Licence.find_each do |aLicence|
-      logger.info "Licence #{aLicence.id.to_s}"
-      aLicence.delete
-    end
+    Document.destroy_all
+    Item.destroy_all
+    Collection.destroy_all
+    CollectionList.destroy_all
+    Licence.destroy_all
 
   end
 
@@ -103,31 +83,10 @@ namespace :fedora do
 
     logger.info "rake fedora:clear_corpus corpus=#{corpus}"
 
-    objects = find_corpus_items corpus
-
-    logger.info "Removing collection #{corpus}"
-    logger.info "Removing #{objects.count} Items"
-
-    documents = []
-
-    objects.each do |obj|
-      id = obj["id"].to_s
-      logger.info "Removing Item: #{id}"
-      fobj=Item.find(id)
-      documents.concat(fobj.documents)
-      fobj.delete
-    end
-
-    logger.info "Removing #{documents.size} Documents"
-    documents.each { |doc|
-      logger.info "Removing Document: #{doc.id}"
-      doc.delete
-    }
-
-    Collection.find_by_name(corpus).each { |collection|
-      logger.info "Removing collection object #{collection.id}"
-      collection.delete
-    }
+    collection = Collection.find_by_name(corpus)
+    Document.where(item_id: Item.where(collection_id: collection)).delete_all
+    Item.where(collection_id: collection).delete_all
+    collection.destroy
 
     # Clear all metadata and annotations from the triple store
     server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
@@ -187,7 +146,7 @@ namespace :fedora do
 
   end
 
-  #
+  # TODO
   # Consolidate cores by reindexing items found only in the ActiveFedora core
   #
   CHUNK_SIZE = 50
@@ -367,8 +326,6 @@ namespace :fedora do
     collection_name = manifest["collection_name"]
     collection = check_and_create_collection(collection_name, corpus_dir)
 
-    populate_triple_store(corpus_dir, collection_name)
-
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
     if num_spec == :all
@@ -403,7 +360,7 @@ namespace :fedora do
 
     rdf_files.each do |rdf_file|
       begin
-        pid = ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection, nil)
+        pid = ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection)
 
         successes[rdf_file] = pid
       rescue => e

@@ -12,53 +12,36 @@ SESAME_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/sesame.yml")[Rails.env
 # Ingests a single item, creating both a collection object and manifest if they don't
 # already exist. NOTE: the id variable should only be passed in for use in automated tests!
 #
-def ingest_one(corpus_dir, rdf_file, id=nil)
+def ingest_one(corpus_dir, rdf_file)
   check_and_create_manifest(corpus_dir)
   manifest = JSON.parse(IO.read(File.join(corpus_dir, MANIFEST_FILE_NAME)))
 
   collection_name = manifest["collection_name"]
   collection = check_and_create_collection(collection_name, corpus_dir)
 
-  populate_triple_store(corpus_dir, collection_name)
-
-  ingest_rdf_file(corpus_dir, rdf_file, true, manifest, collection, id)
+  ingest_rdf_file(corpus_dir, rdf_file, true, manifest, collection)
 end
 
-def ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection, id)
+def ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection)
   unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
     raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
   end
   logger.info "Ingesting item: #{rdf_file}"
 
-  item, update = create_item_from_file(corpus_dir, rdf_file, manifest, collection, id)
+  item, update = create_item_from_file(corpus_dir, rdf_file, manifest, collection)
 
   if update
     look_for_annotations(item, rdf_file) if annotations
 
-    doc_ids = look_for_documents(item, corpus_dir, rdf_file, manifest)
+    look_for_documents(item, corpus_dir, rdf_file, manifest)
 
     item.save!
   end
 
-  #REMOVE_ME
-  # # Msg to fedora.apim.update
-  # begin
-  #   client = Stomp::Client.open "stomp://localhost:61613"
-  #   client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">finishedWork</title><content type=\"text\">Fedora worker has finished with #{item.pid}</content><summary type=\"text\">#{item.pid}</summary> </xml>")
-  #   if doc_ids.present?
-  #     doc_ids.each { |doc_id|
-  #       client.publish('/queue/fedora.apim.update', "<xml><title type=\"text\">isDocument</title><content type=\"text\">Fedora object #{doc_id} is a Document</content><summary type=\"text\">#{doc_id}</summary> </xml>")
-  #     }
-  #   end
-  # rescue Exception => msg
-  #   logger.error "Error sending message via stomp: #{msg}"
-  # ensure
-  #   client.close if !client.nil?
-  # end
-  return item.id
+  item.id
 end
 
-def create_item_from_file(corpus_dir, rdf_file, manifest, collection, id=nil)
+def create_item_from_file(corpus_dir, rdf_file, manifest, collection)
   item_info = manifest["files"][File.basename(rdf_file)]
   raise StandardError, "Error with file during manifest creation - #{rdf_file}" if !item_info["error"].nil?
   identifier = item_info["id"]
@@ -66,28 +49,21 @@ def create_item_from_file(corpus_dir, rdf_file, manifest, collection, id=nil)
   collection_name = manifest["collection_name"]
   handle = "#{collection_name}:#{identifier}"
 
-  # We can't use find_and_load_from_solr method here since the result is not a full DigitalObject
-  # and thus we can't call methods like modified_date
-  existingItem = Array(Item.where(:handle => handle)).first
+  existing_item = Item.find_by_handle(handle)
 
-  if !existingItem.nil? && File.mtime(rdf_file).utc < Time.parse(existingItem.modified_date)
-    logger.info "Item = #{existingItem.id} already up to date"
-    return existingItem, false
-  elsif !existingItem.nil?
-    logger.info "Item = #{existingItem.id} updated"
-    return update_item_from_file(existingItem, manifest), true
+  if existing_item.present? && File.mtime(rdf_file).utc < existing_item.updated_at.utc
+    logger.info "Item = #{existing_item.id} already up to date"
+    return existing_item, false
+  elsif existing_item.present?
+    logger.info "Item = #{existing_item.id} updated"
+    return update_item_from_file(existing_item, manifest), true
   else
-    if id.nil?
-      item = Item.new
-    else
-      item = Item.create(id: id)
-    end
-    item.save!
+    item = Item.new
 
-    item.label = handle
     item.handle = handle
     item.uri = uri
     item.collection = collection
+    item.save!
 
     logger.info "Item = #{item.id} created"
 
@@ -101,10 +77,9 @@ def update_item_from_file(item, manifest)
   uri = item_info["uri"]
   collection_name = manifest["collection_name"]
   handle = "#{collection_name}:#{identifier}"
-  item.label = handle
-
+  item.handle = handle
   item.uri = uri
-  item.collection = Collection.find_by_name(collection_name).first
+  item.collection = Collection.find_by_name(collection_name)
 
   item.save!
   logger.info "Updated item = " + item.id.to_s
@@ -118,8 +93,10 @@ def check_and_create_collection(collection_name, corpus_dir)
   if collection.nil?
     create_collection(collection_name, corpus_dir)
     collection = Collection.find_by_name(collection_name)
+    populate_triple_store(corpus_dir, collection_name)
+
   end
-  return collection
+  collection
 end
 
 def create_collection(collection_name, corpus_dir)
@@ -165,14 +142,12 @@ def create_collection_from_file(collection_file, collection_name)
 end
 
 def look_for_documents(item, corpus_dir, rdf_file, manifest)
-  doc_ids = []
-
   docs = manifest["files"][File.basename(rdf_file)]["docs"]
 
   # Create a primary text datastream in the fedora Item for primary text documents
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(item.collection.flat_name)
+      repository = server.repository(item.collection.name)
 
       query = RDF::Query.new do
         pattern [RDF::URI.new(item.uri), MetadataHelper::INDEXABLE_DOCUMENT, :indexable_doc]
@@ -200,19 +175,18 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
 
     file_name = last_bit(source)
     existing_doc = item.documents.find_by_file_name(file_name)
-    if existing_doc.empty?
+    if existing_doc.blank?
       # Create a document in fedora
       begin
         doc = Document.new
         doc.file_name = file_name
         doc.file_path = path
-        doc.type      = type
+        doc.doc_type      = type
         doc.mime_type = mime_type_lookup(file_name)
         doc.item = item
         doc.item_id = item.id
 
         doc.save
-        doc_ids << doc.id
 
         logger.info "#{type} Document = #{doc.id.to_s}" unless Rails.env.test?
       rescue Exception => e
@@ -220,11 +194,9 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
       end
     else
       update_document(existing_doc.first, item, file_name, identifier, source, type, corpus_dir)
-      doc_ids << existing_doc.first.id
     end
   end
 
-  return doc_ids
 end
 
 def update_document(document, item, file_name, identifier, source, type, corpus_dir)
@@ -233,7 +205,7 @@ def update_document(document, item, file_name, identifier, source, type, corpus_
 
     document.file_name = file_name
     document.file_path = path
-    document.type      = type
+    document.doc_type      = type
     document.mime_type = mime_type_lookup(file_name)
     document.item = item
     document.save
@@ -259,7 +231,7 @@ def look_for_annotations(item, metadata_filename)
   return if annotation_filename == metadata_filename # HCSVLAB-441
 
   if File.exists?(annotation_filename)
-    if item.annotation_path.empty?
+    if item.annotation_path.blank?
       item.annotation_path = annotation_filename
       logger.info "Annotation datastream added for #{File.basename(annotation_filename)}" unless Rails.env.test?
     else
@@ -349,7 +321,7 @@ def extract_manifest_collection(rdf_file)
   result = query.execute(graph)[0]
   collection_name = last_bit(result.collection.to_s)
 
-  # small hack to handle austalk for the time being, can be fixed up 
+  # small hack to handle austalk for the time being, can be fixed up
   # when we look at getting some form of data uniformity
   if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
     collection_name = "austalk"

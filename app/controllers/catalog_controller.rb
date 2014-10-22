@@ -300,7 +300,7 @@ class CatalogController < ApplicationController
         #TODO REFACTOR
         Collection.all.each do |aCollection|
           #I have access to a collection if I am the owner or if I accepted the licence for that collection
-          hasAccessToCollection = (aCollection.owner.eql? current_user.email) ||
+          hasAccessToCollection = (aCollection.owner_id.eql? current_user.id) ||
               (current_user.has_agreement_to_collection?(aCollection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE, false))
 
           @hasAccessToSomeCollections = @hasAccessToSomeCollections || hasAccessToCollection
@@ -967,12 +967,12 @@ class CatalogController < ApplicationController
   #
   def query_annotations(item, solr_document, type, label)
     item_short_identifier = item.handle.split(":").last
-    corpus = item.collection.flat_name
+    corpus = item.collection.name
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(corpus)
 
-    namespaces = RdfNamespace.get_namespaces(item.collection.flat_name)
+    namespaces = RdfNamespace.get_namespaces(item.collection.name)
 
     prefixes = ""
     namespaces.each do |k, v|
@@ -1064,9 +1064,9 @@ class CatalogController < ApplicationController
     display_document = get_display_document(solr_document)
 
     if !display_document.nil?
-      annotates_document = catalog_document_url(@item.collection.flat_name, filename: display_document[:id])
+      annotates_document = catalog_document_url(@item.collection.name, filename: display_document[:id])
     else
-      annotates_document = catalog_url(@item.collection.flat_name, item_short_identifier)
+      annotates_document = catalog_url(@item.collection.name, item_short_identifier)
     end
 
     return {commonProperties: commonProperties, annotations: hash}, annotates_document
@@ -1080,7 +1080,7 @@ class CatalogController < ApplicationController
     item_short_identifier = item.handle.split(":").last
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-    repo = server.repository(item.collection.flat_name)
+    repo = server.repository(item.collection.name)
 
     query = "" "
         PREFIX dada:<http://purl.org/dada/schema/0.2#>
@@ -1112,7 +1112,7 @@ class CatalogController < ApplicationController
     item_short_identifier = item.handle.split(":").last
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-    repo = server.repository(item.collection.flat_name)
+    repo = server.repository(item.collection.name)
 
     query = "" "
         PREFIX dada:<http://purl.org/dada/schema/0.2#>
@@ -1140,7 +1140,7 @@ class CatalogController < ApplicationController
     sols = repo.sparql_query(query)
     props = sols.select(:property).distinct
 
-    namespaces = RdfNamespace.get_namespaces(item.collection.flat_name)
+    namespaces = RdfNamespace.get_namespaces(item.collection.name)
     props.each do |sol|
       entry = {:uri => sol[:property].to_s}
       entry[:shortened_uri] = RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) if RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) != entry[:uri]
@@ -1157,7 +1157,7 @@ class CatalogController < ApplicationController
 
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(item.collection.flat_name)
+      repository = server.repository(item.collection.name)
 
       query = RDF::Query.new do
         pattern [RDF::URI.new(item.uri), MetadataHelper::DISPLAY_DOCUMENT, :display_doc]

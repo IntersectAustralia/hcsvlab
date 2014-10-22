@@ -1,10 +1,11 @@
 class Item < ActiveRecord::Base
 
   has_many :documents
+
   belongs_to :collection
 
   validates :uri, presence: true
-  validates :handle, presence: true
+  validates :handle, presence: true, uniqueness: {case_sensitive: false}
 
   def has_primary_text?
     self.primary_text.present?

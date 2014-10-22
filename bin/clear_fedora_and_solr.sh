@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Clear out Fedora & Solr by deleting the data on disk
+# Clear out Solr by deleting the data on disk
 # and then running the Fedora rebuild script to rebuild
 # the SQL database.
 #

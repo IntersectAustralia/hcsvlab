@@ -19,7 +19,7 @@ class TranscriptsController < ApplicationController
 
   def show
     begin
-      attributes = document_to_attribues params['id']
+      attributes = document_to_attributes params['id']
       @transcript = load_transcript attributes
       @media_item = load_media attributes
     rescue Exception => e
@@ -108,7 +108,7 @@ class TranscriptsController < ApplicationController
     attributes.select {|key, value| filter.include? key}
   end
 
-  def document_to_attribues(item_id)
+  def document_to_attributes(item_id)
     document = get_solr_document item_id
     attributes = solr_doc_to_hash(document)
 

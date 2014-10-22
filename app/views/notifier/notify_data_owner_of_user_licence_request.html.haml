@@ -2,7 +2,7 @@
 %p
   Email: #{@request.user_email}
   %br/
-  Collection: #{@coll.flat_name}
+  Collection: #{@coll.name}
   %br/
   Timestamp: #{@request.created_at}
 %p You can manage licence access here: #{user_licence_requests_url}

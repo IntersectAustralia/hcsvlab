@@ -8,9 +8,12 @@ class CollectionList < ActiveRecord::Base
   validates_length_of :name, maximum: 255, message: "Name is too long (maximum is 255 characters)"
   validates_presence_of :owner_id, message: 'Collection List owner id can not be empty'
 
-  validate :same_license_integrity_check
+  validate :same_licence_integrity_check
 
   before_destroy :remove_collection_licences
+
+  attr_accessible :name, :private
+
 
   def set_privacy(status)
     self.private = status
@@ -26,8 +29,8 @@ class CollectionList < ActiveRecord::Base
   # Adds collections to a Collection List
   #
   def add_collections(collection_ids)
-    self.collection_ids << collection_ids
-    self.set_license(self.licence)
+    self.collection_ids += collection_ids
+    self.set_licence(self.licence_id)
     self.save!
   end
 
@@ -48,12 +51,11 @@ class CollectionList < ActiveRecord::Base
   #
   # Adds licence to collection list
   #
-  def set_license(licence)
-    licence = Licence.find(licence.to_s) unless licence.is_a? Licence
-
-    Rails.logger.debug "Adding licence #{licence.id} to collection list #{self.id}"
-
-    self.collections.update_all(license_id: licence.id)
+  def set_licence(licence)
+    licence_id = licence.is_a?(Licence) ? licence.id : licence
+    Rails.logger.debug "Adding licence #{licence_id} to collection list #{self.id}"
+    self.update_attribute(:licence_id, licence_id)
+    self.collections.update_all(licence_id: licence_id)
   end
 
   private
@@ -62,20 +64,21 @@ class CollectionList < ActiveRecord::Base
   # Removes the licence of every Collection contained in this Collection List
   #
   def remove_collection_licences
-    self.collections.update_all(license_id: nil)
+    self.update_attribute(:licence_id, nil)
+    self.collections.update_all(licence_id: nil)
   end
 
   #
   # Checks that that licence of this Collection List is the same than the licence of the Collections contained in
   # this Collection List.
   #
-  def same_license_integrity_check
+  def same_licence_integrity_check
 
-    licenses = [license_id] + collections.pluck(:license_id)
-    error = licenses.uniq.size == 1
-    if error
+    licenses = [licence_id] + collections.pluck(:licence_id)
+
+    if licenses.uniq.size > 1
       errors[:base] << "All Collection in a Collection List must have the same licence"
-      collections.where('license_id != ?', license_id.to_i).each do |collection|
+      collections.where('licence_id != ?', licence_id.to_i).each do |collection|
         Rails.logger.debug "Collection #{collection.id} has licence #{collection.licence.name}, but the Collection List #{self.id} has licence #{self.collection.name}"
       end
     end
@@ -108,11 +111,11 @@ class CollectionList < ActiveRecord::Base
     # Find the Collections with the given collection_names
     warnings = []
     missing = collection_names - Collection.where(name: collection_names).pluck(:name)
-    grouped_in_list = Collection.where(name: collection_names).where('license_id is not null')
+    grouped_in_list = Collection.where(name: collection_names).where('licence_id is not null')
     warnings += missing.collect{|cn| "cannot find a Collection called #{cn}" }
     warnings += grouped_in_list.collect{|cn| "Collection #{cn.name} is already part of CollectionList #{cn.licence.name}" }
 
-    to_add = Collection.where(name: collection_names, license_id: nil)
+    to_add = Collection.where(name: collection_names, licence_id: nil)
 
     unless warnings.empty?
       # There were missing collections.
@@ -135,7 +138,7 @@ class CollectionList < ActiveRecord::Base
     result.private = false
     result.save
     result.add_collections(to_add.pluck(:id))
-    result.set_license(new_licence) unless new_licence.nil?
+    result.set_licence(new_licence) unless new_licence.nil?
 
     Rails.logger.info("Collection list #{result.name} created with #{result.collection_ids.size} collection(s)")
     Rails.logger.info("Licence #{new_licence.name} assigned to Collection list #{result.name}") unless new_licence.nil?

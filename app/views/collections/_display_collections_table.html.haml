@@ -98,14 +98,14 @@
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
                     %h3#myModalLabel= collection.licence.name
                   #licence_terms_dialog.modal-body{:title => "Licence Terms"}
-                    #licence_terms_content{:readonly => "true"}= collection.licence.flat_text.html_safe
+                    #licence_terms_content{:readonly => "true"}= collection.licence.text.html_safe
                   .modal-footer
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 
 
 
 #new_collection_list.modal.hide.fade{ tabindex:"-1", role:"dialog", 'aria-labelledby'=>"myModalLabel", 'aria-hidden'=>"true"}
-  = form_for(collection_list.new) do |f|
+  = form_for(CollectionList.new) do |f|
     .modal-header
       %button.close{ type:"button", :"data-dismiss"=>"modal", "aria-hidden"=>"true"} ×
       %h3#myModalLabel Create New Collection list

@@ -8,7 +8,7 @@ class UserLicenceRequestsController < ApplicationController
   def approve_request
     @request = UserLicenceRequest.find(params[:id])
     email = @request.user_email
-    coll_name = @request.request.flat_name
+    coll_name = @request.request.name
     user = @request.user
     @request.approve
 
@@ -20,7 +20,7 @@ class UserLicenceRequestsController < ApplicationController
     @request = UserLicenceRequest.find(params[:id])
     reason = params[:reason]
     email = @request.user_email
-    coll_name = @request.request.flat_name
+    coll_name = @request.request.name
     user = @request.user
     @request.destroy
 

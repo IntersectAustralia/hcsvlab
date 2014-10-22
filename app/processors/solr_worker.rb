@@ -116,8 +116,8 @@ private
 
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(fed_item.collection.flat_name)
-      raise Exception.new "Repository not found - #{fed_item.collection.flat_name}" if repository.nil?
+      repository = server.repository(fed_item.collection.name)
+      raise Exception.new "Repository not found - #{fed_item.collection.name}" if repository.nil?
     rescue => e
       error("Solr Worker", e.message)
       error("Solr Worker", e.backtrace)
@@ -293,8 +293,8 @@ private
     debug("Solr_Worker", "Adding edit Permission field for group with value #{ident_parts[:collection]}-edit")
     ::Solrizer::Extractor.insert_solr_field_value(document, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
     #Create user permission fields
-    data_owner = Collection.find_by_name(ident_parts[:collection]).first.flat_private_data_owner
-    if (!data_owner.nil?)
+    data_owner = Collection.find_by_name(ident_parts[:collection]).owner.email
+    if data_owner
       debug("Solr_Worker", "Adding discover Permission field for user with value #{data_owner}-discover")
       ::Solrizer::Extractor.insert_solr_field_value(document, :'discover_access_person_ssim', "#{data_owner}")
       debug("Solr_Worker", "Adding read Permission field for user with value #{ident_parts[:collection]}-read")

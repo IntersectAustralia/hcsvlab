@@ -25,12 +25,9 @@ class CollectionListsController < ApplicationController
     else
       collections = params[:collection_ids].split(",")
     end
-
     if collections.length > 0
       begin
-        collection_list = CollectionList.new(params[:collection_list])
-        collection_list.owner_id = current_user.id.to_s
-        collection_list.save
+        collection_list = current_user.collection_lists.create(params[:collection_list])
         add_collections_to_collection_list(collection_list, collections)
         flash[:notice] = 'Collections list created successfully'
       rescue ActiveRecord::RecordInvalid => e
@@ -51,16 +48,16 @@ class CollectionListsController < ApplicationController
 
   def add_collections
     if params[:add_all_collections] == "true"
-      collections = Collection.where(owner_id: current_user.id, collection_list_id: nil).pluck(:id)
+      collections = current_user.collections.where(collection_list_id: nil).pluck(:id)
     else
       collections = params[:collection_ids].split(",")
     end
 
     if collections.length > 0
-      collectionList = CollectionList.find(params[:id])
+      collection_list = CollectionList.find(params[:id])
 
-      add_collections_to_collection_list(collectionList, collections)
-      flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collectionList.name}"
+      add_collections_to_collection_list(collection_list, collections)
+      flash[:notice] = "#{view_context.pluralize(collections.size, "")} added to Collection list #{collection_list.name}"
     else
       flash[:error] = "You can not create an empty Collection List, please select at least one Collection."
     end
@@ -103,10 +100,10 @@ class CollectionListsController < ApplicationController
   end
 
   def add_licence_to_collection_list
-    collectionList = CollectionList.find(params[:id])
-    collectionList.set_license(params[:licence_id])
+    collection_list = CollectionList.find(params[:id])
+    collection_list.set_licence(params[:licence_id])
 
-    flash[:notice] = "Successfully added licence to #{collectionList.name}"
+    flash[:notice] = "Successfully added licence to #{collection_list.name}"
     redirect_to licences_path(:hide => (params[:hide] == true.to_s) ? "t" : "f")
 
   end

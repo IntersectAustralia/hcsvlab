@@ -16,7 +16,7 @@ And /^I ingest "([^:]*):([^:]*)" with id "(hcsvlab:\d+)"$/ do |corpus, prefix, p
   manifest_file = "#{SAMPLE_FOLDER}/#{corpus}/manifest.json"
   corpus_dir = "#{SAMPLE_FOLDER}/#{corpus}"
 
-  ingest_one(corpus_dir, rdf_file, pid)
+  ingest_one(corpus_dir, rdf_file)
 
   # # update solr
   Solr_Worker.new.on_message("index #{pid}")
@@ -25,7 +25,7 @@ end
 And /^I reindex all$/ do
   Item.all.each do |anItem|
     begin
-      Solr_Worker.new.on_message("index #{anItem.pid}")
+      Solr_Worker.new.on_message("index #{anItem.id}")
     rescue Exception => e
       # Do nothing
     end
@@ -45,8 +45,8 @@ And /^I have (\d+) licences belonging to "([^"]*)"$/ do |amount, email|
     c = Collection.new
     c.uri = "www.example.com/#{s}"
     c.name = "Licence #{s}"
-    c.private_data_owner = email
-    c.privacy_status = 'false'
+    c.owner = User.find_by_email(email)
+    c.private = false
     c.save
   }
 end

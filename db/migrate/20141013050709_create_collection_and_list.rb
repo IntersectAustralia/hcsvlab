@@ -3,7 +3,7 @@ class CreateCollectionAndList < ActiveRecord::Migration
     create_table :collection_lists do |t|
       t.string :name
       t.boolean :private
-      t.references :license
+      t.references :licence
       t.references :owner
 
       t.timestamps
@@ -17,7 +17,7 @@ class CreateCollectionAndList < ActiveRecord::Migration
       t.boolean :private
       t.references :owner
       t.references :collection_list
-      t.references :license
+      t.references :licence
       t.timestamps
     end
 

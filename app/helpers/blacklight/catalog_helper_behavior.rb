@@ -205,7 +205,7 @@ module Blacklight::CatalogHelperBehavior
     documentsData = []
     uris = [MetadataHelper::IDENTIFIER, MetadataHelper::TYPE, MetadataHelper::EXTENT, MetadataHelper::SOURCE]
     documents = item_documents(document, uris)
-    namespaces = RdfNamespace.get_namespaces(solr_item.collection.flat_name)
+    namespaces = RdfNamespace.get_namespaces(solr_item.collection.name)
 
     if documents.present?
       is_cooee = document[MetadataHelper::short_form(MetadataHelper::COLLECTION)][0] == "cooee"
@@ -256,7 +256,7 @@ module Blacklight::CatalogHelperBehavior
         #Other fields
         begin
           server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-          repo = server.repository(solr_item.collection.flat_name)
+          repo = server.repository(solr_item.collection.name)
 
           query = """
             PREFIX dc:<http://purl.org/dc/terms/>

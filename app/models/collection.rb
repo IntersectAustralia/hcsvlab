@@ -42,7 +42,7 @@ class Collection < ActiveRecord::Base
   #
   def self.assign_licence(collection_name, licence)
     # Find the collection
-    array = Collection.find_by_name(collection_name)
+    array = Collection.where(name: collection_name)
     if array.empty?
       Rails.logger.error("Collection.assign_licence: cannot find a collection called #{name}")
       return
@@ -52,15 +52,15 @@ class Collection < ActiveRecord::Base
     end
 
     collection = array[0]
-    collection.set_license(licence) unless licence.nil?
+    collection.set_licence(licence) unless licence.nil?
 
-    Rails.logger.info("Licence #{licence.name} assigned to Collection #{collection.flat_name}") unless licence.nil?
+    Rails.logger.info("Licence #{licence.name} assigned to Collection #{collection.name}") unless licence.nil?
   end
   # End of Support for adding licences to collections via scripts
   # ---------------------------------------------------------------------------
   #
 
   def rdf_graph
-    RDF::Graph.load(self.rdf_file_path, :format => :ttl, :validate => true)
+    RDF::Graph.load(self.rdf_file_path)
   end
 end

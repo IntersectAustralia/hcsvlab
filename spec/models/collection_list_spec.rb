@@ -20,15 +20,13 @@ describe CollectionList do
 
       u = FactoryGirl.create(:user, :status => 'A', :email => "test@intersect.org.au")
       c.owner_id = u.id.to_s
-      c.owner_email = u.email
 
       c.save
       pid = c.pid
 
       coll = CollectionList.find(pid)
-      coll.flat_name.should eq "coll_list"
-      coll.flat_ownerId.to_i.should eq u.id
-      coll.flat_ownerEmail.should eq "test@intersect.org.au"
+      coll.name.should eq "coll_list"
+      coll.owner.should eq u
     end
 
   end
@@ -44,10 +42,10 @@ describe CollectionList do
       pid = c.pid
 
       coll = CollectionList.find(pid)
-      coll.licence.flat_name.should match /Creative Commons [0-9]+/
-      coll.licence.flat_text.should eq "Creative Commons Licence Terms"
+      coll.licence.name.should match /Creative Commons [0-9]+/
+      coll.licence.text.should eq "Creative Commons Licence Terms"
       coll.licence.private.should eq false
-      coll.licence.flat_ownerEmail.should eq "test@intersect.org.au"
+      coll.licence.owner.should eq u
     end
 
     it "should keep integrity between the Collection's licence" do
@@ -58,9 +56,9 @@ describe CollectionList do
       l2 = FactoryGirl.create(:licence, :owner_id => u.id.to_s)
 
       # Set licence L1 to the Collection
-      c.set_license(l1)
+      c.set_licence(l1)
       # Set licence L2 to the Collection List
-      cl.set_license(l2.id)
+      cl.set_licence(l2.id)
 
       # Now lets assign the Collection to the Collection List
       cl.add_collections([c.id])
@@ -80,7 +78,7 @@ describe CollectionList do
       l1 = FactoryGirl.create(:licence, :owner_id => u.id.to_s)
 
       # Set licence L1 to the Collection List
-      cl.set_license(l1.id)
+      cl.set_licence(l1.id)
 
       # Now lets assign the Collection to the Collection List
       cl.add_collections([c.id])

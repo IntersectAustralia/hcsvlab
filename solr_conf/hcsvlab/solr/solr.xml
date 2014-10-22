@@ -54,6 +54,5 @@
          hostContext="${hostContext:}" 
          zkClientTimeout="${zkClientTimeout:15000}">
     <core name="hcsvlab"    instanceDir="hcsvlab-core" />
-    <core name="hcsvlab-AF" instanceDir="hcsvlab-AF-core" />
   </cores>
 </solr>
