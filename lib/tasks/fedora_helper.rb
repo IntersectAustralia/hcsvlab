@@ -161,6 +161,7 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
         path = res[:source].value.gsub("file://", "")
         if File.exists? path and File.file? path
           item.primary_text_path = path
+          item.save
         end
       end
     rescue => e
@@ -211,12 +212,12 @@ def update_document(document, item, file_name, identifier, source, type, corpus_
     document.item = item
     document.save
 
-    # Create a primary text datastream in the fedora Item for primary text documents
     logger.info "Path:" + path
     if File.exists? path and File.file? path and STORE_DOCUMENT_TYPES.include? type
       case type
         when 'Text'
           item.primary_text_path = path
+          item.save
         else
           logger.warn "??? Creating a #{type} document for #{path} but not adding it to its Item" unless Rails.env.test?
       end

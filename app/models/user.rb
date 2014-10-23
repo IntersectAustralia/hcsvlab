@@ -217,7 +217,7 @@ class User < ActiveRecord::Base
 
   def has_agreement_to_collection?(collection, access_type, exact=false)
     # if the user is the owner of the collection, then he/she does have access.
-    if collection.owner.eql?(self)
+    if collection.owner_id.eql?(self.id)
       return true
     end
 

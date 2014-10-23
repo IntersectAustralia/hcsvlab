@@ -65,6 +65,27 @@ namespace :fedora do
     Collection.delete_all
     CollectionList.delete_all
 
+    # clear Solr
+    uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
+
+    req = Net::HTTP::Post.new(uri)
+    req.body = '<delete><query>*:*</query></delete>'
+
+    req.content_type = "text/xml; charset=utf-8"
+    req.body.force_encoding("UTF-8")
+    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+      http.request(req)
+    end
+
+    # Clear Sesame
+    server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
+    repositories = server.repositories
+    repositories.each_key do |repositoryName|
+      if (!"SYSTEM".eql? repositoryName)
+        server.delete(repositories[repositoryName].path)
+      end
+    end
+
   end
 
 
@@ -75,7 +96,7 @@ namespace :fedora do
 
     corpus = ENV['corpus']
 
-    if (corpus.nil?)
+    if corpus.nil?
       puts "Usage: rake fedora:clear_corpus corpus=<corpus name>"
       exit 1
     end

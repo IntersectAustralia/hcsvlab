@@ -575,26 +575,26 @@ class CatalogController < ApplicationController
         # If HTTP_RANGE variable is set, we need to send partial content and tell the browser
         # what fragment of the file we are sending by using the variables Content-Range and
         # Content-Length
-        if request.headers["HTTP_RANGE"]
-          #TODO how to send file with partial content?
-          size = doc.datastreams['CONTENT1'].content.size
-          bytes = Rack::Utils.byte_ranges(request.headers, size)[0]
-          offset = bytes.begin
-          length = bytes.end - bytes.begin
-
-          response.header["Accept-Ranges"] = "bytes" # Tells the browser that we accept partial content
-          response.header["Content-Range"] = "bytes #{bytes.begin}-#{bytes.end}/#{size}"
-          response.header["Content-Length"] = (length+1).to_s
-          response.status = :partial_content
-
-          #TODO content?
-          # content = doc.datastreams['CONTENT1'].content[offset, length+1]
-        else
-          #TODO content?
-          # content = doc.datastreams['CONTENT1'].content
-          response.header["Content-Length"] = Rack::Utils.bytesize(content).to_s
-
-        end
+        # if request.headers["HTTP_RANGE"]
+        #   #TODO how to send file with partial content?
+        #   size = doc.datastreams['CONTENT1'].content.size
+        #   bytes = Rack::Utils.byte_ranges(request.headers, size)[0]
+        #   offset = bytes.begin
+        #   length = bytes.end - bytes.begin
+        #
+        #   response.header["Accept-Ranges"] = "bytes" # Tells the browser that we accept partial content
+        #   response.header["Content-Range"] = "bytes #{bytes.begin}-#{bytes.end}/#{size}"
+        #   response.header["Content-Length"] = (length+1).to_s
+        #   response.status = :partial_content
+        #
+        #   #TODO content?
+        #   # content = doc.datastreams['CONTENT1'].content[offset, length+1]
+        # else
+        #   #TODO content?
+        #   # content = doc.datastreams['CONTENT1'].content
+        #   # response.header["Content-Length"] = Rack::Utils.bytesize(content).to_s
+        #
+        # end
         send_file doc.file_path, disposition: params[:disposition], type: doc.mime_type
         # send_data content,
         #           :disposition => params[:disposition],
