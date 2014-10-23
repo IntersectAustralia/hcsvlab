@@ -21,9 +21,9 @@ describe Licence do
       l.owner = u
 
       l.save
-      pid = l.pid
+      id = l.id
 
-      lic = Licence.find(pid)
+      lic = Licence.find(id)
       lic.name.should eq "CC Licence " + rnd
       lic.text.should eq "Various text outlining terms of the licence"
       lic.private.should eq false

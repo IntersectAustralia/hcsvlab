@@ -15,11 +15,11 @@ describe Collection do
       coll.uri = 'http://ns.ausnc.org.au/colly'
       coll.name = 'colly'
       coll.save
-      pid = coll.pid
+      id = coll.id
 
-      coll2 = Collection.find(pid)
-      coll2.uri[0].should eq 'http://ns.ausnc.org.au/colly'
-      coll2.name[0].should eq 'colly'
+      coll2 = Collection.find(id)
+      coll2.uri.should eq 'http://ns.ausnc.org.au/colly'
+      coll2.name.should eq 'colly'
     end
 
   end
