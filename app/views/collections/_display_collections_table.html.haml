@@ -56,7 +56,7 @@
                 .label.licence
                   %span
                     =(collection.collection_list.nil?)? "" :collection.collection_list.name
-                  = link_to("" , {:controller=>"collection_lists", :action => "remove_collection", :collection_listId => collection.collection_list.id, :collectionId => collection.id},
+                  = link_to("" , {:controller=>"collection_lists", :action => "remove_collection", :collectionListId => collection.collection_list_id, :collectionId => collection.id},
                                   :class=>"remove", :onClick => "return (confirmRemoveCollection(#{collection.collection_list.collections.length}, '#{collection.collection_list.name}', '#{collection.name}', event));")
             %td.licence
               -if collection.collection_list.nil?

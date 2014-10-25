@@ -27,7 +27,7 @@ class CollectionListsController < ApplicationController
     end
     if collections.length > 0
       begin
-        collection_list = current_user.collection_lists.create(params[:collection_list])
+        collection_list = current_user.collection_lists.new(params[:collection_list])
         add_collections_to_collection_list(collection_list, collections)
         flash[:notice] = 'Collections list created successfully'
       rescue ActiveRecord::RecordInvalid => e
@@ -90,7 +90,7 @@ class CollectionListsController < ApplicationController
     collectionList = CollectionList.find(params[:id])
 
     name = collectionList.name
-    UserLicenceRequest.where(:request_id => collectionList.id).destroy_all
+    UserLicenceRequest.where(request_id: collectionList.id.to_s).destroy_all
     collectionList.delete
 
     Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((Time.now.to_f - bench_start.to_f)*1000)}ms)")
@@ -113,7 +113,7 @@ class CollectionListsController < ApplicationController
     private = params[:privacy]
     collection_list.set_privacy(private)
     if private=="false"
-      UserLicenceRequest.where(:request_id => collection_list.id).destroy_all
+      UserLicenceRequest.where(:request_id => collection_list.id.to_s).destroy_all
     end
     private=="true" ? state="requiring approval" : state="not requiring approval"
     flash[:notice] = "#{collection_list.name} has been successfully marked as #{state}"
@@ -122,7 +122,7 @@ class CollectionListsController < ApplicationController
 
   def revoke_access
     coll_list = CollectionList.find(params[:id])
-    UserLicenceRequest.where(:request_id => coll_list.id).destroy_all if coll_list.private?
+    UserLicenceRequest.where(:request_id => coll_list.id.to_s).destroy_all if coll_list.private?
     coll_list.collections.each do |collection|
       UserLicenceAgreement.where("group_name LIKE :prefix", prefix: "#{collection.name}%").destroy_all
     end

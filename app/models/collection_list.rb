@@ -29,8 +29,11 @@ class CollectionList < ActiveRecord::Base
   # Adds collections to a Collection List
   #
   def add_collections(collection_ids)
+    puts collection_ids
     self.collection_ids += collection_ids
-    self.set_licence(self.licence_id)
+    puts self.collections
+    self.collections.update_all(licence_id: self.licence_id)
+    puts self.collections.pluck(:licence_id)
     self.save!
   end
 
@@ -74,12 +77,12 @@ class CollectionList < ActiveRecord::Base
   #
   def same_licence_integrity_check
 
-    licenses = [licence_id] + collections.pluck(:licence_id)
+    licences = [licence_id] + self.collections.pluck(:licence_id)
 
-    if licenses.uniq.size > 1
+    if licences.uniq.size > 1
       errors[:base] << "All Collection in a Collection List must have the same licence"
       collections.where('licence_id != ?', licence_id.to_i).each do |collection|
-        Rails.logger.debug "Collection #{collection.id} has licence #{collection.licence.name}, but the Collection List #{self.id} has licence #{self.collection.name}"
+        Rails.logger.debug "Collection #{collection.id} has licence #{collection.licence.name}, but the Collection List #{self.id} has licence #{self.licence.name}"
       end
     end
 

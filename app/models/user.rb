@@ -234,11 +234,11 @@ class User < ActiveRecord::Base
   end
 
   def has_requested_collection?(id)
-    user_licence_requests.where(:request_id => id).count > 0
+    user_licence_requests.where(:request_id => id.to_s).count > 0
   end
 
   def requested_collection(id)
-    user_licence_requests.find_by_request_id(id)
+    user_licence_requests.find_by_request_id(id.to_s)
   end
 
   #

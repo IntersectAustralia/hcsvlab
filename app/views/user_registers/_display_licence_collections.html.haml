@@ -53,7 +53,7 @@
                   .modal-body{:title => "Licence Terms"}
                     %h4#myModalLabel= k[:item].licence.name
                     %p#licence_preview{:readonly => "true"}
-                    = k[:item].licence.flat_text.html_safe
+                    = k[:item].licence.text.html_safe
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal", onClick: "accept_licence_terms('#{k[:type]}', '#{k[:item].id}');"} Accept
