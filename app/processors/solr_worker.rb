@@ -247,10 +247,11 @@ private
           rdf_field_name = (uri.qname.present?)? uri.qname.join(':') : nil
           solr_name = (@@configured_fields.include?(field)) ? field : "#{field}_tesim"
 
-          isNew = ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field), nil)
-
-          debug("Solr_Worker", "Creating new mapping for field #{field}") if (isNew)
-          debug("Solr_Worker", "Updating mapping for field: #{field}")  if (!isNew)
+          if ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field), nil)
+            debug("Solr_Worker", "Creating new mapping for field #{field}")
+          else
+            debug("Solr_Worker", "Updating mapping for field: #{field}")
+          end
 
         }
       }

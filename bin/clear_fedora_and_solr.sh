@@ -43,6 +43,6 @@ sleep 10
 echo ""
 echo "Deleting Sesame triples"
 echo ""
-rake sesame:clear
+bundle exec rake sesame:clear
 
 exit 0

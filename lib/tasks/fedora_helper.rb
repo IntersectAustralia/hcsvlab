@@ -64,8 +64,9 @@ def create_item_from_file(corpus_dir, rdf_file, manifest, collection)
     item.uri = uri
     item.collection = collection
     item.save!
-    # TODO temporary
-    Solr_Worker.new.on_message("index #{item.id}")
+
+    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+    reindex_item_to_solr(item.id, stomp_client)
     logger.info "Item = #{item.id} created"
 
     return item, true

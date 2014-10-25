@@ -5,12 +5,9 @@ class ItemMetadataFieldNameMapping < ActiveRecord::Base
   #
   #
   def self.create_or_update_field_mapping(solr_name, rdf_field_name, user_friendly_name, display_name)
-    item_fields_mapping = ItemMetadataFieldNameMapping.where({solr_name:solr_name}).to_a.first
-    item_fields_mapping = ItemMetadataFieldNameMapping.new if item_fields_mapping.nil?
-    item_fields_mapping.solr_name = solr_name
+    item_fields_mapping = ItemMetadataFieldNameMapping.find_or_initialize_by_solr_name(solr_name)
     item_fields_mapping.rdf_name = rdf_field_name if rdf_field_name.present?
     item_fields_mapping.user_friendly_name = user_friendly_name
-
     isNew = item_fields_mapping.id.nil?
 
     item_fields_mapping.save

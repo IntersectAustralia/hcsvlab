@@ -15,6 +15,14 @@ class TimestampingLogger
     @logger.tagged(DateTime.now, "Info") { @logger.info(message) }
   end
 
+  def level
+    @logger.level
+  end
+
+  def level=(level)
+    @logger.level=level
+  end
+
   # required for request_exception_handler gem
   def info?
     return true

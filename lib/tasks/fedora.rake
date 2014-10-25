@@ -108,6 +108,18 @@ namespace :fedora do
     Item.where(collection_id: collection).delete_all
     collection.destroy
 
+    # clear Solr
+    uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
+
+    req = Net::HTTP::Post.new(uri)
+    req.body = "<delete><query>handle:#{corpus}\\:*</query></delete>"
+
+    req.content_type = "text/xml; charset=utf-8"
+    req.body.force_encoding("UTF-8")
+    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+      http.request(req)
+    end
+
     # Clear all metadata and annotations from the triple store
     server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
     repository = server.repository(corpus)

@@ -632,7 +632,7 @@ class CatalogController < ApplicationController
   # This is an API method for downloading items' documents and metadata
   #
   def download_items
-    if (params[:items].present?)
+    if params[:items].present?
 
       itemHandles = params[:items].collect { |x| "#{File.basename(File.split(x).first)}:#{File.basename(x)}" }
 
@@ -656,12 +656,7 @@ class CatalogController < ApplicationController
   # Display every field that can be user to do a search in the metadata
   #
   def searchable_fields
-    @nameMappings = []
-    ItemMetadataFieldNameMapping.all.each do |aNameMapping|
-      @nameMappings << {rdfName: aNameMapping['rdf_name'], user_friendly_name: aNameMapping['user_friendly_name']}
-    end
-    @nameMappings.sort! { |x, y| x[:user_friendly_name].downcase <=> y[:user_friendly_name].downcase }
-    @nameMappings
+    @name_mappings = ItemMetadataFieldNameMapping.order('lower(user_friendly_name)').select([:rdf_name, :user_friendly_name])
   end
 
   #
