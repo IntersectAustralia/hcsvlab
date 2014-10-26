@@ -123,7 +123,9 @@ private
     # get full text from item
     begin
       unless fed_item.nil? || fed_item.primary_text_path.nil?
-        full_text = File.open(fed_item.primary_text_path).read
+        file = File.open(fed_item.primary_text_path)
+        full_text = file.read
+        file.close
       end 
     rescue
       warning("Solr_Worker", "caught exception fetching full_text for: #{object}")

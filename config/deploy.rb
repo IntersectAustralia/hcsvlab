@@ -23,7 +23,7 @@ set :scm, 'git'
 # Uncomment to enable Jetty submodule
 #set :git_enable_submodules, 1
 set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
-set :deploy_via, :copy
+set :deploy_via, :checkout
 set :copy_exclude, [".git/*", "features/*", "spec/*", "test/*"]
 
 #version tagging
@@ -224,7 +224,6 @@ namespace :deploy do
   desc "Start ActiveMQ, Jetty, the A13g workers"
   task :start_services, :roles => :app do
     start_activemq
-    #start_jetty
     puts "    Waiting 30 seconds for ActiveMQ to start..."
     sleep(30)
     start_tomcat6
@@ -234,7 +233,6 @@ namespace :deploy do
   desc "Stop ActiveMQ, Jetty, the A13g workers"
   task :stop_services, :roles => :app do
     stop_a13g_pollers
-    #stop_jetty
     stop_tomcat6
     stop_activemq
   end
