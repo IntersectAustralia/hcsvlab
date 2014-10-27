@@ -4,7 +4,7 @@ class ItemMetadataFieldNameMapping < ActiveRecord::Base
   #
   #
   #
-  def self.create_or_update_field_mapping(solr_name, rdf_field_name, user_friendly_name, display_name)
+  def self.create_or_update_field_mapping(solr_name, rdf_field_name, user_friendly_name)
     item_fields_mapping = ItemMetadataFieldNameMapping.find_or_initialize_by_solr_name(solr_name)
     is_new = item_fields_mapping.id.nil?
     # No point committing if the values are the same. Helps to clear up the log

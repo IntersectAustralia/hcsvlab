@@ -229,7 +229,7 @@ private
           rdf_field_name = (uri.qname.present?)? uri.qname.join(':') : nil
           solr_name = (@@configured_fields.include?(field)) ? field : "#{field}_tesim"
 
-          if ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field), nil)
+          if ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field))
             debug("Solr_Worker", "Creating new mapping for field #{field}")
           else
             debug("Solr_Worker", "Updating mapping for field: #{field}")
@@ -314,15 +314,15 @@ private
   #---------------------------------------------------------------------------------------------------
   def process_field_mapping(field, binding)
     rdf_field_name = nil
-    if (!binding.nil? and !binding[:predicate].qname.nil?)
+    if binding.present? and binding[:predicate].qname.present?
       rdf_field_name = binding[:predicate].qname.join(':')
-    elsif (!binding.nil?)
+    elsif binding.present?
       debug("Solr_Worker", "WARNING: Vocab not defined for field #{field} (#{binding[:predicate].to_s}). Please update it in /lib/rdf/vocab.")
     end
 
     solr_name = (@@configured_fields.include?(field)) ? field : "#{field}_tesim"
 
-    if ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field), nil)
+    if ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field))
       debug("Solr_Worker", "Creating new mapping for field #{solr_name}")
     else
       debug("Solr_Worker", "Updating mapping for field: #{solr_name}")
@@ -335,7 +335,7 @@ private
     uri = uri.sub(/_facet/, '')
     uri = uri.sub(/^([A-Z]+_)+/, '') unless uri.starts_with?('RDF')
 
-    return uri
+    uri
   end
 
   #---------------------------------------------------------------------------------------------------
@@ -361,8 +361,8 @@ private
     document.keys.each do | key |
     
       value = document[key]
-    
-      if (key.to_s == "id")
+
+      if key.to_s == "id"
         xml_update << "<field name='#{key.to_s}'>#{value.to_s}</field>"
       else
         if value.kind_of?(Array)
@@ -379,7 +379,7 @@ private
 
     debug("Solr_Worker", "XML= " + xml_update)
     
-    return xml_update
+    xml_update
 
   end
 
