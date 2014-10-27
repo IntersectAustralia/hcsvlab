@@ -25,8 +25,8 @@ class Solr_Worker < ApplicationProcessor
   #
   # Load up the facet fields from the supplied config
   #
-  def self.load_config()
-    @@configured_fields = Set.new()
+  def self.load_config
+    @@configured_fields = Set.new
     FACETS_CONFIG[:facets].each do |aFacetConfig|
       @@configured_fields.add(aFacetConfig[:name])
     end
@@ -96,24 +96,26 @@ private
   #
   def index_item(object)
     fed_item = Item.find(object)
+    collection = fed_item.collection
 
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(fed_item.collection.name)
-      raise Exception.new "Repository not found - #{fed_item.collection.name}" if repository.nil?
+      repository = server.repository(collection.name)
+      raise Exception.new "Repository not found - #{collection.name}" if repository.nil?
     rescue => e
       error("Solr Worker", e.message)
       error("Solr Worker", e.backtrace)
       return
-    end 
+    end
 
-    basic_results = repository.query(:subject => RDF::URI.new(fed_item.uri))
+    rdf_uri = RDF::URI.new(fed_item.uri)
+    basic_results = repository.query(:subject => rdf_uri)
 
     extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
     internalUseData = {:documents_path => []}
 
     # Get date group if there is one
-    date_result = repository.query(:subject => RDF::URI.new(fed_item.uri), :predicate => MetadataHelper::CREATED)
+    date_result = repository.query(:subject => rdf_uri, :predicate => MetadataHelper::CREATED)
     unless date_result.empty?
       date = date_result.first_object
       group = date_group(date)
@@ -133,7 +135,7 @@ private
     end
 
     # Get document info
-    document_results = repository.query(:subject => RDF::URI.new(fed_item.uri), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
+    document_results = repository.query(:subject => rdf_uri, :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
 
     document_results.each { |result|
       document = result.to_hash[:object]
@@ -147,26 +149,7 @@ private
       internalUseData[:documents_path] << doc_info[MetadataHelper::SOURCE][0].to_s unless doc_info[MetadataHelper::SOURCE].nil?
     }
 
-    store_results(object, basic_results, full_text, extras, internalUseData)
-  end
-
-  #
-  # Query the given graph for each field, bearing in mind that the graph might
-  # not have all of the fields
-  #
-  def query_graph(graph, fields)
-    result = {}
-
-    fields.keys.each { |key|
-      value = fields[key]
-      query = RDF::Query.new({:document => {key => value}})
-      individual_result = query.execute(graph)
-      unless individual_result.size == 0
-        result[key] = last_bit(individual_result[0][value])
-      end
-    }
-
-    return result
+    store_results(object, basic_results, full_text, extras, internalUseData, collection)
   end
 
   #
@@ -188,9 +171,9 @@ private
   #
   # Make a Solr document from information extracted from the Item
   #
-  def make_solr_document(object, results, full_text, extras, internalUseData)
+  def make_solr_document(object, results, full_text, extras, internalUseData, collection)
     document = {}
-    configured_fields_found = Set.new()
+    configured_fields_found = Set.new
     ident_parts = {collection: "Unknown Collection", identifier: "Unknown Identifier"}
 
     results.each { |binding|
@@ -204,9 +187,6 @@ private
       if binding[:predicate] == MetadataHelper::CREATED
         value = binding[:object].to_s
       elsif binding[:predicate] == MetadataHelper::IS_PART_OF
-        # Check whether this is telling us the object is part of a collection
-        collection = find_collection(binding[:object])
-
         unless collection.nil?
           # This is pointing at a collection, so treat it differently
           field = MetadataHelper::COLLECTION
@@ -279,7 +259,7 @@ private
     debug("Solr_Worker", "Adding edit Permission field for group with value #{ident_parts[:collection]}-edit")
     ::Solrizer::Extractor.insert_solr_field_value(document, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
     #Create user permission fields
-    data_owner = Collection.find_by_name(ident_parts[:collection]).owner.email
+    data_owner = collection.owner.email
     if data_owner
       debug("Solr_Worker", "Adding discover Permission field for user with value #{data_owner}-discover")
       ::Solrizer::Extractor.insert_solr_field_value(document, :'discover_access_person_ssim', "#{data_owner}")
@@ -413,10 +393,10 @@ private
   #
   # Update Solr with the information we've found
   #
-  def store_results(object, results, full_text, extras = nil, internalUseData)
-    get_solr_connection()
-    document = make_solr_document(object, results, full_text, extras, internalUseData)
-    if (object_exists_in_solr?(object))
+  def store_results(object, results, full_text, extras = nil, internalUseData, collection)
+    get_solr_connection
+    document = make_solr_document(object, results, full_text, extras, internalUseData, collection)
+    if object_exists_in_solr?(object)
       debug("Solr_Worker", "Updating " + object.to_s)
       xml_update = make_solr_update(document)
       response = @@solr.update :data => xml_update
@@ -446,7 +426,7 @@ private
   # Invoked when we get the "delete" command.
   #
   def delete(object)
-    get_solr_connection()
+    get_solr_connection
     @@solr.delete_by_id(object)
     @@solr.commit
   end

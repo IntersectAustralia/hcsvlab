@@ -8,11 +8,6 @@ class Collection < ActiveRecord::Base
   belongs_to :collection_list
   belongs_to :licence
 
-  def setCollectionList(collectionList)
-    self.collectionList = collectionList
-    self.save!
-  end
-
   def setLicence(licence)
     unless licence.nil?
       licence = Licence.find(licence.to_s) unless licence.is_a? Licence

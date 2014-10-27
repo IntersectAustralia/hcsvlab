@@ -81,7 +81,7 @@ namespace :fedora do
     server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
     repositories = server.repositories
     repositories.each_key do |repositoryName|
-      if (!"SYSTEM".eql? repositoryName)
+      unless "SYSTEM".eql?(repositoryName)
         server.delete(repositories[repositoryName].path)
       end
     end
@@ -353,7 +353,9 @@ namespace :fedora do
 
     overall_start = Time.now
 
-    manifest = JSON.parse(IO.read(File.join(corpus_dir, MANIFEST_FILE_NAME)))
+    manifest_file = File.open(File.join(corpus_dir, MANIFEST_FILE_NAME))
+    manifest = JSON.parse(manifest_file.read)
+    manifest_file.close
 
     collection_name = manifest["collection_name"]
     collection = check_and_create_collection(collection_name, corpus_dir)
