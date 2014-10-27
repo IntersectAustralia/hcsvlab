@@ -54,11 +54,12 @@ def create_item_from_file(corpus_dir, rdf_file, manifest, collection)
   if existing_item.present? && File.mtime(rdf_file).utc < existing_item.updated_at.utc
     logger.info "Item = #{existing_item.id} already up to date"
     return existing_item, false
-  elsif existing_item.present?
-    logger.info "Item = #{existing_item.id} updated"
-    return update_item_from_file(existing_item, manifest), true
   else
-    item = Item.new
+    if existing_item
+      item = existing_item
+    else
+      item = Item.new
+    end
 
     item.handle = handle
     item.uri = uri
@@ -67,27 +68,15 @@ def create_item_from_file(corpus_dir, rdf_file, manifest, collection)
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     reindex_item_to_solr(item.id, stomp_client)
-    logger.info "Item = #{item.id} created"
+    stomp_client.close
 
+    if existing_item
+      logger.info "Item = #{existing_item.id} updated"
+    else
+      logger.info "Item = #{item.id} created"
+    end
     return item, true
   end
-end
-
-def update_item_from_file(item, manifest)
-  item_info = manifest["files"][File.basename(rdf_file)]
-  identifier = item_info["id"]
-  uri = item_info["uri"]
-  collection_name = manifest["collection_name"]
-  handle = "#{collection_name}:#{identifier}"
-  item.handle = handle
-  item.uri = uri
-  item.collection = Collection.find_by_name(collection_name)
-
-  item.save!
-  logger.info "Updated item = " + item.id.to_s
-  stomp_client = Stomp::Client.open "stomp://localhost:61613"
-  reindex_item_to_solr(item.id, stomp_client)
-  item
 end
 
 def check_and_create_collection(collection_name, corpus_dir)
