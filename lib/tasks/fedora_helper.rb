@@ -79,6 +79,11 @@ def create_item_from_file(corpus_dir, rdf_file, manifest, collection)
   end
 end
 
+def reindex_item_to_solr(item_id, stomp_client)
+  logger.info "Reindexing item: #{item_id}"
+  stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
+end
+
 def check_and_create_collection(collection_name, corpus_dir)
   collection = Collection.find_by_name(collection_name)
   if collection.nil?

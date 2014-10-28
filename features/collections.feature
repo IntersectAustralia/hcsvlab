@@ -3,13 +3,11 @@ Feature: Collections
   I want to view collections and their details
 
   Background:
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    And I ingest "auslit:adaessa" with id "hcsvlab:2"
-    And I have the usual roles and permissions
-    And I have users
-      | email                       | first_name | last_name |
-      | researcher@intersect.org.au | Researcher | One       |
-    And "researcher@intersect.org.au" has role "researcher"
+    Given I have the usual roles and permissions
+    And I have a user "data_owner@intersect.org.au" with role "data owner"
+    And I have a user "researcher@intersect.org.au" with role "researcher"
+    And I ingest "cooee:1-001"
+    And I ingest "auslit:adaessa"
     And I am logged in as "researcher@intersect.org.au"
 
   Scenario: View list of collections
@@ -43,7 +41,7 @@ Feature: Collections
     And I should see "Title: Corpus of Oz Early English "
     And I should see "Access Rights: See AusNC Terms of Use "
     And I should see "Created: 2004 "
-    And I should see "Extent: 1353 text samples, 2,000,000 words "
+    And I should see "Extent: 2,000,000 words, 1353 text samples"
     And I should see "Language: eng"
     And I should see "Owner: None. Individual owner is Clemens Fritz. "
     And I should see "SPARQL Endpoint: http://www.example.com/sparql/cooee"
