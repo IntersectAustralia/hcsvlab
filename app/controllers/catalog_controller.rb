@@ -376,9 +376,9 @@ class CatalogController < ApplicationController
       format.json {}
       # Add all dynamically added (such as by document extensions)
       # export formats.
-      if !@document.nil?
+      if @document
 
-        @itemInfo = create_display_info_hash(@document, @user_annotations)
+        @item_info = create_display_info_hash(@document, @user_annotations)
 
         @document.export_formats.each_key do |format_name|
           # It's important that the argument to send be a symbol;

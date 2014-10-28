@@ -338,8 +338,8 @@ module Blacklight::CatalogHelperBehavior
       itemInfo.annotations_url = Rails.application.routes.url_helpers.catalog_annotations_url(collectionName, itemIdentifier, parameters)
     end
     #if (!userAnnotationsData.empty?)
-    #  itemInfo.annotations = {} if itemInfo.annotations.nil?
-    #  itemInfo.annotations[:user_annotationes] = userAnnotationsData
+    #  item_info.annotations = {} if item_info.annotations.nil?
+    #  item_info.annotations[:user_annotationes] = userAnnotationsData
     #end
 
 

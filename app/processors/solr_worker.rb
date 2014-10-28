@@ -110,7 +110,6 @@ private
 
     rdf_uri = RDF::URI.new(fed_item.uri)
     basic_results = repository.query(:subject => rdf_uri)
-
     extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
     internalUseData = {:documents_path => []}
 
@@ -177,8 +176,8 @@ private
     ident_parts = {collection: "Unknown Collection", identifier: "Unknown Identifier"}
 
     results.each { |binding|
-      binding = binding.to_hash
 
+      binding = binding.to_hash
       # Set the defaults for field and value
       field = binding[:predicate].to_s
       value = last_bit(binding[:object])
@@ -187,10 +186,11 @@ private
       if binding[:predicate] == MetadataHelper::CREATED
         value = binding[:object].to_s
       elsif binding[:predicate] == MetadataHelper::IS_PART_OF
-        unless collection.nil?
+        is_part_of = find_collection(binding[:object])
+        unless is_part_of.nil?
           # This is pointing at a collection, so treat it differently
           field = MetadataHelper::COLLECTION
-          value = collection.name
+          value = is_part_of.name
           ident_parts[:collection] = value
         end
       elsif binding[:predicate] == MetadataHelper::IDENTIFIER

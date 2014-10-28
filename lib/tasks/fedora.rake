@@ -448,8 +448,8 @@ namespace :fedora do
     graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
     query = RDF::Query.new({
                                :item => {
-                                   RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
-                                   RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                                   RDF::URI(MetadataHelper::IS_PART_OF) => :collection,
+                                   RDF::URI(MetadataHelper::IDENTIFIER) => :identifier
                                }
                            })
     result = query.execute(graph)[0]

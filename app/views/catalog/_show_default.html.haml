@@ -59,7 +59,7 @@
   %dt{:class => "blacklight-sparql_endpoint"}
     = "SPARQL endpoint"
   %dd{:class => "blacklight-sparql_endpoint"}
-    = raw @itemInfo.metadata["#{PROJECT_PREFIX_NAME}:sparqlEndpoint"].to_s
+    = raw @item_info.metadata["#{PROJECT_PREFIX_NAME}:sparqlEndpoint"].to_s
 
 - if Rails.env.development?
   %h3

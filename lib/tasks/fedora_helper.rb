@@ -65,10 +65,11 @@ def create_item_from_file(corpus_dir, rdf_file, manifest, collection)
     item.uri = uri
     item.collection = collection
     item.save!
-
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    reindex_item_to_solr(item.id, stomp_client)
-    stomp_client.close
+    unless Rails.env.test?
+      stomp_client = Stomp::Client.open "stomp://localhost:61613"
+      reindex_item_to_solr(item.id, stomp_client)
+      stomp_client.close
+    end
 
     if existing_item
       logger.info "Item = #{existing_item.id} updated"
@@ -312,17 +313,17 @@ def extract_manifest_collection(rdf_file)
   graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
   query = RDF::Query.new({
                            :item => {
-                               RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection
+                               RDF::URI(MetadataHelper::IS_PART_OF) => :collection
                            }
                          })
   result = query.execute(graph)[0]
   collection_name = last_bit(result.collection.to_s)
-
   # small hack to handle austalk for the time being, can be fixed up
   # when we look at getting some form of data uniformity
   if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
     collection_name = "austalk"
   end
+
   collection_name
 end
 

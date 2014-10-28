@@ -86,7 +86,7 @@ Feature: Browsing via API
     | the home page                   | 406  |
 
   Scenario Outline: Visit pages with an invalid API token and JSON format
-    Given I ingest "austalk:1_1014_1_11_001"
+    Given I ingest "cooee:1-001"
     When I make a JSON request for <page> with an invalid API token
     Then I should get a <code> response code
   # home page does not accept json response
@@ -146,7 +146,7 @@ Feature: Browsing via API
     Then I should get a 404 response code
 
   Scenario: Get item details for cooee item
-    Given I ingest "austalk:1_1014_1_11_001"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -277,7 +277,7 @@ Feature: Browsing via API
     And the response should be:
     """
     This is the plain text file 1-002-plain.txt.
-    
+
     """
 
   Scenario: Download document that doesn't exist for item that does exist

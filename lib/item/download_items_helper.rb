@@ -8,8 +8,8 @@ module Item::DownloadItemsHelper
 
       # Creates a ZIP file containing the documents and item's metadata
       zip_path = DownloadItemsAsArchive.new(current_user, current_ability).createAndRetrieveZipPath(itemHandles) do |aDoc|
-        @itemInfo = create_display_info_hash(aDoc)
-        renderer = Rabl::Renderer.new('catalog/show', @itemInfo, { :format => 'json', :view_path => 'app/views', :scope => self })
+        @item_info = create_display_info_hash(aDoc)
+        renderer = Rabl::Renderer.new('catalog/show', @item_info, { :format => 'json', :view_path => 'app/views', :scope => self })
         itemMetadata = renderer.render
         itemMetadata
       end
