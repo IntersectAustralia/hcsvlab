@@ -4,21 +4,15 @@ Feature: Displaying Items
 
   Background:
     Given I have the usual roles and permissions
-    Given I have users
-      | email                       | first_name | last_name |
-      | researcher@intersect.org.au | Researcher | One       |
-      | data_owner@intersect.org.au | Data       | Owner     |
-    Given "data_owner@intersect.org.au" has role "data owner"
-    Given I have user "researcher@intersect.org.au" with the following groups
-      | collectionName | accessType |
-      | cooee          | read       |
-      | custom         | read       |
-      | rirusyd        | read       |
-    And "researcher@intersect.org.au" has role "researcher"
+    And I have a user "data_owner@intersect.org.au" with role "data owner"
+    And I have a user "researcher@intersect.org.au" with role "researcher"
     And I am logged in as "researcher@intersect.org.au"
 
   Scenario: HCSVLAB-272 - Clicking through to a COOEE Item's details
     Given I ingest "cooee:1-001"
+    And I have user "researcher@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | cooee          | read       |
     Given I am on the catalog page for "cooee:1-001"
     Then I should see a page with the title: "Alveo - cooee:1-001"
     Then I should see "cooee:1-001"
@@ -54,7 +48,10 @@ Feature: Displaying Items
 
   Scenario: Verify presence of every faceted field
     Given I ingest "custom:custom1"
-    Given I am on the catalog page for "custom:custom1"
+    And I have user "researcher@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | custom         | read       |
+    And I am on the catalog page for "custom:custom1"
     Then I should see "custom:custom1"
     And I should see "Display Document"
     And I should see "Documents"
@@ -78,6 +75,9 @@ Feature: Displaying Items
 
   Scenario: Verify items with special characters in its id (1 dot, 2 underscores)
     Given I ingest "rirusyd:A_x3m_z0.34m"
+    And I have user "researcher@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | rirusyd        | read       |
     Given I am on the catalog page for "rirusyd:A_x3m_z0.34m"
     Then I should see "rirusyd:A_x3m_z0.34m"
     And I should see fields displayed
@@ -87,6 +87,9 @@ Feature: Displaying Items
 
   Scenario: Verify items with special characters in its id (2 dots, 2 underscores)
     Given I ingest "rirusyd:A_x1.5m_z0.5m"
+    And I have user "researcher@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | rirusyd        | read       |
     Given I am on the catalog page for "rirusyd:A_x1.5m_z0.5m"
     Then I should see "rirusyd:A_x1.5m_z0.5m"
     And I should see fields displayed
@@ -96,6 +99,9 @@ Feature: Displaying Items
 
   Scenario: Verify items with special UTF-8 characters in its metadata
     Given I ingest "custom:utf8_test_1"
+    And I have user "researcher@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | custom         | read       |
     Given I am on the catalog page for "custom:utf8_test_1"
     Then I should see "custom:utf8_test_1"
     And I should see fields displayed
