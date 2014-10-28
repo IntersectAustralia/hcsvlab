@@ -245,7 +245,7 @@ Feature: Administer users
       | name  |
       | Test  |
       | Test2 |
-    And I ingest "cooee:1-001" with id "hcsvlab:1"
+    And I ingest "cooee:1-001"
     And "georgina@intersect.org.au" has "read" access to collection "cooee"
     And "georgina@intersect.org.au" has an api token
     And I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "georgina@intersect.org.au" with JSON params

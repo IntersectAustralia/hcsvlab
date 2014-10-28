@@ -660,7 +660,7 @@ class CatalogController < ApplicationController
     # Validate item. This line will also validate that the user has permission for adding
     # the annotation in that item.
     item = Item.find_by_handle(item_handler)
-    if item.empty?
+    if item.nil?
       respond_to do |format|
         format.json {
           render :json => {:error => "No Item with handle '#{item_handler}' exists."}.to_json, :status => 412

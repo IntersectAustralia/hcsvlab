@@ -10,8 +10,8 @@ Feature: Managing Collection Lists and Licences
       | research@intersect.org.au   | research   | student   |
     Given "data_owner@intersect.org.au" has role "data owner"
     Given "research@intersect.org.au" has role "researcher"
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I ingest licences
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the licences page

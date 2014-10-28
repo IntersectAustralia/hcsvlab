@@ -10,8 +10,8 @@ Feature: Managing Subscriptions to Collections
       | researcher@intersect.org.au | Edmund     | Muir      |
     Given "data_owner@intersect.org.au" has role "data owner"
     Given "researcher@intersect.org.au" has role "researcher"
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I ingest licences
     Given Collections ownership is
       | collection | owner_email                 |

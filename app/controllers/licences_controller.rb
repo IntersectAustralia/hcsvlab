@@ -59,7 +59,7 @@ class LicencesController < ApplicationController
       newLicence.name = name
       newLicence.text = sanitizedText
       newLicence.private = true
-      newLicence.ownerId = current_user.id.to_s
+      newLicence.owner_id = current_user.id.to_s
       newLicence.save!
 
       # Now lets assign the licence to every collection list

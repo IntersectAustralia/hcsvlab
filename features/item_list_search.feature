@@ -5,9 +5,9 @@ Feature: Searching item lists
   So that I can analyse my collection
 
   Background:
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:4"
-    Given I ingest "auslit:bolroma" with id "hcsvlab:5"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "auslit:bolroma"
     Given I have the usual roles and permissions
     Given I have users
       | email                        | first_name | last_name |

@@ -16,7 +16,7 @@ Feature: Displaying Items
     And I am logged in as "researcher@intersect.org.au"
 
   Scenario: HCSVLAB-272 - Clicking through to a COOEE Item's details
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I am on the catalog page for "cooee:1-001"
     Then I should see a page with the title: "Alveo - cooee:1-001"
     Then I should see "cooee:1-001"
@@ -51,7 +51,7 @@ Feature: Displaying Items
     And I should not see "Development Extras"
 
   Scenario: Verify presence of every faceted field
-    Given I ingest "custom:custom1" with id "hcsvlab:2"
+    Given I ingest "custom:custom1"
     Given I am on the catalog page for "custom:custom1"
     Then I should see "custom:custom1"
     And I should see "Display Document"
@@ -75,7 +75,7 @@ Feature: Displaying Items
       | Type                      | Original, Raw, Text |
 
   Scenario: Verify items with special characters in its id (1 dot, 2 underscores)
-    Given I ingest "rirusyd:A_x3m_z0.34m" with id "hcsvlab:1"
+    Given I ingest "rirusyd:A_x3m_z0.34m"
     Given I am on the catalog page for "rirusyd:A_x3m_z0.34m"
     Then I should see "rirusyd:A_x3m_z0.34m"
     And I should see fields displayed
@@ -84,7 +84,7 @@ Feature: Displaying Items
       | Creator    | Densil Cabrera |
 
   Scenario: Verify items with special characters in its id (2 dots, 2 underscores)
-    Given I ingest "rirusyd:A_x1.5m_z0.5m" with id "hcsvlab:1"
+    Given I ingest "rirusyd:A_x1.5m_z0.5m"
     Given I am on the catalog page for "rirusyd:A_x1.5m_z0.5m"
     Then I should see "rirusyd:A_x1.5m_z0.5m"
     And I should see fields displayed
@@ -93,7 +93,7 @@ Feature: Displaying Items
       | Creator    | Densil Cabrera |
 
   Scenario: Verify items with special UTF-8 characters in its metadata
-    Given I ingest "custom:utf8_test_1" with id "hcsvlab:1"
+    Given I ingest "custom:utf8_test_1"
     Given I am on the catalog page for "custom:utf8_test_1"
     Then I should see "custom:utf8_test_1"
     And I should see fields displayed

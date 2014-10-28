@@ -4,8 +4,8 @@ Feature: Managing Item Lists
   So that I can organise my collection
 
   Background:
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "cooee:1-002" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "cooee:1-002"
     Given I have the usual roles and permissions
     Given I have users
       | email                        | first_name | last_name |
@@ -217,8 +217,8 @@ Feature: Managing Item Lists
     And I should not have the link "Stop Sharing"
 
   Scenario: User should see a message when he has no access right to every item in the shared item list
-    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
-    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "auslit:bolroma"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |

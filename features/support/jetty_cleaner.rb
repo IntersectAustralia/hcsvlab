@@ -10,7 +10,7 @@ end
 
 #make sure jetty is set up properly
 
-output = `diff #{Rails.root}/solr_conf/conf/schema.xml #{Rails.root}jetty/solr/development-core/conf/schema.xml`
+output = `diff #{Rails.root}/solr_conf/conf/schema.xml #{Rails.root}/jetty/solr/development-core/conf/schema.xml`
 if output.present?
   puts "Please run rake jetty:config to set up Solr".red
   puts output

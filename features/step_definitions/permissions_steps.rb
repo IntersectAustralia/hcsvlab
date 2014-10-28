@@ -26,7 +26,7 @@ end
 Given /^I have user "(.*)" with the following groups$/ do |userMail, table|
   user = User.find_by_email(userMail)
   table.hashes.each do |row|
-    col = Collection.find_by_name(row[:collectionName]).first
+    col = Collection.find_by_name(row[:collectionName])
 
     if (col.nil?)
       col = Collection.new

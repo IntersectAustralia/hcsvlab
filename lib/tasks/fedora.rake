@@ -15,9 +15,7 @@ namespace :fedora do
     end
 
     logger.info "rake fedora:ingest_one[#{corpus_rdf}]"
-    pid = ingest_one(File.dirname(corpus_rdf), corpus_rdf)
-    # puts "Ingested item #{pid}" if Rails.env.test?
-
+    ingest_one(File.dirname(corpus_rdf), corpus_rdf)
   end
 
 
@@ -407,10 +405,6 @@ namespace :fedora do
 
   end
 
-  def reindex_item_to_solr(item_id, stomp_client)
-    logger.info "Reindexing item: #{item_id}"
-    stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
-  end
 
   def check_corpus(corpus_dir)
 

@@ -168,7 +168,7 @@ class ItemList < ActiveRecord::Base
   #
   def remove_items_by_handle(item_handles)
     item_handles = [item_handles] if item_handles.is_a?(String)
-    self.items_in_item_lists.where(item: item_handles).delete_all.count
+    self.items_in_item_lists.where(item: item_handles).delete_all
   end
 
   #

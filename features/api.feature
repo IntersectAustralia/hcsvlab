@@ -86,7 +86,7 @@ Feature: Browsing via API
     | the home page                   | 406  |
 
   Scenario Outline: Visit pages with an invalid API token and JSON format
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "austalk:1_1014_1_11_001"
     When I make a JSON request for <page> with an invalid API token
     Then I should get a <code> response code
   # home page does not accept json response
@@ -146,7 +146,7 @@ Feature: Browsing via API
     Then I should get a 404 response code
 
   Scenario: Get item details for cooee item
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "austalk:1_1014_1_11_001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -172,7 +172,7 @@ Feature: Browsing via API
       | $..["alveo:documents"][2]["dc:title"]  | 1-001#Raw                                                |
 
   Scenario: Get item details for austalk item
-    Given I ingest "austalk:1_1014_1_11_001" with id "hcsvlab:1"
+    Given I ingest "austalk:1_1014_1_11_001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | austalk        | read       |
@@ -200,7 +200,7 @@ Feature: Browsing via API
       | $..["alveo:annotations_url'] | http://example.org/catalog/austalk/1_1014_1_11_001/annotations.json |
 
   Scenario: Get item details should not return fields used for authorization
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -225,7 +225,7 @@ Feature: Browsing via API
     """
 
   Scenario: Download primary_text from item
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -234,7 +234,7 @@ Feature: Browsing via API
     Then I should get the primary text for "cooee:1-001"
 
   Scenario: Download primary_text from item with UTF-8 Characters
-    Given I ingest "custom:utf8_test_1" with id "hcsvlab:1"
+    Given I ingest "custom:utf8_test_1"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | custom         | read       |
@@ -256,7 +256,7 @@ Feature: Browsing via API
     """
 
   Scenario: Download primary_text from item that doesn't exist
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -268,7 +268,7 @@ Feature: Browsing via API
     """
 
   Scenario: Download document which exists
-    Given I ingest "cooee:1-002" with id "hcsvlab:2"
+    Given I ingest "cooee:1-002"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -281,7 +281,7 @@ Feature: Browsing via API
     """
 
   Scenario: Download document that doesn't exist for item that does exist
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -293,7 +293,7 @@ Feature: Browsing via API
     """
 
   Scenario: Download document where the item doesn't exist
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -305,7 +305,7 @@ Feature: Browsing via API
     """
 
   Scenario: Access collection details via the API
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     And I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -322,7 +322,7 @@ Feature: Browsing via API
     """
 
   Scenario: Get item details with no Accept header should default to json
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -334,9 +334,9 @@ Feature: Browsing via API
       | $..["alveo:primary_text_url"] | http://example.org/catalog/cooee/1-001/primary_text.json |
 
   Scenario: Search for simple term in all metadata
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
-    Given I ingest "ice:S2B-035" with id "hcsvlab:3"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "ice:S2B-035"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -352,10 +352,10 @@ Feature: Browsing via API
     """
 
   Scenario: Search for two simple term in all metadata joined with AND via the API
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "ice:S2B-035" with id "hcsvlab:2"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
-    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I ingest "cooee:1-001"
+    Given I ingest "ice:S2B-035"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "auslit:bolroma"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -371,10 +371,10 @@ Feature: Browsing via API
     """
 
   Scenario: Search for two simple term in all metadata joined with OR via the API
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "ice:S2B-035" with id "hcsvlab:2"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
-    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I ingest "cooee:1-001"
+    Given I ingest "ice:S2B-035"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "auslit:bolroma"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -390,10 +390,10 @@ Feature: Browsing via API
     """
 
   Scenario: Search for term with asterisk in all metadata via the API
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "cooee:1-002" with id "hcsvlab:2"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
-    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I ingest "cooee:1-001"
+    Given I ingest "cooee:1-002"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "auslit:bolroma"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -408,8 +408,8 @@ Feature: Browsing via API
     """
 
   Scenario: Search metadata with field:value via the API using solr field name
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -424,8 +424,8 @@ Feature: Browsing via API
     """
 
   Scenario: Search metadata with field:value via the API using user friendly field name
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -440,8 +440,8 @@ Feature: Browsing via API
     """
 
   Scenario: Search metadata with field:value via the API using user friendly field name and all metadata search
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -456,8 +456,8 @@ Feature: Browsing via API
     """
 
   Scenario: Search metadata with field:value via the API using user friendly field name and all metadata search with asterisk
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -472,8 +472,8 @@ Feature: Browsing via API
     """
 
   Scenario: Search metadata with quotes via the API
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -488,8 +488,8 @@ Feature: Browsing via API
     """
 
   Scenario: Search metadata with ranges via the API
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -514,10 +514,10 @@ Feature: Browsing via API
     """
 
   Scenario: Testing permissions when searching using the API
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "ice:S2B-035" with id "hcsvlab:2"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
-    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I ingest "cooee:1-001"
+    Given I ingest "ice:S2B-035"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "auslit:bolroma"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -532,8 +532,8 @@ Feature: Browsing via API
     """
 
   Scenario: Add items to a new item list via the API
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "cooee:1-002" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "cooee:1-002"
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | name  | items                                                                               |
       | cooee | ["http://example.org/catalog/cooee/1-001","http://example.org/catalog/cooee/1-002"] |
@@ -547,7 +547,7 @@ Feature: Browsing via API
     Given "researcher1@intersect.org.au" has item lists
       | name  |
       | cooee |
-    Given I ingest "cooee:1-002" with id "hcsvlab:1"
+    Given I ingest "cooee:1-002"
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | name  | items                                      |
       | cooee | ["http://example.org/catalog/cooee/1-002"] |
@@ -578,7 +578,7 @@ Feature: Browsing via API
     """
 
   Scenario: Add items to an item list via the API including non-existent items
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I make a JSON post request for the item lists page with the API token for "researcher1@intersect.org.au" with JSON params
       | name  | items                                                                                    |
       | cooee | ["http://example.org/catalog/cooee/1-001","http://example.org/catalog/cooee/non-exists"] |
@@ -625,14 +625,14 @@ Feature: Browsing via API
     """
 
   Scenario: Download items metadata and files in Zip format including non-existent items
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
       | format | items                                                                                    |
       | zip    | ["http://example.org/catalog/cooee/1-001","http://example.org/catalog/cooee/non-exists"] |
     Then I should get a 200 response code
 
   Scenario: Download items metadata and files in Warc format
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     And "researcher1@intersect.org.au" has item lists
       | name   |
       | Test 1 |
@@ -646,7 +646,7 @@ Feature: Browsing via API
   ###########################################################################################################
 
   Scenario: Get annotation context
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     And "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON request for the annotation context page with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
@@ -664,7 +664,7 @@ Feature: Browsing via API
     """
 
   Scenario: Get annotations for item
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
@@ -695,7 +695,7 @@ Feature: Browsing via API
     """
 
   Scenario: Get annotations for item with different @type
-    Given I ingest "cooee:1-002" with id "hcsvlab:1"
+    Given I ingest "cooee:1-002"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON request for the catalog annotations page for "cooee:1-002" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
@@ -720,18 +720,18 @@ Feature: Browsing via API
     """
 
   Scenario: Request annotations for item that doesn't have annotations
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "auslit:adaessa"
     Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
     When I make a JSON request for the catalog annotations page for "auslit:adaessa" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
   Scenario: Get annotations for item that doesn't exist
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     When I make a JSON request for the catalog annotations page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
   Scenario: Get annotation properties for an item
-    Given I ingest "cooee:1-002" with id "hcsvlab:1"
+    Given I ingest "cooee:1-002"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON request for the catalog annotation properties page for "cooee:1-002" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
@@ -773,18 +773,18 @@ Feature: Browsing via API
     """
 
   Scenario: Get annotation properties for an item that doesn't have annotations
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "auslit:adaessa"
     Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
     When I make a JSON request for the catalog annotation properties page for "auslit:adaessa" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
   Scenario: Get annotations properties for item that doesn't exist
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     When I make a JSON request for the catalog annotation properties page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
   Scenario: Get annotation types for an item
-    Given I ingest "cooee:1-002" with id "hcsvlab:1"
+    Given I ingest "cooee:1-002"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON request for the catalog annotation types page for "cooee:1-002" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
@@ -799,18 +799,18 @@ Feature: Browsing via API
     """
 
   Scenario: Get annotation types for an item that doesn't have annotations
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "auslit:adaessa"
     Given "researcher1@intersect.org.au" has "read" access to collection "austlit"
     When I make a JSON request for the catalog annotation types page for "auslit:adaessa" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
   Scenario: Get annotations types for item that doesn't exist
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     When I make a JSON request for the catalog annotation types page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au"
     Then I should get a 404 response code
 
   Scenario: Get specific annotations for item by label
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -839,7 +839,7 @@ Feature: Browsing via API
     """
 
   Scenario: Get specific annotations for item by type
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -867,7 +867,7 @@ Feature: Browsing via API
     """
 
   Scenario: Get annotations for item using extra properties
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -895,7 +895,7 @@ Feature: Browsing via API
     """
 
   Scenario: Get annotations for item using invalid property
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -909,7 +909,7 @@ Feature: Browsing via API
     """
 
   Scenario: Get annotations for item including a user uploaded one
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name | Content | Filename                                               | Type                     |
@@ -934,7 +934,7 @@ Feature: Browsing via API
   ###########################################################################################################
 
   Scenario: Successfully uploaded user annotation
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name | Content | Filename                                               | Type                     |
@@ -942,14 +942,14 @@ Feature: Browsing via API
     Then I should get a 200 response code
 
   Scenario: Upload annotation to non existing item
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     When I make a JSON multipart request for the catalog annotations page for "cooee:non-exists" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name | Content | Filename                                               | Type                     |
       | file |         | test/samples/annotations/upload_annotation_sample.json | application/octet-stream |
     Then I should get a 404 response code
 
   Scenario: Upload blank annotation to an item
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name | Content | Filename                                                     | Type                     |
@@ -961,7 +961,7 @@ Feature: Browsing via API
     """
 
   Scenario: Upload same annotation file twice
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name | Content | Filename                                               | Type                     |
@@ -978,7 +978,7 @@ Feature: Browsing via API
     """
 
   Scenario: Upload malformed annotation to an item
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given "researcher1@intersect.org.au" has "read" access to collection "cooee"
     When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name | Content | Filename                                                         | Type                     |
@@ -990,7 +990,7 @@ Feature: Browsing via API
     """
 
   Scenario: Uploaded user annotation for an item I have no read access
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     When I make a JSON multipart request for the catalog annotations page for "cooee:1-001" with the API token for "researcher1@intersect.org.au" with JSON params
       | Name | Content | Filename                                               | Type                     |
       | file |         | test/samples/annotations/upload_annotation_sample.json | application/octet-stream |
@@ -1001,8 +1001,8 @@ Feature: Browsing via API
   ###########################################################################################################
 
   Scenario: Send sparql query without specifying the query.
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -1016,8 +1016,8 @@ Feature: Browsing via API
     """
 
   Scenario: Send sparql query to a collection I have no access.
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -1031,8 +1031,8 @@ Feature: Browsing via API
 # In the near future we might allow the SERVICE keyword in the query. I'll leave this test for that purpose
 #
 #  Scenario: Send sparql query to a collection I have no access by using the service keyword.
-#    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-#    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+#    Given I ingest "cooee:1-001"
+#    Given I ingest "auslit:adaessa"
 #    Given I have user "researcher1@intersect.org.au" with the following groups
 #      | collectionName  | accessType  |
 #      | cooee           | read        |
@@ -1053,7 +1053,7 @@ Feature: Browsing via API
     """
 
   Scenario: Send sparql query to retrieve an item identifier
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -1086,7 +1086,7 @@ Feature: Browsing via API
 # In the near future we might allow the SERVICE keyword in the query. I'll leave this test for that purpose
 #
 #  Scenario: Send sparql query to retrieve an item identifier by using Service keyword
-#    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+#    Given I ingest "cooee:1-001"
 #    Given I have user "researcher1@intersect.org.au" with the following groups
 #      | accessType  |
 #      | read        |
@@ -1116,8 +1116,8 @@ Feature: Browsing via API
 #    """
 
   Scenario: Send sparql query to retrieve all items' collection name
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "cooee:1-002" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    Given I ingest "cooee:1-002"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -1162,7 +1162,7 @@ Feature: Browsing via API
     """
 
   Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using wrong Service with Silent keyword
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -1176,7 +1176,7 @@ Feature: Browsing via API
     """
 
   Scenario: Send sparql query to retrieve utf-8 text in Russian
-    Given I ingest "custom:custom1" with id "hcsvlab:1"
+    Given I ingest "custom:custom1"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | custom         | read       |
@@ -1204,7 +1204,7 @@ Feature: Browsing via API
     """
 
   Scenario: Send sparql query to retrieve utf-8 text in Chinese
-    Given I ingest "custom:custom1" with id "hcsvlab:1"
+    Given I ingest "custom:custom1"
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | custom         | read       |
@@ -1235,8 +1235,8 @@ Feature: Browsing via API
 # In the near future we might allow the SERVICE keyword in the query. I'll leave these 2 tests for that purpose
 #
 #  Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using Service keyword
-#    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-#    Given I ingest "auslit:adaessa" with id "hcsvlab:2"
+#    Given I ingest "cooee:1-001"
+#    Given I ingest "auslit:adaessa"
 #    Given I have user "researcher1@intersect.org.au" with the following groups
 #      | collectionName  | accessType  |
 #      | cooee           | read        |
@@ -1273,7 +1273,7 @@ Feature: Browsing via API
 #    """
 
 #  Scenario: Send sparql query to retrieve an item identifier by specifying collection and also using wrong Service with Silent keyword
-#    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+#    Given I ingest "cooee:1-001"
 #    Given I have user "researcher1@intersect.org.au" with the following groups
 #      | collectionName  | accessType  |
 #      | cooee           | read        |
@@ -1306,9 +1306,9 @@ Feature: Browsing via API
 #    """
 
   Scenario: Use API to get collections list
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "ice:S2B-035" with id "hcsvlab:2"
-    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
+    Given I ingest "cooee:1-001"
+    Given I ingest "ice:S2B-035"
+    Given I ingest "auslit:adaessa"
     Given I make a JSON request for the collections page with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should be:
@@ -1359,8 +1359,8 @@ Feature: Browsing via API
     """
 
   Scenario: Clear item_list via the API, more than one items
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    And I ingest "cooee:1-002" with id "hcsvlab:2"
+    Given I ingest "cooee:1-001"
+    And I ingest "cooee:1-002"
     And "researcher1@intersect.org.au" has item lists
       | name       |
       | Clear Test |
@@ -1373,7 +1373,7 @@ Feature: Browsing via API
     """
 
   Scenario: Clear item_list via the API, only one item
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
+    Given I ingest "cooee:1-001"
     And "researcher1@intersect.org.au" has item lists
       | name       |
       | Clear Test |
