@@ -5,20 +5,23 @@ Feature: Administer users
 
   Background:
     Given I have users
-      | email                     | first_name | last_name |
-      | raul@intersect.org.au     | Raul       | Carrizo   |
-      | georgina@intersect.org.au | Georgina   | Edwards   |
+      | email                       | first_name | last_name |
+      | raul@intersect.org.au       | Raul       | Carrizo   |
+      | georgina@intersect.org.au   | Georgina   | Edwards   |
+      | data_owner@intersect.org.au | Data       | Owner     |
     And I have the usual roles and permissions
     And I am logged in as "georgina@intersect.org.au"
     And "georgina@intersect.org.au" has role "admin"
+    And "data_owner@intersect.org.au" has role "data owner"
 
   Scenario: View a list of users
     Given "raul@intersect.org.au" is deactivated
     When I am on the list users page
     Then I should see "users" table with
-      | First name | Last name | Email                     | Role  | Status      |
-      | Georgina   | Edwards   | georgina@intersect.org.au | admin | Active      |
-      | Raul       | Carrizo   | raul@intersect.org.au     |       | Deactivated |
+      | First name | Last name | Email                       | Role       | Status      |
+      | Data       | Owner     | data_owner@intersect.org.au | data owner | Active      |
+      | Georgina   | Edwards   | georgina@intersect.org.au   | admin      | Active      |
+      | Raul       | Carrizo   | raul@intersect.org.au       |            | Deactivated |
 
   Scenario: View user details
     Given "raul@intersect.org.au" has role "researcher"

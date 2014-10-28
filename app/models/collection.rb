@@ -8,7 +8,7 @@ class Collection < ActiveRecord::Base
   belongs_to :collection_list
   belongs_to :licence
 
-  def setLicence(licence)
+  def set_licence(licence)
     unless licence.nil?
       licence = Licence.find(licence.to_s) unless licence.is_a? Licence
     end
@@ -16,7 +16,7 @@ class Collection < ActiveRecord::Base
     self.save!
   end
 
-  def setPrivacy(status)
+  def set_privacy(status)
     self.private = status
     self.save!
   end

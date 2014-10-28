@@ -56,7 +56,7 @@ describe CollectionList do
       l2 = FactoryGirl.create(:licence, :owner_id => u.id)
 
       # Set licence L1 to the Collection
-      c.setLicence(l1)
+      c.set_licence(l1)
       # Set licence L2 to the Collection List
       cl.set_licence(l2.id)
 

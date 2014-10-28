@@ -3,7 +3,7 @@ class Ability
 
   # TODO check if Hydra Ability is still required
   include Hydra::Ability
-  #include Hydra::PolicyAwareAbility
+  # include Hydra::PolicyAwareAbility
 
   require 'blacklight/catalog'
 

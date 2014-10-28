@@ -47,7 +47,7 @@ class CollectionsController < ApplicationController
     collection = Collection.find(params[:collection_id])
     licence = Licence.find (params[:licence_id])
 
-    collection.setLicence(licence)
+    collection.set_licence(licence)
 
     flash[:notice] = "Successfully added licence to #{collection.name}"
     redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
@@ -59,7 +59,7 @@ class CollectionsController < ApplicationController
   def change_collection_privacy
     collection = Collection.find(params[:id])
     private = params[:privacy]
-    collection.setPrivacy(private)
+    collection.set_privacy(private)
     if private=="false"
       UserLicenceRequest.where(:request_id => collection.id.to_s).destroy_all
     end

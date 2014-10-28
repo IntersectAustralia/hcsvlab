@@ -9,6 +9,8 @@ Feature: Collection access control
       | data_owner1@intersect.org.au | dataOwner1 | One       |
       | data_owner2@intersect.org.au | dataOwner2 | Two       |
       | researcher1@intersect.org.au | Researcher | R         |
+      | data_owner@intersect.org.au  | Data       | Owner     |
+    Given "data_owner@intersect.org.au" has role "data owner"
     Given "data_owner1@intersect.org.au" has role "data owner"
     Given "data_owner2@intersect.org.au" has role "data owner"
     Given "researcher1@intersect.org.au" has role "researcher"

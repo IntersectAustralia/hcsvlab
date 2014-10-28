@@ -68,7 +68,7 @@ class LicencesController < ApplicationController
         aCollectionList.set_licence(newLicence.id)
       elsif !collectionId.nil?
         aCollection = Collection.find(collectionId)
-        aCollection.setLicence(newLicence)
+        aCollection.set_licence(newLicence)
       end
 
       flash[:notice] = "Licence created successfully"

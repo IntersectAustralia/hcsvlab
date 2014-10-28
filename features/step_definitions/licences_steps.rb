@@ -78,7 +78,7 @@ end
 
 Given /^User "([^"]*)" has a Collection List called "([^"]*)" containing$/ do |email, list_name, table|
   # Create the Collection List
-  list = CollectionList.new()
+  list = CollectionList.new
   list.name = list_name
 
   user = User.find_by_user_key(email)
@@ -88,7 +88,7 @@ Given /^User "([^"]*)" has a Collection List called "([^"]*)" containing$/ do |e
   # Populate it with the collections mentioned in the table
   ids = []
   table.hashes.each_with_index do |row|
-    collection = Collection.find_by_name(row[:collection]).to_a.first
+    collection = Collection.find_by_name(row[:collection])
     ids << collection.id
   end
 
@@ -110,23 +110,15 @@ Then /^the Review and Acceptance of Licence Terms table should have$/ do |table|
 end
 
 And /^I have added a licence to (private )?Collection "([^"]*)"$/ do |priv, name|
-  coll = Collection.find_by_name(name).to_a.first
+  coll = Collection.find_by_name(name)
   coll.set_licence(Licence.first.id)
-  if priv
-    coll.set_privacy('true')
-  else
-    coll.setPrivacy('false')
-  end
+  coll.set_privacy(priv.present?)
 end
 
 And /^I have added a licence to (private )?Collection List "([^"]*)"$/ do |priv, name|
-  list = CollectionList.find_by_name(name)[0]
+  list = CollectionList.find_by_name(name)
   list.set_licence(Licence.first.id)
-  if priv
-    list.set_privacy('true')
-  else
-    list.setPrivacy('false')
-  end
+  list.set_privacy(priv.present?)
 end
 
 And /^I click the action button in the (\d+)(?:|st|nd|rd|th) row of the "([^"]*)" table$/ do |position, table|
@@ -150,17 +142,17 @@ And /^I click "([^"]*)" on the (\d+)(?:|st|nd|rd|th) licence dialogue$/ do |name
 end
 
 Given(/^there is a licence request for collection "(.*?)" by "(.*?)"$/) do |collection_name, email|
-  coll = Collection.find_by_name(collection_name)[0]
+  coll = Collection.find_by_name(collection_name)
   user = User.find_by_user_key(email)
-  req = UserLicenceRequest.new(:request_id => coll.id.to_s, :request_type => "collection", :owner => coll.owner, :approved => false)
+  req = UserLicenceRequest.new(:request_id => coll.id.to_s, :request_type => "collection", :approved => false)
   req.user = user
   req.save!
 end
 
 Given(/^there is a licence request for collection list "(.*?)" by "(.*?)"$/) do |collection_name, email|
-  coll = CollectionList.find_by_name(collection_name)[0]
+  coll = CollectionList.find_by_name(collection_name)
   user = User.find_by_user_key(email)
-  req = UserLicenceRequest.new(:request_id => coll.id.to_s, :request_type => "collection_list", :owner => coll.owner, :approved => false)
+  req = UserLicenceRequest.new(:request_id => coll.id.to_s, :request_type => "collection_list", :approved => false)
   req.user = user
   req.save!
 end

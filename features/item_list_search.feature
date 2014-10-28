@@ -13,6 +13,8 @@ Feature: Searching item lists
       | email                        | first_name | last_name |
       | researcher@intersect.org.au  | Researcher | One       |
       | researcher2@intersect.org.au | Researcher | two       |
+      | data_owner@intersect.org.au  | Data       | Owner     |
+    Given "data_owner@intersect.org.au" has role "data owner"
     Given "researcher@intersect.org.au" has role "researcher"
     Given "researcher2@intersect.org.au" has role "researcher"
     Given I have user "researcher@intersect.org.au" with the following groups

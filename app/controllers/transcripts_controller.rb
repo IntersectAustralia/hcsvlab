@@ -133,9 +133,9 @@ class TranscriptsController < ApplicationController
     handle = nil
     handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
 
-    if (!handle.nil?)
-      item = Item.find_and_load_from_solr({handle:handle})
-      if (!item.present?)
+    if handle
+      item = Item.find_by_handle(handle)
+      if item.nil?
         respond_to do |format|
           format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a record that doesn't exist.")) and return}
           format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return}

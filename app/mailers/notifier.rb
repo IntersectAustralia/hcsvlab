@@ -40,7 +40,7 @@ class Notifier < ActionMailer::Base
   def notify_data_owner_of_user_licence_request(user_licence_request)
     @request = user_licence_request
     @coll = @request.request
-    owner_email = @request.owner.email
+    owner_email = @coll.owner.email
     mail( :to => owner_email,
           :from => APP_CONFIG['licence_access_request_notification_sender'],
           :reply_to => @request.user_email,

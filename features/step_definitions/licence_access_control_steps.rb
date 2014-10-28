@@ -8,13 +8,6 @@ Given /^Collections ownership is$/ do |table|
     collection.save
     user.add_agreement_to_collection(collection, UserLicenceAgreement::EDIT_ACCESS_TYPE)
 
-    #By now this is not going to work since "our" SOLR core is not being updated
-    #collection.items.each do |aItem|
-    #  aItem.set_discover_users([row[:owner_email]], [])
-    #  aItem.set_read_users([row[:owner_email]], [])
-    #  aItem.set_edit_users([row[:owner_email]], [])
-    #  aItem.save
-    #end
   end
 end
 

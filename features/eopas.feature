@@ -7,6 +7,8 @@ Feature: Displaying Items in EOPAS
     Given I have users
       | email                       | first_name | last_name |
       | researcher@intersect.org.au | Researcher | One       |
+      | data_owner@intersect.org.au | Data       | Owner     |
+    Given "data_owner@intersect.org.au" has role "data owner"
     And "researcher@intersect.org.au" has role "researcher"
     And I am logged in as "researcher@intersect.org.au"
 
