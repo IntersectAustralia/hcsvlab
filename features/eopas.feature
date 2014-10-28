@@ -82,4 +82,4 @@
 #
 #  Scenario: Requesting an EOPAS item that doesn't exists
 #    Given I am on the eopas page for item "hcsvlab:notExists"
-    Then I should see "Sorry, you have requested a record that doesn't exist."
+#    Then I should see "Sorry, you have requested a record that doesn't exist."
