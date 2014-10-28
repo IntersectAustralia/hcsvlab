@@ -11,14 +11,14 @@ Feature: Managing Item Lists
       | researcher@intersect.org.au  | Researcher | One       |
       | researcher1@intersect.org.au | Researcher | One       |
       | data_owner@intersect.org.au  | Data       | Owner     |
-    Given I have user "researcher@intersect.org.au" with the following groups
-      | collectionName | accessType |
-      | cooee          | read       |
     Given "researcher@intersect.org.au" has role "researcher"
     Given "researcher1@intersect.org.au" has role "researcher"
     Given "data_owner@intersect.org.au" has role "data owner"
     Given I ingest "cooee:1-001"
     Given I ingest "cooee:1-002"
+    Given I have user "researcher@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | cooee          | read       |
     Given I am logged in as "researcher@intersect.org.au"
     Given I have done a search with collection "cooee"
     Then I should see the applied facet "Collection" with the value "cooee"

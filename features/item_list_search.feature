@@ -5,9 +5,6 @@ Feature: Searching item lists
   So that I can analyse my collection
 
   Background:
-    Given I ingest "cooee:1-001"
-    Given I ingest "auslit:adaessa"
-    Given I ingest "auslit:bolroma"
     Given I have the usual roles and permissions
     Given I have users
       | email                        | first_name | last_name |
@@ -17,6 +14,9 @@ Feature: Searching item lists
     Given "data_owner@intersect.org.au" has role "data owner"
     Given "researcher@intersect.org.au" has role "researcher"
     Given "researcher2@intersect.org.au" has role "researcher"
+    Given I ingest "cooee:1-001"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "auslit:bolroma"
     Given I have user "researcher@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -134,7 +134,6 @@ Feature: Searching item lists
   ##########################################################################
   ## FREQUENCY SEARCH                                                     ##
   ##########################################################################
-
   Scenario: Doing a frequency search for simple words (can)
     Given I am logged in as "researcher@intersect.org.au"
     Given "researcher@intersect.org.au" has item lists

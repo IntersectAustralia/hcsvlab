@@ -84,8 +84,8 @@ Then /^frequency search for "(.*)" in item list "(.*)" should show this results$
   field = find_field("Facet")
   result = list.doFrequencySearch(term, field.value)
 
+  result[:status].should eq("OK")
   table.hashes.each do |attributes|
-    result[:status].should eq("OK")
     result[:data][attributes[:facetValue]].should_not eq (nil)
     result[:data][attributes[:facetValue]][:num_docs].to_s.should eq(attributes[:matchingDocuments])
     result[:data][attributes[:facetValue]][:total_docs].to_s.should eq(attributes[:totalDocs])
