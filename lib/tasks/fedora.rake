@@ -7,18 +7,16 @@ namespace :fedora do
   #
   # Ingest one metadata file, given as an argument
   #
-  task :ingest_one => :environment do
-
-    corpus_rdf = ARGV[1] unless ARGV[1].nil?
-
+  task :ingest_one, [:corpus_rdf] => :environment do |t, args|
+    corpus_rdf = args.corpus_rdf
     if (corpus_rdf.nil?) || (!File.exists?(corpus_rdf))
-      puts "Usage: rake fedora:ingest_one <corpus rdf file>"
+      puts "Usage: rake fedora:ingest_one[<corpus rdf file>]"
       exit 1
     end
 
-    logger.info "rake fedora:ingest_one #{corpus_rdf}"
+    logger.info "rake fedora:ingest_one[#{corpus_rdf}]"
     pid = ingest_one(File.dirname(corpus_rdf), corpus_rdf)
-    puts "Ingested item #{pid}" if Rails.env.test?
+    # puts "Ingested item #{pid}" if Rails.env.test?
 
   end
 

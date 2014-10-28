@@ -318,7 +318,7 @@ def extract_manifest_collection(rdf_file)
   if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
     collection_name = "austalk"
   end
-  return collection_name
+  collection_name
 end
 
 #

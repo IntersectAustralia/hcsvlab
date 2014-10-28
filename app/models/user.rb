@@ -190,7 +190,7 @@ class User < ActiveRecord::Base
   end
 
   def cannot_own_data?
-    return !((Role.superuser_roles + Role.data_owner_roles).include? self.role)
+    !((Role.superuser_roles + Role.data_owner_roles).include? self.role)
   end
 
   def groups

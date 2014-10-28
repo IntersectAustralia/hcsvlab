@@ -29,11 +29,8 @@ class CollectionList < ActiveRecord::Base
   # Adds collections to a Collection List
   #
   def add_collections(collection_ids)
-    puts collection_ids
     self.collection_ids += collection_ids
-    puts self.collections
     self.collections.update_all(licence_id: self.licence_id)
-    puts self.collections.pluck(:licence_id)
     self.save!
   end
 

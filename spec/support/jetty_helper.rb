@@ -35,11 +35,15 @@ def ingest_test_collections
   Dir.glob(qa_collections_folder.to_s + "/*").each do |aFile|
     if (Dir.exists?(aFile))
       rdf_files = Dir.glob(aFile + "/*-metadata.rdf")
-
+      require 'rake'
+      rake = Rake::Application.new
+      Rake.application = rake
+      rake.init
+      rake.load_rakefile
       rdf_files.each do |rdf_file|
-        response = `RAILS_ENV=test bundle exec rake fedora:ingest_one #{rdf_file}`
-        pid = response[/(hcsvlab:\d+)/, 1]
-        Solr_Worker.new.on_message("index #{pid}")
+        rake["fedora:ingest_one"].invoke(rdf_file)
+        rake["fedora:ingest_one"].reenable
+        Solr_Worker.new.on_message("index #{Item.last.id}")
       end
     end
   end
