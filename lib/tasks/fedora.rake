@@ -532,7 +532,7 @@ namespace :fedora do
 
   def setup_collection_list(list_name, licence, *collection_names)
     list = CollectionList.create_public_list(list_name, licence, *collection_names)
-    logger.warning("Didn't create CollectionList #{list_name}") if list.nil?
+    logger.warn("Didn't create CollectionList #{list_name}") if list.nil?
   end
 
   def send_solr_message(command, objectID)

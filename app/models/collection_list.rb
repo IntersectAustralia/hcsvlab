@@ -79,7 +79,7 @@ class CollectionList < ActiveRecord::Base
     if licences.uniq.size > 1
       errors[:base] << "All Collection in a Collection List must have the same licence"
       collections.where('licence_id != ?', licence_id.to_i).each do |collection|
-        Rails.logger.debug "Collection #{collection.id} has licence #{collection.licence.name}, but the Collection List #{self.id} has licence #{self.licence.name}"
+        Rails.logger.debug "Collection #{collection.id} has licence #{collection.licence.try(:name)}, but the Collection List #{self.id} has licence #{self.licence.try(:name)}"
       end
     end
 
@@ -120,7 +120,7 @@ class CollectionList < ActiveRecord::Base
     unless warnings.empty?
       # There were missing collections.
       warnings.each { |w|
-        Rails.logger.warning("CollectionList.create_public_list: #{w}")
+        Rails.logger.warn("CollectionList.create_public_list: #{w}")
       }
     end
 

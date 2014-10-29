@@ -1,2 +1,2 @@
-node(:item_url) { catalog_url(@item.collection.name, @item.handle.first.split(':').last) }
+node(:item_url) { catalog_url(@item.collection.name, @item.handle.split(':').last) }
 node(:annotation_types) { @types }
