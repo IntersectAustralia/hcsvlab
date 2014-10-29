@@ -7,6 +7,9 @@ class Item < ActiveRecord::Base
   validates :uri, presence: true
   validates :handle, presence: true, uniqueness: {case_sensitive: false}
 
+  scope :unindexed, where(indexed_at: nil)
+  scope :indexed, where('indexed_at is not null')
+
   def has_primary_text?
     self.primary_text_path.present?
   end

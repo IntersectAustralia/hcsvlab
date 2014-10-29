@@ -95,8 +95,8 @@ private
   # Do the indexing for an Item
   #
   def index_item(object)
-    fed_item = Item.find(object)
-    collection = fed_item.collection
+    item = Item.find(object)
+    collection = item.collection
 
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
@@ -108,7 +108,7 @@ private
       return
     end
 
-    rdf_uri = RDF::URI.new(fed_item.uri)
+    rdf_uri = RDF::URI.new(item.uri)
     basic_results = repository.query(:subject => rdf_uri)
     extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
     internalUseData = {:documents_path => []}
@@ -123,8 +123,8 @@ private
 
     # get full text from item
     begin
-      unless fed_item.nil? || fed_item.primary_text_path.nil?
-        file = File.open(fed_item.primary_text_path)
+      unless item.nil? || item.primary_text_path.nil?
+        file = File.open(item.primary_text_path)
         full_text = file.read
         file.close
       end 
@@ -149,6 +149,8 @@ private
     }
 
     store_results(object, basic_results, full_text, extras, internalUseData, collection)
+    item.indexed_at = Time.now
+    item.save!
   end
 
   #
@@ -276,7 +278,7 @@ private
 
     add_json_metadata_field(document, internalUseData)
 
-    return document
+    document
   end
 
   #
@@ -407,7 +409,9 @@ private
     else
       debug("Solr_Worker", "Inserting " + object.to_s )
       response = @@solr.add(document)
+      debug("Solr_Worker", "Add response= #{response.to_s}")
       response = @@solr.commit
+      debug("Solr_Worker", "Commit response= #{response.to_s}")
     end
   end
 

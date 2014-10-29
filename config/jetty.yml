@@ -5,7 +5,7 @@ default: &default
     - "-Xmx1g"
 
 test:
-  jetty_port: 8984
+  jetty_port: 8983
   java_opts:
     - "-XX:MaxPermSize=256m"
     - "-Xmx1g"

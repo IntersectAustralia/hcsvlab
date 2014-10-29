@@ -123,31 +123,6 @@ namespace :fedora do
 
   end
 
-
-  #
-  # Reindex one item (given as item=<item-id>)
-  #
-  task :reindex_one => :environment do
-    item_id = ENV['item']
-
-    if item_id.nil?
-      puts "Usage: rake fedora:reindex_one item=<item id>"
-      exit 1
-    end
-
-    unless item_id =~ /hcsvlab:[0-9]+/
-      puts "Error: invalid item id, expecting 'hcsvlab:<digits>'"
-      exit 1
-    end
-
-    logger.info "rake fedora:reindex_one item=#{item_id}"
-
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    reindex_item_to_solr(item_id, stomp_client)
-    stomp_client.close
-  end
-
-
   #
   # Reindex one corpus (given as corpus=<corpus-name>)
   #
@@ -155,58 +130,57 @@ namespace :fedora do
 
     corpus = ENV['corpus']
 
-    if (corpus.nil?)
+    if corpus.nil?
       puts "Usage: rake fedora:reindex_corpus corpus=<corpus name>"
       exit 1
     end
 
     logger.info "rake fedora:reindex_corpus corpus=#{corpus}"
 
-    objects = find_corpus_items corpus
+    items = Collection.find_by_name(corpus).items.pluck(:id)
 
-    logger.info "Reindexing #{objects.count} Items"
+    count = items.count
+    logger.info "Reindexing #{count} items"
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    objects.each do |obj|
-      reindex_item_to_solr(obj["id"], stomp_client)
+
+    items.each_with_index do |item_id,i|
+      print "Indexing #{i+1}/#{count}\r"
+      reindex_item_to_solr(item_id, stomp_client)
     end
+    puts "Published #{count} index messages to ActiveMQ"
+
     stomp_client.close
 
   end
 
-  # TODO
-  # Consolidate cores by reindexing items found only in the ActiveFedora core
+  # Consolidate cores by indexing unindexed items
   #
-  CHUNK_SIZE = 50
-  task :consolidate_cores => :environment do
-    solr_af_core = ActiveFedora::SolrService.instance.conn
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+  BATCH_SIZE = 5000
+  task :consolidate => :environment do
 
     corpus = ENV['corpus']
-    if corpus.present?
-      query = "has_model_ssim:info:fedora/afmodel:Item edit_access_group_ssim:#{corpus}-edit"
+    if corpus
+      query = Item.where(collection_id: Collection.find_by_name(corpus)).unindexed
     else
-      query = 'has_model_ssim:info:fedora/afmodel:Item'
+      query = Item.unindexed
     end
 
-    fedora_response = solr_af_core.get 'select', :params => {:q => query}
-    num = fedora_response["response"]["numFound"]
-    chunks = (num/CHUNK_SIZE)+1
-    start_row = 0
-    chunks.times do |chunk|
-      logger.info "Investigating item set " + (chunk+1).to_s + " of " + chunks.to_s
-      fedora_response = solr_af_core.get 'select', :params => {:q => query, :fl => 'id', :sort => 'id asc', :start => start_row, :rows => CHUNK_SIZE}
-      fedora_records = fedora_response["response"]["docs"].collect { |f| f["id"] }
-      fq_query = "id:(" + fedora_records.collect { |item| item.sub(/:/, '\:') }.join(" OR ") +")"
-      solr_reponse = @solr.get 'select', :params => {fq: fq_query, :fl => 'id', rows: CHUNK_SIZE}
-      solr_records = solr_reponse["response"]["docs"].collect { |s| s["id"] }
-      missing_ids = fedora_records - solr_records
-      missing_ids.each do |missing_id|
-        reindex_item_to_solr(missing_id, stomp_client)
-      end
-      start_row+=CHUNK_SIZE
+    count = query.count
+    logger.info "Indexing all #{count} #{corpus} items"
+    # solr_worker = Solr_Worker.new
+    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+
+    i = 1
+    query.select(:id).find_each(:batch_size => BATCH_SIZE) do |item|
+      print "Indexing #{i}/#{count}\r"
+      # solr_worker.on_message("index #{item.id}")
+      reindex_item_to_solr(item.id, stomp_client)
+      i += 1
     end
+    puts "Published #{count} index messages to ActiveMQ"
     stomp_client.close
+
   end
 
   #
@@ -216,23 +190,19 @@ namespace :fedora do
 
     logger.info "rake fedora:reindex_all"
 
-    response = @solr.get 'select', :params => {:q => ''}
-    num = response["response"]["numFound"]
+    count = Item.count
+    logger.info "Reindexing all #{count} Items"
 
-    logger.info "Reindexing all #{num} Items"
-
+    # solr_worker = Solr_Worker.new
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
-
-    chunks = (num/CHUNK_SIZE)+1
-    start_row = 0
-    chunks.times do |chunk|
-      response = @solr.get 'select', :params => {:fl => 'id', :sort => 'id asc', :start => start_row, :rows => CHUNK_SIZE}
-      response["response"]["docs"].each do |doc|
-        reindex_item_to_solr(doc["id"], stomp_client)
-      end
-      start_row+=CHUNK_SIZE
+    i = 1
+    Item.select(:id).find_each(:batch_size => BATCH_SIZE) do |item|
+      print "Indexing #{i}/#{count}\r"
+      # solr_worker.on_message("index #{item.id}")
+      reindex_item_to_solr(item.id, stomp_client)
+      i += 1
     end
-
+    puts "Published #{count} index messages to ActiveMQ"
     stomp_client.close
 
   end
@@ -420,7 +390,7 @@ namespace :fedora do
     rdf_files.each do |rdf_file|
       begin
         index = index + 1
-        handle = check_rdf_file(corpus_dir, rdf_file, index, rdf_files.size)
+        handle = check_rdf_file(rdf_file, index, rdf_files.size)
         handles[handle] = Set.new unless handles.has_key?(handle)
         handles[handle].add(rdf_file)
         if handles[handle].size > 1
@@ -440,7 +410,7 @@ namespace :fedora do
   end
 
 
-  def check_rdf_file(corpus_dir, rdf_file, index, limit)
+  def check_rdf_file(rdf_file, index, limit)
     unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
       raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
     end
