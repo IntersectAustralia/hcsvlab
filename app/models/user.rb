@@ -278,7 +278,7 @@ class User < ActiveRecord::Base
 
     unless include_own
       result = result.reject { |elt|
-        elt[:state] == "Owner"
+        elt[:state] == :owner
       }
     end
 

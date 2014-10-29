@@ -9,9 +9,6 @@ class Collection < ActiveRecord::Base
   belongs_to :licence
 
   def set_licence(licence)
-    unless licence.nil?
-      licence = Licence.find(licence.to_s) unless licence.is_a? Licence
-    end
     self.licence = licence
     self.save!
   end
