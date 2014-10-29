@@ -3,7 +3,7 @@ class UserLicenceRequest < ActiveRecord::Base
   belongs_to :user
   # TODO try polymorphic association
 
-  attr_accessible :request_type, :request_id, :approved
+  attr_accessible :request_type, :request_id, :approved, :owner_id
 
   validates_presence_of :request_type, :request_id
 

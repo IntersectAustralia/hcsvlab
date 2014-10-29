@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141028113041) do
+ActiveRecord::Schema.define(:version => 20141029032823) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -47,7 +47,7 @@ ActiveRecord::Schema.define(:version => 20141028113041) do
   create_table "documents", :force => true do |t|
     t.string   "file_name"
     t.string   "file_path"
-    t.string   "doc_type"
+    t.string   "type"
     t.string   "mime_type"
     t.integer  "item_id"
     t.datetime "created_at", :null => false
@@ -160,6 +160,7 @@ ActiveRecord::Schema.define(:version => 20141028113041) do
     t.integer  "user_id"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
+    t.integer  "owner_id"
   end
 
   add_index "user_licence_requests", ["user_id"], :name => "index_user_licence_requests_on_user_id"
