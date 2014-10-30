@@ -1,33 +1,33 @@
 .sidenav.static.span3
   %h4 My Item Lists
   %ul.nav
-    - if (@userItemLists.empty?)
+    - if @user_item_lists.empty?
       %li
-        %h5{} Empty
+        %h5 Empty
     -else
-      - @userItemLists.each do |itemList|
-        - selectedClass="active" if (itemList.id == (params[:id].to_i))
-        %li{ :class => selectedClass }
-          =link_to item_list_path(itemList) do
-            -if (itemList.shared?)
+      - @user_item_lists.each do |item_list|
+        - selected_class="active" if (item_list.id == (params[:id].to_i))
+        %li{ :class => selected_class }
+          =link_to item_list_path(item_list) do
+            - if item_list.shared?
               %i.icon-globe.active
-            -else
+            - else
               %i.icon-globe
-            =itemList.name
-            =link_to(itemList, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Item List "'+ itemList.name + '"?\', event));', :id => "delete_item_list_#{itemList.id}", :class => "delete") do
+            = item_list.name
+            = link_to(item_list, :method => :delete, :onClick => 'return (confirmDelete(\'Are you sure you want to remove the Item List "'+ item_list.name + '"?\', event));', :id => "delete_item_list_#{item_list.id}", :class => "delete") do
               %i{:class=>"icon-trash"}
 
   %h4 Shared by Others
   %ul.nav
-    - if (@sharedItemLists.empty?)
+    - if @shared_item_lists.empty?
       %li
-        %h5{} Empty
+        %h5 Empty
     -else
-      - @sharedItemLists.each do |itemList|
-        - selectedClass="active" if (itemList.id == (params[:id].to_i))
-        %li{ :class => selectedClass }
-          =link_to item_list_path(itemList) do
-            =itemList.name
+      - @shared_item_lists.each do |item_list|
+        - selected_class="active" if (item_list.id == (params[:id].to_i))
+        %li{ :class => selected_class }
+          =link_to item_list_path(item_list) do
+            =item_list.name
 
 :javascript
   function confirmDelete(text, event) {

@@ -4,18 +4,21 @@ Feature: Managing Item Lists
   So that I can organise my collection
 
   Background:
-    Given I ingest "cooee:1-001" with id "hcsvlab:1"
-    Given I ingest "cooee:1-002" with id "hcsvlab:2"
+
     Given I have the usual roles and permissions
     Given I have users
-      | email                         | first_name | last_name |
-      | researcher@intersect.org.au   | Researcher | One       |
-      | researcher1@intersect.org.au  | Researcher | One       |
-    Given I have user "researcher@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
+      | email                        | first_name | last_name |
+      | researcher@intersect.org.au  | Researcher | One       |
+      | researcher1@intersect.org.au | Researcher | One       |
+      | data_owner@intersect.org.au  | Data       | Owner     |
     Given "researcher@intersect.org.au" has role "researcher"
     Given "researcher1@intersect.org.au" has role "researcher"
+    Given "data_owner@intersect.org.au" has role "data owner"
+    Given I ingest "cooee:1-001"
+    Given I ingest "cooee:1-002"
+    Given I have user "researcher@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | cooee          | read       |
     Given I am logged in as "researcher@intersect.org.au"
     Given I have done a search with collection "cooee"
     Then I should see the applied facet "Collection" with the value "cooee"
@@ -129,7 +132,7 @@ Feature: Managing Item Lists
     Then I should see "Item list renamed successfully"
     And I should see "New Name"
 
-    Scenario: Renaming an item list with invalid name
+  Scenario: Renaming an item list with invalid name
     And "researcher@intersect.org.au" has item lists
       | name        |
       | Rename Test |
@@ -217,12 +220,12 @@ Feature: Managing Item Lists
     And I should not have the link "Stop Sharing"
 
   Scenario: User should see a message when he has no access right to every item in the shared item list
-    Given I ingest "auslit:adaessa" with id "hcsvlab:3"
-    Given I ingest "auslit:bolroma" with id "hcsvlab:4"
+    Given I ingest "auslit:adaessa"
+    Given I ingest "auslit:bolroma"
     Given I have user "researcher1@intersect.org.au" with the following groups
-      | collectionName  | accessType  |
-      | cooee           | read        |
-      | austlit         | read        |
+      | collectionName | accessType |
+      | cooee          | read       |
+      | austlit        | read       |
     Given "researcher1@intersect.org.au" has item lists
       | name       | shared |
       | Share Test | true   |

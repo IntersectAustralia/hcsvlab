@@ -1,6 +1,6 @@
 = render 'display_collections'
 .span9
-  - if (!params[:id].nil?)
+  - if params[:id]
     = render :file => '/collections/show'
   - else
     %h2 Select a collection to view general information about that collection

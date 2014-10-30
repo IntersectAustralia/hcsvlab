@@ -10,13 +10,13 @@
           %b
             Name:
         %td
-          = @currentCollectionList.name[0]
+          = @currentCollectionList.name
       %tr
         %td
           %b
             Owner:
         %td
-          = @currentCollectionList.ownerEmail[0]
+          = @currentCollectionList.owner.email
     %br
     %h3
       Collections assigned to this Collection List
@@ -29,8 +29,8 @@
       -@currentCollectionList.collections.each do |aCollection|
         %tr
           %td
-            = aCollection.uri[0]
+            = aCollection.uri
           %td
-            = aCollection.short_name[0]
+            = aCollection.name
 = render 'shared/nectar_attribution'
 = render 'shared/modal_waiting_panel'

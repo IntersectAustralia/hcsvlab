@@ -2,13 +2,13 @@ class UserLicenceRequestsController < ApplicationController
   before_filter :authenticate_user!
 
   def index
-    @requests = UserLicenceRequest.where(:owner_email => current_user.email, :approved => false)
+    @requests = UserLicenceRequest.where(approved: false, owner_id: current_user.id)
   end
 
   def approve_request
     @request = UserLicenceRequest.find(params[:id])
     email = @request.user_email
-    coll_name = @request.request.flat_name
+    coll_name = @request.request.name
     user = @request.user
     @request.approve
 
@@ -20,7 +20,7 @@ class UserLicenceRequestsController < ApplicationController
     @request = UserLicenceRequest.find(params[:id])
     reason = params[:reason]
     email = @request.user_email
-    coll_name = @request.request.flat_name
+    coll_name = @request.request.name
     user = @request.user
     @request.destroy
 

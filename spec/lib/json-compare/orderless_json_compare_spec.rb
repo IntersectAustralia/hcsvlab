@@ -19,7 +19,6 @@ describe 'Json compare' do
 
       result = OrderlessJsonCompare.get_diff(old, new)
 
-      puts result
 
       result.should be_empty
     end

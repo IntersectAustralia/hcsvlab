@@ -13,7 +13,7 @@ namespace :sesame do
 
     collection_dir = ENV['collection'] unless ENV['collection'].nil?
 
-    if (collection_dir.nil?) || (!Dir.exists?(collection_dir))
+    if collection_dir.nil? || !Dir.exists?(collection_dir)
       if collection_dir.nil?
         puts "No corpus directory specified."
       else
@@ -45,13 +45,13 @@ namespace :sesame do
   #
   #
   def ingest_collection(collection_dir)
-    metadataFiles = Dir["#{collection_dir}/**/*-metadata.rdf"]
+    metadata_files = Dir["#{collection_dir}/**/*-metadata.rdf"]
 
-    graph = RDF::Graph.load(metadataFiles.first, :format => :ttl, :validate => true)
+    graph = RDF::Graph.load(metadata_files.first, :format => :ttl, :validate => true)
     query = RDF::Query.new({
                                :item => {
-                                   RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
-                                   RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                                   RDF::URI(MetadataHelper::IS_PART_OF) => :collection,
+                                   RDF::URI(MetadataHelper::IDENTIFIER) => :identifier
                                }
                            })
     result = query.execute(graph)[0]

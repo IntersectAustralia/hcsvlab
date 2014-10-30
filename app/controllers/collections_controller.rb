@@ -10,7 +10,7 @@ class CollectionsController < ApplicationController
   #
   #
   def index
-    @collections = getCollectionsIHaveAccess()
+    @collections = getCollectionsIHaveAccess
     respond_to do |format|
       format.html
       format.json
@@ -21,15 +21,11 @@ class CollectionsController < ApplicationController
   #
   #
   def show
-    @collections = getCollectionsIHaveAccess()
+    @collections = getCollectionsIHaveAccess
 
-    begin
-      @collection = Array(Collection.find_by_short_name(params[:id])).first
-    rescue Exception => e
-      #error handled below
-    end
+    @collection = Collection.find_by_name(params[:id])
     respond_to do |format|
-      if @collection.nil? or @collection.flat_short_name.nil?
+      if @collection.nil? or @collection.name.nil?
         format.html { 
             flash[:error] = "Collection does not exist with the given id"
             redirect_to collections_path }
@@ -51,9 +47,9 @@ class CollectionsController < ApplicationController
     collection = Collection.find(params[:collection_id])
     licence = Licence.find (params[:licence_id])
 
-    collection.setLicence(licence)
+    collection.set_licence(licence)
 
-    flash[:notice] = "Successfully added licence to #{collection.flat_short_name}"
+    flash[:notice] = "Successfully added licence to #{collection.name}"
     redirect_to licences_path(:hide=>(params[:hide] == true.to_s)?"t":"f")
   end
 
@@ -63,12 +59,12 @@ class CollectionsController < ApplicationController
   def change_collection_privacy
     collection = Collection.find(params[:id])
     private = params[:privacy]
-    collection.setPrivacy(private)
+    collection.set_privacy(private)
     if private=="false"
-      UserLicenceRequest.where(:request_id => collection.id).destroy_all
+      UserLicenceRequest.where(:request_id => collection.id.to_s).destroy_all
     end
     private=="true" ? state="requiring approval" : state="not requiring approval"
-    flash[:notice] = "#{collection.flat_name} has been successfully marked as #{state}"
+    flash[:notice] = "#{collection.name} has been successfully marked as #{state}"
     redirect_to licences_path
   end
 
@@ -77,9 +73,9 @@ class CollectionsController < ApplicationController
   #
   def revoke_access
     collection = Collection.find(params[:id])
-    UserLicenceRequest.where(:request_id => collection.id).destroy_all if collection.private?
-    UserLicenceAgreement.where("group_name LIKE :prefix", prefix: "#{collection.flat_name}%").destroy_all
-    flash[:notice] = "All access to #{collection.flat_name} has been successfully revoked"
+    UserLicenceRequest.where(:request_id => collection.id.to_s).destroy_all if collection.private?
+    UserLicenceAgreement.where("group_name LIKE :prefix", prefix: "#{collection.name}%").destroy_all
+    flash[:notice] = "All access to #{collection.name} has been successfully revoked"
     redirect_to licences_path
   end
 
@@ -88,9 +84,10 @@ class CollectionsController < ApplicationController
   #
   # Retrieve the collections I have access right
   #
+  # TODO REFACTOR
   def getCollectionsIHaveAccess
     collection = Collection.all.select { |c| can? :discover, c }
-    return collection.sort_by { |coll| coll.flat_short_name }
+    return collection.sort_by { |coll| coll.name }
   end
 
   #

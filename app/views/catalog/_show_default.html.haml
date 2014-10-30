@@ -12,7 +12,7 @@
 - elsif @display_document[:type] == "Audio" or @display_document[:type] == "MP3"
   %audio{:controls => "", :style => "width:450px"}
     %source{:src => "/catalog/#{document[:handle].sub(":", "/")}/document/#{@display_document[:id]}"}
-    %embed{:height => "50", :src => @display_document[:source], :width => "100"}
+    %embed{:height => "50", :src => "/catalog/#{document[:handle].sub(":", "/")}/document/#{@display_document[:id]}", :width => "100"}
 
   %div{class:"eopas_message"}
     = showMessageIfCannotPlayFile(@display_document[:id])
@@ -35,9 +35,9 @@
           = raw render_language_codes document[solr_fname]
       - elsif solr_fname == 'collection_name_facet'
         %dd{:class => "blacklight-#{solr_fname.parameterize}"}
-          - coll = Collection.find_by_short_name(document[solr_fname])[0]
+          - coll = Collection.find_by_name(document[solr_fname])
           - if !coll.nil?
-            = link_to(format_duplicates(document[solr_fname]), collection_path(coll.short_name))
+            = link_to(format_duplicates(document[solr_fname]), collection_path(coll.name))
           - else
             = render_document_show_field_value document, :field => solr_fname
       - elsif solr_fname == 'DC_type_facet'
@@ -59,7 +59,7 @@
   %dt{:class => "blacklight-sparql_endpoint"}
     = "SPARQL endpoint"
   %dd{:class => "blacklight-sparql_endpoint"}
-    = raw @itemInfo.metadata["#{PROJECT_PREFIX_NAME}:sparqlEndpoint"].to_s
+    = raw @item_info.metadata["#{PROJECT_PREFIX_NAME}:sparqlEndpoint"].to_s
 
 - if Rails.env.development?
   %h3
@@ -98,7 +98,7 @@
           - if values.has_key?(MetadataHelper::TYPE)
             - field = values[MetadataHelper::TYPE]
             - field = "unlabelled" if field == ""
-            / - field = "Plain" if is_cooee && field == type
+            -#/ - field = "Plain" if is_cooee && field == type
           - else
             - field = "unlabelled"
           %td= sprintf(type_format, field)

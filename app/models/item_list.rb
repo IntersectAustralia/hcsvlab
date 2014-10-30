@@ -15,9 +15,11 @@ class ItemList < ActiveRecord::Base
   attr_accessible :name, :id, :user_id, :shared
 
   validates :name, presence: true
-  validates_length_of :name, :maximum => 255 , message:"Name is too long (maximum is 255 characters)"
+  validates_length_of :name, :maximum => 255, message: "Name is too long (maximum is 255 characters)"
 
   before_save :default_values
+
+  has_many :items_in_item_lists
   #
   # Class variables for information about Solr
   #
@@ -35,15 +37,11 @@ class ItemList < ActiveRecord::Base
   self.solr_search_params_logic += [:add_access_controls_to_solr_params]
   self.solr_search_params_logic += [:exclude_unwanted_models]
 
-  def shared?
-    return self.shared || false
-  end
-
   #
   # This method set the item list as shared
   #
   def share
-    self.shared=true
+    self.shared = true
     self.save!
   end
 
@@ -51,7 +49,7 @@ class ItemList < ActiveRecord::Base
   # This method set the item list as not shared
   #
   def unshare
-    self.shared=false
+    self.shared = false
     self.save!
   end
 
@@ -59,7 +57,7 @@ class ItemList < ActiveRecord::Base
   # Get the documents ids from given search parameters
   #
   def getAllItemsFromSearch(search_params)
-    get_solr_connection()
+    get_solr_connection
 
     params = eval(search_params)
     max_rows = 1000
@@ -70,13 +68,13 @@ class ItemList < ActiveRecord::Base
     # asking for and ask for them all this time. Sadly, there doesn't appear to be
     # a "give me everything" value for the rows parameter.
     if response["response"]["numFound"] > max_rows
-        params['rows'] = response["response"]["numFound"]
-        response = @@solr.get('select', params: params)
+      params['rows'] = response["response"]["numFound"]
+      response = @@solr.get('select', params: params)
     end
 
     docs = Array.new
     response["response"]["docs"].each do |d|
-      docs.push({id: d['id'], handle:d['handle']})
+      docs.push({id: d['id'], handle: d['handle']})
     end
     return docs
   end
@@ -86,8 +84,7 @@ class ItemList < ActiveRecord::Base
   # Return an array of Strings.
   #
   def get_item_handles
-    handles = ItemsInItemList.find_all_by_item_list_id(self.id).to_a.map {|aRecord| aRecord.item}
-    return handles.sort
+    self.items_in_item_lists.order(:item).pluck(:item)
   end
 
   #
@@ -96,74 +93,67 @@ class ItemList < ActiveRecord::Base
   # Return the response we get from Solr.
   #
   def get_items(start, rows)
-    get_solr_connection()
+    get_solr_connection
 
     rows = 20 if rows.nil?
     if start.nil?
-      startValue = 0
+      start_value = 0
     else
-      startValue = (start.to_i-1)*rows.to_i
+      start_value = (start.to_i-1)*rows.to_i
     end
 
-    handles = get_item_handles()
+    handles = get_item_handles
 
-    if (!handles.empty?)
-      validItems = validateItems(handles)
-
-      params = {:start => startValue, :rows => rows, "facet.field" => "collection_name_facet"}
+    if handles.present?
+      params = {:start => start_value, :rows => rows, "facet.field" => "collection_name_facet"}
       document_list, response = SearchUtils.retrieveDocumentsFromSolr(params, handles)
     else
       response = {}
-      response['response'] = {'numFound'=>0, 'start'=>0, 'docs'=>[]}
+      response['response'] = {'numFound' => 0, 'start' => 0, 'docs' => []}
     end
 
-    return response
+    response
   end
-  
+
   #
   # Add some Items to this ItemList. The Items should be specified by
   # their ids. Don't add an Item which is already part of this ItemList.
   # Return a Set of the ids of the Items which were added.
-  #
   def add_items(item_handles)
-    get_solr_connection()
+    get_solr_connection
 
     bench_start = Time.now
 
-    adding = Set.new(item_handles.map{ |item_handle| item_handle.to_s })
-    adding.subtract(get_item_handles())
+    adding = Set.new(item_handles.map(&:to_s))
+    adding.subtract(get_item_handles)
 
     # The variable adding now contains only the new ids
+    # TODO do we really need to check that every item one by one?
 
-    verifiedItemHandles = []
-    adding.each { |item_id|
+    verified_handles = []
+    adding.each { |handle|
       # Get the specified Item's Solr Document
-      params = {:q=>"handle:#{RSolr.escape(item_id.to_s)}"}
+      params = {:q => "handle:#{RSolr.escape(handle.to_s)}"}
       response = @@solr.get('select', params: params)
 
       # Check that we got something useful...
       if response == nil
-        Rails.logger.warn "No response from Solr when searching for Item #{item_id}"
+        Rails.logger.warn "No response from Solr when searching for Item #{handle}"
       elsif response["response"] == nil
-        Rails.logger.warn "Badly formed response from Solr when searching for Item #{item_id}"
+        Rails.logger.warn "Badly formed response from Solr when searching for Item #{handle}"
       elsif response["response"]["numFound"] == 0
-        Rails.logger.warn "Cannot find Item #{item_id} in Solr"
-        adding.delete(item_id)
+        Rails.logger.warn "Cannot find Item #{handle} in Solr"
+        adding.delete(handle)
       elsif response["response"]["numFound"] > 1
-        Rails.logger.warn "Multiple documents for Item #{item_id} in Solr"
+        Rails.logger.warn "Multiple documents for Item #{handle} in Solr"
       else
         #... and if we did, update it
-        verifiedItemHandles << response['response']['docs'].first['handle']
-
+        verified_handles << {item: response['response']['docs'].first['handle']}
       end
     }
 
-    if (!verifiedItemHandles.empty?)
-      recordsToInsert = []
-      verifiedItemHandles.each do |anItemHandle|
-        recordsToInsert << {item_list: self, item: anItemHandle}
-      end
-      ItemsInItemList.create(recordsToInsert)
+    if verified_handles.present?
+      self.items_in_item_lists.create(verified_handles)
     end
 
     bench_end = Time.now
@@ -172,36 +162,29 @@ class ItemList < ActiveRecord::Base
 
     return {addedItems: adding, profiler: profiler}
   end
-  
+
   #
   #
   #
   def remove_items_by_handle(item_handles)
     item_handles = [item_handles] if item_handles.is_a?(String)
-
-    recordsToRemove = ItemsInItemList.where("item_list_id=? AND item IN (?)", self.id, item_handles).to_a
-
-    recordsToRemove.each do |aRecordToRemove|
-      aRecordToRemove.destroy
-    end
-
-    recordsToRemove.size
+    self.items_in_item_lists.where(item: item_handles).delete_all
   end
 
   #
   # Remove all Items from this ItemList.
   #
-  def clear()
-    return remove_items_by_handle(get_item_handles())
+  def clear
+    remove_items_by_handle(get_item_handles)
   end
 
   #
   # Generate R script for item list
   #
   def getRScript(root_url)
-    return  "library(alveo)\n" +
-            "client <- RestClient(server_uri='#{root_url.chomp("/")}')\n" +
-            "item_list <- client$get_item_list_by_id(#{self.id})"
+    return "library(alveo)\n" +
+        "client <- RestClient(server_uri='#{root_url.chomp("/")}')\n" +
+        "item_list <- client$get_item_list_by_id(#{self.id})"
   end
 
   #
@@ -222,7 +205,7 @@ class ItemList < ActiveRecord::Base
     # do matching only in the text. search for "dog," results in "dog", but search for "dog-fighter" results in "dog-fighter"
     search_for = term.match(/(\w+([-]?\w+)?)/i).to_s
 
-    handles = getItemsHandlesThatTheCurrentUserHasAccess()
+    handles = get_authorised_item_handles
 
     params = {}
     params[:q] = "{!qf=full_text pf=''}#{search_for}"
@@ -257,7 +240,7 @@ class ItemList < ActiveRecord::Base
   # Perform a Frequency search for a given query
   #
   def doFrequencySearch(query, facet)
-    if (query.strip.empty?)
+    if query.strip.empty?
       result = {:status => "INPUT_ERROR", :message => "Frequency search does not allow empty searches"}
       return result
     end
@@ -265,15 +248,15 @@ class ItemList < ActiveRecord::Base
     pattern = /(([^\w])|(^-\w+)|(\w+-$))/i
     matchingWords = query.to_enum(:scan, pattern).map { Regexp.last_match }
 
-    if (matchingWords.length > 0)
+    if matchingWords.length > 0
       result = ComplexFrequencySearch.new.executeFrequencySearchOnComplexTerm(query, facet, self)
     else
       result = SimpleFrequencySearch.new.executeFrequencySearchOnSimpleTerm(query, facet, self)
     end
 
-    if (result.nil? || result.empty?)
+    if result.nil? || result.empty?
       result = {:status => "NO_MATCHING_DOCUMENTS"}
-    elsif (result[:status].nil?)
+    elsif result[:status].nil?
       result[:status] = "OK"
     end
 
@@ -284,41 +267,41 @@ class ItemList < ActiveRecord::Base
   # This method will return the list of item handles for which the current user
   # has at least read access rights.
   #
-  def getItemsHandlesThatTheCurrentUserHasAccess
-    validItems = []
+  def get_authorised_item_handles
+    valid_items = []
 
-    handles = get_item_handles()
-    if (!handles.empty?)
-      validItems = validateItems(handles)
+    handles = get_item_handles
+    if handles
+      valid_items = validate_items(handles)
     end
 
-    validItems
+    valid_items
   end
 
   #
   #
   #
-  def setCurrentUser(currentUser)
-    @current_user = currentUser
+  def set_current_user(user)
+    @current_user = user
   end
 
   #
   #
   #
-  def setCurrentAbility(currentAbility)
-    @current_ability = currentAbility
+  def set_current_ability(ability)
+    @current_ability = ability
   end
 
   private
 
   #
-  # This method will filter the item handles for which the current user has no granted access
-  #
-  def validateItems (handles, batch_group =50)
+  # This method will filter the item handles for which the current user has not granted access
+  # TODO refactor this to look at user licence agreements instead?
+  def validate_items(handles, batch_group =50)
     valids = []
     handles.in_groups_of(batch_group, false) do |groupOfItemsHandle|
       # create disjunction condition with the items Ids
-      condition = groupOfItemsHandle.map{|itemHandle| "handle:\"#{itemHandle.gsub(":", "\:")}\""}.join(" OR ")
+      condition = groupOfItemsHandle.map { |itemHandle| "handle:\"#{itemHandle.gsub(":", "\:")}\"" }.join(" OR ")
 
       params = {}
       params[:q] = condition
@@ -328,6 +311,7 @@ class ItemList < ActiveRecord::Base
       document_list.each do |aDoc|
         valids << aDoc[:handle]
       end
+
     end
     valids
   end
@@ -354,10 +338,10 @@ class ItemList < ActiveRecord::Base
       matchingData.each { |m|
         # get the text preceding the match and extract the last 7 words
         pre = m.pre_match()
-        pre = pre[-[pre.size, charactersChunkSize].min,charactersChunkSize].split(" ").last(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
+        pre = pre[-[pre.size, charactersChunkSize].min, charactersChunkSize].split(" ").last(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
 
         # get the text after the match and extract the first 7 words
-        post = m.post_match()[0,charactersChunkSize].split(" ").first(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
+        post = m.post_match()[0, charactersChunkSize].split(" ").first(CONCORDANCE_PRE_POST_CHUNK_SIZE).join(" ")
 
         # since some special character might slip in the match, we do a second match to
         # add color only to the proper text.
@@ -369,7 +353,7 @@ class ItemList < ActiveRecord::Base
         highlightedText = "<span class='highlighting'>#{subMatch.to_s}</span>"
 
         formattedMatch = {}
-        formattedMatch[:textBefore] = pre +  subMatchPre
+        formattedMatch[:textBefore] = pre + subMatchPre
         formattedMatch[:textAfter] = subMatchPost + post
         formattedMatch[:textHighlighted] = highlightedText
 
@@ -405,7 +389,7 @@ class ItemList < ActiveRecord::Base
   def get_solr_connection
     if @@solr_config.nil?
       @@solr_config = Blacklight.solr_config
-      @@solr        = RSolr.connect(@@solr_config)
+      @@solr = RSolr.connect(@@solr_config)
     end
   end
 

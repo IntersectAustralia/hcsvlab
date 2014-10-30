@@ -1,9 +1,15 @@
 #!/bin/bash
 
 DEFAULT_CORPUS_PATH=/data/processed
+CORPUS_PATH=$1
 
-echo "Enter corpora base directory:"
-read -e -p "[$DEFAULT_CORPUS_PATH]: " CORPUS_PATH
+if [ -z $CORPUS_PATH ]
+then
+  echo "Enter corpora base directory:"
+  read -e -p "[$DEFAULT_CORPUS_PATH]: " CORPUS_PATH
+else
+  echo "Using $CORPUS_PATH from arguments"
+fi
 
 if [ -z $CORPUS_PATH ]
   then

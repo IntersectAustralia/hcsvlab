@@ -5,10 +5,10 @@
         Add selected to Collection list
         %span.caret
       %ul#create_list_drop_down.dropdown-menu
-        -@collection_lists.each do |aCollectionList|
+        -@collection_lists.each do |acollection_list|
           %li
-            %a{:href => "#add_to_existing_collection_list", :id=>"#{aCollectionList.id}"}
-              =aCollectionList.flat_name
+            %a{:href => "#add_to_existing_collection_list", :id=>"#{acollection_list.id}"}
+              =acollection_list.name
         %li.divider
         %li
           %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
@@ -30,55 +30,55 @@
           %th.revoke_access Revoke Access
           %th.terms Licence Terms
       %tbody
-        - @collections.each_with_index do |aCollection, index|
-          %tr{class: (aCollection.collectionList.nil?)? "" : "groupedCollection" }
+        - @collections.each_with_index do |collection, index|
+          %tr{class: collection.collection_list.nil? ? "" : "groupedCollection" }
             %td.checkbox_field
-              -if (aCollection.collectionList.nil?)
-                %input.toggle_collection{:name => "#{aCollection.id}", :type => "checkbox", :id => "checkbox_collection_#{index}"}/
+              -if collection.collection_list.nil?
+                %input.toggle_collection{:name => collection.id, :type => "checkbox", :id => "checkbox_collection_#{index}"}/
             %td.name
-              = aCollection.flat_name
+              = collection.name
             %td.privacy
-              -if aCollection.collectionList.nil?
-                -if aCollection.private?
+              -if collection.collection_list.nil?
+                -if collection.private?
                   .label.privacy.personal
                     %span
                       Required
-                    = link_to("", change_collection_privacy_collections_path(:id => aCollection.id, :privacy => "false"), :method => :put, :class=>"remove")
+                    = link_to("", change_collection_privacy_collections_path(:id => collection.id, :privacy => "false"), :method => :put, :class=>"remove")
                 -else
                   .label.privacy
                     %span
                       Not Required
-                    = link_to("", change_collection_privacy_collections_path(:id => aCollection.id, :privacy => "true"), :method => :put, :class=>"remove")
+                    = link_to("", change_collection_privacy_collections_path(:id => collection.id, :privacy => "true"), :method => :put, :class=>"remove")
               -else
-                = (aCollection.collectionList.private?) ? "Required" : "Not Required"
+                = (collection.collection_list.private?) ? "Required" : "Not Required"
             %td.collection
-              -if !(aCollection.collectionList.nil?)
+              -if collection.collection_list.present?
                 .label.licence
                   %span
-                    =(aCollection.collectionList.nil?)? "" :aCollection.collectionList.flat_name
-                  = link_to("" , {:controller=>"collection_lists", :action => "remove_collection", :collectionListId => aCollection.collectionList.id, :collectionId => aCollection.id},
-                                  :class=>"remove", :onClick => "return (confirmRemoveCollection(#{aCollection.collectionList.collections.length}, '#{aCollection.collectionList.flat_name}', '#{aCollection.flat_short_name}', event));")
+                    =(collection.collection_list.nil?)? "" :collection.collection_list.name
+                  = link_to("" , {:controller=>"collection_lists", :action => "remove_collection", :collectionListId => collection.collection_list_id, :collectionId => collection.id},
+                                  :class=>"remove", :onClick => "return (confirmRemoveCollection(#{collection.collection_list.collections.length}, '#{collection.collection_list.name}', '#{collection.name}', event));")
             %td.licence
-              -if (aCollection.collectionList.nil?)
+              -if collection.collection_list.nil?
                 .css-dropdown
                   %button.dropdown-toggle.btn.btn-mini{ "data-toggle" => "dropdown" }
-                    - if aCollection.licence.present?
-                      = aCollection.licence.flat_name
+                    - if collection.licence.present?
+                      = collection.licence.name
                     - else
                       Add Licence
                     %span.caret
                   %ul.dropdown-menu
                     - @licences.each do |lic|
                       %li
-                        %a{:href => "#add_licence_to_collection", :onClick => "add_licence_to_collection('#{aCollection.id}', '#{lic.id}');"}= lic.flat_name
+                        %a{:href => "#add_licence_to_collection", :onClick => "add_licence_to_collection('#{collection.id}', '#{lic.id}');"}= lic.name
                     %li.divider
                     %li
-                      = link_to("Create New", {:controller => "licences", :action => "new", :collection => aCollection.id}, :collection => aCollection.id, :onClick => "showProgressAnimation();")
+                      = link_to("Create New", {:controller => "licences", :action => "new", :collection => collection.id}, :collection => collection.id, :onClick => "showProgressAnimation();")
               -else
                 %span
-                  =(aCollection.collectionList.licence.nil?)? "" :aCollection.collectionList.licence.flat_name
+                  =(collection.collection_list.licence.nil?)? "" :collection.collection_list.licence.name
             %td.revoke_access
-              -if aCollection.collectionList.nil? and !aCollection.licence.nil?
+              -if collection.collection_list.nil? and !collection.licence.nil?
                 %a.btn.btn-danger.btn-mini{"data-toggle" => "modal", :href => "#revoke_access_modal#{index}", :role => "button"} Revoke Access
                 .modal.hide.fade.in{:id => "revoke_access_modal#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
@@ -86,19 +86,19 @@
                     %h3#myModalLabel= "Revoke Access to Collection"
                   .modal-body{:title => "Revoke Access"}
                     %p#revoke_access{:readonly => "true"}
-                      = "Are you sure you want to revoke access to #{aCollection.flat_name} for all users?"
+                      = "Are you sure you want to revoke access to #{collection.name} for all users?"
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
-                    = link_to "Revoke Access", {:controller => :collections, :action => :revoke_access, :id => aCollection.id}, { :method => :put, :class => "btn btn-primary", :id => "revoke_access#{index}"}
+                    = link_to "Revoke Access", {:controller => :collections, :action => :revoke_access, :id => collection.id}, { :method => :put, :class => "btn btn-primary", :id => "revoke_access#{index}"}
             %td.terms
-              -if (aCollection.licence.present?)
+              -if collection.licence.present?
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#licence_terms_collection#{index}", :role => "button"} View Licence Terms
                 .modal.hide.fade.in{:id => "licence_terms_collection#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                    %h3#myModalLabel= aCollection.licence.flat_name
+                    %h3#myModalLabel= collection.licence.name
                   #licence_terms_dialog.modal-body{:title => "Licence Terms"}
-                    #licence_terms_content{:readonly => "true"}= aCollection.licence.flat_text.html_safe
+                    #licence_terms_content{:readonly => "true"}= collection.licence.text.html_safe
                   .modal-footer
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
 
@@ -117,8 +117,8 @@
       .control-group
         .controls
           %label.checkbox
-            = f.check_box :privacy_status, {:checked=>false}
-            = f.label :privacy_status, "This collection list requires personal approval"
+            = f.check_box :private, {:checked=>false}
+            = f.label :private, "This collection list requires personal approval"
             = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_new_collection_list"}
             = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_new_collection_list"}
             = hidden_field_tag :hide, nil, {id: "hide_for_add_collection_to_new_collection_list"}
@@ -235,12 +235,12 @@
   /*
    *
    */
-  function confirmRemoveCollection(collectionsInCollectionList, collectionListName, collectionName, event) {
+  function confirmRemoveCollection(collectionsIncollection_list, collection_listName, collectionName, event) {
     answer = true;
-    if (collectionsInCollectionList > 1) {
-      answer = confirm("Are you sure you want to remove the collection '" + collectionName + "' from '" + collectionListName + "'?");
+    if (collectionsIncollection_list > 1) {
+      answer = confirm("Are you sure you want to remove the collection '" + collectionName + "' from '" + collection_listName + "'?");
     } else {
-      answer = confirm("The collection list '" + collectionListName + "' has only 1 Collection, by removing '" + collectionName + "', you will be deleting the collection list.\n\nDo you want to proceed?");
+      answer = confirm("The collection list '" + collection_listName + "' has only 1 Collection, by removing '" + collectionName + "', you will be deleting the collection list.\n\nDo you want to proceed?");
     }
 
     if (answer) {
@@ -276,11 +276,11 @@
    * This will fill the form for the action: "ADD SELECTED TO AN EXISTING COLLECTION LIST"
    */
   jQuery("A[href='#add_to_existing_collection_list']").click( function() {
-    collectionListId=$(this).attr('id');
+    collection_listId=$(this).attr('id');
     var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
 
     generateCollectionsIds("#collection_ids_for_add_collection_to_collection_list");
-    $("#id_for_add_collection_to_collection_list").val(collectionListId);
+    $("#id_for_add_collection_to_collection_list").val(collection_listId);
     $("#add_all_collections_for_add_collection_to_collection_list").val("false");
     $("#hide_for_add_collection_to_collection_list").val(isChecked)
 
@@ -291,8 +291,8 @@
    * This will fill the form for the action: "ADD ALL TO AN EXISTING COLLECTION LIST"
    */
   jQuery("A[href='#add_all_to_existing_collection_list']").click( function() {
-    collectionListId=$(this).attr('id');
-    jQuery("#id_for_add_collection_to_collection_list").val(collectionListId);
+    collection_listId=$(this).attr('id');
+    jQuery("#id_for_add_collection_to_collection_list").val(collection_listId);
     jQuery("#add_all_collections_for_add_collection_to_collection_list").val("true");
     jQuery("#add_collection_to_collection_list").submit();
   });

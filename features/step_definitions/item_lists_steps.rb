@@ -30,11 +30,11 @@ end
 
 Then /^concordance search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
   list = ItemList.find_by_name(list_name)
-  list.setCurrentUser(@current_user)
-  list.setCurrentAbility(Ability.new(@current_user))
+  list.set_current_user(@current_user)
+  list.set_current_ability(Ability.new(@current_user))
   result = list.doConcordanceSearch(term)
   highlightings = result[:highlighting]
-  totalMatches = highlightings.inject(0) {|sum, highlighting| sum + highlighting[1][:matches].length}
+  totalMatches = highlightings.inject(0) { |sum, highlighting| sum + highlighting[1][:matches].length }
   countMatches = 0
   table.hashes.each do |attributes|
     requestedMatch = attributes[:textBefore].strip()
@@ -60,8 +60,8 @@ end
 
 Then /^concordance search for "(.*)" in item list "(.*)" should show not matches found message$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
-  list.setCurrentUser(@current_user)
-  list.setCurrentAbility(Ability.new(@current_user))
+  list.set_current_user(@current_user)
+  list.set_current_ability(Ability.new(@current_user))
 
   result = list.doConcordanceSearch(term)
   result[:matching_docs].should eq(0)
@@ -69,8 +69,8 @@ end
 
 Then /^concordance search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
-  list.setCurrentUser(@current_user)
-  list.setCurrentAbility(Ability.new(@current_user))
+  list.set_current_user(@current_user)
+  list.set_current_ability(Ability.new(@current_user))
 
   result = list.doConcordanceSearch(term)
   result[:error].empty?.should eq(false)
@@ -78,14 +78,14 @@ end
 
 Then /^frequency search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
   list = ItemList.find_by_name(list_name)
-  list.setCurrentUser(@current_user)
-  list.setCurrentAbility(Ability.new(@current_user))
+  list.set_current_user(@current_user)
+  list.set_current_ability(Ability.new(@current_user))
 
   field = find_field("Facet")
   result = list.doFrequencySearch(term, field.value)
 
+  result[:status].should eq("OK")
   table.hashes.each do |attributes|
-    result[:status].should eq("OK")
     result[:data][attributes[:facetValue]].should_not eq (nil)
     result[:data][attributes[:facetValue]][:num_docs].to_s.should eq(attributes[:matchingDocuments])
     result[:data][attributes[:facetValue]][:total_docs].to_s.should eq(attributes[:totalDocs])
@@ -97,8 +97,8 @@ end
 
 Then /^frequency search for "(.*)" in item list "(.*)" should show error$/ do |term, list_name|
   list = ItemList.find_by_name(list_name)
-  list.setCurrentUser(@current_user)
-  list.setCurrentAbility(Ability.new(@current_user))
+  list.set_current_user(@current_user)
+  list.set_current_ability(Ability.new(@current_user))
 
   field = find_field("Facet")
   result = list.doFrequencySearch(term, field.value)

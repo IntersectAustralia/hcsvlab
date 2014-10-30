@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140318230337) do
+ActiveRecord::Schema.define(:version => 20141029032823) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -20,6 +20,38 @@ ActiveRecord::Schema.define(:version => 20140318230337) do
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
     t.string   "user_type"
+  end
+
+  create_table "collection_lists", :force => true do |t|
+    t.string   "name"
+    t.boolean  "private"
+    t.integer  "licence_id"
+    t.integer  "owner_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "collections", :force => true do |t|
+    t.string   "uri"
+    t.text     "text"
+    t.string   "name"
+    t.text     "rdf_file_path"
+    t.boolean  "private"
+    t.integer  "owner_id"
+    t.integer  "collection_list_id"
+    t.integer  "licence_id"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  create_table "documents", :force => true do |t|
+    t.string   "file_name"
+    t.string   "file_path"
+    t.string   "doc_type"
+    t.string   "mime_type"
+    t.integer  "item_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "item_lists", :force => true do |t|
@@ -41,6 +73,17 @@ ActiveRecord::Schema.define(:version => 20140318230337) do
 
   add_index "item_metadata_field_name_mappings", ["solr_name"], :name => "index_item_metadata_field_name_mappings_on_solr_name", :unique => true
 
+  create_table "items", :force => true do |t|
+    t.string   "uri"
+    t.string   "handle"
+    t.string   "primary_text_path"
+    t.string   "annotation_path"
+    t.integer  "collection_id"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+    t.datetime "indexed_at"
+  end
+
   create_table "items_in_item_lists", :force => true do |t|
     t.integer  "item_list_id"
     t.string   "item"
@@ -49,6 +92,15 @@ ActiveRecord::Schema.define(:version => 20140318230337) do
   end
 
   add_index "items_in_item_lists", ["item_list_id"], :name => "index_items_in_item_lists_on_item_list_id"
+
+  create_table "licences", :force => true do |t|
+    t.string   "name"
+    t.text     "text"
+    t.integer  "owner_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+    t.boolean  "private"
+  end
 
   create_table "roles", :force => true do |t|
     t.string   "name"
@@ -104,11 +156,11 @@ ActiveRecord::Schema.define(:version => 20140318230337) do
   create_table "user_licence_requests", :force => true do |t|
     t.string   "request_id"
     t.string   "request_type"
-    t.string   "owner_email"
     t.boolean  "approved"
     t.integer  "user_id"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
+    t.integer  "owner_id"
   end
 
   add_index "user_licence_requests", ["user_id"], :name => "index_user_licence_requests_on_user_id"

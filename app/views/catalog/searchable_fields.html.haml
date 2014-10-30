@@ -17,15 +17,15 @@
         %b
           Field name for Queries
   %tbody
-    -if @nameMappings.empty?
+    -if @name_mappings.empty?
       %tr
         %td{:colspan => 2}
           No searchable fields found
     -else
-      -@nameMappings.each do |aNameMapping|
+      -@name_mappings.each do |name_mapping|
         %tr
           %td
-            =aNameMapping[:rdfName]
+            =name_mapping.rdf_name
           %td
-            =aNameMapping[:user_friendly_name]
+            =name_mapping.user_friendly_name
 = render 'shared/nectar_attribution'

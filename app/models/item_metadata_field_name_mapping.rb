@@ -4,18 +4,17 @@ class ItemMetadataFieldNameMapping < ActiveRecord::Base
   #
   #
   #
-  def self.create_or_update_field_mapping(solr_name, rdf_field_name, user_friendly_name, display_name)
-    item_fields_mapping = ItemMetadataFieldNameMapping.where({solr_name:solr_name}).to_a.first
-    item_fields_mapping = ItemMetadataFieldNameMapping.new if item_fields_mapping.nil?
-    item_fields_mapping.solr_name = solr_name
-    item_fields_mapping.rdf_name = rdf_field_name if rdf_field_name.present?
-    item_fields_mapping.user_friendly_name = user_friendly_name
+  def self.create_or_update_field_mapping(solr_name, rdf_field_name, user_friendly_name)
+    item_fields_mapping = ItemMetadataFieldNameMapping.find_or_initialize_by_solr_name(solr_name)
+    is_new = item_fields_mapping.id.nil?
+    # No point committing if the values are the same. Helps to clear up the log
+    unless item_fields_mapping.rdf_name.eql?(rdf_field_name) && item_fields_mapping.user_friendly_name.eql?(user_friendly_name)
+      item_fields_mapping.rdf_name = rdf_field_name if rdf_field_name.present?
+      item_fields_mapping.user_friendly_name = user_friendly_name
+      item_fields_mapping.save
+    end
 
-    isNew = item_fields_mapping.id.nil?
-
-    item_fields_mapping.save
-
-    isNew
+    is_new
   end
 
   #

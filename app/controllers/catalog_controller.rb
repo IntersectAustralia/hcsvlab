@@ -16,7 +16,6 @@ class CatalogController < ApplicationController
   set_tab :catalog
 
   before_filter :authenticate_user!, :except => [:index, :annotation_context, :searchable_fields]
-  #load_and_authorize_resource
 
   include Blacklight::Catalog
   include Hydra::Controller::ControllerBehavior
@@ -298,9 +297,10 @@ class CatalogController < ApplicationController
         params.delete(:fq)
         @hasAccessToEveryCollection = true
         @hasAccessToSomeCollections = false
+        #TODO REFACTOR
         Collection.all.each do |aCollection|
           #I have access to a collection if I am the owner or if I accepted the licence for that collection
-          hasAccessToCollection = (aCollection.flat_ownerEmail.eql? current_user.email) ||
+          hasAccessToCollection = (aCollection.owner_id.eql? current_user.id) ||
               (current_user.has_agreement_to_collection?(aCollection, UserLicenceAgreement::DISCOVER_ACCESS_TYPE, false))
 
           @hasAccessToSomeCollections = @hasAccessToSomeCollections || hasAccessToCollection
@@ -376,9 +376,9 @@ class CatalogController < ApplicationController
       format.json {}
       # Add all dynamically added (such as by document extensions)
       # export formats.
-      if !@document.nil?
+      if @document
 
-        @itemInfo = create_display_info_hash(@document, @user_annotations)
+        @item_info = create_display_info_hash(@document, @user_annotations)
 
         @document.export_formats.each_key do |format_name|
           # It's important that the argument to send be a symbol;
@@ -435,13 +435,13 @@ class CatalogController < ApplicationController
   #
   def annotations
     bench_start = Time.now
-    if Item.where(id: params[:id]).count != 0
+    @item = Item.find(params[:id])
+    if @item
       @response, @document = get_solr_response_for_doc_id
     end
     begin
-      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
 
-      if !@item.datastreams["annotationSet1"].nil?
+      if @item.annotation_path.present?
         begin
           @anns, @annotates_document = query_annotations(@item, @document, params[:type], params[:label])
         rescue Exception => e
@@ -474,9 +474,9 @@ class CatalogController < ApplicationController
   #
   def annotation_properties
     begin
-      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
+      @item = Item.find(params[:id])
 
-      if !@item.datastreams["annotationSet1"].nil?
+      if @item.annotation_path.present?
         @properties = query_annotation_properties(@item)
 
         respond_to do |format|
@@ -499,9 +499,10 @@ class CatalogController < ApplicationController
   #
   def annotation_types
     begin
-      @item = Item.find_and_load_from_solr({:id => params[:id]}).first
+      @item = Item.find(params[:id])
 
-      if !@item.datastreams["annotationSet1"].nil?
+      if @item.annotation_path.present?
+
         @types = query_annotation_types(@item)
 
         respond_to do |format|
@@ -523,13 +524,13 @@ class CatalogController < ApplicationController
   #
   #
   def annotation_context
-    @predefinedProperties = collect_predefined_context_properties()
+    @predefinedProperties = collect_predefined_context_properties
 
-    avoid_context = collect_restricted_predefined_vocabulary()
+    avoid_context = collect_restricted_predefined_vocabulary
 
     @vocab_hash = {}
     RDF::Vocabulary.each { |vocab|
-      if (!avoid_context.include?(vocab.to_uri) and vocab.to_uri.qname.present?)
+      if !avoid_context.include?(vocab.to_uri) and vocab.to_uri.qname.present?
         prefix = vocab.to_uri.qname.first.to_s
         uri = vocab.to_uri.to_s
         @vocab_hash[prefix] = {:@id => uri}
@@ -546,11 +547,9 @@ class CatalogController < ApplicationController
   def primary_text
     bench_start = Time.now
     begin
-      item = Item.find_and_load_from_solr({id: params[:id]}).first
+      item = Item.find(params[:id])
 
-      response.header["Content-Length"] = item.primary_text.content.length.to_s
-      send_data item.primary_text.content, type: 'text/plain', filename: item.primary_text.label
-
+      send_file item.primary_text_path
       bench_end = Time.now
       Rails.logger.debug("Time for retrieving primary text for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
     rescue Exception => e
@@ -567,37 +566,31 @@ class CatalogController < ApplicationController
   #
   def document
     begin
-      doc = Document.find_and_load_from_solr({:file_name => params[:filename].to_s, item: params[:id]}).first
+      doc = Document.find_by_file_name_and_item_id(params[:filename], params[:id])
 
-      if (!doc.nil?)
+      if doc.present?
         params[:disposition] = 'Inline'
         params[:disposition].capitalize!
 
         # If HTTP_RANGE variable is set, we need to send partial content and tell the browser
         # what fragment of the file we are sending by using the variables Content-Range and
         # Content-Length
-        if (request.headers["HTTP_RANGE"])
-          size = doc.datastreams['CONTENT1'].content.size
+        if request.headers["HTTP_RANGE"]
+          size = File.size(doc.file_path)
           bytes = Rack::Utils.byte_ranges(request.headers, size)[0]
           offset = bytes.begin
-          length = bytes.end - bytes.begin
+          length = size - offset
 
           response.header["Accept-Ranges"] = "bytes" # Tells the browser that we accept partial content
-          response.header["Content-Range"] = "bytes #{bytes.begin}-#{bytes.end}/#{size}"
-          response.header["Content-Length"] = (length+1).to_s
+          response.header["Content-Range"] = "bytes #{offset}-#{bytes.end}/#{size}"
+          response.header["Content-Length"] = length.to_s
           response.status = :partial_content
 
-          content = doc.datastreams['CONTENT1'].content[offset, length+1]
+          send_data IO.binread(doc.file_path,length, offset), disposition: params[:disposition], type: doc.mime_type, status: response.status, stream: true
         else
-          content = doc.datastreams['CONTENT1'].content
-          response.header["Content-Length"] = Rack::Utils.bytesize(content).to_s
-
+          send_file doc.file_path, disposition: params[:disposition], type: doc.mime_type, status: response.status
         end
 
-        send_data content,
-                  :disposition => params[:disposition],
-                  :filename => doc.file_name[0].to_s,
-                  :type => doc.datastreams['CONTENT1'].mimeType.to_s
 
         return
       end
@@ -630,7 +623,7 @@ class CatalogController < ApplicationController
   # This is an API method for downloading items' documents and metadata
   #
   def download_items
-    if (params[:items].present?)
+    if params[:items].present?
 
       itemHandles = params[:items].collect { |x| "#{File.basename(File.split(x).first)}:#{File.basename(x)}" }
 
@@ -654,12 +647,7 @@ class CatalogController < ApplicationController
   # Display every field that can be user to do a search in the metadata
   #
   def searchable_fields
-    @nameMappings = []
-    ItemMetadataFieldNameMapping.all.each do |aNameMapping|
-      @nameMappings << {rdfName: aNameMapping['rdf_name'], user_friendly_name: aNameMapping['user_friendly_name']}
-    end
-    @nameMappings.sort! { |x, y| x[:user_friendly_name].downcase <=> y[:user_friendly_name].downcase }
-    @nameMappings
+    @name_mappings = ItemMetadataFieldNameMapping.order('lower(user_friendly_name)').select([:rdf_name, :user_friendly_name])
   end
 
   #
@@ -671,8 +659,8 @@ class CatalogController < ApplicationController
 
     # Validate item. This line will also validate that the user has permission for adding
     # the annotation in that item.
-    item = Item.find_and_load_from_solr({handle: item_handler.to_s})
-    if item.empty?
+    item = Item.find_by_handle(item_handler)
+    if item.nil?
       respond_to do |format|
         format.json {
           render :json => {:error => "No Item with handle '#{item_handler}' exists."}.to_json, :status => 412
@@ -681,7 +669,7 @@ class CatalogController < ApplicationController
       end
     end
 
-    if (!uploaded_file.is_a? ActionDispatch::Http::UploadedFile)
+    if !uploaded_file.is_a? ActionDispatch::Http::UploadedFile
       render :json => {:error => "Error in file parameter."}.to_json, :status => 412
       return
     elsif uploaded_file.blank? or uploaded_file.size == 0
@@ -693,7 +681,7 @@ class CatalogController < ApplicationController
       # If we have a file with the same name, for the same item and with the same MD5 checksum will suppose that
       # that file was already uploaded, and hence will reject it.
       similarUploadedAnnotations = UserAnnotation.where(original_filename: uploaded_file.original_filename, item_identifier: item_handler)
-      if (!similarUploadedAnnotations.empty?)
+      if !similarUploadedAnnotations.empty?
         currentFileContentMD5 = Digest::MD5.hexdigest(IO.read(uploaded_file.tempfile))
 
         similarUploadedAnnotations.each do |anUploadedAnnotations|
@@ -761,10 +749,10 @@ class CatalogController < ApplicationController
 
     # First will validate the parameters. 'collection' and 'query' are both required
     query = params[:query]
-    collectionName = params[:collection].to_s.downcase
+    collection_name = params[:collection].to_s.downcase
 
     # If the 'query' parameter is no present then we return precondition no met error.
-    if (!query.present?)
+    if query.blank?
       respond_to do |format|
         format.json { render :json => {:error => "Parameter 'query' is required."}.to_json, :status => 412 and return }
       end
@@ -773,20 +761,20 @@ class CatalogController < ApplicationController
     # Now we are going to forbid the SERVICE keyword in the SPARQL query
     pattern = /SERVICE/i
     matchingWords = query.to_enum(:scan, pattern).map { Regexp.last_match }
-    if (!matchingWords.empty?)
+    if matchingWords.present?
       respond_to do |format|
         format.json { render :json => {:error => "Service keyword is forbidden in queries."}.to_json, :status => 412 and return }
       end
     end
 
-    collection = Collection.find_by_short_name(collectionName).to_a.first
-    if (collection.nil?)
+    collection = Collection.find_by_name(collection_name)
+    if collection.nil?
       respond_to do |format|
         format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return }
       end
     end
 
-    if (!collection.nil?)
+    if collection.present?
       #Verify if the user has at least read access to the collection
       if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
         authorization_error(Exception.new("You are not authorized to access this resource."))
@@ -824,7 +812,7 @@ class CatalogController < ApplicationController
 
     #collections = []
     #collectionNames.each do |aCollectionName|
-    #  Retrieve the collection from Fedora
+    #  Retrieve the collection
     #collection = Collection.find_by_short_name(aCollectionName[:name]).to_a.first
     #if (collection.nil? && !aCollectionName[:silent])
     #  respond_to do |format|
@@ -844,7 +832,7 @@ class CatalogController < ApplicationController
 
     # Create the URL for the sesame endpoint.
     params = {query: query}
-    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collectionName}")
+    uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collection_name}")
     uri.query = URI.encode_www_form(params)
 
     # Send the request to the sparql endpoint.
@@ -929,15 +917,15 @@ class CatalogController < ApplicationController
     handle = nil
     handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
 
-    if (!handle.nil?)
-      item = Item.find_and_load_from_solr({handle: handle})
-      if (!item.present?)
+    if handle.present?
+      item = Item.find_by_handle(handle)
+      if item.nil?
         respond_to do |format|
           format.html { resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a document that doesn't exist.")) and return }
           format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return }
         end
       end
-      params[:id] = item.first.id if item.present?
+      params[:id] = item.id
     end
   end
 
@@ -964,13 +952,13 @@ class CatalogController < ApplicationController
   # query the annotations for an item and return them along with the "primary" document
   #
   def query_annotations(item, solr_document, type, label)
-    item_short_identifier = item.flat_handle.split(":").last
-    corpus = item.collection.flat_name
+    item_short_identifier = item.handle.split(":").last
+    corpus = item.collection.name
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(corpus)
 
-    namespaces = RdfNamespace.get_namespaces(item.collection.flat_name)
+    namespaces = RdfNamespace.get_namespaces(item.collection.name)
 
     prefixes = ""
     namespaces.each do |k, v|
@@ -1062,9 +1050,9 @@ class CatalogController < ApplicationController
     display_document = get_display_document(solr_document)
 
     if !display_document.nil?
-      annotates_document = catalog_document_url(@item.collection.flat_name, filename: display_document[:id])
+      annotates_document = catalog_document_url(@item.collection.name, filename: display_document[:id])
     else
-      annotates_document = catalog_url(@item.collection.flat_name, item_short_identifier)
+      annotates_document = catalog_url(@item.collection.name, item_short_identifier)
     end
 
     return {commonProperties: commonProperties, annotations: hash}, annotates_document
@@ -1075,10 +1063,10 @@ class CatalogController < ApplicationController
   #
   def query_annotation_types(item)
     types = []
-    item_short_identifier = item.flat_handle.split(":").last
+    item_short_identifier = item.handle.split(":").last
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-    repo = server.repository(item.collection.flat_name)
+    repo = server.repository(item.collection.name)
 
     query = "" "
         PREFIX dada:<http://purl.org/dada/schema/0.2#>
@@ -1107,10 +1095,10 @@ class CatalogController < ApplicationController
   #
   def query_annotation_properties(item)
     properties = []
-    item_short_identifier = item.flat_handle.split(":").last
+    item_short_identifier = item.handle.split(":").last
 
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-    repo = server.repository(item.collection.flat_name)
+    repo = server.repository(item.collection.name)
 
     query = "" "
         PREFIX dada:<http://purl.org/dada/schema/0.2#>
@@ -1138,7 +1126,7 @@ class CatalogController < ApplicationController
     sols = repo.sparql_query(query)
     props = sols.select(:property).distinct
 
-    namespaces = RdfNamespace.get_namespaces(item.collection.flat_name)
+    namespaces = RdfNamespace.get_namespaces(item.collection.name)
     props.each do |sol|
       entry = {:uri => sol[:property].to_s}
       entry[:shortened_uri] = RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) if RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces) != entry[:uri]
@@ -1155,10 +1143,10 @@ class CatalogController < ApplicationController
 
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(item.collection.flat_name)
+      repository = server.repository(item.collection.name)
 
       query = RDF::Query.new do
-        pattern [RDF::URI.new(item.flat_uri), MetadataHelper::DISPLAY_DOCUMENT, :display_doc]
+        pattern [RDF::URI.new(item.uri), MetadataHelper::DISPLAY_DOCUMENT, :display_doc]
         pattern [:display_doc, MetadataHelper::TYPE, :type]
         pattern [:display_doc, MetadataHelper::SOURCE, :source]
         pattern [:display_doc, MetadataHelper::IDENTIFIER, :id]

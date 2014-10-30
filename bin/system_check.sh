@@ -4,18 +4,15 @@
 #
 # 1. The amount of free disk space
 # 2. Whether ActiveMQ is up and on the right ports
-# 3. Fedora is up
-# 4. Solr is up
-# 5. The workers are running
-# 6. The web app is running
+# 3. Solr is up
+# 4. The workers are running
+# 5. The web app is running
 #
 
 RET_STATUS=0
 
 ACTIVEMQ_URL="http://localhost:8161/"
 ACTIVEMQ_USER="admin:admin"
-
-FEDORA_ADMIN="fedoraAdmin:fedoraAdmin"
 
 WEB_PORT_NUMBER=3000
 JAVA_PORT_NUMBER=8983
@@ -103,18 +100,6 @@ then
   echo "+ The Java Container is listening on port $JAVA_PORT_NUMBER (status= $java_status)"
 else
   echo "- WARN: It looks like the Java container is not running (status= $java_status)"
-  RET_STATUS=1
-fi
-
-# Fedora
-
-fedora_status=`curl -I -u $FEDORA_ADMIN ${JAVA_URL}fedora/describe 2>/dev/null  | head -1 | awk '{print $2}' `
-
-if [ "$fedora_status" == "200" -o "$fedora_status" == "302" ]
-then
-  echo "+ It looks like Fedora is available (status= $fedora_status)"
-else
-  echo "- WARN: It looks like Fedora is not running (status= $fedora_status)"
   RET_STATUS=1
 fi
 

@@ -14,7 +14,7 @@ class ItemListsController < ApplicationController
   # This method will inject currentUser and currentAbility to the instance of ItemList
   # Those values are required by Hydra Access Control.
   before_filter :inject_user_and_ability_to_item_list
-  before_filter :setUserAndSharedItemLists, only: [:index, :show, :concordance_search, :frequency_search]
+  before_filter :retrieve_item_lists, only: [:index, :show, :concordance_search, :frequency_search]
 
   FIXNUM_MAX = 2147483647
 
@@ -25,7 +25,7 @@ class ItemListsController < ApplicationController
   #
   #
   def index
-    if (session[:profiler])
+    if session[:profiler]
       @profiler = session[:profiler]
       session.delete(:profiler)
     end
@@ -35,7 +35,7 @@ class ItemListsController < ApplicationController
   #
   #
   def show
-    if (session[:profiler])
+    if session[:profiler]
       @profiler = session[:profiler]
       session.delete(:profiler)
     end
@@ -46,12 +46,12 @@ class ItemListsController < ApplicationController
         @response = @item_list.get_items(params[:page], params[:per_page])
         @document_list = @response["response"]["docs"]
 
-        itemsWithAccessRights = @item_list.getItemsHandlesThatTheCurrentUserHasAccess()
-        if (@response['response']['numFound'] > itemsWithAccessRights.size)
+        authorised_item_handles = @item_list.get_authorised_item_handles
+        if @response['response']['numFound'] > authorised_item_handles.size
           all_collections = @item_list.get_item_handles.collect { |item| item.split(":")[0]}.uniq
-          collections_with_permission = itemsWithAccessRights.collect { |item| item.split(":")[0]}.uniq
-          @missing_collections = all_collections.select { |coll| coll if !collections_with_permission.include? coll }.join(", ")
-          @message = "You only have access to #{itemsWithAccessRights.size} out of #{@response['response']['numFound']} Items in this shared Item List."
+          collections_with_permission = authorised_item_handles.collect { |item| item.split(":")[0]}.uniq
+          @missing_collections = (all_collections - collections_with_permission).join(", ")
+          @message = "You only have access to #{authorised_item_handles.size} out of #{@response['response']['numFound']} Items in this shared Item List."
         end
 
         if current_user.authentication_token.nil? #generate auth token if one doesn't already exist
@@ -358,20 +358,17 @@ class ItemListsController < ApplicationController
   # Those values are required by Hydra Access Control.
   #
   def inject_user_and_ability_to_item_list
-    if (!@item_list.nil?)
-      @item_list.setCurrentUser(current_user)
-      @item_list.setCurrentAbility(current_ability)
+    if @item_list
+      @item_list.set_current_user(current_user)
+      @item_list.set_current_ability(current_ability)
     end
   end
 
   #
   # This method will set the current user owned item list and also the shared ones
   #
-  def setUserAndSharedItemLists
-    @userItemLists = current_user.item_lists
-    @userItemLists.sort! { |a,b| a.name.downcase <=> b.name.downcase }
-
-    @sharedItemLists = ItemList.where('shared = ? AND user_id != ?', true, current_user.id)
-    @sharedItemLists.sort! { |a,b| a.name.downcase <=> b.name.downcase }
+  def retrieve_item_lists
+    @user_item_lists = current_user.item_lists.order("lower(name)")
+    @shared_item_lists = ItemList.order("lower(name)").where('shared = ? AND user_id != ?', true, current_user.id)
   end
 end

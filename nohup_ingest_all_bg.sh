@@ -2,5 +2,5 @@
 
 for CORPUS in $@
 do
-  rake fedora:ingest corpus=$CORPUS
+  time bundle exec rake fedora:ingest corpus=$CORPUS
 done

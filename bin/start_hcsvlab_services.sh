@@ -19,9 +19,9 @@ sleep 5
 $CATALINA_HOME/bin/startup.sh
 sleep 5
 
-# Starting Solr and Fedora Workers
+# Starting Solr Workers
 cd /home/devel/hcsvlab-web/current/
-/home/devel/.rvm/gems/ruby-2.0.0-p481\@global/bin/rake  a13g:start_pollers
+/home/devel/.rvm/gems/ruby-2.0.0-p481\@global/bin/rake a13g:start_pollers
 
 # Start Galaxy
 cd $GALAXY_HOME

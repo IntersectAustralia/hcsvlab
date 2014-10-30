@@ -23,7 +23,7 @@ set :scm, 'git'
 # Uncomment to enable Jetty submodule
 #set :git_enable_submodules, 1
 set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
-set :deploy_via, :copy
+set :deploy_via, :checkout
 set :copy_exclude, [".git/*", "features/*", "spec/*", "test/*"]
 
 # Fix an issue related to net-ssh, see https://github.com/net-ssh/net-ssh/issues/145
@@ -169,7 +169,6 @@ namespace :deploy do
     refresh_db
 
     configure_activemq
-    configure_fedora
     configure_solr
     configure_tomcat6
 
@@ -177,7 +176,6 @@ namespace :deploy do
 
   task :configure do
     configure_activemq
-    configure_fedora
     configure_solr
     configure_tomcat6
   end
@@ -231,7 +229,6 @@ namespace :deploy do
   desc "Start ActiveMQ, Jetty, the A13g workers"
   task :start_services, :roles => :app do
     start_activemq
-    #start_jetty
     puts "    Waiting 30 seconds for ActiveMQ to start..."
     sleep(30)
     start_tomcat6
@@ -241,7 +238,6 @@ namespace :deploy do
   desc "Stop ActiveMQ, Jetty, the A13g workers"
   task :stop_services, :roles => :app do
     stop_a13g_pollers
-    #stop_jetty
     stop_tomcat6
     stop_activemq
   end
@@ -294,7 +290,6 @@ after 'multistage:ensure' do
     config/aaf_rc.yml
     config/broker.yml
     config/database.yml
-    config/fedora.yml
     config/hcsvlab-web_config.yml
     config/linguistics.yml
     config/solr.yml

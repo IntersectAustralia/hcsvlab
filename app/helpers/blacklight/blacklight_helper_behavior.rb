@@ -660,14 +660,6 @@ module Blacklight::BlacklightHelperBehavior
     val
   end
 
-  #
-  # Build the URL of a particular datastream of the given Fedora object
-  #
-  def buildURI(object_id, datastream)
-    config = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env]
-    return config["url"].to_s + "/objects/#{object_id}/datastreams/#{datastream}/content"
-  end
-
   def render_display_text(source)
     begin
       text = File.read(source.gsub("file://", "")).strip.force_encoding("UTF-8")
@@ -686,13 +678,13 @@ module Blacklight::BlacklightHelperBehavior
     document_descriptors = []
 
     fed_item = Item.find(document[:id])
-    item = fed_item.flat_uri
+    item = fed_item.uri
 
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(fed_item.collection.flat_name)
+      repository = server.repository(fed_item.collection.name)
 
-      raise Exception.new "Repository not found - #{fed_item.collection.flat_name}" if repository.nil?
+      raise Exception.new "Repository not found - #{fed_item.collection.name}" if repository.nil?
 
       document_results = repository.query(:subject => RDF::URI.new(item), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
 
@@ -716,14 +708,10 @@ module Blacklight::BlacklightHelperBehavior
     return document_descriptors
   end
 
-  def collection_show_fields(collection_id)
-    uri = buildURI(collection_id, 'rdfMetadata')
-    graph = RDF::Graph.load(uri)
-
-    collectionName = Collection.find_and_load_from_solr({id:collection_id}).first.flat_name
-
+  def collection_show_fields(collection)
+    graph = collection.rdf_graph
     fields = graph.statements.map { |i| {collection_label(MetadataHelper::short_form(i.predicate)) => collection_value(graph, i.predicate)} }.uniq
-    fields << {'SPARQL Endpoint' => catalog_sparqlQuery_url(collectionName)}
+    fields << {'SPARQL Endpoint' => catalog_sparqlQuery_url(collection.name)}
     fields
   end
 

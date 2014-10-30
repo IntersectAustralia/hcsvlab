@@ -9,7 +9,7 @@ Feature: Request an account
     And I have a user "diego.alonso@intersect.org.au" with role "admin"
 
   @javascript
-  Scenario: HCSVLAB-247 - Request account 
+  Scenario: HCSVLAB-247 - Request account
     Given I am on the request account page
     Then I should see "Once your registration is confirmed, you will get access to collections by agreeing to the licence terms for those collections."
     When I fill in the following:

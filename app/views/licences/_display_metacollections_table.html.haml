@@ -21,18 +21,18 @@
           - @collection_lists.each_with_index do |coll_list, index|
             %tr
               %td.name
-                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection_list#{index}", :role => "button"}=coll_list.flat_name
+                %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection_list#{index}", :role => "button"}=coll_list.name
                 .modal.hide.fade.in{:id => "collection_list#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                    %h3#myModalLabel= coll_list.flat_name
+                    %h3#myModalLabel= coll_list.name
                   #collection_list_detail_dialog.modal-body{:title => "Licence Terms"}
                     #collection_list_detail_content{:readonly => "true"}
                       %table
                         - coll_list.collections.each do |aCollection|
                           %tr
                             %td
-                              =aCollection.flat_name
+                              =aCollection.name
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               %td.privacy
@@ -46,19 +46,19 @@
                     %span
                       Not Required
                     = link_to("", change_collection_list_privacy_collection_lists_path(:id => coll_list.id, :privacy => "true"), :method => :put, :class=>"remove")
-              %td.owner= coll_list.flat_ownerEmail
+              %td.owner= link_to coll_list.owner.email
               %td.licence
                 .css-dropdown
                   %button.dropdown-toggle.btn.btn-mini{ "data-toggle" => "dropdown" }
-                    - if coll_list.licence.present?
-                      = coll_list.licence.flat_name
+                    - if coll_list.licence
+                      = coll_list.licence.name
                     - else
                       Add Licence
                     %span.caret
                   %ul.dropdown-menu
                     - @licences.each do |lic|
                       %li
-                        %a{:href => "#add_licence_to_collection_list", :onClick => "add_licence_to_collection_list('#{coll_list.id}', '#{lic.id}');"}= lic.flat_name
+                        %a{:href => "#add_licence_to_collection_list", :onClick => "add_licence_to_collection_list('#{coll_list.id}', '#{lic.id}');"}= lic.name
                     %li.divider
                     %li
                       = link_to("Create New", {:controller => "licences", :action => "new", :collectionList => coll_list.id}, :collectionList => coll_list.id, :onClick => "showProgressAnimation();")
@@ -71,7 +71,7 @@
                       %h3#myModalLabel= "Revoke Access to Collection List"
                     .modal-body{:title => "Revoke Access"}
                       %p#revoke_access{:readonly => "true"}
-                        = "Are you sure you want to revoke access to #{coll_list.flat_name} for all users?"
+                        = "Are you sure you want to revoke access to #{coll_list.name} for all users?"
                     .modal-footer
                       %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                       = link_to "Revoke Access", {:controller => :collection_lists, :action => :revoke_access, :id => coll_list.id}, { :method => :put, :class => "btn btn-primary", :id => "revoke_list_access#{index}"}
@@ -81,13 +81,13 @@
                   .modal.hide.fade.in{:id => "licence_terms_collection_list#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                     .modal-header
                       %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                      %h3#myModalLabel= coll_list.licence.flat_name
+                      %h3#myModalLabel= coll_list.licence.name
                     #licence_terms_dialog.modal-body{:title => "Licence Terms"}
-                      #licence_terms_content{:readonly => "true"}= coll_list.licence.flat_text.html_safe
+                      #licence_terms_content{:readonly => "true"}= coll_list.licence.text.html_safe
                     .modal-footer
                       %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               %td.actions
-                %a{:href=>"#", :onclick => "remove_collection_list('#{coll_list.id}', '#{coll_list.flat_name}')"}
+                %a{:href=>"#", :onclick => "remove_collection_list('#{coll_list.id}', '#{coll_list.name}')"}
                   %i.icon-trash
 
 = form_tag({:controller => "collection_lists", :action => "add_licence_to_collection_list"}, :id => "add_licence_to_collection_list_form", :onSubmit => "showProgressAnimation();") do

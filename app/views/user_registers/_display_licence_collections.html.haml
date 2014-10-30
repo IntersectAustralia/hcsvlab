@@ -16,22 +16,22 @@
         %tr.documentHeadersdf.clearfixsdf
           %td.title
             - if k[:type] == :collection
-              -#%a{:href => "/collections/#{k[:item].id}?state=#{k[:state_label]}"}= k[:item].flat_name
-              = link_to k[:item].flat_name, collection_path(k[:item].flat_name, :state=>k[:state_label])
+              -#%a{:href => "/collections/#{k[:item].id}?state=#{k[:state_label]}"}= k[:item].name
+              = link_to k[:item].name, collection_path(k[:item].name, :state=>k[:state_label])
             - else
-              %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection_list#{index}", :role => "button"}=k[:item].flat_name
+              %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection_list#{index}", :role => "button"}=k[:item].name
               .modal.hide.fade.in{:id => "collection_list#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                 .modal-header
                   %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                  %h3#myModalLabel= k[:item].flat_name
+                  %h3#myModalLabel= k[:item].name
                 #collection_list_detail_dialog.modal-body{:title => "Collection details"}
                   #collection_list_detail_content{:readonly => "true"}
                     %table
                       - k[:item].collections.each do |aCollection|
                         %tr
                           %td
-                            -#%a{:href => "/collections/#{aCollection.id}?state=#{k[:state_label]}"}= aCollection.flat_name
-                            = link_to aCollection.flat_name, collection_path(aCollection.flat_name, :state=>k[:state_label])
+                            -#%a{:href => "/collections/#{aCollection.id}?state=#{k[:state_label]}"}= aCollection.name
+                            = link_to aCollection.name, collection_path(aCollection.name, :state=>k[:state_label])
 
                 .modal-footer
                   %a.btn.pull-right{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
@@ -39,7 +39,7 @@
           %td.collection
             =k[:type] == :collection ? "1" : k[:item].collections.size
           %td.owner
-            =k[:item].flat_ownerEmail
+            =k[:item].owner.email
           %td.state
             =k[:state_label]
           %td.actions
@@ -49,11 +49,11 @@
                 .modal.hide.fade.in{:id => "licence_preview#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                    %h3#myModalLabel= "Licence terms for #{k[:item].flat_name}"
+                    %h3#myModalLabel= "Licence terms for #{k[:item].name}"
                   .modal-body{:title => "Licence Terms"}
-                    %h4#myModalLabel= k[:item].licence.flat_name
+                    %h4#myModalLabel= k[:item].licence.name
                     %p#licence_preview{:readonly => "true"}
-                    = k[:item].licence.flat_text.html_safe
+                    = k[:item].licence.text.html_safe
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal", onClick: "accept_licence_terms('#{k[:type]}', '#{k[:item].id}');"} Accept
@@ -62,11 +62,11 @@
                 .modal.hide.fade.in{:id => "licence_review#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                    %h3#myModalLabel= "Licence terms for #{k[:item].flat_name}"
+                    %h3#myModalLabel= "Licence terms for #{k[:item].name}"
                   .modal-body{:title => "Licence Terms"}
-                    %h4#myModalLabel= k[:item].licence.flat_name
+                    %h4#myModalLabel= k[:item].licence.name
                     %p#licence_review{:readonly => "true"}
-                    = k[:item].licence.flat_text.html_safe
+                    = k[:item].licence.text.html_safe
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               - if action == :viewForRequest
@@ -74,9 +74,9 @@
                 .modal.hide.fade.in{:id => "request_access_modal#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                    %h3#myModalLabel= "Request licence for #{k[:item].flat_name}"
+                    %h3#myModalLabel= "Request licence for #{k[:item].name}"
                   .modal-body{:title => "Request message"}
-                    %p#request_access{:readonly => "true"}= "Are you sure you want to request access to #{k[:item].flat_name}?"
+                    %p#request_access{:readonly => "true"}= "Are you sure you want to request access to #{k[:item].name}?"
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     %a.btn.btn-primary{"aria-hidden" => "true()", "data-dismiss" => "modal", :id => "request_access#{index}", onClick: "request_access_to('#{k[:type]}', '#{k[:item].id}');"} Request Access
@@ -85,10 +85,10 @@
                 .modal.hide.fade.in{:id => "request_cancel_modal#{index}","aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
-                    %h3#myModalLabel= "Cancel access request to #{k[:item].flat_name}"
+                    %h3#myModalLabel= "Cancel access request to #{k[:item].name}"
                   .modal-body{:title => "Cancel Request"}
                     %p#request_cancel{:readonly => "true"}
-                    = "Are you sure you want to cancel your request for access to #{k[:item].flat_name}?"
+                    = "Are you sure you want to cancel your request for access to #{k[:item].name}?"
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
                     - unless k[:request].nil?

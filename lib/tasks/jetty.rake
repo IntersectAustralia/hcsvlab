@@ -7,20 +7,14 @@ tasks.delete 'jetty:start'
 namespace :jetty do
 
   task :config => :environment do
-    puts "HCS vLab jetty config task"
+    puts "Alveo jetty config task"
 
-    system 'cp -vp fedora_conf/conf/development/fedora.fcfg jetty/fedora/default/server/config/'
-    system 'cp -vp fedora_conf/conf/test/fedora.fcfg        jetty/fedora/test/server/config/'
 
     system 'cp -vp solr_conf/conf/schema.xml jetty/solr/development-core/conf/'
-    system 'cp -vp solr_conf/conf/schema.xml jetty/solr/development-AF-core/conf/'
     system 'cp -vp solr_conf/conf/schema.xml jetty/solr/test-core/conf/'
-    system 'cp -vp solr_conf/conf/schema.xml jetty/solr/test-AF-core/conf/'
 
     system 'cp -vp solr_conf/conf/solrconfig.xml jetty/solr/development-core/conf/'
-    system 'cp -vp solr_conf/conf/solrconfig.xml jetty/solr/development-AF-core/conf/'
     system 'cp -vp solr_conf/conf/solrconfig.xml jetty/solr/test-core/conf/'
-    system 'cp -vp solr_conf/conf/solrconfig.xml jetty/solr/test-AF-core/conf/'
 
     # Adds OpenRDF Sesame into jetty.
     system 'cp -vp sesame_bin/openrdf-sesame.war jetty/webapps/'
@@ -39,13 +33,13 @@ namespace :jetty do
   task :start => :environment do
     Jettywrapper.start(JETTY_CONFIG)
     puts "jetty started at PID #{Jettywrapper.pid(JETTY_CONFIG)}"
-    puts "Waiting for Fedora, Solr and Sesame to be ready...".yellow
+    puts "Waiting for Solr and Sesame to be ready...".yellow
     sleep 30
 
     while !ping(Blacklight.solr_config[:url]) do
       sleep 5
     end
-    puts "Fedora, Solr and Sesame are ready".green
+    puts "Solr and Sesame are ready".green
   end
 
 end

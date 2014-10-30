@@ -99,12 +99,12 @@ class UsersController < ApplicationController
       coll = Collection.find(coll_id)
       @request.request_type = "collection"
       @request.request_id = coll.id
-      @request.owner_email = coll.flat_ownerEmail
+      @request.owner_id = coll.owner_id
     else
       list = CollectionList.find(coll_id)
       @request.request_type = "collection_list"
       @request.request_id = list.id
-      @request.owner_email = list.collections.first.flat_ownerEmail
+      @request.owner_id  = list.owner_id
     end
     @request.approved = false
     @request.save!
@@ -123,13 +123,13 @@ class UsersController < ApplicationController
     if type == "collection"
       coll = Collection.find(coll_id)
       current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
-      name = coll.flat_name
+      name = coll.name
     else
       list = CollectionList.find(coll_id)
       list.collections.each { |coll|
         current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
       }
-      name = list.flat_name
+      name = list.name
     end
 
     current_user.accept_licence_request(coll_id)

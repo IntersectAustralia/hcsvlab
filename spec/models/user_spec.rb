@@ -273,7 +273,7 @@ describe User do
 
     it "Should add read group to the user" do
       user = FactoryGirl.create(:user, :status => 'A')
-      collection  = FactoryGirl.create(:collection, :short_name=>"ace")
+      collection  = FactoryGirl.create(:collection, :name=>"ace")
       licence = FactoryGirl.create(:licence)
       collection.licence = licence
 
@@ -284,7 +284,7 @@ describe User do
 
     it "Should remove read group to the user" do
       user = FactoryGirl.create(:user, :status => 'A')
-      collection  = FactoryGirl.create(:collection, :short_name=>"ace")
+      collection  = FactoryGirl.create(:collection, :name=>"ace")
       licence = FactoryGirl.create(:licence)
       collection.licence = licence
 

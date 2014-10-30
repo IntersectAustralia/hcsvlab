@@ -15,7 +15,7 @@ Then /^I should get (at least|at most|exactly) (\d+) results?$/i do |comparator,
       number_of_records.should >= comparison_num.to_i
     when "at most"
       number_of_records.should <= comparison_num.to_i
-    when "exactly"  
+    when "exactly"
       number_of_records.should == comparison_num.to_i
   end
 end
@@ -28,7 +28,7 @@ Then /^I should have (the same number of|fewer|more) results (?:than|as) a(?:n?)
   case comparator
     when "the same number of"
       get_number_of_results_for_query(query).should == number_of_records
-   when "fewer"
+    when "fewer"
       get_number_of_results_for_query(query).should > number_of_records
     when "fewer"
       get_number_of_results_for_query(query).should < number_of_records
@@ -54,9 +54,9 @@ Then /^I should not get id "([^\"]+)" in the first (\d+) results?$/i do |id, max
   pos.should_not == -1
 
   if pos > 0
-    pos.should >= max_num.to_i 
+    pos.should >= max_num.to_i
   else
-    pos.should == -1 if pos == -1 
+    pos.should == -1 if pos == -1
   end
 end
 
@@ -83,10 +83,10 @@ Then /^I should get at least (\d+) of these ids in the first (\d+) results: "([^
   id_string.split(/,/).select do |id|
     pos = get_position_in_result_page(page, id)
     pos != -1 and pos < limit.to_i
-  end.length.should >= how_many.to_i 
+  end.length.should >= how_many.to_i
 end
 
-Then /^I (should not|should) see an? "([^\"]*)" element with an? "([^\"]*)" attribute of "([^\"]*)"$/ do |bool,elem,attribute,value|
+Then /^I (should not|should) see an? "([^\"]*)" element with an? "([^\"]*)" attribute of "([^\"]*)"$/ do |bool, elem, attribute, value|
   if bool == "should not"
     page.should_not have_selector("#{elem}[#{attribute}=#{value}]")
   else

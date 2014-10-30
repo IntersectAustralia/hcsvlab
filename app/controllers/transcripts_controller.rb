@@ -17,11 +17,9 @@ class TranscriptsController < ApplicationController
   TRANSCRIPT_FIELDS = %w(title date depositor country_code language_code copyright license private
       source source_cache transcript_format participants_attributes description format recorded_on)
 
-  FEDORA_CONFIG = YAML.load_file("#{Rails.root.to_s}/config/fedora.yml")[Rails.env] unless const_defined?(:FEDORA_CONFIG)
-  
   def show
     begin
-      attributes = document_to_attribues params['id']
+      attributes = document_to_attributes params['id']
       @transcript = load_transcript attributes
       @media_item = load_media attributes
     rescue Exception => e
@@ -110,7 +108,7 @@ class TranscriptsController < ApplicationController
     attributes.select {|key, value| filter.include? key}
   end
 
-  def document_to_attribues(item_id)
+  def document_to_attributes(item_id)
     document = get_solr_document item_id
     attributes = solr_doc_to_hash(document)
 
@@ -135,9 +133,9 @@ class TranscriptsController < ApplicationController
     handle = nil
     handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
 
-    if (!handle.nil?)
-      item = Item.find_and_load_from_solr({handle:handle})
-      if (!item.present?)
+    if handle
+      item = Item.find_by_handle(handle)
+      if item.nil?
         respond_to do |format|
           format.html {resource_not_found(Blacklight::Exceptions::InvalidSolrID.new("Sorry, you have requested a record that doesn't exist.")) and return}
           format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return}

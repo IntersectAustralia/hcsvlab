@@ -17,7 +17,6 @@ private
     PURL_BIBO_BASE_URI   = PURL_ROOT_URI + 'ontology/bibo/'
     PURL_VOCAB_BASE_URI  = PURL_ROOT_URI + 'vocab/bio/0.1/'
 
-  FEDORA_BASE_URI     = 'info:fedora/fedora-system:def/relations-external#' unless const_defined?(:FEDORA_BASE_URI)
   OLAC_BASE_URI       = 'http://www.language-archives.org/OLAC/1.1/'
   FOAF_BASE_URI       = 'http://xmlns.com/foaf/0.1/'
   RDF_BASE_URI        = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
@@ -40,7 +39,6 @@ private
     PURL_BIBO_BASE_URI   => "PURL_BIBO",
     PURL_VOCAB_BASE_URI  => "PURL_VOCAB",
 
-    FEDORA_BASE_URI      => "FEDORA",
     FOAF_BASE_URI        => "FOAF",
     OLAC_BASE_URI        => "OLAC",
     RDF_BASE_URI         => "RDF",
@@ -84,13 +82,6 @@ public
   TITLE = RDF::URI(DC_TERMS_BASE_URI + 'title') unless const_defined?(:TITLE)
 
   @@lookup[TITLE.to_s] = prefixes[DC_TERMS_BASE_URI] + "_title"
-
-  #
-  # FEDORA
-  #
-  IS_MEMBER_OF = RDF::URI(FEDORA_BASE_URI + 'isMemberOf') unless const_defined?(:IS_MEMBER_OF)
-
-  @@lookup[IS_MEMBER_OF.to_s] = prefixes[FEDORA_BASE_URI] + "_is_member_of"
 
   #
   # OLAC

@@ -14,12 +14,6 @@ module EopasHelper
     # This code is consuming a lot of memory since is loading the whole content of each document
     # in memory just to decide the mimeType of it. Following some changes I would do to this code:
 
-    # 1) Change line
-    #       item = Item.find(id)
-    #    by
-    #       item = Item.find_and_load_from_solr({id:id})
-    # This prevent ActiveFedora to bring every single datastream for the item
-
     # 2) Instead of loading the content in memory to detect the mimeType, we could use this line:
     #     mimeType = document.mime_type.first
     # 3) Finally, given the mimeType we need to check whether it is Audio or Video.

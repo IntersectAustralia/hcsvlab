@@ -41,7 +41,7 @@ files.each do |rdf_file|
     graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
 
     # Find the identity of the Item
-    query = RDF::Query.new({:item => {RDF::URI("http://purl.org/dc/terms/isPartOf") => :corpus}})
+    query = RDF::Query.new({:item => {RDF::URI(MetadataHelper::IS_PART_OF) => :corpus}})
     results = query.execute(graph)
 
     unless results.size == 0

@@ -178,8 +178,8 @@ end
 
 
 Then /^the JSON response should (not)?\s?have$/ do |negative, table|
+  json = JSON.parse(last_response.body)
   table.hashes.each do |hash|
-    json = JSON.parse(last_response.body)
     json_path = hash[:json_path]
     text = hash[:text]
     results = JsonPath.new(json_path).on(json).to_a.map(&:to_s)

@@ -8,17 +8,19 @@ class LicencesController < ApplicationController
 
   def index
 
-    opts = { rows: 1_000_000_000 } # If that's not more than we have, we'll have issues all over the place
 
     bench_start = Time.now
+
     # gets PUBLIC licences and the user licences.
-    @licences = Licence.find_and_load_from_solr({type: Licence::LICENCE_TYPE_PUBLIC}, opts).to_a.concat(Licence.find_and_load_from_solr({ownerId: current_user.id.to_s}, opts).to_a)
+    t = Licence.arel_table
+
+    @licences = Licence.where(t[:private].eq(false).or(t[:owner_id].eq(current_user.id)))
 
     # gets the Collections list of the logged user.
-    @collection_lists = CollectionList.find_and_load_from_solr({ownerId: current_user.id.to_s}, opts).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
+    @collection_lists = current_user.collection_lists.includes(:owner, :licence).order(:name)
 
     # gets the Collections of the logged user.
-    @collections = Collection.find_and_load_from_solr({private_data_owner: current_user.email}, opts).to_a.sort! { |a,b| a.flat_name.downcase <=> b.flat_name.downcase }
+    @collections = current_user.collections.order(:name)
     bench_end = Time.now
     @profiler = ["Time for fetching all collections, licences and collection lists took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
@@ -56,30 +58,29 @@ class LicencesController < ApplicationController
       newLicence = Licence.new
       newLicence.name = name
       newLicence.text = sanitizedText
-      newLicence.type = Licence::LICENCE_TYPE_PRIVATE
-      newLicence.ownerId = current_user.id.to_s
-      newLicence.ownerEmail = current_user.email
+      newLicence.private = true
+      newLicence.owner_id = current_user.id.to_s
       newLicence.save!
 
       # Now lets assign the licence to every collection list
-      if (!collectionListId.nil?)
+      if !collectionListId.nil?
         aCollectionList = CollectionList.find(collectionListId)
-        aCollectionList.setLicence(newLicence.id)
-      elsif (!collectionId.nil?)
+        aCollectionList.set_licence(newLicence.id)
+      elsif !collectionId.nil?
         aCollection = Collection.find(collectionId)
-        aCollection.setLicence(newLicence)
+        aCollection.set_licence(newLicence)
       end
 
       flash[:notice] = "Licence created successfully"
 
       #TODO: This should redirect to
       redirect_to licences_path
-    rescue ActiveFedora::RecordInvalid => e
+    rescue ActiveRecord::RecordInvalid => e
       @params = params
-      if (!collectionListId.nil?)
+      if !collectionListId.nil?
         @CollectionList = CollectionList.find(collectionListId)
       end
-      if (!collectionId.nil?)
+      if !collectionId.nil?
         @Collection = Collection.find(collectionId)
       end
       @errors = e.record.errors.messages

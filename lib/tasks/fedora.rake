@@ -7,19 +7,15 @@ namespace :fedora do
   #
   # Ingest one metadata file, given as an argument
   #
-  task :ingest_one => :environment do
-
-    corpus_rdf = ARGV[1] unless ARGV[1].nil?
-
+  task :ingest_one, [:corpus_rdf] => :environment do |t, args|
+    corpus_rdf = args.corpus_rdf
     if (corpus_rdf.nil?) || (!File.exists?(corpus_rdf))
-      puts "Usage: rake fedora:ingest_one <corpus rdf file>"
+      puts "Usage: rake fedora:ingest_one[<corpus rdf file>]"
       exit 1
     end
 
-    logger.info "rake fedora:ingest_one #{corpus_rdf}"
-    pid = ingest_one(File.dirname(corpus_rdf), corpus_rdf)
-    puts "Ingested item #{pid}" if Rails.env.test?
-
+    logger.info "rake fedora:ingest_one[#{corpus_rdf}]"
+    ingest_one(File.dirname(corpus_rdf), corpus_rdf)
   end
 
 
@@ -59,31 +55,31 @@ namespace :fedora do
   task :clear => :environment do
 
     logger.info "rake fedora:clear"
-    logger.info "Emptying Fedora"
 
-    Item.find_each do |item|
-      logger.info "Item #{item.pid.to_s}"
-      item.delete
+    Document.delete_all
+    Item.delete_all
+    Collection.delete_all
+    CollectionList.delete_all
+
+    # clear Solr
+    uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
+
+    req = Net::HTTP::Post.new(uri)
+    req.body = '<delete><query>*:*</query></delete>'
+
+    req.content_type = "text/xml; charset=utf-8"
+    req.body.force_encoding("UTF-8")
+    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+      http.request(req)
     end
 
-    Document.find_each do |doc|
-      logger.info "Document #{doc.pid.to_s}"
-      doc.delete
-    end
-
-    Collection.find_each do |coll|
-      logger.info "Collection #{coll.pid.to_s}"
-      coll.delete
-    end
-
-    CollectionList.find_each do |aCollectionList|
-      logger.info "Collection List #{aCollectionList.pid.to_s}"
-      aCollectionList.delete
-    end
-
-    Licence.find_each do |aLicence|
-      logger.info "Licence #{aLicence.pid.to_s}"
-      aLicence.delete
+    # Clear Sesame
+    server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
+    repositories = server.repositories
+    repositories.each_key do |repositoryName|
+      unless "SYSTEM".eql?(repositoryName)
+        server.delete(repositories[repositoryName].path)
+      end
     end
 
   end
@@ -96,70 +92,36 @@ namespace :fedora do
 
     corpus = ENV['corpus']
 
-    if (corpus.nil?)
+    if corpus.nil?
       puts "Usage: rake fedora:clear_corpus corpus=<corpus name>"
       exit 1
     end
 
     logger.info "rake fedora:clear_corpus corpus=#{corpus}"
 
-    objects = find_corpus_items corpus
+    collection = Collection.find_by_name(corpus)
+    Document.where(item_id: Item.where(collection_id: collection)).delete_all
+    Item.where(collection_id: collection).delete_all
+    collection.destroy
 
-    logger.info "Removing collection #{corpus}"
-    logger.info "Removing #{objects.count} Items"
+    # clear Solr
+    uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
 
-    documents = []
+    req = Net::HTTP::Post.new(uri)
+    req.body = "<delete><query>handle:#{corpus}\\:*</query></delete>"
 
-    objects.each do |obj|
-      id = obj["id"].to_s
-      logger.info "Removing Item: #{id}"
-      fobj=Item.find(id)
-      documents.concat(fobj.documents)
-      fobj.delete
+    req.content_type = "text/xml; charset=utf-8"
+    req.body.force_encoding("UTF-8")
+    res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+      http.request(req)
     end
-
-    logger.info "Removing #{documents.size} Documents"
-    documents.each { |doc|
-      logger.info "Removing Document: #{doc.pid}"
-      doc.delete
-    }
-
-    Collection.find_by_short_name(corpus).each { |collection|
-      logger.info "Removing collection object #{collection.pid}"
-      collection.delete
-    }
 
     # Clear all metadata and annotations from the triple store
     server = RDF::Sesame::Server.new(SESAME_CONFIG["url"].to_s)
     repository = server.repository(corpus)
-    repository.clear() if !repository.nil?
+    repository.clear if repository.present?
 
   end
-
-
-  #
-  # Reindex one item (given as item=<item-id>)
-  #
-  task :reindex_one => :environment do
-    item_id = ENV['item']
-
-    if item_id.nil?
-      puts "Usage: rake fedora:reindex_one item=<item id>"
-      exit 1
-    end
-
-    unless item_id =~ /hcsvlab:[0-9]+/
-      puts "Error: invalid item id, expecting 'hcsvlab:<digits>'"
-      exit 1
-    end
-
-    logger.info "rake fedora:reindex_one item=#{item_id}"
-
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    reindex_item_to_solr(item_id, stomp_client)
-    stomp_client.close
-  end
-
 
   #
   # Reindex one corpus (given as corpus=<corpus-name>)
@@ -168,58 +130,57 @@ namespace :fedora do
 
     corpus = ENV['corpus']
 
-    if (corpus.nil?)
+    if corpus.nil?
       puts "Usage: rake fedora:reindex_corpus corpus=<corpus name>"
       exit 1
     end
 
     logger.info "rake fedora:reindex_corpus corpus=#{corpus}"
 
-    objects = find_corpus_items corpus
+    items = Collection.find_by_name(corpus).items.pluck(:id)
 
-    logger.info "Reindexing #{objects.count} Items"
+    count = items.count
+    logger.info "Reindexing #{count} items"
 
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    objects.each do |obj|
-      reindex_item_to_solr(obj["id"], stomp_client)
+
+    items.each_with_index do |item_id,i|
+      print "Indexing #{i+1}/#{count}\r"
+      reindex_item_to_solr(item_id, stomp_client)
     end
+    puts "Published #{count} index messages to ActiveMQ"
+
     stomp_client.close
 
   end
 
+  # Consolidate cores by indexing unindexed items
   #
-  # Consolidate cores by reindexing items found only in the ActiveFedora core
-  #
-  CHUNK_SIZE = 50
-  task :consolidate_cores => :environment do
-    solr_af_core = ActiveFedora::SolrService.instance.conn
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+  BATCH_SIZE = 5000
+  task :consolidate => :environment do
 
     corpus = ENV['corpus']
-    if corpus.present?
-      query = "has_model_ssim:info:fedora/afmodel:Item edit_access_group_ssim:#{corpus}-edit"
+    if corpus
+      query = Item.where(collection_id: Collection.find_by_name(corpus)).unindexed
     else
-      query = 'has_model_ssim:info:fedora/afmodel:Item'
+      query = Item.unindexed
     end
 
-    fedora_response = solr_af_core.get 'select', :params => {:q => query}
-    num = fedora_response["response"]["numFound"]
-    chunks = (num/CHUNK_SIZE)+1
-    start_row = 0
-    chunks.times do |chunk|
-      logger.info "Investigating item set " + (chunk+1).to_s + " of " + chunks.to_s
-      fedora_response = solr_af_core.get 'select', :params => {:q => query, :fl => 'id', :sort => 'id asc', :start => start_row, :rows => CHUNK_SIZE}
-      fedora_records = fedora_response["response"]["docs"].collect { |f| f["id"] }
-      fq_query = "id:(" + fedora_records.collect { |item| item.sub(/:/, '\:') }.join(" OR ") +")"
-      solr_reponse = @solr.get 'select', :params => {fq: fq_query, :fl => 'id', rows: CHUNK_SIZE}
-      solr_records = solr_reponse["response"]["docs"].collect { |s| s["id"] }
-      missing_ids = fedora_records - solr_records
-      missing_ids.each do |missing_id|
-        reindex_item_to_solr(missing_id, stomp_client)
-      end
-      start_row+=CHUNK_SIZE
+    count = query.count
+    logger.info "Indexing all #{count} #{corpus} items"
+    # solr_worker = Solr_Worker.new
+    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+
+    i = 1
+    query.select(:id).find_each(:batch_size => BATCH_SIZE) do |item|
+      print "Indexing #{i}/#{count}\r"
+      # solr_worker.on_message("index #{item.id}")
+      reindex_item_to_solr(item.id, stomp_client)
+      i += 1
     end
+    puts "Published #{count} index messages to ActiveMQ"
     stomp_client.close
+
   end
 
   #
@@ -229,23 +190,19 @@ namespace :fedora do
 
     logger.info "rake fedora:reindex_all"
 
-    response = @solr.get 'select', :params => {:q => ''}
-    num = response["response"]["numFound"]
+    count = Item.count
+    logger.info "Reindexing all #{count} Items"
 
-    logger.info "Reindexing all #{num} Items"
-
+    # solr_worker = Solr_Worker.new
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
-
-    chunks = (num/CHUNK_SIZE)+1
-    start_row = 0
-    chunks.times do |chunk|
-      response = @solr.get 'select', :params => {:fl => 'id', :sort => 'id asc', :start => start_row, :rows => CHUNK_SIZE}
-      response["response"]["docs"].each do |doc|
-        reindex_item_to_solr(doc["id"], stomp_client)
-      end
-      start_row+=CHUNK_SIZE
+    i = 1
+    Item.select(:id).find_each(:batch_size => BATCH_SIZE) do |item|
+      print "Indexing #{i}/#{count}\r"
+      # solr_worker.on_message("index #{item.id}")
+      reindex_item_to_solr(item.id, stomp_client)
+      i += 1
     end
-
+    puts "Published #{count} index messages to ActiveMQ"
     stomp_client.close
 
   end
@@ -291,7 +248,7 @@ namespace :fedora do
 
     licences = {}
     Licence.all.each { |licence|
-      licences[licence.flat_name] = licence
+      licences[licence.name] = licence
     }
 
     setup_collection_list("AUSNC", licences["AusNC Terms of Use"],
@@ -362,12 +319,12 @@ namespace :fedora do
 
     overall_start = Time.now
 
-    manifest = JSON.parse(IO.read(File.join(corpus_dir, MANIFEST_FILE_NAME)))
+    manifest_file = File.open(File.join(corpus_dir, MANIFEST_FILE_NAME))
+    manifest = JSON.parse(manifest_file.read)
+    manifest_file.close
 
     collection_name = manifest["collection_name"]
     collection = check_and_create_collection(collection_name, corpus_dir)
-
-    populate_triple_store(corpus_dir, collection_name)
 
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
@@ -403,11 +360,11 @@ namespace :fedora do
 
     rdf_files.each do |rdf_file|
       begin
-        pid = ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection, nil)
+        pid = ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection)
 
         successes[rdf_file] = pid
       rescue => e
-        logger.error "Error! #{e.message}"
+        logger.error "Error! #{e.message}\n#{e.backtrace}"
         errors[rdf_file] = e.message
       end
     end
@@ -418,10 +375,6 @@ namespace :fedora do
 
   end
 
-  def reindex_item_to_solr(item_id, stomp_client)
-    logger.info "Reindexing item: #{item_id}"
-    stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
-  end
 
   def check_corpus(corpus_dir)
 
@@ -437,7 +390,7 @@ namespace :fedora do
     rdf_files.each do |rdf_file|
       begin
         index = index + 1
-        handle = check_rdf_file(corpus_dir, rdf_file, index, rdf_files.size)
+        handle = check_rdf_file(rdf_file, index, rdf_files.size)
         handles[handle] = Set.new unless handles.has_key?(handle)
         handles[handle].add(rdf_file)
         if handles[handle].size > 1
@@ -457,7 +410,7 @@ namespace :fedora do
   end
 
 
-  def check_rdf_file(corpus_dir, rdf_file, index, limit)
+  def check_rdf_file(rdf_file, index, limit)
     unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
       raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
     end
@@ -465,8 +418,8 @@ namespace :fedora do
     graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
     query = RDF::Query.new({
                                :item => {
-                                   RDF::URI("http://purl.org/dc/terms/isPartOf") => :collection,
-                                   RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                                   RDF::URI(MetadataHelper::IS_PART_OF) => :collection,
+                                   RDF::URI(MetadataHelper::IDENTIFIER) => :identifier
                                }
                            })
     result = query.execute(graph)[0]
@@ -579,6 +532,15 @@ namespace :fedora do
 
   def setup_collection_list(list_name, licence, *collection_names)
     list = CollectionList.create_public_list(list_name, licence, *collection_names)
-    logger.warning("Didn't create CollectionList #{list_name}") if list.nil?
+    logger.warn("Didn't create CollectionList #{list_name}") if list.nil?
+  end
+
+  def send_solr_message(command, objectID)
+    info("Fedora_Worker", "sending instruction to Solr_Worker: #{command} #{objectID}")
+    publish :solr_worker, "#{command} #{objectID}"
+    debug("Fedora_Worker", "Cache size: #{@@cache.size}")
+    @@cache.each_pair { |key, value|
+      debug("Fedora_Worker", "   @cache[#{key}] = #{value}")
+    }
   end
 end

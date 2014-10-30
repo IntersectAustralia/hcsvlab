@@ -1,102 +1,48 @@
-include ActiveFedora::DatastreamCollections
+class CollectionList < ActiveRecord::Base
 
-class CollectionList < HcsvlabActiveFedora
-  has_metadata 'descMetadata', type: Datastream::CollectionListMetadata
+  has_many :collections, uniq: true
+  belongs_to :licence
+  belongs_to :owner, class_name: 'User'
 
-  has_many :collections, :property => :is_part_of
-  belongs_to :licence, :property => :has_licence
+  validates_presence_of :name, message: 'Collection List Name can not be blank'
+  validates_length_of :name, maximum: 255, message: "Name is too long (maximum is 255 characters)"
+  validates_presence_of :owner_id, message: 'Collection List owner id can not be empty'
 
-  delegate :name, to: 'descMetadata'
-  delegate :ownerId, to: 'descMetadata'
-  delegate :ownerEmail, to: 'descMetadata'
-  delegate :privacy_status, to: 'descMetadata'
+  validate :same_licence_integrity_check
 
-  validates_presence_of :flat_name, message: 'Collection List Name can not be blank'
-  validates_length_of :flat_name, maximum: 255, message:"Name is too long (maximum is 255 characters)"
-  validates_presence_of :flat_ownerId, message: 'Collection List owner id can not be empty'
-  validates_presence_of :flat_ownerEmail, message: 'Collection List owner email can not be empty'
+  before_destroy :remove_collection_licences
 
-  validate :sameLicenceIntegrityCheck
+  attr_accessible :name, :private
 
-  # ActiveFedora returns the value as an array, we need the first value
-  def flat_name
-    self[:name].first
-  end
 
-  # ActiveFedora returns the value as an array, we need the first value
-  def flat_ownerId
-    self[:ownerId].first
-  end
-
-  # ActiveFedora returns the value as an array, we need the first value
-  def flat_ownerEmail
-    self[:ownerEmail].first
-  end
-
-  #
-  # Gets the Collection Lists for the given user
-  #
-  def self.find_by_owner_id(userId)
-    return CollectionList.find(ownerId:userId.to_s)
-  end
-
-  #
-  # Find a collection using its short_name
-  #
-  def self.find_by_name(name)
-    return CollectionList.where(name: name).all
-  end
-
-  def setPrivacy(status)
-    self.privacy_status = status
+  def set_privacy(status)
+    self.private = status
     self.save!
   end
 
   # Query of privacy status
-  def private?
-    self[:privacy_status].first == "true"
-  end
-
-  # Query of privacy status
   def public?
-    self[:privacy_status].first == "false"
+    !private?
   end
 
   #
   # Adds collections to a Collection List
   #
   def add_collections(collection_ids)
-    collection_ids.each do |aCollectionsId|
-      self.collections=[] if self.collections.nil?
-      begin
-        aCollection = Collection.find(aCollectionsId.to_s)
-        # We are only adding Collections that are not assigned to any other Collection List.
-        if (aCollection.collectionList.nil?)
-          self.collections << aCollection
-          aCollection.setCollectionList(self)
-
-          # for some reason, sometime the licence object is not retrieved and I need to fetch it
-          aLicence = (self.licence.nil?)? nil : Licence.find(self.licence.id)
-          aCollection.setLicence(aLicence)
-        end
-      rescue ActiveFedora::ObjectNotFoundError => e
-        Rails.logger.debug "Error finding collection #{aCollectionsId.to_s}"
-        # If the Collection does not exist, then do nothing.
-      end
-    end
-
+    self.collection_ids += collection_ids
+    self.collections.update_all(licence_id: self.licence_id)
     self.save!
   end
 
   #
   # Removes a collection from its Collection List
   #
-  def remove_collection(collectionId)
-    if (collections.length <= 1)
+  def remove_collection(collection_id)
+    if collections.length <= 1
       self.delete
     else
-      collection = Collection.find(collectionId)
-      collection.collectionList = nil
+      collection = Collection.find(collection_id)
+      collection.collection_list_id = nil
       collection.licence = nil
       collection.save!
     end
@@ -105,23 +51,11 @@ class CollectionList < HcsvlabActiveFedora
   #
   # Adds licence to collection list
   #
-  def setLicence(licence)
-    licence = Licence.find(licence.to_s) unless licence.is_a? Licence
-
-    Rails.logger.debug "Adding licence #{licence.id} to collection list #{self.id}"
-
-    self.collections.each do |aCollection|
-      aCollection.licence = licence
-      aCollection.save!
-    end
-
-    self.licence = licence
-  	self.save!
-  end
-
-  def delete
-    removeLicenceFromCollections
-    super
+  def set_licence(licence)
+    licence_id = licence.is_a?(Licence) ? licence.id : licence
+    Rails.logger.debug "Adding licence #{licence_id} to collection list #{self.id}"
+    self.update_attribute(:licence_id, licence_id)
+    self.collections.update_all(licence_id: licence_id)
   end
 
   private
@@ -129,39 +63,26 @@ class CollectionList < HcsvlabActiveFedora
   #
   # Removes the licence of every Collection contained in this Collection List
   #
-  def removeLicenceFromCollections
-    self.collections.each do |aCollection|
-      aCollection.collectionList = nil
-      aCollection.licence = nil
-      aCollection.save!
-    end
+  def remove_collection_licences
+    self.update_attribute(:licence_id, nil)
+    self.collections.update_all(licence_id: nil)
   end
 
   #
   # Checks that that licence of this Collection List is the same than the licence of the Collections contained in
   # this Collection List.
   #
-  def sameLicenceIntegrityCheck
-    if (!collections.nil?)
-      error = false
-      collections.each do |aCollection|
-        # if the collection list licence is null, then the licence for the collection must be null
-        if (licence.nil?)
-          error = error || !aCollection.licence.nil?
-        else
-          error = error || aCollection.licence.nil?
-          if (!aCollection.licence.nil?)
-            error = error || !licence.id.eql?(aCollection.licence.id)
-          end
-        end
-        if (error)
-          Rails.logger.debug "Collection #{aCollection.id} has licence #{aCollection.licence.inspect}, but the Collection List #{self.id} has licence #{self.licence.inspect}"
-        end
-      end
-      if (error)
-        errors[:base] << "All Collection in a Collection List must have the same licence"
+  def same_licence_integrity_check
+
+    licences = [licence_id] + self.collections.pluck(:licence_id)
+
+    if licences.uniq.size > 1
+      errors[:base] << "All Collection in a Collection List must have the same licence"
+      collections.where('licence_id != ?', licence_id.to_i).each do |collection|
+        Rails.logger.debug "Collection #{collection.id} has licence #{collection.licence.try(:name)}, but the Collection List #{self.id} has licence #{self.licence.try(:name)}"
       end
     end
+
   end
 
   #
@@ -180,57 +101,47 @@ class CollectionList < HcsvlabActiveFedora
   # skip them (with a warning). Once the CollectionList has been created,
   # assign the given licence to it (allow a nil licence).
   #
-  def self.create_public_list(name, licence, *collection_names)
+  def self.create_public_list(name, new_licence, *collection_names)
     # Check there isn't already a CollectionList with that name.
-    cls = CollectionList.find_by_name(name)
-    unless cls.empty?
+    if CollectionList.find_by_name(name).present?
       Rails.logger.error("CollectionList.create_public_list: there is already a CollectionList called #{name}")
       return nil
     end
 
     # Find the Collections with the given collection_names
-    user = nil
-    found = []
     warnings = []
-    collection_names.each { |cn|
-      array = Collection.find_by_short_name(cn)
-      if array.empty?
-        # Couldn't find such a collection
-        warnings << "cannot find a Collection called #{cn}"
-      elsif !array[0].collectionList.nil?
-        # Collection is already in a list
-        warnings << "Collection #{cn} is already part of CollectionList #{array[0].collectionList.name}"
-      else
-        # got it!
-        found << array[0].id
-        user = array[0].data_owner if user.nil?
-      end
-    }
+    missing = collection_names - Collection.where(name: collection_names).pluck(:name)
+    grouped_in_list = Collection.where(name: collection_names).where('licence_id is not null')
+    warnings += missing.collect{|cn| "cannot find a Collection called #{cn}" }
+    warnings += grouped_in_list.collect{|cn| "Collection #{cn.name} is already part of CollectionList #{cn.licence.name}" }
+
+    to_add = Collection.where(name: collection_names, licence_id: nil)
 
     unless warnings.empty?
       # There were missing collections.
       warnings.each { |w|
-        Rails.logger.warning("CollectionList.create_public_list: #{w}")
+        Rails.logger.warn("CollectionList.create_public_list: #{w}")
       }
     end
 
-    if found.empty?
+    if to_add.empty?
       Rails.logger.error("CollectionList.create_public_list: no viable collections in argument list!")
       return nil
+    else
+      user = to_add.first.owner
     end
 
     # Do the actual creation and adding
     result = CollectionList.new
-    result.name           = name
-    result.ownerEmail     = user.email
-    result.ownerId        = user.id.to_s
-    result.privacy_status = 'false'
+    result.name = name
+    result.owner_id = user.id.to_s
+    result.private = false
     result.save
-    result.add_collections(found)
-    result.setLicence(licence) unless licence.nil?
+    result.add_collections(to_add.pluck(:id))
+    result.set_licence(new_licence) unless new_licence.nil?
 
     Rails.logger.info("Collection list #{result.name} created with #{result.collection_ids.size} collection(s)")
-    Rails.logger.info("Licence #{licence.name} assigned to Collection list #{result.name}") unless licence.nil?
+    Rails.logger.info("Licence #{new_licence.name} assigned to Collection list #{result.name}") unless new_licence.nil?
 
     # Return the new CollectionList
     return result

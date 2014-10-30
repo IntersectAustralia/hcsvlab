@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.18'
+gem 'rails', '~> 3.2.18'
 gem 'pg'
 
 # Gems used only for assets and not required
@@ -18,6 +18,7 @@ group :development, :test do
   gem "rspec-rails"
   gem "factory_girl_rails"
   # cucumber gems
+  gem "quiet_assets"
   gem "cucumber"
   gem "capybara"
   gem "database_cleaner"
@@ -76,7 +77,6 @@ gem 'daemons'
 gem 'activemessaging'
 
 gem 'solrizer'
-# gem 'solrizer-fedora', "3.0.0.pre1"
 gem 'rsolr'
 gem "xml-simple"
 gem 'nokogiri'

@@ -2,7 +2,7 @@ defaults: &defaults
   password_reset_email_sender: kali@intersect.org.au
   account_request_user_status_email_sender: kali@intersect.org.au
   account_request_admin_notification_sender: kali@intersect.org.au
-  default_data_owner: davidc@intersect.org.au
+  default_data_owner: data_owner@intersect.org.au
   licence_access_request_notification_sender: kali@intersect.org.au
   licence_access_request_response_sender: kali@intersect.org.au
 
