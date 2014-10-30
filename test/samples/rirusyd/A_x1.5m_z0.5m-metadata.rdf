@@ -15,7 +15,7 @@
 <http://ns.ausnc.org.au/corpora/rirusyd/source/A_x1.5m_z0.5m#Audio> a foaf:Document ;
     dc:extent 383300 ;
     dc:identifier "A_x1.5m_z0.5m.wav" ;
-    dc:source <file:///data_hcsvlab/rirusyd/A_x1.5m_z0.5m.wav> ;
+    dc:source <file:///data/alveo-test/rirusyd/A_x1.5m_z0.5m.wav> ;
     dc:title "A_x1.5m_z0.5m#Audio" ;
     dc:type "Audio" .
 

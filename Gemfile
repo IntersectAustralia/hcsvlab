@@ -15,6 +15,8 @@ end
 gem "jquery-rails", "2.3.0"
 
 group :development, :test do
+  gem "brakeman"
+  gem "bundler-audit"
   gem "rspec-rails"
   gem "factory_girl_rails"
   # cucumber gems
@@ -27,7 +29,7 @@ group :development, :test do
 end
 
 group :development do
-  gem "bundler-audit"
+  gem 'thin'
   gem 'xray-rails'
   gem 'pry'
   gem 'pry-rails'
@@ -42,7 +44,6 @@ end
 group :test do
   gem "cucumber-rails", :require => false
   gem "shoulda"
-  gem "brakeman"
   gem "simplecov", ">=0.3.8", :require => false
   gem 'simplecov-rcov'
   gem "poltergeist"

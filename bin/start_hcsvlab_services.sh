@@ -8,7 +8,7 @@
 #
 #
 
-PATH=/home/devel/.rvm/gems/ruby-2.0.0-p481/bin:/home/devel/.rvm/gems/ruby-2.0.0-p481@global/bin:/home/devel/.rvm/rubies/ruby-2.0.0-p481/bin:/home/devel/.rvm/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH
+PATH=/home/devel/.rvm/gems/ruby-2.1.4/bin:/home/devel/.rvm/gems/ruby-2.1.4@global/bin:/home/devel/.rvm/rubies/ruby-2.1.4/bin:/home/devel/.rvm/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH
 export $PATH
 
 # Starting ActiveMQ
@@ -21,7 +21,7 @@ sleep 5
 
 # Starting Solr Workers
 cd /home/devel/hcsvlab-web/current/
-/home/devel/.rvm/gems/ruby-2.0.0-p481\@global/bin/rake a13g:start_pollers
+/home/devel/.rvm/gems/ruby-2.1.4\@global/bin/rake a13g:start_pollers
 
 # Start Galaxy
 cd $GALAXY_HOME

@@ -15,7 +15,7 @@ set :default_stage, "qa"
 set :rpms, "openssl openssl-devel curl-devel httpd-devel apr-devel apr-util-devel zlib zlib-devel libxml2 libxml2-devel libxslt libxslt-devel libffi mod_ssl mod_xsendfile"
 set :shared_children, shared_children + %w(log_archive)
 set :shell, '/bin/bash'
-set :rvm_ruby_string, 'ruby-2.0.0-p481@hcsvlab'
+set :rvm_ruby_string, 'ruby-2.1.4@hcsvlab'
 set :rvm_type, :user
 
 # Deploy using copy for now
@@ -70,6 +70,8 @@ before 'deploy:setup' do
   server_setup.rvm.trust_rvmrc
   server_setup.gem_install
   server_setup.passenger
+  server_setup.config.apache
+
 end
 after 'deploy:setup' do
   server_setup.filesystem.dir_perms
@@ -77,7 +79,6 @@ after 'deploy:setup' do
 end
 after 'deploy:update' do
   server_setup.logging.rotation
-  server_setup.config.apache
   deploy.new_secret
   deploy.restart
   deploy.additional_symlinks

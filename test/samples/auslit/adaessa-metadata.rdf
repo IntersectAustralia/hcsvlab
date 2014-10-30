@@ -28,21 +28,21 @@
 <http://ns.ausnc.org.au/corpora/austlit/source/adaessa#Original> a foaf:Document ;
     dc:extent 448913 ;
     dc:identifier "adaessa.xml" ;
-    dc:source <file:///data_hcsvlab/auslit/adaessa.xml> ;
+    dc:source <file:///data/alveo-test/auslit/adaessa.xml> ;
     dc:title "adaessa#Original" ;
     dc:type "Original" .
 
 <http://ns.ausnc.org.au/corpora/austlit/source/adaessa#Raw> a foaf:Document ;
     dc:extent 448913 ;
     dc:identifier "adaessa-raw.txt" ;
-    dc:source <file:///data_hcsvlab/auslit/adaessa-raw.txt> ;
+    dc:source <file:///data/alveo-test/auslit/adaessa-raw.txt> ;
     dc:title "adaessa#Raw" ;
     dc:type "Raw" .
 
 <http://ns.ausnc.org.au/corpora/austlit/source/adaessa#Text> a foaf:Document ;
     dc:extent 413669 ;
     dc:identifier "adaessa-plain.txt" ;
-    dc:source <file:///data_hcsvlab/auslit/adaessa-plain.txt> ;
+    dc:source <file:///data/alveo-test/auslit/adaessa-plain.txt> ;
     dc:title "adaessa#Text" ;
     dc:type "Text" .
 

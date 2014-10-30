@@ -39,7 +39,7 @@
 <http://ns.ausnc.org.au/corpora/custom/source/utf8_test_1#Text> a foaf:Document ;
     dc:extent 413669 ;
     dc:identifier "utf8_test_1-plain.txt" ;
-    dc:source <file:///data_hcsvlab/test_collections/custom/utf8_test_1-plain.txt> ;
+    dc:source <file:///data/alveo-test/test_collections/custom/utf8_test_1-plain.txt> ;
     dc:title "utf8_test_1#Text" ;
     dc:type "Text" .
 

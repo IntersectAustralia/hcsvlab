@@ -29,13 +29,13 @@
 
 <http://ns.ausnc.org.au/corpora/eopas_test/source/Video_Eopas_transcript.xml> a foaf:Document ;
     dc:identifier "Video_Eopas_transcript.xml" ;
-    dc:source <file:///data_hcsvlab/eopas_test/Video_Eopas_transcript.xml> ;
+    dc:source <file:///data/alveo-test/eopas_test/Video_Eopas_transcript.xml> ;
     dc:title "Video_Eopas_transcript.xml" ;
     dc:type "Other" .
 
 <http://ns.ausnc.org.au/corpora/eopas_test/source/Video_Eopas_video.ogg> a foaf:Document ;
     dc:identifier "Video_Eopas_video.ogg" ;
-    dc:source <file:///data_hcsvlab/eopas_test/Video_Eopas_video.ogg> ;
+    dc:source <file:///data/alveo-test/eopas_test/Video_Eopas_video.ogg> ;
     dc:title "Video_Eopas_video.ogg" ;
     dc:type "Audio" .
 
