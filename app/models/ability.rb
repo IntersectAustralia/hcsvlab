@@ -1,7 +1,6 @@
 class Ability
   include CanCan::Ability
 
-  # TODO check if Hydra Ability is still required
   include Hydra::Ability
   # include Hydra::PolicyAwareAbility
 
@@ -14,8 +13,8 @@ class Ability
     @user = @current_user # just in case someone was using this in an override. Just don't.
     @session = session
     @cache = Hydra::PermissionsCache.new
-    hydra_default_permissions()
-    
+    hydra_default_permissions
+
     # alias edit_role to update_role so that they don't have to be declared separately
     alias_action :edit_role, :to => :update_role
     alias_action :edit_approval, :to => :approve

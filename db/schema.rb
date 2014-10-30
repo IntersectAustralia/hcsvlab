@@ -47,7 +47,7 @@ ActiveRecord::Schema.define(:version => 20141029032823) do
   create_table "documents", :force => true do |t|
     t.string   "file_name"
     t.string   "file_path"
-    t.string   "type"
+    t.string   "doc_type"
     t.string   "mime_type"
     t.integer  "item_id"
     t.datetime "created_at", :null => false

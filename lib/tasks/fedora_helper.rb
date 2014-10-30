@@ -141,40 +141,39 @@ end
 def look_for_documents(item, corpus_dir, rdf_file, manifest)
   docs = manifest["files"][File.basename(rdf_file)]["docs"]
 
-  # Create a primary text datastream in the fedora Item for primary text documents
-    begin
-      server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(item.collection.name)
+  # Create a primary text in the Item for primary text documents
+  begin
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repository = server.repository(item.collection.name)
 
-      query = RDF::Query.new do
-        pattern [RDF::URI.new(item.uri), MetadataHelper::INDEXABLE_DOCUMENT, :indexable_doc]
-        pattern [:indexable_doc, MetadataHelper::SOURCE, :source]
-      end
-
-      results = repository.query(query)
-
-      results.each do |res|
-        path = res[:source].value.gsub("file://", "")
-        if File.exists? path and File.file? path
-          item.primary_text_path = path
-          item.save
-        end
-      end
-    rescue => e
-      Rails.logger.error e.inspect
-      Rails.logger.error "Could not connect to triplestore - #{SESAME_CONFIG["url"].to_s}"
+    query = RDF::Query.new do
+      pattern [RDF::URI.new(item.uri), MetadataHelper::INDEXABLE_DOCUMENT, :indexable_doc]
+      pattern [:indexable_doc, MetadataHelper::SOURCE, :source]
     end
+
+    results = repository.query(query)
+
+    results.each do |res|
+      path = URI(res[:source]).path
+      if File.exists? path and File.file? path
+        item.primary_text_path = path
+        item.save
+      end
+    end
+  rescue => e
+    Rails.logger.error e.inspect
+    Rails.logger.error "Could not connect to triplestore - #{SESAME_CONFIG["url"].to_s}"
+  end
 
   docs.each do |result|
     identifier = result["identifier"]
     source = result["source"]
-    path = source.gsub("file:", "")
+    path = URI(source).path
     type = result["type"]
 
     file_name = last_bit(source)
     existing_doc = item.documents.find_by_file_name(file_name)
     if existing_doc.blank?
-      # Create a document in fedora
       begin
         doc = Document.new
         doc.file_name = file_name
@@ -199,7 +198,7 @@ end
 
 def update_document(document, item, file_name, identifier, source, type, corpus_dir)
   begin
-    path = source.gsub("file:", "")
+    path = URI(source).path
 
     document.file_name = file_name
     document.file_path = path
@@ -312,9 +311,9 @@ end
 def extract_manifest_collection(rdf_file)
   graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
   query = RDF::Query.new({
-                           :item => {
-                               RDF::URI(MetadataHelper::IS_PART_OF) => :collection
-                           }
+                             :item => {
+                                 RDF::URI(MetadataHelper::IS_PART_OF) => :collection
+                             }
                          })
   result = query.execute(graph)[0]
   collection_name = last_bit(result.collection.to_s)
@@ -335,9 +334,9 @@ def extract_manifest_info(rdf_file)
   begin
     graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
     query = RDF::Query.new({
-                             :item => {
-                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
-                             }
+                               :item => {
+                                   RDF::URI("http://purl.org/dc/terms/identifier") => :identifier
+                               }
                            })
     result = query.execute(graph)[0]
     identifier = result.identifier.to_s
@@ -346,11 +345,11 @@ def extract_manifest_info(rdf_file)
     hash = {"id" => identifier, "uri" => uri, "docs" => []}
 
     query = RDF::Query.new({
-                             :document => {
-                                 RDF::URI("http://purl.org/dc/terms/type") => :type,
-                                 RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
-                                 RDF::URI("http://purl.org/dc/terms/source") => :source
-                             }
+                               :document => {
+                                   RDF::URI("http://purl.org/dc/terms/type") => :type,
+                                   RDF::URI("http://purl.org/dc/terms/identifier") => :identifier,
+                                   RDF::URI("http://purl.org/dc/terms/source") => :source
+                               }
                            })
     query.execute(graph).each do |result|
       hash["docs"].append({"identifier" => result.identifier.to_s, "source" => result.source.to_s, "type" => result.type.to_s})
@@ -455,42 +454,42 @@ end
 # Rough guess at mime_type from file extension
 #
 def mime_type_lookup(file_name)
-    case File.extname(file_name.to_s)
+  case File.extname(file_name.to_s)
 
-      # Text things
-      when '.txt'
-          return 'text/plain'
-      when '.xml'
-          return 'text/xml'
+    # Text things
+    when '.txt'
+      return 'text/plain'
+    when '.xml'
+      return 'text/xml'
 
-      # Images
-      when '.jpg'
-          return 'image/jpeg'
-      when '.tif'
-          return 'image/tif'
+    # Images
+    when '.jpg'
+      return 'image/jpeg'
+    when '.tif'
+      return 'image/tif'
 
-      # Audio things
-      when '.mp3'
-          return 'audio/mpeg'
-      when '.wav'
-          return 'audio/wav'
+    # Audio things
+    when '.mp3'
+      return 'audio/mpeg'
+    when '.wav'
+      return 'audio/wav'
 
-      # Video things
-      when '.avi'
-          return 'video/x-msvideo'
-      when '.mov'
-          return 'video/quicktime'
-      when '.mp4'
-          return 'video/mp4'
+    # Video things
+    when '.avi'
+      return 'video/x-msvideo'
+    when '.mov'
+      return 'video/quicktime'
+    when '.mp4'
+      return 'video/mp4'
 
-      # Other stuff
-      when '.doc'
-          return 'application/msword'
-      when '.pdf'
-          return 'application/pdf'
+    # Other stuff
+    when '.doc'
+      return 'application/msword'
+    when '.pdf'
+      return 'application/pdf'
 
-      # Default
-      else
-          return 'application/octet-stream'
-    end
+    # Default
+    else
+      return 'application/octet-stream'
   end
+end

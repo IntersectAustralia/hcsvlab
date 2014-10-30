@@ -14,12 +14,14 @@ And /^I ingest "([^:]*):([^:]*)"$/ do |corpus, prefix|
 end
 
 And /^I reindex all$/ do
-  Item.all.each do |anItem|
-    begin
-      Solr_Worker.new.on_message("index #{anItem.id}")
-    rescue Exception => e
-      # Do nothing
-    end
+  solr_worker = Solr_Worker.new
+  Item.pluck(:id).each do |id|
+    # begin
+      solr_worker.on_message("index #{id}")
+    # rescue Exception => e
+    #
+    #   # Do nothing
+    # end
   end
 end
 

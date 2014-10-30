@@ -934,7 +934,7 @@ class CatalogController < ApplicationController
   #
   def wrapped_enforce_show_permissions(opts={})
     begin
-      # enforce_show_permissions(opts)
+      enforce_show_permissions(opts)
     rescue Hydra::AccessDenied => e
       respond_to do |format|
         format.html { raise e }

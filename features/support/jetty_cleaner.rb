@@ -26,22 +26,10 @@ at_exit do
 end
 
 Before do |scenario|
+  clear_jetty
   if scenario.instance_of?(Cucumber::Ast::Scenario)
-    shouldCleanBeforeScenario = scenario.feature_tags.tags.select { |t| "@ingest_qa_collections".eql? t.name.to_s }.empty?
-
-    if (shouldCleanBeforeScenario)
-      clear_jetty
-      $alreadyIngested = false
-
+    if scenario.feature_tags.tags.collect(&:name).include?("@ingest_qa_collections")
+      ingest_test_collections
     end
-  else
-    clear_jetty
-  end
-end
-
-Before('@ingest_qa_collections') do
-  if (!$alreadyIngested)
-    ingest_test_collections
-    $alreadyIngested = true
   end
 end

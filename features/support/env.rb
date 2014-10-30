@@ -42,24 +42,6 @@ rescue NameError
   raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
 end
 
-# You may also want to configure DatabaseCleaner to use different strategies for certain features and scenarios.
-# See the DatabaseCleaner documentation for details. Example:
-#
-#   Before('@no-txn,@selenium,@culerity,@celerity,@javascript') do
-#     # { :except => [:widgets] } may not do what you expect here
-#     # as Cucumber::Rails::Database.javascript_strategy overrides
-#     # this setting.
-#     DatabaseCleaner.strategy = :truncation
-#   end
-#
-#   Before('~@no-txn', '~@selenium', '~@culerity', '~@celerity', '~@javascript') do
-#     DatabaseCleaner.strategy = :transaction
-#   end
-#
-
-# Possible values are :truncation and :transaction
-# The :transaction strategy is faster, but might give you threading problems.
-# See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
 #Cucumber::Rails.logger.level = Logger::ERROR
@@ -69,22 +51,22 @@ require 'capybara/poltergeist'
 # for spreewald's table comparison steps
 require 'spreewald/table_steps'
 
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(app, {debug: false})
-end
-
-Capybara.register_driver :poltergeist_debug do |app|
-  Capybara::Poltergeist::Driver.new(app, {debug: false, :inspector => true})
-end
+# Capybara.register_driver :poltergeist do |app|
+#   Capybara::Poltergeist::Driver.new(app, {debug: false})
+# end
+#
+# Capybara.register_driver :poltergeist_debug do |app|
+#   Capybara::Poltergeist::Driver.new(app, {debug: false, :inspector => true})
+# end
+#
+# Capybara.register_driver :selenium do |app|
+#   Capybara::Selenium::Driver.new(app, :browser => :chrome)
+# end
+# Capybara.current_driver = :chrome
 
 Capybara.javascript_driver = :poltergeist
-
-#Capybara.javascript_driver = :poltergeist_debug
-#Capybara.javascript_driver = :selenium
-
-#Before do |scenario|
-#  puts "Starting Scenario: #{scenario.name}"
-#end
+# Capybara.javascript_driver = :poltergeist_debug
+# Capybara.javascript_driver = :selenium
 
 def set_html_request
   begin

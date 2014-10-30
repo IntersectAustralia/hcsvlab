@@ -18,9 +18,9 @@ Then /^I should get the following security outcomes$/ do |table|
 end
 
 Given /^I have the usual roles and permissions$/ do
-  Role.create!(:name => Role::SUPERUSER_ROLE)
-  Role.create!(:name => Role::RESEARCHER_ROLE)
-  Role.create!(:name => Role::DATA_OWNER_ROLE)
+  Role.find_or_create_by_name!(Role::SUPERUSER_ROLE)
+  Role.find_or_create_by_name!(Role::RESEARCHER_ROLE)
+  Role.find_or_create_by_name!(Role::DATA_OWNER_ROLE)
 end
 
 Given /^I have user "(.*)" with the following groups$/ do |userMail, table|
@@ -36,7 +36,7 @@ Given /^I have user "(.*)" with the following groups$/ do |userMail, table|
     end
 
     # Id the collection has no licence set, we will create one
-    if (col.licence.nil?)
+    if col.licence.nil?
       l1 = Licence.new
       l1.name = "Licence 1"
       l1.text = "Text Licence 1"

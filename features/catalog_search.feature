@@ -11,7 +11,6 @@ Feature: Searching for items
     Given I have users
       | email                       | first_name | last_name |
       | researcher@intersect.org.au | Researcher | One       |
-      | data_owner@intersect.org.au | Researcher | One       |
     Given I have user "researcher@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
@@ -19,7 +18,6 @@ Feature: Searching for items
       | ice            | read       |
       | custom         | read       |
     And "researcher@intersect.org.au" has role "researcher"
-    And "data_owner@intersect.org.au" has role "data_owner"
     And I am logged in as "researcher@intersect.org.au"
     And I am on the home page
 

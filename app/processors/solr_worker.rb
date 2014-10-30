@@ -71,10 +71,15 @@ class Solr_Worker < ApplicationProcessor
     object = parse[1]
 
     case command
-    when "index"
-      index_item(object)
-    when "delete"
-      delete(object)
+      when "index"
+        begin
+          index_item(object)
+        rescue Exception => e
+          error("Solr Worker", e.message)
+          error("Solr Worker", e.backtrace)
+        end
+      when "delete"
+        delete(object)
     else
       error("Solr_Worker", "unknown instruction: #{command}")
       return
@@ -97,21 +102,14 @@ private
   def index_item(object)
     item = Item.find(object)
     collection = item.collection
-
-    begin
-      server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(collection.name)
-      raise Exception.new "Repository not found - #{collection.name}" if repository.nil?
-    rescue => e
-      error("Solr Worker", e.message)
-      error("Solr Worker", e.backtrace)
-      return
-    end
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repository = server.repository(collection.name)
+    raise Exception.new "Repository not found - #{collection.name}" if repository.nil?
 
     rdf_uri = RDF::URI.new(item.uri)
     basic_results = repository.query(:subject => rdf_uri)
     extras = {MetadataHelper::TYPE => [], MetadataHelper::EXTENT => [], "date_group_facet" => []}
-    internalUseData = {:documents_path => []}
+    internal_use_data = {:documents_path => []}
 
     # Get date group if there is one
     date_result = repository.query(:subject => rdf_uri, :predicate => MetadataHelper::CREATED)
@@ -132,7 +130,6 @@ private
       warning("Solr_Worker", "caught exception fetching full_text for: #{object}")
       full_text = ""
     end
-
     # Get document info
     document_results = repository.query(:subject => rdf_uri, :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
 
@@ -145,10 +142,10 @@ private
 
       extras[MetadataHelper::EXTENT] << doc_info[MetadataHelper::EXTENT][0].to_s unless doc_info[MetadataHelper::EXTENT].nil?
 
-      internalUseData[:documents_path] << doc_info[MetadataHelper::SOURCE][0].to_s unless doc_info[MetadataHelper::SOURCE].nil?
+      internal_use_data[:documents_path] << doc_info[MetadataHelper::SOURCE][0].to_s unless doc_info[MetadataHelper::SOURCE].nil?
     }
 
-    store_results(object, basic_results, full_text, extras, internalUseData, collection)
+    store_results(object, basic_results, full_text, extras, internal_use_data, collection)
     item.indexed_at = Time.now
     item.save!
   end
@@ -172,7 +169,7 @@ private
   #
   # Make a Solr document from information extracted from the Item
   #
-  def make_solr_document(object, results, full_text, extras, internalUseData, collection)
+  def make_solr_document(object, results, full_text, extras, internal_use_data, collection)
     document = {}
     configured_fields_found = Set.new
     ident_parts = {collection: "Unknown Collection", identifier: "Unknown Identifier"}
@@ -244,9 +241,6 @@ private
       logger.debug "\tAdding configured field #{:full_text} with value #{trim(full_text, 128)}"
       ::Solrizer::Extractor.insert_solr_field_value(document, :full_text, full_text)
     end
-    default_il = ['0']
-    #debug("Solr_Worker", "Adding configured field #{:item_lists} with value #{default_il}")
-    #::Solrizer::Extractor.insert_solr_field_value(document, :item_lists, default_il)
     debug("Solr_Worker", "Adding configured field #{:id} with value #{object}")
     ::Solrizer::Extractor.insert_solr_field_value(document, :id, object)
     ident = ident_parts[:collection] + ":" + ident_parts[:identifier]
@@ -260,6 +254,7 @@ private
     ::Solrizer::Extractor.insert_solr_field_value(document, :'read_access_group_ssim', "#{ident_parts[:collection]}-read")
     debug("Solr_Worker", "Adding edit Permission field for group with value #{ident_parts[:collection]}-edit")
     ::Solrizer::Extractor.insert_solr_field_value(document, :'edit_access_group_ssim', "#{ident_parts[:collection]}-edit")
+
     #Create user permission fields
     data_owner = collection.owner.email
     if data_owner
@@ -276,7 +271,7 @@ private
       add_field(document, field, "unspecified", nil) unless configured_fields_found.include?(field)
     }
 
-    add_json_metadata_field(document, internalUseData)
+    add_json_metadata_field(document, internal_use_data)
 
     document
   end
@@ -284,31 +279,31 @@ private
   #
   #
   #
-  def add_json_metadata_field(document, internalUseData)
+  def add_json_metadata_field(document, internal_use_data)
     itemInfo = create_display_info_hash(document)
     # Removes id, item_list, *_ssim and *_sim fields
     #metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|item_lists|id)$/)}
     metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|id)$/)}
 
     # create a mapping with the documents locations {filename => fullPath}
-    documentsLocations = {}
+    documents_locations = {}
     #documentsPath = Hash[*document.select{|key, value| key.to_s.match(/#{MetadataHelper.short_form(MetadataHelper::SOURCE.to_s)}_.*/)}.first]
-    documentsPath = internalUseData[:documents_path]
+    documents_path = internal_use_data[:documents_path]
 
-    if (documentsPath.present?)
-      documentsPath.each do |path|
-        documentsLocations[File.basename(path).to_s] = path.to_s
+    if documents_path.present?
+      documents_path.each do |path|
+        documents_locations[File.basename(path).to_s] = path.to_s
       end
     end
 
-    jsonMetadata = {catalog_url:itemInfo.catalog_url,
+    json_metadata = {catalog_url:itemInfo.catalog_url,
             metadata:metadata,
             primary_text_url:itemInfo.primary_text_url,
             annotations_url:itemInfo.annotations_url,
             documents: itemInfo.documents,
-            documentsLocations: documentsLocations}.to_json
+            documentsLocations: documents_locations}.to_json
 
-    ::Solrizer::Extractor.insert_solr_field_value(document, 'json_metadata', jsonMetadata.to_s)
+    ::Solrizer::Extractor.insert_solr_field_value(document, 'json_metadata', json_metadata.to_s)
 
   end
 
@@ -322,7 +317,7 @@ private
       debug("Solr_Worker", "WARNING: Vocab not defined for field #{field} (#{binding[:predicate].to_s}). Please update it in /lib/rdf/vocab.")
     end
 
-    solr_name = (@@configured_fields.include?(field)) ? field : "#{field}_tesim"
+    solr_name = @@configured_fields.include?(field) ? field : "#{field}_tesim"
 
     if ItemMetadataFieldNameMapping.create_or_update_field_mapping(solr_name, rdf_field_name, format_key(field))
       debug("Solr_Worker", "Creating new mapping for field #{solr_name}")
@@ -357,8 +352,7 @@ private
     #  end
     #end
 
-    xml_update = "";
-    xml_update << "<add overwrite='true' allowDups='false'> <doc>"
+    xml_update = "<add overwrite='true' allowDups='false'> <doc>"
       
     document.keys.each do | key |
     
@@ -396,9 +390,9 @@ private
   #
   # Update Solr with the information we've found
   #
-  def store_results(object, results, full_text, extras = nil, internalUseData, collection)
+  def store_results(object, results, full_text, extras = nil, internal_use_data, collection)
     get_solr_connection
-    document = make_solr_document(object, results, full_text, extras, internalUseData, collection)
+    document = make_solr_document(object, results, full_text, extras, internal_use_data, collection)
     if object_exists_in_solr?(object)
       debug("Solr_Worker", "Updating " + object.to_s)
       xml_update = make_solr_update(document)
