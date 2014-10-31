@@ -114,9 +114,9 @@ class ItemListsController < ApplicationController
       end
     else
       name = params[:item_list][:name]
-      item_list = current_user.item_lists.find_by_name(name)
+      @item_list = current_user.item_lists.find_or_initialize_by_name(name)
       inject_user_and_ability_to_item_list
-      if item_list.nil?
+      if @item_list.new_record?
         if params[:all_items] == 'true'
           documents = @item_list.get_all_items_from_search(params[:query_all_params])
           documents = documents.map { |d| d['handle'] }
