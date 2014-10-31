@@ -6,6 +6,15 @@ tasks.delete 'jetty:start'
 
 namespace :jetty do
 
+  task :reset_all do
+    Rake::Task['a13g:stop_pollers'].invoke
+    Rake::Task['jetty:stop'].invoke
+    Rake::Task['jetty:clean'].invoke
+    Rake::Task['jetty:config'].invoke
+    Rake::Task['jetty:start'].invoke
+    Rake::Task['a13g:start_pollers'].invoke
+  end
+
   task :config => :environment do
     puts "Alveo jetty config task"
 

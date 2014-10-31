@@ -3,9 +3,9 @@
 # .NET, PHP, Python and Node applications with deep visibility and low
 # overhead.  For more information, visit www.newrelic.com.
 #
-# Generated July 04, 2014
+# Generated October 31, 2014
 #
-# This configuration file is custom generated for Intersect Australia_2
+# This configuration file is custom generated for Intersect Australia Limited
 
 
 # Here are the settings that are common to all environments
@@ -15,7 +15,7 @@ common: &default_settings
   # You must specify the license key associated with your New Relic
   # account.  This key binds your Agent's data to your account in the
   # New Relic service.
-  license_key: ''
+  license_key: '441c8b58a40dab9bbe04ceabcfabd9da0242d2c5'
 
   # Agent Enabled (Ruby/Rails Only)
   # Use this setting to force the agent to run or not run.
@@ -41,6 +41,13 @@ common: &default_settings
   #   app_name:
   #       - Ajax Service
   #       - All Services
+  #
+  # Caution: If you change this name, a new application will appear in the New
+  # Relic user interface with the new name, and data will stop reporting to the
+  # app with the old name.
+  #
+  # See https://newrelic.com/docs/site/renaming-applications for more details
+  # on renaming your New Relic applications.
   #
   app_name: Alveo
 
@@ -120,7 +127,7 @@ common: &default_settings
     # Transaction tracer is enabled by default. Set this to false to
     # turn it off. This feature is only available at the Professional
     # and above product levels.
-    enabled: true
+    enabled: false
 
     # Threshold in seconds for when to collect a transaction
     # trace. When the response time of a controller action exceeds
@@ -158,7 +165,7 @@ common: &default_settings
     # Error collector is enabled by default. Set this to false to turn
     # it off. This feature is only available at the Professional and above
     # product levels.
-    enabled: true
+    enabled: false
 
     # To stop specific errors from reporting to New Relic, set this property
     # to comma-separated values.  Default is to ignore routing errors,
@@ -184,7 +191,7 @@ common: &default_settings
 development:
   <<: *default_settings
   # Turn on communication to New Relic service in development mode
-  monitor_mode: false
+  monitor_mode: true
   app_name: Alveo (Development)
 
   # Rails Only - when running in Developer Mode, the New Relic Agent will
@@ -211,16 +218,6 @@ production:
 # Many applications have a staging environment which behaves
 # identically to production. Support for that environment is provided
 # here.  By default, the staging environment has the agent turned on.
-staging:
-  <<: *default_settings
-  monitor_mode: true
-  app_name: Alveo (Staging 1)
-
-staging2:
-  <<: *default_settings
-  monitor_mode: true
-  app_name: Alveo (Staging 2)
-
 qa:
   <<: *default_settings
   monitor_mode: true
@@ -230,3 +227,13 @@ qa2:
   <<: *default_settings
   monitor_mode: true
   app_name: Alveo (QA 2)
+
+staging:
+  <<: *default_settings
+  monitor_mode: true
+  app_name: Alveo (Staging 1)
+
+staging2:
+  <<: *default_settings
+  monitor_mode: true
+  app_name: Alveo (Staging 2)

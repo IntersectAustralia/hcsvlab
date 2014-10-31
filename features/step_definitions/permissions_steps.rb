@@ -37,14 +37,13 @@ Given /^I have user "(.*)" with the following groups$/ do |userMail, table|
 
     # Id the collection has no licence set, we will create one
     if col.licence.nil?
-      l1 = Licence.new
-      l1.name = "Licence 1"
+      l1 = Licence.find_or_create_by_name("Licence 1")
       l1.text = "Text Licence 1"
       l1.owner = user
-      l1.save
+      l1.save!
 
       col.licence = l1
-      col.save
+      col.save!
     end
 
     user.add_agreement_to_collection(col, row[:accessType])

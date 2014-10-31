@@ -10,6 +10,7 @@ class ItemList < ActiveRecord::Base
 
   FIXNUM_MAX = 2147483647
   CONCORDANCE_PRE_POST_CHUNK_SIZE = 7
+  GROUP_SIZE = 2500
 
   belongs_to :user
   attr_accessible :name, :id, :user_id, :shared
@@ -19,7 +20,8 @@ class ItemList < ActiveRecord::Base
 
   before_save :default_values
 
-  has_many :items_in_item_lists
+  has_many :items_in_item_lists, dependent: :delete_all
+  has_many :items, through: :items_in_item_lists
   #
   # Class variables for information about Solr
   #
@@ -56,27 +58,15 @@ class ItemList < ActiveRecord::Base
   #
   # Get the documents ids from given search parameters
   #
-  def getAllItemsFromSearch(search_params)
+  def get_all_items_from_search(search_params)
     get_solr_connection
 
     params = eval(search_params)
-    max_rows = 1000
-    params['rows'] = max_rows
+    params['rows'] = FIXNUM_MAX
+    params['fl'] = 'id,handle'
     response = @@solr.get('select', params: params)
 
-    # If there are more rows in Solr than we asked for, increase the number we're
-    # asking for and ask for them all this time. Sadly, there doesn't appear to be
-    # a "give me everything" value for the rows parameter.
-    if response["response"]["numFound"] > max_rows
-      params['rows'] = response["response"]["numFound"]
-      response = @@solr.get('select', params: params)
-    end
-
-    docs = Array.new
-    response["response"]["docs"].each do |d|
-      docs.push({id: d['id'], handle: d['handle']})
-    end
-    return docs
+    response["response"]["docs"]
   end
 
   #
@@ -84,7 +74,7 @@ class ItemList < ActiveRecord::Base
   # Return an array of Strings.
   #
   def get_item_handles
-    self.items_in_item_lists.order(:item).pluck(:item)
+    self.items_in_item_lists.order(:handle).pluck(:handle)
   end
 
   #
@@ -106,7 +96,7 @@ class ItemList < ActiveRecord::Base
 
     if handles.present?
       params = {:start => start_value, :rows => rows, "facet.field" => "collection_name_facet"}
-      document_list, response = SearchUtils.retrieveDocumentsFromSolr(params, handles)
+      document_list, response = SearchUtils.retrieve_documents_from_solr(params, handles)
     else
       response = {}
       response['response'] = {'numFound' => 0, 'start' => 0, 'docs' => []}
@@ -120,62 +110,39 @@ class ItemList < ActiveRecord::Base
   # their ids. Don't add an Item which is already part of this ItemList.
   # Return a Set of the ids of the Items which were added.
   def add_items(item_handles)
+
     get_solr_connection
 
     bench_start = Time.now
 
-    adding = Set.new(item_handles.map(&:to_s))
-    adding.subtract(get_item_handles)
+    # TODO Confirm if we sohuld find Items that the user has read access to
+    # licence_ids = UserLicenceAgreement.where(user_id: current_user.id).pluck('distinct licence_id')
+    # t = Collection.arel_table
+    # collection_ids = Collection.where(t[:licence_id].in(licence_ids).or(t[:owner_id].eq(current_user.id))).pluck(:id)
+    # adding = Item.indexed.where(collection_id: collection_ids, handle: item_handles - get_item_handles).pluck(:handle)
 
-    # The variable adding now contains only the new ids
-    # TODO do we really need to check that every item one by one?
+    # Find items that exist in solr
+    adding = Item.indexed.where(handle: item_handles - get_item_handles).pluck(:handle)
 
-    verified_handles = []
-    adding.each { |handle|
-      # Get the specified Item's Solr Document
-      params = {:q => "handle:#{RSolr.escape(handle.to_s)}"}
-      response = @@solr.get('select', params: params)
-
-      # Check that we got something useful...
-      if response == nil
-        Rails.logger.warn "No response from Solr when searching for Item #{handle}"
-      elsif response["response"] == nil
-        Rails.logger.warn "Badly formed response from Solr when searching for Item #{handle}"
-      elsif response["response"]["numFound"] == 0
-        Rails.logger.warn "Cannot find Item #{handle} in Solr"
-        adding.delete(handle)
-      elsif response["response"]["numFound"] > 1
-        Rails.logger.warn "Multiple documents for Item #{handle} in Solr"
-      else
-        #... and if we did, update it
-        verified_handles << {item: response['response']['docs'].first['handle']}
-      end
+    timestamp = ActiveRecord::Base::sanitize(Time.now)
+    adding.in_groups_of(GROUP_SIZE, false) { |handles|
+      inserts = handles.collect { |handle| "(#{ActiveRecord::Base::sanitize(handle)}, #{self.id}, #{timestamp}, #{timestamp})" }
+      sql = "INSERT INTO items_in_item_lists (handle, item_list_id, created_at, updated_at) VALUES #{inserts.join(", ")}"
+      connection.execute sql
     }
-
-    if verified_handles.present?
-      self.items_in_item_lists.create(verified_handles)
-    end
 
     bench_end = Time.now
     Rails.logger.debug("Time for adding #{adding.size} items to an item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
     profiler = ["Time for adding #{adding.size} items to an item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
-    return {addedItems: adding, profiler: profiler}
-  end
-
-  #
-  #
-  #
-  def remove_items_by_handle(item_handles)
-    item_handles = [item_handles] if item_handles.is_a?(String)
-    self.items_in_item_lists.where(item: item_handles).delete_all
+    {addedItems: adding, profiler: profiler}
   end
 
   #
   # Remove all Items from this ItemList.
   #
   def clear
-    remove_items_by_handle(get_item_handles)
+    ItemsInItemList.where(item_list_id: self.id).delete_all
   end
 
   #
@@ -211,7 +178,7 @@ class ItemList < ActiveRecord::Base
     params[:q] = "{!qf=full_text pf=''}#{search_for}"
     params[:rows] = FIXNUM_MAX
 
-    document_list, response = SearchUtils.retrieveDocumentsFromSolr(params, handles)
+    document_list, response = SearchUtils.retrieve_documents_from_solr(params, handles)
 
     process_bench_start = Time.now
 
@@ -268,14 +235,10 @@ class ItemList < ActiveRecord::Base
   # has at least read access rights.
   #
   def get_authorised_item_handles
-    valid_items = []
-
-    handles = get_item_handles
-    if handles
-      valid_items = validate_items(handles)
-    end
-
-    valid_items
+    licence_ids = UserLicenceAgreement.where(user_id: current_user.id).pluck('distinct licence_id')
+    t = Collection.arel_table
+    collection_ids = Collection.where(t[:licence_id].in(licence_ids).or(t[:owner_id].eq(current_user.id))).pluck(:id)
+    self.items.indexed.where(collection_id: collection_ids).pluck(:handle)
   end
 
   #
@@ -293,28 +256,6 @@ class ItemList < ActiveRecord::Base
   end
 
   private
-
-  #
-  # This method will filter the item handles for which the current user has not granted access
-  # TODO refactor this to look at user licence agreements instead?
-  def validate_items(handles, batch_group =50)
-    valids = []
-    handles.in_groups_of(batch_group, false) do |groupOfItemsHandle|
-      # create disjunction condition with the items Ids
-      condition = groupOfItemsHandle.map { |itemHandle| "handle:\"#{itemHandle.gsub(":", "\:")}\"" }.join(" OR ")
-
-      params = {}
-      params[:q] = condition
-      params[:rows] = FIXNUM_MAX
-
-      (response, document_list) = get_search_results params
-      document_list.each do |aDoc|
-        valids << aDoc[:handle]
-      end
-
-    end
-    valids
-  end
 
   #
   # Process the documents returned in the concordance search, it highlights the searched term and

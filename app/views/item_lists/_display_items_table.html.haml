@@ -18,24 +18,23 @@
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
           %li
             = link_to("Download as ZIP", {:controller => "item_lists", :action => "show", :format=>"zip"}, :method => 'GET', :id => params[:id].to_i, :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);')
-          - if (@item_list.user_id == current_user.id)
+          - if @item_list.user_id == current_user.id
             %li
-              - if (@item_list.shared?)
+              - if @item_list.shared?
                 = link_to("Stop Sharing", {:controller => "item_lists", :action => "unshare"}, :method => 'POST', :id => params[:id].to_i)
               -else
                 = link_to("Share", {:controller => "item_lists", :action => "share"}, :method => 'POST', :id => params[:id].to_i)
-      - if (@document_list.empty?)
-      - else
+      - unless @document_list.empty?
         = render 'catalog/paginate_compact'
         = render 'catalog/per_page_widget'
-    - if (@document_list.empty?)
+    - if @document_list.empty?
       .info
         Item List is
         %strong empty
         %a.close{"data-dismiss" => "alert", :href => "#"} ×
     - else
       = render 'galaxy_link', :title => "Use Item List in Galaxy "
-      - if (!@message.nil?)
+      - unless @message.nil?
         %span{class:"info alert-info", :style=>"display:block; text-align:center"}
           =@message
           ="This is because you do not have access to the following collections: #{@missing_collections}."

@@ -13,7 +13,7 @@ module FrequencySearchHelper
     def executeFrequencySearchOnSimpleTerm(query, facet, itemList)
       bench_start = Time.now
 
-      handles = itemList.get_authorised_item_handles()
+      handles = itemList.get_authorised_item_handles
 
       params = {}
       params[:'facet.field'] = facet
@@ -24,7 +24,7 @@ module FrequencySearchHelper
       # Merge the base parameters with some extra parameters needed for the search
       mergedParams = params.merge(add_frequency_solr_extra_filters({}, params))
       # Send request to solr and retrieve the results.
-      document_list, response = SearchUtils.retrieveDocumentsFromSolr(mergedParams, handles)
+      document_list, response = SearchUtils.retrieve_documents_from_solr(mergedParams, handles)
 
       all_facet_fields = response[:facet_counts][:facet_fields]
 
@@ -60,7 +60,7 @@ module FrequencySearchHelper
       # Merge the base parameters with some extra parameters needed for the search
       mergedParams = params.merge(add_frequency_solr_extra_filters({}, params))
       # Send request to solr and retrieve the results.
-      document_list, response = SearchUtils.retrieveDocumentsFromSolr(mergedParams, handles)
+      document_list, response = SearchUtils.retrieve_documents_from_solr(mergedParams, handles)
 
       facet_fields = response[:facet_counts][:facet_fields]
       highlighting = response[:highlighting]
@@ -177,7 +177,7 @@ module FrequencySearchHelper
     def executeFrequencySearchOnComplexTerm(query, facet, itemList)
       bench_start = Time.now
 
-      handles = itemList.get_authorised_item_handles()
+      handles = itemList.get_authorised_item_handles
 
       params = {}
       params[:'facet.field'] = facet
@@ -189,7 +189,7 @@ module FrequencySearchHelper
       # Merge the base parameters with some extra parameters needed for the search
       mergedParams = params.merge(add_frequency_solr_extra_filters({}, params))
       # Send request to solr and retrieve the results.
-      document_list, response = SearchUtils.retrieveDocumentsFromSolr(mergedParams, handles)
+      document_list, response = SearchUtils.retrieve_documents_from_solr(mergedParams, handles)
 
       all_facet_fields = response[:facet_counts][:facet_fields]
 
@@ -227,7 +227,7 @@ module FrequencySearchHelper
       # Merge the base parameters with some extra parameters needed for the search
       mergedParams = params.merge(add_frequency_solr_extra_filters({}, params))
       # Send request to solr and retrieve the results.
-      document_list, response = SearchUtils.retrieveDocumentsFromSolr(mergedParams, handles)
+      document_list, response = SearchUtils.retrieve_documents_from_solr(mergedParams, handles)
 
       facet_fields = response[:facet_counts][:facet_fields]
       highlighting = response[:highlighting]
@@ -369,52 +369,52 @@ module FrequencySearchHelper
     # This method will send a request request to solr and retrieve the
     # documents list and the response object
     #
-    def self.retrieveDocumentsFromSolr(params, itemHandles, batch_group=50)
+    def self.retrieve_documents_from_solr(params, item_handles, batch_group=50)
       # If the :start and :rows symbols are defined, we need to only search the
       # items handles in that range. Otherwise we search for everything
-      if (params[:start].present? and params[:rows].present?)
-        itemHandlesLimited = itemHandles[params[:start]..params[:start]+params[:rows]-1]
+      if params[:start].present? and params[:rows].present?
+        item_handles_limited = item_handles[params[:start]..params[:start]+params[:rows]-1]
       else
-        itemHandlesLimited = itemHandles
+        item_handles_limited = item_handles
       end
 
-      get_solr_connection()
+      get_solr_connection
       document_list = []
       facet_fields = {}
       highlighting = {}
-      itemHandlesLimited.in_groups_of(batch_group, false) do |groupOfItemHandles|
+      item_handles_limited.in_groups_of(batch_group, false) do |groupOfItemHandles|
         condition = groupOfItemHandles.map{|handle| "handle:\"#{handle.gsub(":", "\:")}\""}.join(" OR ")
 
         # We will filter the results using the :fq query field. If the :d field was not previouly defined
         # we have to set it to *:* in order to bring everything
-        queryParams = {q:"*:*"}
-        queryParams[:fq] = condition
+        query_params = {q: "*:*"}
+        query_params[:fq] = condition
 
         # If the :q parameter was defined, we override the defined *:*
-        queryParams.merge!(params)
+        query_params.merge!(params)
 
         # since we are using :fq parameter, we need to tell solr to make the query from :start=0
         # Otherwise it will apply the :fq restriction and after that will apply the :start one. so
         # if your :fq parameter bring 20 items and your :start is 20, then no items will be returned.
-        queryParams[:start] = 0
+        query_params[:start] = 0
 
-        solrResponse = @@solr.get('select', params: queryParams)
-        response = Blacklight::SolrResponse.new(force_to_utf8(solrResponse), params)
+        solr_response = @@solr.get('select', params: query_params)
+        response = Blacklight::SolrResponse.new(force_to_utf8(solr_response), params)
 
         document_list += response['response']['docs']
 
         # Since we are querying solr in chucks, we need to consolidate the results of each group.
-        facet_fields = consolidateFacetFields(facet_fields, response)
+        facet_fields = consolidate_facet_fields(facet_fields, response)
 
-        if (response['highlighting'].present?)
+        if response['highlighting'].present?
           highlighting.merge!(response['highlighting'])
         end
       end
 
       response = {}
-      response['response'] = {'numFound'=>itemHandles.length, 'start'=>((params[:start].present?)?params[:start]:0), 'docs'=>document_list}
+      response['response'] = {'numFound' => item_handles.length, 'start' => ((params[:start].present?) ? params[:start] : 0), 'docs' => document_list}
       response['facet_counts'] = {'facet_fields' => facet_fields}
-      if (!highlighting.empty?)
+      unless highlighting.empty?
         response['highlighting'] = highlighting
       end
       response = Blacklight::SolrResponse.new(force_to_utf8(response), params)
@@ -432,30 +432,30 @@ module FrequencySearchHelper
     # positions contain the name and the add ones contains the count.
     # E.g. ["cooee", 10, "ace" 20]
     #
-    def self.consolidateFacetFields(facet_fields, response)
+    def self.consolidate_facet_fields(facet_fields, response)
       # If we have not fields defined, then just use the ones retrieved
-      if (facet_fields.empty?)
+      if facet_fields.empty?
         facet_fields = response['facet_counts']['facet_fields']
       else
         # Otherwise we need to look for the values in the previously loaded hash
         response['facet_counts']['facet_fields'].each_pair do |key, value|
           # If the facet field was not included, then just use the retrieved one
-          if (!facet_fields.include?(key))
+          unless facet_fields.include?(key)
             facet_fields[key] = value
           else
             # Otherwise, we need to consolidate both arrays adding up in the case
             # where both the arrays contain the same name.
             i = 0
-            while (i < value.length)
+            while i < value.length
               name = value[i]
               count = value[i+1]
               # verify if the array already have the name
-              valuePos = facet_fields[key].index(name)
-              if (valuePos.nil?)
+              value_pos = facet_fields[key].index(name)
+              if value_pos.nil?
                 facet_fields[key] << name
                 facet_fields[key] << count
               else
-                facet_fields[key][valuePos+1] = facet_fields[key][valuePos+1] + count
+                facet_fields[key][value_pos+1] = facet_fields[key][value_pos+1] + count
               end
               i = i +2
             end
@@ -471,7 +471,7 @@ module FrequencySearchHelper
     def self.get_solr_connection
       if @@solr.nil?
         solr_config = Blacklight.solr_config
-        @@solr        = RSolr.connect(solr_config)
+        @@solr = RSolr.connect(solr_config)
       end
     end
 

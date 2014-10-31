@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141029032823) do
+ActiveRecord::Schema.define(:version => 20141031001607) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -84,9 +84,11 @@ ActiveRecord::Schema.define(:version => 20141029032823) do
     t.datetime "indexed_at"
   end
 
+  add_index "items", ["handle"], :name => "index_items_on_handle"
+
   create_table "items_in_item_lists", :force => true do |t|
     t.integer  "item_list_id"
-    t.string   "item"
+    t.string   "handle"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
   end

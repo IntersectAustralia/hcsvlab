@@ -69,11 +69,8 @@ class ItemListsController < ApplicationController
           flash[:error] = "No items in the item list you are trying to download"
           redirect_to @item_list and return
         end
-        
-        # Get the items of the item list
-        itemsHandles = @item_list.get_item_handles
 
-        download_as_zip(itemsHandles, "#{@item_list.name}.zip")
+        download_as_zip(@item_list.get_item_handles, "#{@item_list.name}.zip")
       }
       format.warc {
         if @item_list.get_item_handles.length == 0
@@ -81,10 +78,7 @@ class ItemListsController < ApplicationController
           redirect_to @item_list and return
         end
 
-        # Get the items of the item list
-        itemsHandles = @item_list.get_item_handles
-
-        download_as_warc(itemsHandles, "#{@item_list.name}.warc")
+        download_as_warc(@item_list.get_item_handles, "#{@item_list.name}.warc")
       }
     end
   end
@@ -96,19 +90,14 @@ class ItemListsController < ApplicationController
     if request.format == 'json' and request.post?
       name = params[:name]
       if (!name.nil? and !name.blank? and !(name.length > 255)) and (!params[:items].nil? and params[:items].is_a? Array)
-        item_lists = current_user.item_lists.where(:name => name)
-        if item_lists.empty?
-          @item_list = ItemList.new(:name => name, :user_id => current_user.id)
-          @item_list.save!
-          new_item_list = true
-        else
-          @item_list = item_lists[0]
-          new_item_list = false
-        end
+        @item_list = current_user.item_lists.find_or_initialize_by_name(name)
+        inject_user_and_ability_to_item_list
+        is_new_item_list = @item_list.new_record?
+        @item_list.save!
         ids = params[:items].collect { |x| "#{File.basename(File.split(x).first)}:#{File.basename(x)}" }
-        addItemsResult = add_item_to_item_list(@item_list, ids)
-        added_set = addItemsResult[:addedItems]
-        if new_item_list
+        add_items_result = add_item_to_item_list(@item_list, ids)
+        added_set = add_items_result[:addedItems]
+        if is_new_item_list
           @success_message = "#{added_set.count} items added to new item list #{@item_list.name}"
         else
           @success_message = "#{added_set.count} items added to existing item list #{@item_list.name}"
@@ -125,11 +114,12 @@ class ItemListsController < ApplicationController
       end
     else
       name = params[:item_list][:name]
-      item_lists = current_user.item_lists.find_by_name(name)
-      if (item_lists.nil?)
+      item_list = current_user.item_lists.find_by_name(name)
+      inject_user_and_ability_to_item_list
+      if item_list.nil?
         if params[:all_items] == 'true'
-          documents = @item_list.getAllItemsFromSearch(params[:query_all_params])
-          documents = documents.map{|d| d[:handle]}
+          documents = @item_list.get_all_items_from_search(params[:query_all_params])
+          documents = documents.map { |d| d['handle'] }
         else
           documents = params[:sel_document_ids].split(",")
         end
@@ -140,8 +130,8 @@ class ItemListsController < ApplicationController
         if @item_list.save
           flash[:notice] = 'Item list created successfully'
 
-          addItemsResult = add_item_to_item_list(@item_list, documents)
-          session[:profiler] = addItemsResult[:profiler]
+          add_items_results = add_item_to_item_list(@item_list, documents)
+          session[:profiler] = add_items_results[:profiler]
           redirect_to @item_list and return
         end
         flash[:error] = "Error trying to create an Item list, name too long (max. 255 characters)" if (name.length > 255)
@@ -159,8 +149,8 @@ class ItemListsController < ApplicationController
   #
   def add_items
     if params[:add_all_items] == "true"
-      documents = @item_list.getAllItemsFromSearch(params[:query_params])
-      documents = documents.map{|d| d[:handle]}
+      documents = @item_list.get_all_items_from_search(params[:query_params])
+      documents = documents.map { |d| d['handle'] }
     else
       documents = params[:document_ids].split(",")
     end
@@ -206,8 +196,8 @@ class ItemListsController < ApplicationController
     else
       name = params[:item_list][:name]
       item_lists = current_user.item_lists.find_by_name(name)
-      if (item_lists.nil? or @item_list.name == name)
-        if @item_list.update_attributes(params[:item_list]) 
+      if item_lists.nil? or @item_list.name.eql?(name)
+        if @item_list.update_attributes(params[:item_list])
           flash[:notice] = 'Item list renamed successfully'
           redirect_to @item_list and return
         end
@@ -251,13 +241,12 @@ class ItemListsController < ApplicationController
     bench_start = Time.now
 
     name = @item_list.name
-    removed_set = @item_list.clear
-    @item_list.delete
+    @item_list.destroy
 
     bench_end = Time.now
 
-    Rails.logger.debug("Time for deleting an Item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
-    session[:profiler] = ["Time for deleting an Item list of #{removed_set.size} items: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
+    Rails.logger.debug("Time for deleting an Item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
+    session[:profiler] = ["Time for deleting an Item list: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
     respond_to do |format|
       format.html do
@@ -311,7 +300,7 @@ class ItemListsController < ApplicationController
   def concordance_search
     result = @item_list.doConcordanceSearch(params[:concordance_search_for])
 
-    if (result[:error].nil? or result[:error].empty?)
+    if result[:error].nil? or result[:error].empty?
       @highlighting = result[:highlighting]
       @matchingDocs = result[:matching_docs]
       @profiler = result[:profiler]
@@ -327,7 +316,7 @@ class ItemListsController < ApplicationController
   #
   def frequency_search
     result = @item_list.doFrequencySearch(params[:frequency_search_for], params[:facet])
-    if (result[:error].nil? or result[:error].empty?)
+    if result[:error].nil? or result[:error].empty?
       flash[:error] = nil
       @result = result
     else
@@ -340,15 +329,15 @@ class ItemListsController < ApplicationController
   #
   #
   #
-  def add_item_to_item_list(item_list, documents_handles)
-    item_list.add_items(documents_handles) unless item_list.nil?
+  def add_item_to_item_list(item_list, item_handles)
+    item_list.add_items(item_handles) unless item_list.nil?
   end
 
   #
   #
   #
   def validate_id_parameter
-    if (params[:id].to_i > FIXNUM_MAX)
+    if params[:id].to_i > FIXNUM_MAX
       resource_not_found(Exception.new("Couldn't find ItemList with id=#{params[:id]}"))
     end
   end

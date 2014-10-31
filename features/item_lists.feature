@@ -225,7 +225,6 @@ Feature: Managing Item Lists
     Given I have user "researcher1@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
-      | austlit        | read       |
     Given "researcher1@intersect.org.au" has item lists
       | name       | shared |
       | Share Test | true   |
@@ -233,9 +232,6 @@ Feature: Managing Item Lists
     When I am on the item list page for "Share Test"
     Then the item list "Share Test" should have 4 items
     And I should see "You only have access to 2 out of 4 Items in this shared Item List. This is because you do not have access to the following collections: austlit. To gain access to more Collections, visit the Licence Agreements page."
-
-
-#TODO check output maybe?
 
   Scenario: Sending item list to R
     Given "researcher@intersect.org.au" has item lists
