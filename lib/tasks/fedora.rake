@@ -102,7 +102,7 @@ namespace :fedora do
     collection = Collection.find_by_name(corpus)
     Document.where(item_id: Item.where(collection_id: collection)).delete_all
     Item.where(collection_id: collection).delete_all
-    collection.destroy
+    collection.try(:destroy)
 
     # clear Solr
     uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')

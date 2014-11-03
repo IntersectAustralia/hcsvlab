@@ -81,7 +81,6 @@ gem 'solrizer'
 gem 'rsolr'
 gem "xml-simple"
 gem 'nokogiri'
-gem 'fileutils'
 gem 'mimemagic'
 # gem for showing tabs on pages
 gem "tabs_on_rails"
