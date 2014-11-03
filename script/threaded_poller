@@ -6,8 +6,8 @@
 # this is tested on 1.9.3, and rails 3+
 
 # Make sure stdout and stderr write out without delay for using with daemon like scripts
-STDOUT.sync = true; STDOUT.flush
-STDERR.sync = true; STDERR.flush
+STDOUT.sync = true; STDOUT.flush if STDOUT.respond_to? :flush
+STDERR.sync = true; STDOUT.flush if STDOUT.respond_to? :flush
 
 # we're not going to load rails, but activemessaging does expect there to be an app root
 # this goes back to when it was used in both rails or merb, but work with just not loading a framework

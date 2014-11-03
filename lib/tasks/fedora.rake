@@ -108,7 +108,7 @@ namespace :fedora do
     uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
 
     req = Net::HTTP::Post.new(uri)
-    req.body = "<delete><query>handle:#{corpus}\\:*</query></delete>"
+    req.body = "<delete><query>collection_name_facet:#{corpus}</query></delete>"
 
     req.content_type = "text/xml; charset=utf-8"
     req.body.force_encoding("UTF-8")

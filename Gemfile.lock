@@ -54,7 +54,7 @@ GEM
       rdf-rdfxml (~> 1.0.0)
       rsolr
       rubydora (~> 1.6, >= 1.6.5)
-    activemessaging (0.12.1)
+    activemessaging (0.13.0)
       activemessaging
       activesupport (>= 2.3.11)
     activemodel (3.2.20)

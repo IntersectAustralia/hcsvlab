@@ -394,18 +394,18 @@ private
     get_solr_connection
     document = make_solr_document(object, results, full_text, extras, internal_use_data, collection)
     if object_exists_in_solr?(object)
-      debug("Solr_Worker", "Updating " + object.to_s)
+      info("Solr_Worker", "Updating " + object.to_s)
       xml_update = make_solr_update(document)
       response = @@solr.update :data => xml_update
       debug("Solr_Worker", "Update response= #{response.to_s}")
       response = @@solr.commit
-      debug("Solr_Worker", "Commit response= #{response.to_s}")
+      info("Solr_Worker", "Commit response= #{response.to_s}")
     else
-      debug("Solr_Worker", "Inserting " + object.to_s )
+      info("Solr_Worker", "Inserting " + object.to_s )
       response = @@solr.add(document)
       debug("Solr_Worker", "Add response= #{response.to_s}")
       response = @@solr.commit
-      debug("Solr_Worker", "Commit response= #{response.to_s}")
+      info("Solr_Worker", "Commit response= #{response.to_s}")
     end
   end
 
