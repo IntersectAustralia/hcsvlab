@@ -28,7 +28,7 @@ module FrequencySearchHelper
 
       all_facet_fields = response[:facet_counts][:facet_fields]
 
-      if (all_facet_fields[facet].nil? || all_facet_fields[facet].empty?)
+      if all_facet_fields[facet].blank?
         result = {:status => "NO_FACET_VALUES_DEFINED"}
         return result
       end
@@ -40,7 +40,7 @@ module FrequencySearchHelper
         all_facet_wcs[all_facet_fields[facet][i]] = 0 if i%2 == 0
       }
       document_list.each { |document|
-        if (document[facet].present?)
+        if document[facet].present?
           facet_value = document[facet][0]
           words = document["AUSNC_itemwordcount_tesim"]
           if words.nil?
@@ -193,7 +193,7 @@ module FrequencySearchHelper
 
       all_facet_fields = response[:facet_counts][:facet_fields]
 
-      if (all_facet_fields[facet].nil? || all_facet_fields[facet].empty?)
+      if all_facet_fields[facet].blank?
         result = {:status => "NO_FACET_VALUES_DEFINED"}
         return result
       end
@@ -205,7 +205,7 @@ module FrequencySearchHelper
         all_facet_wcs[all_facet_fields[facet][i]] = 0 if i%2 == 0
       }
       document_list.each { |document|
-        if (document[facet].present?)
+        if document[facet].present?
           facet_value = document[facet][0]
           words = document["AUSNC_itemwordcount_tesim"]
           if words.nil?

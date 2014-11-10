@@ -1,0 +1,10 @@
+%h2 Usage Metrics
+= render 'metrics_table'
+= link_to 'Download all weeks as CSV', download_metrics_path, :class => 'btn'
+%br
+%br
+= render 'users/user_metrics'
+/ = render 'triplestore_metrics'
+= render 'shared/modal_waiting_panel'
+= render 'shared/nectar_attribution'
+= render 'shared/profiler'

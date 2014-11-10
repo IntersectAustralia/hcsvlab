@@ -28,6 +28,31 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def metrics
+    @metrics = MetricCalculator.get_latest_metrics
+
+    @triplestore_metrics = MetricCalculator.get_triplestore_metrics
+    @approved_researcher_count = User.approved_researchers.count
+    @total_weekly_visits_count = UserHelper::get_total_weekly_visits
+    @total_weekly_duration_count = UserHelper::get_total_weekly_duration
+    @average_weekly_visits_count = UserHelper::get_average_frequency_visits
+    @average_weekly_duration_count = UserHelper::get_average_weekly_duration
+  end
+
+  def metrics_download
+    metrics = MetricCalculator.get_metrics
+
+    file = Tempfile.new("newfile")
+    unless metrics.empty?
+      file.puts metrics.first.keys.to_csv
+      metrics.each do |metric|
+        file.puts metric.values.join(",")
+      end
+    end
+    file.close
+    send_file file.path, :filename => "metrics.csv", :disposition => "attachment"
+  end
+
   private
   def get_api_key
     params.delete(:api_key)

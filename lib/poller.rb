@@ -14,6 +14,7 @@ end
 
 Rails.logger = Logger.new(STDOUT)
 ActiveMessaging.logger = Rails.logger
+ActiveMessaging.logger.level = ActiveSupport::BufferedLogger.const_get(Rails.configuration.log_level.to_s.upcase)
 
 # Load ActiveMessaging
 ActiveMessaging::load_processors

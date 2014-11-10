@@ -172,11 +172,9 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
     type = result["type"]
 
     file_name = last_bit(source)
-    existing_doc = item.documents.find_by_file_name(file_name)
-    if existing_doc.blank?
+    doc = item.documents.find_or_initialize_by_file_name(file_name)
+    if doc.new_record?
       begin
-        doc = Document.new
-        doc.file_name = file_name
         doc.file_path = path
         doc.doc_type      = type
         doc.mime_type = mime_type_lookup(file_name)
@@ -190,7 +188,7 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
         logger.error("Error creating document: #{e.message}")
       end
     else
-      update_document(existing_doc.first, item, file_name, identifier, source, type, corpus_dir)
+      update_document(doc.first, item, file_name, identifier, source, type, corpus_dir)
     end
   end
 

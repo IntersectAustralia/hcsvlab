@@ -141,7 +141,7 @@ module NavigationHelpers
         user_licence_requests_path(options)
 
       when /^the view metrics page$/
-        view_metrics_admin_index_path(options)
+        view_metrics_path(options)
 
       when /^the share item list page for "([^"]*)"$/
         item_list = ItemList.find_by_name($1)

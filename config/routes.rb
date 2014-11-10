@@ -6,6 +6,8 @@ HcsvlabWeb::Application.routes.draw do
   root :to => "catalog#index"
 
   get "version", :to => "application#version"
+  get "metrics", :to => 'application#metrics', :as => 'view_metrics'
+  get "metrics/download", :to => 'application#metrics_download', :as => 'download_metrics'
 
   get "/", :to => 'catalog#index', :as => 'catalog_index'
   get "catalog/advanced_search", :to => 'catalog#advanced_search', :as => 'catalog_advanced_search'
@@ -123,11 +125,6 @@ HcsvlabWeb::Application.routes.draw do
 
       resources :licences, :only => [:index, :new, :create], :path => "/licences" do
         get :index
-
-        #collection do
-        #  get 'newLicenceForm'
-        #  post 'createNewLicence'
-        #end
       end
 
       resources :user_licence_requests, :only => [:index], :path => "/collection_requests" do
@@ -137,8 +134,6 @@ HcsvlabWeb::Application.routes.draw do
         end
       end
 
-      get "metrics", :to => 'admin#metrics', :as => 'view_metrics'
-      get "metrics/download", :to => 'admin#metrics_download', :as => 'download_metrics'
 
     end
   end
