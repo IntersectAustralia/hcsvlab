@@ -115,7 +115,7 @@ class ItemList < ActiveRecord::Base
 
     bench_start = Time.now
 
-    # TODO Confirm if we sohuld find Items that the user has read access to
+    # TODO Confirm if we should find Items that the user has read access to
     # licence_ids = UserLicenceAgreement.where(user_id: current_user.id).pluck('distinct licence_id')
     # t = Collection.arel_table
     # collection_ids = Collection.where(t[:licence_id].in(licence_ids).or(t[:owner_id].eq(current_user.id))).pluck(:id)

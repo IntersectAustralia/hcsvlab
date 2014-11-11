@@ -1,3 +1,4 @@
+#!/bin/sh
 # Set FEDORA_HOME and SOLR_HOME so the tomcat config can access them
 JAVA_OPTS="$JAVA_OPTS -DFEDORA_HOME=$FEDORA_HOME -DSOLR_HOME=$SOLR_HOME"
 

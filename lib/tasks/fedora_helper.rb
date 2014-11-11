@@ -427,12 +427,11 @@ def create_default_licences(root_path = "config")
       l.private = false
 
       l.save!
-
     rescue Exception => e
-      logger.error "Licence Name: #{l.name[0]} not ingested: #{l.errors.messages.inspect}"
+      logger.error "Licence Name: #{l.name} not ingested: #{l.errors.messages.inspect}"
       next
     else
-      logger.info "Licence '#{l.name[0]}' = #{l.id}" unless Rails.env.test?
+      logger.info "Licence '#{l.name}' = #{l.id}" unless Rails.env.test?
     end
 
   end

@@ -5,14 +5,20 @@ Feature: Managing Collection Lists and Licences
   Background:
     Given I have the usual roles and permissions
     Given I have users
-      | email                       | first_name | last_name |
-      | data_owner@intersect.org.au | dataOwner  | One       |
-      | research@intersect.org.au   | research   | student   |
+      | email                        | first_name | last_name |
+      | data_owner@intersect.org.au  | dataOwner  | One       |
+      | data_owner2@intersect.org.au | dataOwner  | Two       |
+      | research@intersect.org.au    | research   | student   |
     Given "data_owner@intersect.org.au" has role "data owner"
-    Given "research@intersect.org.au" has role "researcher"
-    Given I ingest "cooee:1-001"
-    Given I ingest "auslit:adaessa"
-    Given I ingest licences
+    And "data_owner2@intersect.org.au" has role "data owner"
+    And "research@intersect.org.au" has role "researcher"
+    And I ingest "cooee:1-001"
+    And I ingest "auslit:adaessa"
+    And I ingest "ice:S2B-035"
+    And Collections ownership is
+      | collection | owner_email                  |
+      | ice        | data_owner2@intersect.org.au |
+    And I ingest licences
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the licences page
 
@@ -255,6 +261,30 @@ Feature: Managing Collection Lists and Licences
     And I fill in tiny_mce editor with "This is the text of Licence 1"
     And I press "Create"
     Then I should see "Licence name 'Licence 1' already exists"
+    And I fill in "Licence name" with "AusNC Terms of Use"
+    And I fill in tiny_mce editor with "This is the text of Licence 1"
+    And I press "Create"
+    Then I should see "Licence name 'AusNC Terms of Use' already exists"
+
+    And I am logged out
+    And I am logged in as "data_owner2@intersect.org.au"
+    And I am on the licences page
+    And The Collection table should have
+      | collection | collection_list | licence     | licence_terms |
+      | ice        |                 | Add Licence |               |
+    And I click Add Licence for the 1st collection
+    And I follow "Create New"
+    And I fill in "Licence name" with "AusNC Terms of Use"
+    And I fill in tiny_mce editor with "This is the text of Licence 1"
+    And I press "Create"
+    Then I should see "Licence name 'AusNC Terms of Use' already exists"
+    And I fill in "Licence name" with "Licence 1"
+    And I fill in tiny_mce editor with "This is the text of Licence 1"
+    And I press "Create"
+    Then I should see "Licence created successfully"
+    Then The Collection table should have
+      | collection | collection_list | licence   | licence_terms      |
+      | ice        |                 | Licence 1 | View Licence Terms |
 
   @javascript
   Scenario: Create licence with empty name
@@ -268,19 +298,6 @@ Feature: Managing Collection Lists and Licences
     And I fill in tiny_mce editor with "This is the text of Licence 1"
     And I press "Create"
     Then I should see "Licence Name can not be blank"
-
-  @javascript
-  Scenario: Create licence with empty text
-    And The Collection table should have
-      | collection | collection_list | licence     | licence_terms |
-      | austlit    |                 | Add Licence |               |
-      | cooee      |                 | Add Licence |               |
-    And I click Add Licence for the 1st collection
-    And I follow "Create New"
-    And I fill in "Licence name" with "Licence 1"
-    And I fill in tiny_mce editor with ""
-    And I press "Create"
-    Then I should see "Licence Text can not be blank"
 
   @javascript
   Scenario: Change a collection list's privacy status
