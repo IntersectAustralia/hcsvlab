@@ -21,7 +21,7 @@ private
   FOAF_BASE_URI       = 'http://xmlns.com/foaf/0.1/'
   RDF_BASE_URI        = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   LOC_BASE_URI        = 'http://id.loc.gov/vocabulary/relators/'
-  HCSVLAB_BASE_URI    = 'http://hcsvlab.org/vocabulary/'
+  ALVEO_BASE_URI    = 'http://alveo.edu.au/vocabulary/'
 
   AUSTALK_BASE_URI = 'http://ns.austalk.edu.au/'
 
@@ -46,7 +46,7 @@ private
 
     AUSTALK_BASE_URI     => "AUSTALK",
 
-    HCSVLAB_BASE_URI     => "HCSvLab"
+    ALVEO_BASE_URI     => "Alveo"
   }
 
 public
@@ -141,10 +141,10 @@ public
   # HCSVLAB
   #
   COLLECTION = RDF::URI('collection_name_facet') unless const_defined?(:COLLECTION)
-  IDENT      = RDF::URI(HCSVLAB_BASE_URI + 'ident') unless const_defined?(:IDENT)
+  IDENT      = RDF::URI(ALVEO_BASE_URI + 'ident') unless const_defined?(:IDENT)
   HAS_LICENCE= RDF::URI('has_licence') unless const_defined?(:HAS_LICENCE)
-  INDEXABLE_DOCUMENT= RDF::URI(HCSVLAB_BASE_URI + 'indexable_document') unless const_defined?(:INDEXABLE_DOCUMENT)
-  DISPLAY_DOCUMENT  = RDF::URI(HCSVLAB_BASE_URI + 'display_document') unless const_defined?(:DISPLAY_DOCUMENT)
+  INDEXABLE_DOCUMENT= RDF::URI(ALVEO_BASE_URI + 'indexable_document') unless const_defined?(:INDEXABLE_DOCUMENT)
+  DISPLAY_DOCUMENT  = RDF::URI(ALVEO_BASE_URI + 'display_document') unless const_defined?(:DISPLAY_DOCUMENT)
 
   #
   # short_form - return a shortened form of the given uri (which will

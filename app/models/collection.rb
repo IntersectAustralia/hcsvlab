@@ -7,6 +7,8 @@ class Collection < ActiveRecord::Base
   belongs_to :collection_list
   belongs_to :licence
 
+  validates :name, presence: true
+
   def set_licence(licence)
     self.licence = licence
     self.save!

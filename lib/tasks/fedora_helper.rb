@@ -188,7 +188,7 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
         logger.error("Error creating document: #{e.message}")
       end
     else
-      update_document(doc.first, item, file_name, identifier, source, type, corpus_dir)
+      update_document(doc, item, file_name, identifier, source, type, corpus_dir)
     end
   end
 
