@@ -55,7 +55,7 @@ class Solr_Worker < ApplicationProcessor
   # Deal with an incoming message
   #
   def on_message(message)
-    # Expect message to be a command verb followed by the name of a Fedora object
+    # Expect message to be a command verb followed by the id of the Item
     # and then do what the verb says to the object. Complain if the message is
     # badly formed, or we don't understand the command verb.
     
@@ -271,7 +271,7 @@ private
       add_field(document, field, "unspecified", nil) unless configured_fields_found.include?(field)
     }
 
-    add_json_metadata_field(document, internal_use_data)
+    add_json_metadata_field(object, document, internal_use_data)
 
     document
   end
@@ -279,11 +279,11 @@ private
   #
   #
   #
-  def add_json_metadata_field(document, internal_use_data)
-    itemInfo = create_display_info_hash(document)
+  def add_json_metadata_field(object, document, internal_use_data)
+    item_info = create_display_info_hash(document)
     # Removes id, item_list, *_ssim and *_sim fields
     #metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|item_lists|id)$/)}
-    metadata = itemInfo.metadata.delete_if {|key, value| key.to_s.match(/^(.*_sim|.*_ssim|id)$/)}
+    metadata = item_info.metadata.delete_if { |key, value| key.to_s.match(/^(.*_sim|.*_ssim|id)$/) }
 
     # create a mapping with the documents locations {filename => fullPath}
     documents_locations = {}
@@ -295,15 +295,15 @@ private
         documents_locations[File.basename(path).to_s] = path.to_s
       end
     end
-
-    json_metadata = {catalog_url:itemInfo.catalog_url,
-            metadata:metadata,
-            primary_text_url:itemInfo.primary_text_url,
-            annotations_url:itemInfo.annotations_url,
-            documents: itemInfo.documents,
-            documentsLocations: documents_locations}.to_json
-
-    ::Solrizer::Extractor.insert_solr_field_value(document, 'json_metadata', json_metadata.to_s)
+    item = Item.find(object)
+    item.json_metadata = {catalog_url: item_info.catalog_url,
+                          metadata: metadata,
+                          primary_text_url: item_info.primary_text_url,
+                          annotations_url: item_info.annotations_url,
+                          documents: item_info.documents,
+                          documentsLocations: documents_locations}.to_json.to_s
+    item.save!
+    # ::Solrizer::Extractor.insert_solr_field_value(document, 'json_metadata', json_metadata.to_s)
 
   end
 

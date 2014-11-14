@@ -29,10 +29,10 @@
                   #collection_list_detail_dialog.modal-body{:title => "Licence Terms"}
                     #collection_list_detail_content{:readonly => "true"}
                       %table
-                        - coll_list.collections.each do |aCollection|
+                        - coll_list.collections.order(:name).pluck(:name).each do |collection_name|
                           %tr
                             %td
-                              =aCollection.name
+                              =collection_name
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               %td.privacy

@@ -91,7 +91,7 @@ let count=0
 while [ $count -lt 15 -a "$java_status" == "" ]
 do
   sleep 2
-  java_status=`curl -I -u $FEDORA_ADMIN ${JAVA_URL}fedora 2>/dev/null  | head -1 | awk '{print $2}' `
+  java_status=`curl -I ${JAVA_URL}solr 2>/dev/null  | head -1 | awk '{print $2}' `
   let count=count+1
 done
 
@@ -122,7 +122,7 @@ echo "Checking A13g pollers..."
 
 a13g_status=` ps auxw | grep [p]oller | wc -l `
 
-if [ $a13g_status == 2 ]
+if [ $a13g_status == 1 ]
 then
   echo "+ It looks like the A13g pollers are running (processes= $a13g_status)"
 else

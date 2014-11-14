@@ -412,13 +412,15 @@ class CatalogController < ApplicationController
     self.solr_search_params_logic += [:add_unlimited_rows]
 
     # This will allow to search via the API using the parameter q, as it is use via the user-interface
-    if (params[:q].present?)
+    if params[:q].present?
       params[:q] = "{!qf=$all_fields_qf pf=$all_fields_pf}#{params[:q]}"
     end
 
     begin
       (@response, document_list) = get_search_results params
     rescue Exception => e
+      logger.error(e.message)
+      logger.error(e.backtrace)
       respond_to do |format|
         format.any { render :json => {:error => "bad-query"}.to_json, :status => 400 }
       end

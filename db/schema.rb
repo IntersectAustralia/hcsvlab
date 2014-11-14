@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141031001607) do
+ActiveRecord::Schema.define(:version => 20141113045807) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -82,6 +82,7 @@ ActiveRecord::Schema.define(:version => 20141031001607) do
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
     t.datetime "indexed_at"
+    t.text     "json_metadata"
   end
 
   add_index "items", ["handle"], :name => "index_items_on_handle"

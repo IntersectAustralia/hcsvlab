@@ -38,12 +38,13 @@ end
 #
 def sendRequest(method, relative_url, params = {}, req_header = {})
   requestUri = URI(HOST + relative_url)
-
   case method
     when :get
       requestUri.query = URI.encode_www_form(params)
+      puts "GET #{requestUri}"
       req = Net::HTTP::Get.new(requestUri)
     when :post
+      puts "POST #{requestUri}"
       req = Net::HTTP::Post.new(requestUri)
       req["Content-Type"] = "application/json"
       req.body = params.to_json

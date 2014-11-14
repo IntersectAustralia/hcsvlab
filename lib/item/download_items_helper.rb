@@ -126,10 +126,10 @@ module Item::DownloadItemsHelper
     #
     # Creates a WARC file containing all the documents and metadata for the items listed in 'itemHandles'.
     #
-    def get_warc_with_documents_and_metadata(itemHandles, url, &block)
-      if (!itemHandles.nil? and !itemHandles.empty?)
+    def get_warc_with_documents_and_metadata(item_handles, url, &block)
+      if item_handles.present?
         begin
-          info = verifyItemsPermissionsAndExtractMetadata(itemHandles)
+          info = verifyItemsPermissionsAndExtractMetadata(item_handles)
 
           valids = info[:valids]
           invalids = info[:invalids]
@@ -280,11 +280,11 @@ module Item::DownloadItemsHelper
     # Creates a ZIP file containing all the documents and metadata for the items listed in 'itemHandles'.
     # The returned format respect the BagIt format (http://en.wikipedia.org/wiki/BagIt)
     #
-    def get_zip_with_documents_and_metadata_powered(itemHandles)
-      if (!itemHandles.nil? and !itemHandles.empty?)
+    def get_zip_with_documents_and_metadata_powered(item_handles)
+      if item_handles.present?
         begin
 
-          info = verifyItemsPermissionsAndExtractMetadata(itemHandles)
+          info = verifyItemsPermissionsAndExtractMetadata(item_handles)
 
           valids = info[:valids]
           invalids = info[:invalids]
@@ -337,34 +337,31 @@ module Item::DownloadItemsHelper
     #
     #
     #
-    def verifyItemsPermissionsAndExtractMetadata(itemHandles,batch_group=50)
+    def verifyItemsPermissionsAndExtractMetadata(item_handles, batch_group=2500)
       valids = []
       invalids = []
       metadata = {}
 
-      itemHandles.in_groups_of(batch_group, false) do |groupOfItemHandles|
-        # create disjunction condition with the items Ids
-        condition = groupOfItemHandles.map{|itemHandle| "handle:\"#{itemHandle.gsub(":", "\:")}\""}.join(" OR ")
+      licence_ids = UserLicenceAgreement.where(user_id: @current_user.id).pluck('distinct licence_id')
+      t = Collection.arel_table
+      collection_ids = Collection.where(t[:licence_id].in(licence_ids).or(t[:owner_id].eq(current_user.id))).pluck(:id)
 
-        params = {}
-        params[:q] = condition
-        params[:rows] = FIXNUM_MAX
-
-        (response, document_list) = get_search_results params
-        document_list.each do |aDoc|
-          valids << aDoc[:handle]
+      item_handles.in_groups_of(batch_group, false) do |item_handle_group|
+        query = Item.indexed.where(collection_id: collection_ids, handle: item_handle_group).select([:id, :handle, :json_metadata])
+        valids = query.collect(&:handle)
+        query.each do |item|
           begin
-            jsonMetadata = JSON.parse(aDoc['json_metadata'])
+            json = JSON.parse(item.json_metadata)
           rescue
-            Rails.logger.debug("Error parsing json_metadata for document #{aDoc[:id]}")
+            Rails.logger.debug("Error parsing json_metadata for document #{item.id}")
           end
-          metadata[aDoc[:id]] = {}
-          metadata[aDoc[:id]][:files] = jsonMetadata['documentsLocations'].clone.values.flatten
-          jsonMetadata.delete('documentsLocations')
-          metadata[aDoc[:id]][:metadata] = jsonMetadata
+          metadata[item.id] = {}
+          metadata[item.id][:files] = json['documentsLocations'].clone.values.flatten
+          json.delete('documentsLocations')
+          metadata[item.id][:metadata] = json
         end
 
-        invalids += groupOfItemHandles - valids
+        invalids += item_handle_group - valids
 
       end
 
