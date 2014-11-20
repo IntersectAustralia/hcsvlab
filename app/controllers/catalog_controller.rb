@@ -441,32 +441,26 @@ class CatalogController < ApplicationController
     if @item
       @response, @document = get_solr_response_for_doc_id
     end
+
     begin
-
-      if @item.annotation_path.present?
-        begin
-          @anns, @annotates_document = query_annotations(@item, @document, params[:type], params[:label])
-        rescue Exception => e
-          Rails.logger.error(e.message)
-          Rails.logger.error(e.backtrace.join("\n"))
-          respond_to do |format|
-            format.json { render :json => {:error => "error in query parameters"}.to_json, :status => 400 }
-          end
-        end
-
-        respond_to do |format|
-          format.json {}
-        end
-        return
-      end
+      @anns, @annotates_document = query_annotations(@item, @document, params[:type], params[:label])
     rescue Exception => e
       Rails.logger.error(e.message)
       Rails.logger.error(e.backtrace.join("\n"))
-      # Fall through to return Not Found
+      respond_to do |format|
+        format.json { render :json => {:error => "error in query parameters"}.to_json, :status => 400 }
+      end
+      return
     end
+
     respond_to do |format|
-      format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      if @anns.present? and @anns[:annotations].present?
+        format.json {}
+      else
+        format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+      end
     end
+
     bench_end = Time.now
     Rails.logger.debug("Time for retrieving annotations for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")
   end
@@ -478,9 +472,8 @@ class CatalogController < ApplicationController
     begin
       @item = Item.find(params[:id])
 
-      if @item.annotation_path.present?
-        @properties = query_annotation_properties(@item)
-
+      @properties = query_annotation_properties(@item)
+      if @properties.present?
         respond_to do |format|
           format.json {}
         end
@@ -503,15 +496,14 @@ class CatalogController < ApplicationController
     begin
       @item = Item.find(params[:id])
 
-      if @item.annotation_path.present?
-
-        @types = query_annotation_types(@item)
-
+      @types = query_annotation_types(@item)
+      if @types.present?
         respond_to do |format|
           format.json {}
         end
         return
       end
+
     rescue Exception => e
       Rails.logger.error(e.message)
       Rails.logger.error(e.backtrace.join("\n"))
@@ -970,10 +962,10 @@ class CatalogController < ApplicationController
     filters = ""
     user_params.each do |key, value|
       # key must be a uri, if it is add filter to query
-      unless literal_sparql_key(key)
+      if literal_sparql_key(key)
         filters << "FILTER( EXISTS { ?anno #{sparql_item(key)} #{sparql_item(value)} } || EXISTS { ?loc #{sparql_item(key)} #{sparql_item(value)} } "
-        # If searching for non-uri term, we need to search for terms both inclosed in quotes and without
-        filters << "|| EXISTS { ?anno #{sparql_item(key)} #{sparql_item(value)} } || EXISTS { ?loc #{sparql_item(key)} #{sparql_item(value)} } ".gsub("'", "") if literal_sparql_key(value)
+        # If searching for non-uri term, we need to search for terms both enclosed in quotes and without
+        filters << "|| EXISTS { ?anno #{sparql_item(key)} #{sparql_item(value)} } || EXISTS { ?loc #{sparql_item(key)} #{sparql_item(value)} } ".gsub("'", "") unless literal_sparql_key(value)
         filters << ")\n"
       else
         Rails.logger.error("Invalid sparql query subject, must be a URI")
@@ -990,7 +982,7 @@ class CatalogController < ApplicationController
     end
 
     query = "" "
-    #{prefixes}
+      #{prefixes}
       SELECT *
       WHERE {
         ?identifier dc:identifier '#{item_short_identifier}'.
@@ -1051,7 +1043,7 @@ class CatalogController < ApplicationController
 
     display_document = get_display_document(solr_document)
 
-    if !display_document.nil?
+    if display_document.present?
       annotates_document = catalog_document_url(@item.collection.name, filename: display_document[:id])
     else
       annotates_document = catalog_url(@item.collection.name, item_short_identifier)
@@ -1244,10 +1236,7 @@ class CatalogController < ApplicationController
   end
 
   def literal_sparql_key(item)
-    if uri? item or item.include? ":"
-      return false
-    end
-    return true
+    uri? item or item.include? ":"
   end
 
   def uri?(string)

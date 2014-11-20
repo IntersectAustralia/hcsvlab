@@ -24,7 +24,7 @@ end
 
 def ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection)
   unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
-    raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
+    raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, its name doesn't say 'metadata'"
   end
   logger.info "Ingesting item: #{rdf_file}"
 
@@ -107,8 +107,8 @@ def create_collection(collection_name, corpus_dir)
   if Dir.entries(dir).include?(collection_name + ".n3")
     coll_metadata = dir + "/" + collection_name + ".n3"
   else
-    logger.warn "No collection metadata file found - #{dir}/#{collection_name}.n3"
-    return
+    logger.warn "No collection metadata file found - #{dir}/#{collection_name}.n3. Stopping ingest."
+    raise "No collection metadata file found - #{dir}/#{collection_name}.n3"
   end
 
   create_collection_from_file(coll_metadata, collection_name)
@@ -225,6 +225,7 @@ def look_for_annotations(item, metadata_filename)
   annotation_filename = metadata_filename.sub("metadata", "ann")
   return if annotation_filename == metadata_filename # HCSVLAB-441
 
+  #TODO could be removed once we completely rely on the triple store?
   if File.exists?(annotation_filename)
     if item.annotation_path.blank?
       item.annotation_path = annotation_filename

@@ -207,6 +207,9 @@ module Blacklight::CatalogHelperBehavior
     documents = item_documents(document, uris)
     namespaces = RdfNamespace.get_namespaces(solr_item.collection.name)
 
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repo = server.repository(solr_item.collection.name)
+
     if documents.present?
       is_cooee = document[MetadataHelper::short_form(MetadataHelper::COLLECTION)][0] == "cooee"
       type_format = get_type_format(document, is_cooee)
@@ -255,8 +258,6 @@ module Blacklight::CatalogHelperBehavior
 
         #Other fields
         begin
-          server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-          repo = server.repository(solr_item.collection.name)
 
           query = """
             PREFIX dc:<http://purl.org/dc/terms/>
@@ -316,26 +317,44 @@ module Blacklight::CatalogHelperBehavior
     end
 
 
-    itemInfo = ItemInfo.new
+    item_info = ItemInfo.new
     begin
-      itemInfo.catalog_url = catalog_url(collectionName, itemIdentifier)
+      item_info.catalog_url = catalog_url(collectionName, itemIdentifier)
     rescue NoMethodError => e
       # When we create the json metadata from the solr processor, we need to do the following work around
       # to have access to routes URL methods
 
-      itemInfo.catalog_url = Rails.application.routes.url_helpers.catalog_url(collectionName, itemIdentifier, default_url_options)
+      item_info.catalog_url = Rails.application.routes.url_helpers.catalog_url(collectionName, itemIdentifier, default_url_options)
     end
-    itemInfo.metadata = metadataHash
-    itemInfo.primary_text_url = primary_text
+    item_info.metadata = metadataHash
+    item_info.primary_text_url = primary_text
     begin
-      unless solr_item.annotation_path.empty?
-        itemInfo.annotations_url = catalog_annotations_url(collectionName, format: :json)
+
+      item_short_identifier = solr_item.handle.split(":").last
+
+      query = "" "
+        PREFIX dada:<http://purl.org/dada/schema/0.2#>
+        PREFIX dc: <http://purl.org/dc/terms/>
+        SELECT *
+        WHERE {
+            ?identifier dc:identifier '#{item_short_identifier}'.
+            ?annoCol dada:annotates ?identifier .
+            ?anno dada:partof ?annoCol .
+            ?anno a dada:Annotation .
+        }
+      " ""
+
+      sols = repo.sparql_query(query)
+      sols = sols.select(:anno).distinct
+
+      if sols.present?
+        item_info.annotations_url = catalog_annotations_url(collectionName, format: :json)
       end
     rescue NoMethodError => e
       # When we create the json metadata from the solr processor, we need to do the following work around
       # to have access to routes URL methods
       parameters = default_url_options.merge({format: :json})
-      itemInfo.annotations_url = Rails.application.routes.url_helpers.catalog_annotations_url(collectionName, itemIdentifier, parameters)
+      item_info.annotations_url = Rails.application.routes.url_helpers.catalog_annotations_url(collectionName, itemIdentifier, parameters)
     end
     #if (!userAnnotationsData.empty?)
     #  item_info.annotations = {} if item_info.annotations.nil?
@@ -343,9 +362,9 @@ module Blacklight::CatalogHelperBehavior
     #end
 
 
-    itemInfo.documents = documentsData
+    item_info.documents = documentsData
 
-    itemInfo
+    item_info
   end
 
   #
