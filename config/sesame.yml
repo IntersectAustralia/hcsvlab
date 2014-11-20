@@ -3,7 +3,7 @@ development:
 test: &TEST
   url: http://localhost:8983/openrdf-sesame
 qa:
-  url: http://ic2-hcsvlab-test4-vm.intersect.org.au:8080/openrdf-sesame
+  url: http://alveo-qa.intersect.org.au:8080/openrdf-sesame
 qa2:
   url: http://ic2-hcsvlab-qa2-vm.intersect.org.au:8080/openrdf-sesame
 staging:

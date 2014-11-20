@@ -20,9 +20,10 @@ namespace :server_setup do
     end
   end
   task :gem_install, :roles => :app do
-    run "gem install bundler passenger:4.0.0.rc6"
+    run "gem install bundler"
   end
   task :passenger, :roles => :app do
+    run "gem install bundler passenger:4.0.53"
     run "passenger-install-apache2-module -a"
   end
   namespace :config do

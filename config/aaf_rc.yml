@@ -20,7 +20,7 @@ development:
 
 qa:
   <<: *common
-  hostname: https://ic2-hcsvlab-test4-vm.intersect.org.au
+  hostname: https://alveo-qa.intersect.org.au
   secret_token:
   aaf_rc_login_url:
 

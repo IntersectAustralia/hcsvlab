@@ -22,7 +22,7 @@ set :rvm_type, :user
 set :scm, 'git'
 # Uncomment to enable Jetty submodule
 #set :git_enable_submodules, 1
-set :repository, 'git@github.com:IntersectAustralia/hcsvlab.git'
+set :repository, 'https://github.com/IntersectAustralia/hcsvlab.git'
 set :deploy_via, :checkout
 set :copy_exclude, [".git/*", "features/*", "spec/*", "test/*"]
 
