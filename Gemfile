@@ -60,7 +60,7 @@ gem 'zeroclipboard-rails'
 gem "haml"
 gem "haml-rails"
 gem "simple_form"
-gem "devise"
+gem "devise", "~> 2.2.4"
 gem "email_spec", :group => :test
 gem "cancan"
 
