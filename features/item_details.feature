@@ -45,6 +45,22 @@ Feature: Displaying Items
       | Date Group                                | 1790 - 1799                           |
       | SPARQL endpoint                           | http://www.example.com/sparql/cooee   |
     And I should not see "Development Extras"
+    And I should not see fields displayed
+      | field                                     |
+      | Timestamp                                 |
+      | ID                                 		  |
+      | Full_Text                                 |
+      | RDF_type                                  |
+      | HCSvLab_ident                             |
+      | _version_								  |
+	  | item_lists								  |
+	  |	discover_access_group_ssim				  |
+	  | read_access_group_ssim					  |
+	  | edit_access_group_ssim					  |
+	  | discover_access_person_ssim				  |	
+	  | read_access_person_ssim					  |
+	  | edit_access_person_ssim					  |
+    
 
   Scenario: Verify presence of every faceted field
     Given I ingest "custom:custom1"

@@ -25,6 +25,14 @@ Then /^I should see fields displayed$/ do |table|
   end
 end
 
+Then /^I should not see fields displayed$/ do |table|
+  # as above, this assumes you're using the helper to render the field which sets the div id based on the field name
+  table.hashes.each do |row|
+    field = row[:field]
+    page.should_not have_content(field)
+  end
+end
+
 Then /^I should see button "([^"]*)"$/ do |arg1|
   page.should have_xpath("//input[@value='#{arg1}']")
 end
