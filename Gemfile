@@ -102,7 +102,7 @@ gem 'sparql'
 gem 'request_exception_handler'
 
 # Capistrano stuff
-gem 'rvm-capistrano'
+gem 'rvm-capistrano', "~> 1"
 gem "capistrano_colors"
 
 gem 'tinymce-rails'

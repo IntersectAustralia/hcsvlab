@@ -18,6 +18,8 @@ set :shell, '/bin/bash'
 set :rvm_ruby_string, 'ruby-2.1.4@hcsvlab'
 set :rvm_type, :user
 
+set(:releases)  { capture("ls -x #{releases_path}", :except => { :no_release => true }).split.sort }
+
 # Deploy using copy for now
 set :scm, 'git'
 # Uncomment to enable Jetty submodule
@@ -247,8 +249,21 @@ namespace :deploy do
   #https://github.com/capistrano/capistrano/issues/474
   task :customcleanup, :except => {:no_release => true} do
       count = fetch(:keep_releases, 5).to_i
-      run "ls -1dt #{releases_path}/* | tail -n +#{count + 1} | #{try_sudo} xargs rm -rf"
+      run "ls -1dt #{releases_path}/* | tail -n +#{count + 1} | xargs rm -rf"
   end
+
+  task :create_symlink, :except => { :no_release => true } do
+    on_rollback do
+      if previous_release
+        run "rm -f #{current_path}; ln -s #{previous_release} #{current_path}; true"
+      else
+        logger.important "no previous release to rollback to, rollback of symlink skipped"
+      end
+    end
+
+    run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
+  end
+
 
 end
 
