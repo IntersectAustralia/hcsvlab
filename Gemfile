@@ -103,6 +103,7 @@ gem 'request_exception_handler'
 
 # Capistrano stuff
 gem 'rvm-capistrano', "~> 1"
+gem 'capistrano', '2.15.4'
 gem "capistrano_colors"
 
 gem 'tinymce-rails'

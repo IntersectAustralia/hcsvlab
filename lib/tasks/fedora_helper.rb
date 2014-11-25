@@ -90,9 +90,10 @@ def check_and_create_collection(collection_name, corpus_dir)
   if collection.nil?
     create_collection(collection_name, corpus_dir)
     collection = Collection.find_by_name(collection_name)
-    populate_triple_store(corpus_dir, collection_name)
 
   end
+  populate_triple_store(corpus_dir, collection_name)
+
   collection
 end
 
