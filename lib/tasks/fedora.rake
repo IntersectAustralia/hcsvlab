@@ -49,7 +49,7 @@ namespace :fedora do
     ingest_corpus(corpus_dir, num_spec, random, annotations)
   end
 
-  #
+   #
   # Clear everything out of the system
   #
   task :clear => :environment do
@@ -215,9 +215,6 @@ namespace :fedora do
     create_default_licences
   end
 
-  #
-  # Ingest and create default set of licenses
-  #
   task :ingest_collection_metadata => :environment do
     dir = ENV['dir'] unless ENV['dir'].nil?
 
@@ -238,7 +235,6 @@ namespace :fedora do
       create_collection_from_file(n3, coll_name)
     }
   end
-
 
   #
   # Set up the default CollectionLists and License assignments

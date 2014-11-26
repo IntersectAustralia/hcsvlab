@@ -11,20 +11,22 @@ namespace :sesame do
   #
   task :ingest => :environment do
 
-    collection_dir = ENV['collection'] unless ENV['collection'].nil?
+    dir = ENV['dir'] unless ENV['dir'].nil?
+    corpus = ENV['corpus'] unless ENV['corpus'].nil?
+    glob = ENV['glob'] unless ENV['glob'].nil?
 
-    if collection_dir.nil? || !Dir.exists?(collection_dir)
-      if collection_dir.nil?
-        puts "No corpus directory specified."
+    if dir.nil? || !Dir.exists?(dir) ||  corpus.nil? ||  glob.nil?
+        if dir.nil?
+        puts "No directory specified."
       else
-        puts "Collection directory #{collection_dir} does not exist."
+        puts "Directory #{dir} does not exist."
       end
-      puts "Usage: rake fedora:ingest collection=<collection folder>"
+      puts "Usage: rake sesame:ingest dir=<dir> corpus=<corpus> glob=<glob>"
       exit 1
     end
 
-    logger.info "rake sesame:ingest collection=#{collection_dir}"
-    ingest_collection(collection_dir)
+    logger.info "rake sesame:ingest dir=#{dir} corpus=#{corpus} glob=#{glob}"
+    populate_triple_store(dir, corpus, glob)
   end
 
   #
@@ -41,24 +43,5 @@ namespace :sesame do
     end
   end
 
-  #
-  #
-  #
-  def ingest_collection(collection_dir)
-    metadata_files = Dir["#{collection_dir}/**/*-metadata.rdf"]
-
-    graph = RDF::Graph.load(metadata_files.first, :format => :ttl, :validate => true)
-    query = RDF::Query.new({
-                               :item => {
-                                   RDF::URI(MetadataHelper::IS_PART_OF) => :collection,
-                                   RDF::URI(MetadataHelper::IDENTIFIER) => :identifier
-                               }
-                           })
-    result = query.execute(graph)[0]
-    collection_name = last_bit(result.collection.to_s)
-
-    populate_triple_store(collection_dir, collection_name)
-
-  end
 
 end

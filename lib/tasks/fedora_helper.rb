@@ -92,7 +92,7 @@ def check_and_create_collection(collection_name, corpus_dir)
     collection = Collection.find_by_name(collection_name)
 
   end
-  populate_triple_store(corpus_dir, collection_name)
+  populate_triple_store(corpus_dir, collection_name, "*-{metadata,ann}.rdf")
 
   collection
 end
@@ -366,9 +366,8 @@ end
 #
 # Store all metadata and annotations from the given directory in the triplestore
 #
-def populate_triple_store(corpus_dir, collection_name)
-  logger.debug "Start ingesting metadata and annotations in #{corpus_dir}"
-  metadataFiles = Dir["#{corpus_dir}/**/*-metadata.rdf"]
+def populate_triple_store(corpus_dir, collection_name, glob)
+  logger.debug "Start ingesting files matching #{glob} in #{corpus_dir}"
 
   server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
 
@@ -379,15 +378,9 @@ def populate_triple_store(corpus_dir, collection_name)
   repository = server.repository(collection_name)
 
   # Now will store every RDF file
-  repository.insert_from_rdf_files(metadataFiles)
+  repository.insert_from_rdf_files("#{corpus_dir}/**/#{glob}")
 
-  annotationsFiles = Dir["#{corpus_dir}/**/*-ann.rdf"]
-  # Now will store every RDF file
-  repository.insert_from_rdf_files(annotationsFiles)
-
-  #insert_access_control_info(collection_name, repository)
-
-  logger.debug "Finished ingesting metadata and annotations in #{corpus_dir}"
+  logger.debug "Finished ingesting files matching #{glob} in #{corpus_dir}"
 end
 
 #

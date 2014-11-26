@@ -174,7 +174,7 @@ class UserAnnotation < ActiveRecord::Base
   end
 
   #
-  # Store tiples in the triple store.
+  # Store triples in the triple store.
   #
   # @param [String] absolute_filename
   # @param [String] collection_name
@@ -186,7 +186,7 @@ class UserAnnotation < ActiveRecord::Base
 
     raise Exception.new("Repository #{collection_name} not found in sesame server") if (repository.nil?)
 
-    repository.insert_from_rdf_files([absolute_filename], context)
+    repository.insert_from_rdf_files(absolute_filename, context)
 
   end
 

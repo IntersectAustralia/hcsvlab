@@ -4,7 +4,7 @@ require "#{Rails.root}/app/helpers/blacklight/catalog_helper_behavior.rb"
 require "#{Rails.root}/app/helpers/blacklight/blacklight_helper_behavior"
 require "#{Rails.root}/lib/rdf-sesame/hcsvlab_server.rb"
 
-Dir["#{Rails.root}/lib/rdf/**/*.rb"].each {|f| require f}
+Dir.glob("#{Rails.root}/lib/rdf/**/*.rb") {|f| require f}
 
 #
 # Solr_Worker
@@ -215,6 +215,7 @@ private
       add_field(document, field, value_encoded, binding)
 
     }
+
     unless extras.nil?
       extras.keys.each { |key|
         field = MetadataHelper::short_form(key)
