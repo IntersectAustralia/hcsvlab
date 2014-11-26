@@ -123,7 +123,7 @@ private
     begin
       unless item.nil? || item.primary_text_path.nil?
         file = File.open(item.primary_text_path)
-        full_text = file.read
+        full_text = file.read.encode('utf-8', invalid: :replace)
         file.close
       end 
     rescue
