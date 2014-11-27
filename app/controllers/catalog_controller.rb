@@ -952,13 +952,6 @@ class CatalogController < ApplicationController
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repo = server.repository(corpus)
 
-    namespaces = RdfNamespace.get_namespaces(item.collection.name)
-
-    prefixes = ""
-    namespaces.each do |k, v|
-      prefixes << "PREFIX #{k}:<#{v}>\n"
-    end
-
     filters = ""
     user_params.each do |key, value|
       # key must be a uri, if it is add filter to query
@@ -982,7 +975,8 @@ class CatalogController < ApplicationController
     end
 
     query = "" "
-      #{prefixes}
+      PREFIX dada:<http://purl.org/dada/schema/0.2#>
+      PREFIX dc: <http://purl.org/dc/terms/>
       SELECT *
       WHERE {
         ?identifier dc:identifier '#{item_short_identifier}'.
