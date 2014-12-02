@@ -1,0 +1,34 @@
+= render 'admin_menu'
+.span9
+  %h2= "#{PROJECT_NAME} Document Audit"
+  - if @document_audits.empty?
+    %p
+      No documents have been downloaded yet.
+  - else
+    .well.clearfix
+      .pull-left
+        = link_to download_document_audit_path do
+          .btn Download CSV
+      .pull-right
+        - if @document_audits.count == 1
+          = 'Showing 1 audit'
+        - else
+          = "Showing #{@document_audits.count} audits"
+    %table#document-audits.table.table-condensed
+      %tr
+        %th Collection
+        %th Item
+        %th Document
+        %th User Name
+        %th User Email
+        %th Date/Time Downloaded
+      - @document_audits.each do |audit|
+        %tr{:class => cycle('field_bg', 'field_nobg')}
+          %td= audit.document.item.collection.name
+          %td= audit.document.item.handle
+          %td= audit.document.file_name
+          %td= "#{audit.user.first_name} #{audit.user.last_name}"
+          %td= mail_to audit.user.email
+          %td= audit.created_at.localtime.strftime("%B %d, %Y %H:%M")
+
+= render 'shared/nectar_attribution'

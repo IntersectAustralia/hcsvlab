@@ -81,6 +81,8 @@ HcsvlabWeb::Application.routes.draw do
   resources :issue_reports, :only => [:new, :create] do
   end
 
+  get "document_audit", :to => 'admin#document_audit', :as => 'document_audit'
+  get "document_audit/download", :to => 'admin#document_audit_download', :as => 'download_document_audit'
 
   resources :admin, :only => [:index] do
     collection do

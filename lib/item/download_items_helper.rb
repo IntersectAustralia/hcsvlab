@@ -359,6 +359,9 @@ module Item::DownloadItemsHelper
           metadata[item.id][:files] = json['documentsLocations'].clone.values.flatten
           json.delete('documentsLocations')
           metadata[item.id][:metadata] = json
+          item.documents.each do |doc|
+            DocumentAudit.create(document: doc, user: current_user)
+          end
         end
 
         invalids += item_handle_group - valids

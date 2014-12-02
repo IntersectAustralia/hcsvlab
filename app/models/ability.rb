@@ -111,6 +111,13 @@ class Ability
       can :change_collection_list_privacy, CollectionList, :owner_id => user_id
       can :revoke_access, CollectionList, :owner_id => user_id
     end
+
+    ############################################################
+    ##          PERMISSIONS OVER DOCUMENT AUDITS              ##
+    ############################################################
+    if is_data_owner or is_superuser
+      can :read, DocumentAudit
+    end
   end
 
 end

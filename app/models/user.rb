@@ -16,6 +16,7 @@ class User < ActiveRecord::Base
   has_many :collection_lists, inverse_of: :owner, foreign_key: :owner_id
   has_many :collections, inverse_of: :owner, foreign_key: :owner_id
   has_many :licences, inverse_of: :owner, foreign_key: :owner_id
+  has_many :document_audits
 
   # Setup accessible attributes (status/approved flags should NEVER be accessible by mass assignment)
   attr_accessible :email, :password, :password_confirmation, :first_name, :last_name

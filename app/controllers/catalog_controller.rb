@@ -563,6 +563,10 @@ class CatalogController < ApplicationController
       doc = Document.find_by_file_name_and_item_id(params[:filename], params[:id])
 
       if doc.present?
+
+        # Log download to DocumentAudit
+        DocumentAudit.create(document: doc, user: current_user)
+
         params[:disposition] = 'Inline'
         params[:disposition].capitalize!
 

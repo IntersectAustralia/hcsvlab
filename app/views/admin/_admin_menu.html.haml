@@ -13,3 +13,6 @@
     - if can?(:read, Licence)
       %li{ :class => activepath?(user_licence_requests_path) }
         = link_to "Manage Access To Collections", user_licence_requests_path
+    - if can?(:read, DocumentAudit)
+      %li{ :class => activepath?(document_audit_path) }
+        = link_to "View Document Audit", document_audit_path
