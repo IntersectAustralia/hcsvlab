@@ -16,11 +16,11 @@ class LicencesController < ApplicationController
 
     @licences = Licence.where(t[:private].eq(false).or(t[:owner_id].eq(current_user.id)))
 
-    # gets the Collections list of the logged user.
+    # gets the collection list of the logged user.
     @collection_lists = current_user.collection_lists.includes(:owner, :licence).order(:name)
 
-    # gets the Collections of the logged user.
-    @collections = current_user.collections.order(:name)
+    # gets the collections of the logged user.
+    @collections = current_user.collections.not_in_list.includes(:owner, :licence).order(:name)
     bench_end = Time.now
     @profiler = ["Time for fetching all collections, licences and collection lists took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
@@ -108,7 +108,7 @@ class LicencesController < ApplicationController
 
     start_num = start + 1
     end_num = start_num + @collections.length - 1
-
+    @response = OpenStruct.new(total: total, rows: @collections.length)
     @paging = OpenStruct.new(:start => start_num,
                              :end => end_num,
                              :per_page => per_page,

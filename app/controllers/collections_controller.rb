@@ -10,7 +10,8 @@ class CollectionsController < ApplicationController
   #
   #
   def index
-    @collections = getCollectionsIHaveAccess
+    @collections = collections_by_name
+    @collection_lists = lists_by_name
     respond_to do |format|
       format.html
       format.json
@@ -21,7 +22,8 @@ class CollectionsController < ApplicationController
   #
   #
   def show
-    @collections = getCollectionsIHaveAccess
+    @collections = collections_by_name
+    @collection_lists = lists_by_name
 
     @collection = Collection.find_by_name(params[:id])
     respond_to do |format|
@@ -35,6 +37,14 @@ class CollectionsController < ApplicationController
         format.json {}
       end
     end
+  end
+
+  def collections_by_name
+    Collection.not_in_list.order(:name)
+  end
+
+  def lists_by_name
+    CollectionList.order(:name)
   end
 
   def new
@@ -80,15 +90,6 @@ class CollectionsController < ApplicationController
   end
 
   private
-
-  #
-  # Retrieve the collections I have access right
-  #
-  # TODO REFACTOR
-  def getCollectionsIHaveAccess
-    collection = Collection.all.select { |c| can? :discover, c }
-    return collection.sort_by { |coll| coll.name }
-  end
 
   #
   # Creates the model for blacklight pagination.

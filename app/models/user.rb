@@ -298,7 +298,7 @@ class User < ActiveRecord::Base
       request = self.requested_collection(list.id)
     elsif !self.has_agreement_to_collection?(list.collections.first, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.private?
       state = :unapproved
-    elsif !self.has_agreement_to_collection?(list.collections.first, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.public?
+    elsif !self.has_agreement_to_collection?(list.collections.first, UserLicenceAgreement::DISCOVER_ACCESS_TYPE) and list.is_public?
       state = :not_accepted
     elsif self.has_agreement_to_collection?(list.collections.first, UserLicenceAgreement::DISCOVER_ACCESS_TYPE)
       state = :accepted

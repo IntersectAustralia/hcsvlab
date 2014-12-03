@@ -26,9 +26,9 @@ Feature: Managing Collection Lists and Licences
   Scenario: Verifying initial page data
     And I should see "There are no Collection Lists created."
     And The Collection table should have
-      | collection | collection_list | licence     | licence_terms |
-      | austlit    |                 | Add Licence |               |
-      | cooee      |                 | Add Licence |               |
+      | collection | licence     | licence_terms |
+      | austlit    | Add Licence |               |
+      | cooee      | Add Licence |               |
     And I click Add Licence for the 1st collection
     Then I should see "Creative Commons v3.0 BY-NC"
     And I should see "AusNC Terms of Use"
@@ -54,11 +54,10 @@ Feature: Managing Collection Lists and Licences
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
     And The Collection Lists table should have
-      | collection_list   | owner                       | licence     | licence_terms |
-      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               |
+      | collection_list   | owner                       | licence     | licence_terms | collections |
+      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               | austlit     |
     And The Collection table should have
       | collection | collection_list   | licence     | licence_terms |
-      | austlit    | Collection List 1 |             |               |
       | cooee      |                   | Add Licence |               |
 
   @javascript
@@ -71,13 +70,10 @@ Feature: Managing Collection Lists and Licences
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
     And The Collection Lists table should have
-      | collection_list   | owner                       | licence     | licence_terms |
-      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               |
+      | collection_list   | owner                       | licence     | licence_terms | collections   |
+      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               | austlit,cooee |
     And The Collection table should have
       | collection | collection_list   | licence | licence_terms |
-      | austlit    | Collection List 1 |         |               |
-      | cooee      | Collection List 1 |         |               |
-
   @javascript
   Scenario: Creating two collection lists with one collection each
     And I choose the 1st Collection in the list
@@ -88,11 +84,10 @@ Feature: Managing Collection Lists and Licences
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
     And The Collection Lists table should have
-      | collection_list   | owner                       | licence     | licence_terms |
-      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               |
+      | collection_list   | owner                       | licence     | licence_terms | collections |
+      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               | austlit     |
     And The Collection table should have
       | collection | collection_list   | licence     | licence_terms |
-      | austlit    | Collection List 1 |             |               |
       | cooee      |                   | Add Licence |               |
     Then I check "allnonecheckbox"
     And I follow "Add selected to Collection list"
@@ -102,13 +97,11 @@ Feature: Managing Collection Lists and Licences
     And I fill in "Name" with "Collection List 2"
     And I press "Create Collections List"
     And The Collection Lists table should have
-      | collection_list   | owner                       | licence     | licence_terms |
-      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               |
-      | Collection List 2 | data_owner@intersect.org.au | Add Licence |               |
+      | collection_list   | owner                       | licence     | licence_terms | collections |
+      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               | austlit     |
+      | Collection List 2 | data_owner@intersect.org.au | Add Licence |               | cooee       |
     And The Collection table should have
       | collection | collection_list   | licence | licence_terms |
-      | austlit    | Collection List 1 |         |               |
-      | cooee      | Collection List 2 |         |               |
 
   @javascript
   Scenario: Creating two collection lists with the same name
@@ -133,13 +126,11 @@ Feature: Managing Collection Lists and Licences
     And I should see "Collection list name already exists"
     Then I click "Close"
     And The Collection Lists table should have
-      | collection_list   | owner                       | licence     | licence_terms |
-      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               |
+      | collection_list   | owner                       | licence     | licence_terms | collections |
+      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               | austlit     |
     And The Collection table should have
       | collection | collection_list   | licence     | licence_terms |
-      | austlit    | Collection List 1 |             |               |
       | cooee      |                   | Add Licence |               |
-
 
   @javascript
   Scenario: Assign licence to a Collection
@@ -165,20 +156,18 @@ Feature: Managing Collection Lists and Licences
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
     And The Collection Lists table should have
-      | collection_list   | owner                       | licence     | licence_terms |
-      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               |
+      | collection_list   | owner                       | licence     | licence_terms | collections |
+      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               | austlit     |
     And The Collection table should have
       | collection | collection_list   | licence     | licence_terms |
-      | austlit    | Collection List 1 |             |               |
       | cooee      |                   | Add Licence |               |
     Then I click Add Licence for the 1st collection list
     And I follow "Creative Commons v3.0 BY-NC"
     And The Collection Lists table should have
-      | collection_list   | owner                       | licence                     | licence_terms      |
-      | Collection List 1 | data_owner@intersect.org.au | Creative Commons v3.0 BY-NC | View Licence Terms |
+      | collection_list   | owner                       | licence                     | licence_terms      | collections |
+      | Collection List 1 | data_owner@intersect.org.au | Creative Commons v3.0 BY-NC | View Licence Terms | austlit     |
     And The Collection table should have
       | collection | collection_list   | licence                     | licence_terms      |
-      | austlit    | Collection List 1 | Creative Commons v3.0 BY-NC | View Licence Terms |
       | cooee      |                   | Add Licence                 |                    |
 
   @javascript
@@ -191,11 +180,10 @@ Feature: Managing Collection Lists and Licences
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collections List"
     And The Collection Lists table should have
-      | collection_list   | owner                       | licence     | licence_terms |
-      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               |
+      | collection_list   | owner                       | licence     | licence_terms | collections |
+      | Collection List 1 | data_owner@intersect.org.au | Add Licence |               | austlit     |
     And The Collection table should have
       | collection | collection_list   | licence     | licence_terms |
-      | austlit    | Collection List 1 |             |               |
       | cooee      |                   | Add Licence |               |
     Then I click on the remove icon for the 1st collection list
     And The popup text should contain "Are you sure you want to remove the Collections List"

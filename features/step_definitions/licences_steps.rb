@@ -13,6 +13,18 @@ And /^The Collection Lists table should have$/ do |table|
       else
         page.should have_xpath("//table[@id='collection_lists']//tr[#{index+1}]//td[@class='terms']/a", :text => row[:licence_terms])
       end
+      Capybara.ignore_hidden_elements = false
+      page.should have_xpath("//h3[@id='myModalLabel']", text: row[:collection_list])
+      if row[:collections]
+
+        row[:collections].split(",").each do |collection|
+          page.should have_xpath("//table[@id='collection_lists']//tr[#{index+1}]//td[@class='name']//div[@id='collection_list_detail_content']//td[@class='collection']", :text => collection)
+
+        end
+
+      end
+      Capybara.ignore_hidden_elements = true
+
     end
   end
 end
@@ -22,13 +34,7 @@ And /^The Collection table should have$/ do |table|
     table.hashes.each_with_index do |row, index|
       page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='name']", :text => row[:collection])
 
-      if (row[:collection_list].empty?)
-        page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='collection']", :text => '')
-      else
-        page.should have_xpath("//table[@id='collections']//tr[#{index+1} and @class='groupedCollection']//td[@class='collection']/div[contains(., '#{row[:collection_list]}')]")
-      end
-
-      if (row[:licence].empty? or !row[:collection_list].empty?)
+      if row[:licence].empty?
         page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='licence']", :text => row[:licence])
       else
         page.should have_xpath("//table[@id='collections']//tr[#{index+1}]//td[@class='licence']//button", :text => row[:licence])

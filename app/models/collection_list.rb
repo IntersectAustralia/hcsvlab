@@ -21,7 +21,7 @@ class CollectionList < ActiveRecord::Base
   end
 
   # Query of privacy status
-  def public?
+  def is_public?
     !private?
   end
 
@@ -65,7 +65,7 @@ class CollectionList < ActiveRecord::Base
   #
   def remove_collection_licences
     self.update_attribute(:licence_id, nil)
-    self.collections.update_all(licence_id: nil)
+    self.collections.update_all(licence_id: nil, collection_list_id: nil)
   end
 
   #

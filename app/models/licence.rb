@@ -2,7 +2,7 @@ class Licence < ActiveRecord::Base
 
   attr_accessible :name, :owner_id, :text, :private
   belongs_to :owner, class_name: 'User'
-  scope :public, where(private:false)
+  scope :only_public, where(private:false)
 
   # Validations
   validates_presence_of :name, message: 'Licence Name can not be blank'
@@ -15,7 +15,7 @@ class Licence < ActiveRecord::Base
   validate :duplicate_of_public_licence
 
   def duplicate_of_public_licence
-    if Licence.public.where(name: self.name).exists?
+    if Licence.only_public.where(name: self.name).exists?
       errors[:base] << "Licence name '#{self.name}' already exists"
     end
   end

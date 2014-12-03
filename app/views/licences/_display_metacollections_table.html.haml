@@ -26,13 +26,18 @@
                   .modal-header
                     %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
                     %h3#myModalLabel= coll_list.name
-                  #collection_list_detail_dialog.modal-body{:title => "Licence Terms"}
+                  #collection_list_detail_dialog.modal-body
                     #collection_list_detail_content{:readonly => "true"}
                       %table
-                        - coll_list.collections.order(:name).pluck(:name).each do |collection_name|
+                        - coll_list.collections.order(:name).each do |collection|
                           %tr
+                            %td.collection
+                              = collection.name
                             %td
-                              =collection_name
+                              = link_to({:controller=>"collection_lists", :action => "remove_collection", :collectionListId => collection.collection_list_id, :collectionId => collection.id},
+                                :class=>"remove", :onClick => "return (confirmRemoveCollection(#{collection.collection_list.collections.length}, '#{collection.collection_list.name}', '#{collection.name}', event));") do
+                                %i{:class=>"icon-trash"}
+
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
               %td.privacy
@@ -93,11 +98,9 @@
 = form_tag({:controller => "collection_lists", :action => "add_licence_to_collection_list"}, :id => "add_licence_to_collection_list_form", :onSubmit => "showProgressAnimation();") do
   = hidden_field_tag :id, nil,  {id: "id_for_add_licence_to_collection_list"}
   = hidden_field_tag :licence_id, nil, {id: "licence_id_add_licence_to_collection_list"}
-  = hidden_field_tag :hide, nil, {id: "hide_for_add_licence_to_collection_list"}
 
 = form_tag(collection_lists_path, :method=>:delete, :id => "delete_collection_list_form", :onSubmit => "showProgressAnimation();") do
   = hidden_field_tag :id, nil,  {id: "id_for_delete_collection_list"}
-  = hidden_field_tag :hide, nil, {id: "hide_for_delete_collection_list"}
 
 
 :javascript
@@ -105,21 +108,17 @@
   function remove_collection_list(collectionListId, collectionListName) {
     var confirm = confirmDelete('Are you sure you want to remove the Collections List "'+ collectionListName + '"');
     if (confirm) {
-      var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
       var action = $('#delete_collection_list_form').attr('action');
       $('#delete_collection_list_form').attr('action', action+"/"+collectionListId);
       $('#id_for_delete_collection_list').val(collectionListId)
-      $("#hide_for_delete_collection_list").val(isChecked)
       $('#delete_collection_list_form').submit();
     }
   }
 
   function add_licence_to_collection_list(collection_id, licence_id) {
-    var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
 
     $("#id_for_add_licence_to_collection_list").val(collection_id);
     $("#licence_id_add_licence_to_collection_list").val(licence_id);
-    $("#hide_for_add_licence_to_collection_list").val(isChecked)
     $("#add_licence_to_collection_list_form").submit();
   };
 

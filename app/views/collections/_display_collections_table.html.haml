@@ -5,15 +5,13 @@
         Add selected to Collection list
         %span.caret
       %ul#create_list_drop_down.dropdown-menu
-        -@collection_lists.each do |acollection_list|
+        -@collection_lists.each do |collection_list|
           %li
-            %a{:href => "#add_to_existing_collection_list", :id=>"#{acollection_list.id}"}
-              =acollection_list.name
+            %a{:href => "#add_to_existing_collection_list", :id=>"#{collection_list.id}"}
+              =collection_list.name
         %li.divider
         %li
           %a#create_collection_list.testclass{"data-toggle" => "modal", :href => "#new_collection_list", :role => "button"} Create New Collection List
-    %label#showhide-assigned.btn.checkbox
-      %input{type: "checkbox", id:"hide_show_checkbox", onClick: "hide_grouped_collections(this.checked);"} Hide grouped Collections
 
   #documents
     %table#collections.table.table-condensed
@@ -25,7 +23,6 @@
                 %input#allnonecheckbox{:onclick => "toggleCollection(this)", :type => "checkbox"}/
           %th.name Collection
           %th.privacy Approval Required
-          %th.collection Collection List
           %th.licence Licence
           %th.revoke_access Revoke Access
           %th.terms Licence Terms
@@ -51,13 +48,6 @@
                     = link_to("", change_collection_privacy_collections_path(:id => collection.id, :privacy => "true"), :method => :put, :class=>"remove")
               -else
                 = (collection.collection_list.private?) ? "Required" : "Not Required"
-            %td.collection
-              -if collection.collection_list.present?
-                .label.licence
-                  %span
-                    =(collection.collection_list.nil?)? "" :collection.collection_list.name
-                  = link_to("" , {:controller=>"collection_lists", :action => "remove_collection", :collectionListId => collection.collection_list_id, :collectionId => collection.id},
-                                  :class=>"remove", :onClick => "return (confirmRemoveCollection(#{collection.collection_list.collections.length}, '#{collection.collection_list.name}', '#{collection.name}', event));")
             %td.licence
               -if collection.collection_list.nil?
                 .css-dropdown
@@ -133,12 +123,10 @@
   = hidden_field_tag :id, nil, {id: "id_for_add_collection_to_collection_list"}
   = hidden_field_tag :collection_ids, nil, {id: "collection_ids_for_add_collection_to_collection_list"}
   = hidden_field_tag :add_all_collections, nil, {id: "add_all_collections_for_add_collection_to_collection_list"}
-  = hidden_field_tag :hide, nil, {id: "hide_for_add_collection_to_collection_list"}
 
 = form_tag({:controller => "collections", :action => "add_licence_to_collection"}, :id => "add_licence_to_collection_form", :onSubmit => "showProgressAnimation();") do
   = hidden_field_tag :collection_id, nil, {id: "collection_id_for_add_licence_to_collection"}
   = hidden_field_tag :licence_id, nil, {id: "licence_id_for_add_licence_to_collection"}
-  = hidden_field_tag :hide, nil, {id: "hide_for_add_licence_to_collection"}
 
 = render :partial=>"shared/modal_waiting_panel"
 
@@ -224,11 +212,8 @@
   function add_licence_to_collection(collection_id, licence_id) {
     showProgressAnimation();
 
-    var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
-
     $("#collection_id_for_add_licence_to_collection").val(collection_id);
     $("#licence_id_for_add_licence_to_collection").val(licence_id);
-    $("#hide_for_add_licence_to_collection").val(isChecked)
     $("#add_licence_to_collection_form").submit();
   };
 
@@ -255,11 +240,9 @@
    */
   jQuery("#create_collection_list").click( function() {
   	clearData();
-    var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
 
     generateCollectionsIds("#collection_ids_for_add_collection_to_new_collection_list");
     $("#add_all_collections_for_add_collection_to_new_collection_list").val("false");
-    $("#hide_for_add_collection_to_new_collection_list").val(isChecked)
 
   });
 
@@ -277,12 +260,10 @@
    */
   jQuery("A[href='#add_to_existing_collection_list']").click( function() {
     collection_listId=$(this).attr('id');
-    var isChecked = $('#hide_show_checkbox:checked').val()?true:false;
 
     generateCollectionsIds("#collection_ids_for_add_collection_to_collection_list");
     $("#id_for_add_collection_to_collection_list").val(collection_listId);
     $("#add_all_collections_for_add_collection_to_collection_list").val("false");
-    $("#hide_for_add_collection_to_collection_list").val(isChecked)
 
     jQuery("#add_collection_to_collection_list").submit();
   });
@@ -302,11 +283,3 @@
     jQuery('input:text:visible:first', this).focus();
   })
 
--if (params[:hide].nil? or "f".eql?(params[:hide]))
-  :javascript
-    $('#hide_show_checkbox').prop('checked', false);
-    hide_grouped_collections(false);
--else
-  :javascript
-    $('#hide_show_checkbox').prop('checked', true);
-    hide_grouped_collections(true);

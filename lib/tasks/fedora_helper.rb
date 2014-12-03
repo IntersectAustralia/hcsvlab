@@ -119,11 +119,25 @@ def create_collection_from_file(collection_file, collection_name)
   coll = Collection.new
 
   coll.rdf_file_path = collection_file
-
-  coll.uri = coll.rdf_graph.statements.first.subject.to_s
+  graph = coll.rdf_graph
+  coll.uri = graph.statements.first.subject.to_s
   coll.name = collection_name
 
-  coll.private = false
+  query = RDF::Query.new({
+                             :collection => {
+                                 MetadataHelper::RIGHTS => :rights
+                             }
+                         })
+
+  results = query.execute(graph)
+
+  if collection_name[/^paradisec-/] and results.present? and results[0][:rights].to_s[/Open/].blank?
+    logger.error "Collection #{collection_name} (#{coll.uri}) is not an Open collection - skipping"
+    return
+    # coll.private = results[0][:rights].to_s[/Closed/].present?
+    # otherwise defaults to false
+  end
+
 
   if Collection.find_by_uri(coll.uri).present?
     # There is already such a collection in the system
@@ -367,7 +381,7 @@ end
 # Store all metadata and annotations from the given directory in the triplestore
 #
 def populate_triple_store(corpus_dir, collection_name, glob)
-  logger.debug "Start ingesting files matching #{glob} in #{corpus_dir}"
+  logger.info "Start ingesting files matching #{glob} in #{corpus_dir}"
 
   server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
 
@@ -380,7 +394,7 @@ def populate_triple_store(corpus_dir, collection_name, glob)
   # Now will store every RDF file
   repository.insert_from_rdf_files("#{corpus_dir}/**/#{glob}")
 
-  logger.debug "Finished ingesting files matching #{glob} in #{corpus_dir}"
+  logger.info "Finished ingesting files matching #{glob} in #{corpus_dir}"
 end
 
 #

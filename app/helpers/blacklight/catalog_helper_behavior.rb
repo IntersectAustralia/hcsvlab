@@ -49,19 +49,19 @@ module Blacklight::CatalogHelperBehavior
   #
   # Pass in an RSolr::Response. Displays the "showing X through Y of N" message.
   def render_pagination_info(response, options = {})
-      pagination_info = paginate_params(response)
+    pagination_info = paginate_params(response)
 
-   # TODO: i18n the entry_name
-      entry_name = options[:entry_name]
-      entry_name ||= response.docs.first.class.name.underscore.sub('_', ' ') unless response.docs.empty?
-      entry_name ||= t('blacklight.entry_name.default')
+    # TODO: i18n the entry_name
+    entry_name = options[:entry_name]
+    entry_name ||= response.docs.first.class.name.underscore.sub('_', ' ') unless response.docs.empty?
+    entry_name ||= t('blacklight.entry_name.default')
 
 
-      case pagination_info.total_count
-        when 0; t('blacklight.search.pagination_info.no_items_found', :entry_name => entry_name.pluralize ).html_safe
-        when 1; t('blacklight.search.pagination_info.single_item_found', :entry_name => entry_name).html_safe
-        else; t('blacklight.search.pagination_info.pages', :entry_name => entry_name.pluralize, :current_page => pagination_info.current_page, :num_pages => pagination_info.num_pages, :start_num => format_num(pagination_info.start), :end_num => format_num(pagination_info.end), :total_num => pagination_info.total_count, :count => pagination_info.num_pages).html_safe
-      end
+    case pagination_info.total_count
+      when 0; t('blacklight.search.pagination_info.no_items_found', :entry_name => entry_name.pluralize ).html_safe
+      when 1; t('blacklight.search.pagination_info.single_item_found', :entry_name => entry_name).html_safe
+      else; t('blacklight.search.pagination_info.pages', :entry_name => entry_name.pluralize, :current_page => pagination_info.current_page, :num_pages => pagination_info.num_pages, :start_num => format_num(pagination_info.start), :end_num => format_num(pagination_info.end), :total_num => pagination_info.total_count, :count => pagination_info.num_pages).html_safe
+    end
   end
 
   # Like  #render_pagination_info above, but for an individual
@@ -72,6 +72,19 @@ module Blacklight::CatalogHelperBehavior
   def item_page_entry_info
     t('blacklight.search.entry_pagination_info.other', :current => format_num(session[:search][:counter]), :total => format_num(session[:search][:total]), :count => session[:search][:total].to_i).html_safe
   end
+
+  #
+  # Pass in an paging object. Displays the "showing X through Y of N" message.
+  def render_pagination_info_without_solr(pagination_info, options = {})
+    entry_name = options[:entry_name]
+    puts pagination_info.total_count
+    case pagination_info.total_count
+      when 0; t('blacklight.search.pagination_info.no_items_found', :entry_name => entry_name.pluralize ).html_safe
+      when 1; t('blacklight.search.pagination_info.single_item_found', :entry_name => entry_name).html_safe
+      else; t('blacklight.search.pagination_info.pages', :entry_name => entry_name.pluralize, :current_page => pagination_info.current_page, :num_pages => pagination_info.num_pages, :start_num => format_num(pagination_info.start), :end_num => format_num(pagination_info.end), :total_num => pagination_info.total_count, :count => pagination_info.num_pages).html_safe
+    end
+  end
+
 
   # Look up search field user-displayable label
   # based on params[:qt] and blacklight_configuration.

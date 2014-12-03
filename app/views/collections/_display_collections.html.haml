@@ -1,11 +1,23 @@
-.sidenav.static.span3
-  %h4 Collections
-  %ul.nav
-    - if @collections.empty?
-      %li
-        %h5 Empty
-    -else
-      - @collections.each do |collection|
-        - selectedClass="active" if (collection.id == (params[:id]))
-        %li{ :class => selectedClass }
-          = link_to collection.name, collection_path(collection.name)
+.sidenav.static.span3.facets
+  %h4{data: {toggle: 'collapse', target: '.facets-collapse'}} Collections
+  -#%ul.nav
+  - if @collections.empty? && @collection_lists.empty?
+    %li
+      %h5 Empty
+  -else
+    - @collection_lists.each do |list|
+      .facets-collapse.collapse
+        .facet_limit
+          %h5.twiddle
+            = list.name
+          %ul
+            .facet_box
+              - list.collections.order(:name).pluck(:name).each do |name|
+                - selectedClass="active" if (name == (params[:id]))
+                %li{ :class => selectedClass }
+                  = link_to name, collection_path(name)
+    - @collections.each do |collection|
+      - selectedClass="active" if (collection.name == (params[:id]))
+      %li{ :class => selectedClass }
+        = link_to collection.name, collection_path(collection.name)
+

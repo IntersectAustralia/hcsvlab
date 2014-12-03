@@ -7,6 +7,10 @@ class Collection < ActiveRecord::Base
   belongs_to :collection_list
   belongs_to :licence
 
+  scope :not_in_list, where(collection_list_id: nil)
+  scope :only_public, where(private: false)
+  scope :only_private, where(private: true)
+
   validates :name, presence: true
 
   def set_licence(licence)
@@ -19,7 +23,7 @@ class Collection < ActiveRecord::Base
     self.save!
   end
 
-  def public?
+  def is_public?
     !private?
   end
 

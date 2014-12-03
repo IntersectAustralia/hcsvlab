@@ -321,6 +321,7 @@ namespace :fedora do
 
     collection_name = manifest["collection_name"]
     collection = check_and_create_collection(collection_name, corpus_dir)
+    logger.info "Ingesting #{num} file#{(num==1) ? '' : 's'} of #{rdf_files.size}"
 
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
@@ -366,8 +367,8 @@ namespace :fedora do
     end
 
     report_results(label, corpus_dir, successes, errors)
-    endTime = Time.new
-    logger.debug("Time for ingesting #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - overall_start.to_f)*1000)}ms)")
+    end_time = Time.now
+    logger.info("Time for ingesting #{corpus_dir}: (#{'%.1f' % ((end_time.to_f - overall_start.to_f)*1000)}ms)")
 
   end
 
