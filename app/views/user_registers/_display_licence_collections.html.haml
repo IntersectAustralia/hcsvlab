@@ -26,7 +26,7 @@
                 #collection_list_detail_dialog.modal-body{:title => "Collection details"}
                   #collection_list_detail_content{:readonly => "true"}
                     %table
-                      - k[:item].collections.pluck(:name).each do |collection_name|
+                      - k[:item].collections.order(:name).pluck(:name).each do |collection_name|
                         %tr
                           %td
                             = link_to collection_name, collection_path(collection_name, :state=>k[:state_label])
