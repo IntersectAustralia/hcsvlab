@@ -32,11 +32,12 @@
                         - coll_list.collections.order(:name).each do |collection|
                           %tr
                             %td.collection
-                              = collection.name
+                              %span
+                                = collection.name
                             %td
                               = link_to({:controller=>"collection_lists", :action => "remove_collection", :collectionListId => collection.collection_list_id, :collectionId => collection.id},
                                 :class=>"remove", :onClick => "return (confirmRemoveCollection(#{collection.collection_list.collections.length}, '#{collection.collection_list.name}', '#{collection.name}', event));") do
-                                %i{:class=>"icon-trash"}
+                                %i{:class=>"icon-remove", title: "Remove #{collection.name} from #{collection.collection_list.name} collection list"}
 
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close

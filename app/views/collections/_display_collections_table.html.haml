@@ -117,7 +117,7 @@
     .modal-footer
       %a.btn.pull-left{:"data-dismiss"=>"modal", :"aria-hidden"=>"true()"}
         Close
-      = f.submit "Create Collections List", class: "btn btn-primary", id:"new_collection_list_submit"
+      = f.submit "Create Collection List", class: "btn btn-primary", id:"new_collection_list_submit"
 
 = form_tag({:controller => "collection_lists", :action => "add_collections"}, :id => "add_collection_to_collection_list", :onSubmit => "showProgressAnimation();")  do
   = hidden_field_tag :id, nil, {id: "id_for_add_collection_to_collection_list"}

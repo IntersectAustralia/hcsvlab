@@ -24,7 +24,7 @@ class LicencesController < ApplicationController
     bench_end = Time.now
     @profiler = ["Time for fetching all collections, licences and collection lists took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
-    create_pagination_structure(params)
+    # create_pagination_structure(params)
 
   end
 
