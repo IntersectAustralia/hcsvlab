@@ -196,14 +196,14 @@ class User < ActiveRecord::Base
 
   def groups
     sql = """
-      SELECT CONCAT(c.name, '-', ula_cl.access_type) AS group_name
+      SELECT c.name || '-' || ula_cl.access_type AS group_name
       FROM collections c INNER JOIN
         (SELECT cl.id as collection_list_id, ula.access_type as access_type
         FROM collection_lists cl INNER JOIN user_licence_agreements ula
         ON cl.name=ula.name WHERE ula.collection_type='collection_list' AND ula.user_id=#{self.id}) ula_cl
       ON c.collection_list_id=ula_cl.collection_list_id
       UNION
-      SELECT CONCAT(c.name, '-', ula.access_type) as group_name
+      SELECT c.name || '-' || ula.access_type as group_name
       FROM user_licence_agreements ula
       INNER JOIN collections c
       ON ula.name=c.name
