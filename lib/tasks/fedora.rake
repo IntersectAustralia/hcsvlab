@@ -321,7 +321,6 @@ namespace :fedora do
 
     collection_name = manifest["collection_name"]
     collection = check_and_create_collection(collection_name, corpus_dir)
-    logger.info "Ingesting #{num} file#{(num==1) ? '' : 's'} of #{rdf_files.size}"
 
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
