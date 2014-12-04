@@ -195,15 +195,31 @@ class User < ActiveRecord::Base
   end
 
   def groups
-    self.user_licence_agreements.pluck(:group_name)
+    sql = """
+      SELECT CONCAT(c.name, '-', ula_cl.access_type) AS group_name
+      FROM collections c INNER JOIN
+        (SELECT cl.id as collection_list_id, ula.access_type as access_type
+        FROM collection_lists cl INNER JOIN user_licence_agreements ula
+        ON cl.name=ula.name WHERE ula.collection_type='collection_list' AND ula.user_id=#{self.id}) ula_cl
+      ON c.collection_list_id=ula_cl.collection_list_id
+      UNION
+      SELECT CONCAT(c.name, '-', ula.access_type) as group_name
+      FROM user_licence_agreements ula
+      INNER JOIN collections c
+      ON ula.name=c.name
+      WHERE ula.collection_type='collection' AND ula.user_id=#{self.id};
+    """
+    ActiveRecord::Base.connection.execute(sql).field_values('group_name')
   end
 
   #
-  # Adds the permission level defined by 'accessType' to the given 'collection'
+  # Adds the permission level defined by 'accessType' to the given 'collection' or 'collection_list'
   #
-  def add_agreement_to_collection(collection, accessType)
+  def add_agreement_to_collection(collection, accessType, type='collection')
     ula = UserLicenceAgreement.new
-    ula.group_name = "#{collection.name}-#{accessType}"
+    ula.access_type = accessType
+    ula.name = collection.name
+    ula.collection_type = type
     ula.licence_id = collection.licence_id
     ula.user = self
     ula.save
@@ -222,16 +238,14 @@ class User < ActiveRecord::Base
       return true
     end
 
-    if exact
-      group_names = ["#{collection.name}-#{access_type}"]
+    access_types = UserLicenceAgreement::type_or_higher(access_type) unless exact
+
+    col_list = collection.collection_list
+    if col_list.present?
+      self.user_licence_agreements.where(name: col_list.name, collection_type: 'collection_list', access_type: access_types).count > 0
     else
-      group_names = UserLicenceAgreement::type_or_higher(access_type).map { |t|
-        "#{collection.name}-#{t}"
-      }
+      self.user_licence_agreements.where(name: collection.name, collection_type: 'collection', access_type: access_types).count > 0
     end
-
-    user_licence_agreements.where(group_name: group_names).count > 0
-
   end
 
   def has_requested_collection?(id)
@@ -245,9 +259,8 @@ class User < ActiveRecord::Base
   #
   # Removes the permission level defined by 'accessType' to the given 'collection'
   #
-  def remove_agreement_to_collection(collection, accessType)
-    group_name = "#{collection.name}-#{accessType}"
-    self.user_licence_agreements.where(group_name: group_name).delete_all
+  def remove_agreement_to_collection(collection, access_type)
+    self.user_licence_agreements.where(name: collection.name, collection_type: 'collection', access_type: access_type).delete_all
   end
 
   def accept_licence_request(id)

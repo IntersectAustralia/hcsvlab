@@ -123,9 +123,7 @@ class CollectionListsController < ApplicationController
   def revoke_access
     coll_list = CollectionList.find(params[:id])
     UserLicenceRequest.where(:request_id => coll_list.id.to_s).destroy_all if coll_list.private?
-    coll_list.collections.each do |collection|
-      UserLicenceAgreement.where("group_name LIKE :prefix", prefix: "#{collection.name}%").destroy_all
-    end
+    UserLicenceAgreement.where(name: coll_list.name, collection_type: 'collection_list').destroy_all
     flash[:notice] = "All access to #{coll_list.name} has been successfully revoked"
     redirect_to licences_path
   end

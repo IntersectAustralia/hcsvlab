@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141127010040) do
+ActiveRecord::Schema.define(:version => 20141202235844) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -154,11 +154,13 @@ ActiveRecord::Schema.define(:version => 20141127010040) do
   add_index "user_api_calls", ["user_id"], :name => "index_user_api_calls_on_user_id"
 
   create_table "user_licence_agreements", :force => true do |t|
-    t.string   "group_name"
     t.string   "licence_id"
     t.integer  "user_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.string   "name"
+    t.string   "access_type"
+    t.string   "collection_type"
   end
 
   add_index "user_licence_agreements", ["user_id"], :name => "index_user_licence_agreements_on_user_id"

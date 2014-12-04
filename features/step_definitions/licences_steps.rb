@@ -162,3 +162,9 @@ Given(/^there is a licence request for collection list "(.*?)" by "(.*?)"$/) do 
   req.user = user
   req.save!
 end
+
+And /^I click "([^"]*)" in the add to collection list dropdown$/ do |name|
+  within('#create_list_drop_down') do
+    click_on(name)
+  end
+end

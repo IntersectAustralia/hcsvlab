@@ -122,13 +122,11 @@ class UsersController < ApplicationController
 
     if type == "collection"
       coll = Collection.find(coll_id)
-      current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
+      current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE, type)
       name = coll.name
     else
       list = CollectionList.find(coll_id)
-      list.collections.each { |coll|
-        current_user.add_agreement_to_collection(coll, UserLicenceAgreement::READ_ACCESS_TYPE)
-      }
+      current_user.add_agreement_to_collection(list, UserLicenceAgreement::READ_ACCESS_TYPE, type)
       name = list.name
     end
 

@@ -335,3 +335,31 @@ Feature: Managing Subscriptions to Collections
       | title   | collection | owner                       | state        | actions                        |
       | List_1  | 1          | data_owner@intersect.org.au | Not Accepted | Preview & Accept Licence Terms |
       | austlit | 1          | data_owner@intersect.org.au | Accepted     | Review Licence Terms           |
+
+  @javascript
+  Scenario: Users should be able to access a newly added collection in a collection list if they have already agreed to the licence of the collection list
+    Given I have added a licence to Collection List "List_1"
+    And I am logged in as "researcher@intersect.org.au"
+    And I am on the licence agreements page
+    And I follow "Preview & Accept Licence Terms"
+    And I click "Accept" on the 1st licence dialogue
+    And I am on the home page
+    Then I should see only the following collections displayed in the facet menu
+      | collection |
+      | cooee      |
+    Then I am logged out
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the licences page
+    And I check "allnonecheckbox"
+    And I follow "Add selected to Collection list"
+    And I click "List_1" in the add to collection list dropdown
+    And I wait 2 seconds
+    Then I should see "1 added to Collection list List_1"
+    Then I am logged out
+    And I am on the home page
+    And I am logged in as "researcher@intersect.org.au"
+    Then I should see only the following collections displayed in the facet menu
+      | collection |
+      | cooee      |
+      | austlit    |
+
