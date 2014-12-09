@@ -28,8 +28,8 @@ class DocumentAudit < ActiveRecord::Base
       file.puts header.join(',')
       document_audits.each do |audit|
         values =  [audit.document.item.collection.name,
-                 "#{audit.document.item.collection.name}-#{audit.document.item.handle}",
-                 "#{audit.document.item.collection.name}/#{audit.document.item.handle}/#{audit.document.file_name}",
+                 "#{audit.document.item.handle.gsub ':', '-'}",
+                 "#{audit.document.item.handle.gsub ':', '/'}/#{audit.document.file_name}",
                  "#{audit.user.first_name} #{audit.user.last_name}",
                  audit.user.email,
                  "#{audit.created_at.localtime.strftime('%d/%m/%Y %H:%M')}"]

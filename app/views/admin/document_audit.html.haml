@@ -24,9 +24,12 @@
         %th Date/Time Downloaded
       - @document_audits.each do |audit|
         %tr{:class => cycle('field_bg', 'field_nobg')}
-          %td= audit.document.item.collection.name
-          %td= audit.document.item.handle
-          %td= audit.document.file_name
+          - collection_name = audit.document.item.collection.name
+          - item_handle = audit.document.item.handle
+          - document_filename = audit.document.file_name
+          %td= link_to collection_name, collection_path(collection_name)
+          %td= link_to item_handle, catalog_path(item_handle.split(':').first, item_handle.split(':').last)
+          %td= link_to document_filename, catalog_document_path(collection_name, item_handle.split(':').last, document_filename)
           %td= "#{audit.user.first_name} #{audit.user.last_name}"
           %td= mail_to audit.user.email
           %td= audit.created_at.localtime.strftime("%B %d, %Y %H:%M")
