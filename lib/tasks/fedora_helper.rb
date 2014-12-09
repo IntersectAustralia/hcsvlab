@@ -43,7 +43,7 @@ end
 
 def create_item_from_file(corpus_dir, rdf_file, manifest, collection)
   item_info = manifest["files"][File.basename(rdf_file)]
-  raise StandardError, "Error with file during manifest creation - #{rdf_file}" if !item_info["error"].nil?
+  raise ArgumentError, "Error with file during manifest creation - #{rdf_file}" if !item_info["error"].nil?
   identifier = item_info["id"]
   uri = item_info["uri"]
   collection_name = manifest["collection_name"]
@@ -87,14 +87,54 @@ end
 
 def check_and_create_collection(collection_name, corpus_dir)
   collection = Collection.find_by_name(collection_name)
+  is_new = false
   if collection.nil?
+    is_new = true
     create_collection(collection_name, corpus_dir)
     collection = Collection.find_by_name(collection_name)
-
   end
+
+  paradisec_collection_setup(collection, is_new)
+
   populate_triple_store(corpus_dir, collection_name, "*-{metadata,ann}.rdf")
 
   collection
+end
+
+def paradisec_collection_setup(collection, is_new)
+  collection_name = collection.name
+  if collection_name[/^paradisec-/]
+    graph = collection.rdf_graph
+    query = RDF::Query.new({
+                               :collection => {
+                                   MetadataHelper::RIGHTS => :rights
+                               }
+                           })
+
+    results = query.execute(graph)
+    if results.present? and results[0][:rights].to_s[/Open/].blank?
+      clear_collection_metadata(collection_name) # just in case
+      raise ArgumentError, "Collection #{collection_name} (#{collection.uri}) is not an Open collection - skipping"
+    elsif is_new
+      # Default to Nick Thieberger
+      data_owner = User.find_by_email('thien@unimelb.edu.au')
+      data_owner = find_default_owner if data_owner.nil?
+
+      # Create PARADISEC list automatically
+      collection_list = CollectionList.find_or_initialize_by_name('PARADISEC')
+      if collection_list.new_record?
+        collection_list.owner = data_owner
+        collection_list.private = true
+        collection_list.licence = Licence.find_by_name('PARADISEC Conditions of Access')
+        collection_list.save!
+      end
+
+      collection.owner = data_owner
+      collection.collection_list = collection_list
+      collection.save
+    end
+  end
+
 end
 
 def create_collection(collection_name, corpus_dir)
@@ -108,8 +148,7 @@ def create_collection(collection_name, corpus_dir)
   if Dir.entries(dir).include?(collection_name + ".n3")
     coll_metadata = dir + "/" + collection_name + ".n3"
   else
-    logger.warn "No collection metadata file found - #{dir}/#{collection_name}.n3. Stopping ingest."
-    raise "No collection metadata file found - #{dir}/#{collection_name}.n3"
+    raise ArgumentError, "No collection metadata file found - #{dir}/#{collection_name}.n3. Stopping ingest."
   end
 
   create_collection_from_file(coll_metadata, collection_name)
@@ -123,29 +162,11 @@ def create_collection_from_file(collection_file, collection_name)
   coll.uri = graph.statements.first.subject.to_s
   coll.name = collection_name
 
-  query = RDF::Query.new({
-                             :collection => {
-                                 MetadataHelper::RIGHTS => :rights
-                             }
-                         })
-
-  results = query.execute(graph)
-
-  if collection_name[/^paradisec-/] and results.present? and results[0][:rights].to_s[/Open/].blank?
-    logger.error "Collection #{collection_name} (#{coll.uri}) is not an Open collection - skipping"
-    return
-    # coll.private = results[0][:rights].to_s[/Closed/].present?
-    # otherwise defaults to false
-  end
-
-
   if Collection.find_by_uri(coll.uri).present?
     # There is already such a collection in the system
     logger.error "Collection #{collection_name} (#{coll.uri}) already exists in the system - skipping"
     return
   end
-  coll.save
-
   set_data_owner(coll)
 
   coll.save!
@@ -191,7 +212,7 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
     if doc.new_record?
       begin
         doc.file_path = path
-        doc.doc_type      = type
+        doc.doc_type = type
         doc.mime_type = mime_type_lookup(file_name)
         doc.item = item
         doc.item_id = item.id
@@ -230,7 +251,7 @@ def update_document(document, item, file_name, identifier, source, type, corpus_
           logger.warn "??? Creating a #{type} document for #{path} but not adding it to its Item" unless Rails.env.test?
       end
     end
-    logger.info "#{type} Document = #{doc.id.to_s}" unless Rails.env.test?
+    logger.info "#{type} Document = #{document.id.to_s}" unless Rails.env.test?
   rescue Exception => e
     logger.error("Error creating document: #{e.message}")
   end
@@ -274,7 +295,6 @@ def set_data_owner(collection)
   else
     logger.info "Setting data owner to #{data_owner.email}"
     collection.owner = data_owner
-    collection.save
   end
 end
 
@@ -376,6 +396,32 @@ def extract_manifest_info(rdf_file)
   return filename, hash
 end
 
+#
+# Store all metadata and annotations from the given directory in the triplestore
+#
+def clear_collection_metadata(collection_name)
+  logger.info "Start clearing #{collection_name}"
+
+  # clear Solr
+  uri = URI.parse(Blacklight.solr_config[:url] + '/update?commit=true')
+
+  req = Net::HTTP::Post.new(uri)
+  req.body = "<delete><query>collection_name_facet:#{collection_name}</query></delete>"
+
+  req.content_type = "text/xml; charset=utf-8"
+  req.body.force_encoding("UTF-8")
+  res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+    http.request(req)
+  end
+
+  # Clear all metadata and annotations from the triple store
+  server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+  repository = server.repository(collection_name)
+  repository.clear if repository.present?
+
+  # Now will store every RDF file
+  logger.info "Finished clearing #{collection_name}"
+end
 
 #
 # Store all metadata and annotations from the given directory in the triplestore

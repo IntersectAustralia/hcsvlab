@@ -19,6 +19,7 @@
             %th.actions
         %tbody
           - @collection_lists.each_with_index do |coll_list, index|
+            - list_length = coll_list.collections.count
             %tr
               %td.name
                 %a.btn.btn-mini{"data-toggle" => "modal", :href => "#collection_list#{index}", :role => "button"}=coll_list.name
@@ -36,8 +37,8 @@
                                 = collection.name
                             %td
                               = link_to({:controller=>"collection_lists", :action => "remove_collection", :collectionListId => collection.collection_list_id, :collectionId => collection.id},
-                                :class=>"remove", :onClick => "return (confirmRemoveCollection(#{collection.collection_list.collections.length}, '#{collection.collection_list.name}', '#{collection.name}', event));") do
-                                %i{:class=>"icon-remove", title: "Remove #{collection.name} from #{collection.collection_list.name} collection list"}
+                                :class=>"remove", :onClick => "return (confirmRemoveCollection(#{list_length}, '#{coll_list.name}', '#{collection.name}', event));") do
+                                %i{:class=>"icon-remove", title: "Remove #{collection.name} from #{coll_list.name} collection list"}
 
                   .modal-footer
                     %a.btn.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close

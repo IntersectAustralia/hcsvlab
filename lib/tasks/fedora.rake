@@ -249,8 +249,6 @@ namespace :fedora do
 
     setup_collection_list("AUSNC", licences["AusNC Terms of Use"],
                           "ace", "art", "austlit", "braidedchannels", "cooee", "gcsause", "ice", "mitcheldelbridge", "monash")
-    setup_collection_list("PARADISEC", licences["PARADISEC Conditions of Access"],
-                          "paradisec", "eopas_test")
     Collection.assign_licence("austalk", licences["AusTalk Terms of Use"])
     Collection.assign_licence("avozes", licences["AVOZES Non-commercial (Academic) Licence"])
     Collection.assign_licence("clueweb", licences["ClueWeb Terms of Use"])
@@ -258,6 +256,14 @@ namespace :fedora do
     Collection.assign_licence("rirusyd", licences["Creative Commons v3.0 BY-NC-SA"])
     Collection.assign_licence("mbep", licences["Creative Commons v3.0 BY-NC-SA"])
     Collection.assign_licence("jakartan_indonesian", licences["Creative Commons v3.0 BY-NC-SA"])
+  end
+
+  task :paradisec_clear => :environment do
+    collection_list = CollectionList.find_by_name("PARADISEC")
+    collection_list.collections.each do |coll|
+      logger.info "Clearing metadata for PARADISEC Collection #{coll.name} (#{coll.uri})"
+      clear_collection_metadata(coll.name)
+    end
   end
 
   #
@@ -320,7 +326,13 @@ namespace :fedora do
     manifest_file.close
 
     collection_name = manifest["collection_name"]
-    collection = check_and_create_collection(collection_name, corpus_dir)
+    begin
+      collection = check_and_create_collection(collection_name, corpus_dir)
+    rescue ArgumentError => e
+      logger.error(e.message)
+      puts e.message
+      exit(1)
+    end
 
     rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
 
