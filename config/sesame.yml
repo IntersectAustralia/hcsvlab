@@ -5,11 +5,11 @@ test: &TEST
 qa:
   url: http://alveo-qa.intersect.org.au:8080/openrdf-sesame
 qa2:
-  url: http://ic2-hcsvlab-qa2-vm.intersect.org.au:8080/openrdf-sesame
+  url: http://alveo-qa2.intersect.org.au:8080/openrdf-sesame
 staging:
-  url: http://ic2-hcsvlab-staging1-vm.intersect.org.au:8080/openrdf-sesame
+  url: http://alveo-staging1.intersect.org.au:8080/openrdf-sesame
 staging2:
-  url: http://ic2-hcsvlab-staging2-vm.intersect.org.au:8080/openrdf-sesame
+  url: http://alveo-staging2.intersect.org.au:8080/openrdf-sesame
 production:
   url: http://app.alveo.edu.au:8080/openrdf-sesame
 cucumber:

@@ -26,19 +26,19 @@ qa:
 
 qa2:
   <<: *common
-  hostname: https://ic2-hcsvlab-qa2-vm.intersect.org.au
+  hostname: https://alveo-qa2.intersect.org.au
   secret_token:
   aaf_rc_login_url:
 
 staging:
   <<: *common
-  hostname: https://ic2-hcsvlab-staging1-vm.intersect.org.au
+  hostname: https://alveo-staging1.intersect.org.au
   secret_token:
   aaf_rc_login_url:
 
 staging2:
   <<: *common
-  hostname: https://ic2-hcsvlab-staging2-vm.intersect.org.au
+  hostname: https://alveo-staging2.intersect.org.au
   secret_token:
   aaf_rc_login_url:
 
