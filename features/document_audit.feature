@@ -68,9 +68,9 @@ Feature: Document Audit
     Then I should get a CSV file called "document_audit.csv" with the following metrics:
     """
     collection,item,document,user_name,user_email
-    cooee,cooee-cooee:1-001,cooee/cooee:1-001/1-001.txt,Fred Bloggs,researcher@intersect.org.au
-    cooee,cooee-cooee:1-001,cooee/cooee:1-001/1-001-raw.txt,Fred Bloggs,researcher@intersect.org.au
-    cooee,cooee-cooee:1-001,cooee/cooee:1-001/1-001-plain.txt,Fred Bloggs,researcher@intersect.org.au
+    cooee,cooee-1-001,cooee/1-001/1-001.txt,Fred Bloggs,researcher@intersect.org.au
+    cooee,cooee-1-001,cooee/1-001/1-001-raw.txt,Fred Bloggs,researcher@intersect.org.au
+    cooee,cooee-1-001,cooee/1-001/1-001-plain.txt,Fred Bloggs,researcher@intersect.org.au
     """
 
   Scenario: Unauthorised user cannot see the document audit page
