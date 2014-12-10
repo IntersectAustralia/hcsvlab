@@ -104,6 +104,25 @@ end
 def paradisec_collection_setup(collection, is_new)
   collection_name = collection.name
   if collection_name[/^paradisec-/]
+    if is_new
+      # Default to Nick Thieberger
+      data_owner = User.find_by_email('thien@unimelb.edu.au')
+      data_owner = find_default_owner if data_owner.nil?
+
+      # Create PARADISEC list automatically
+      collection_list = CollectionList.find_or_initialize_by_name('PARADISEC')
+      if collection_list.new_record?
+        collection_list.owner = data_owner
+        collection_list.private = true
+        collection_list.licence = Licence.find_by_name('PARADISEC Conditions of Access')
+        collection_list.save
+      end
+
+      collection.owner = data_owner
+      collection.save
+      collection_list.add_collections([collection.id])
+    end
+
     graph = collection.rdf_graph
     query = RDF::Query.new({
                                :collection => {
@@ -115,23 +134,6 @@ def paradisec_collection_setup(collection, is_new)
     if results.present? and results[0][:rights].to_s[/Open/].blank?
       clear_collection_metadata(collection_name) # just in case
       raise ArgumentError, "Collection #{collection_name} (#{collection.uri}) is not an Open collection - skipping"
-    elsif is_new
-      # Default to Nick Thieberger
-      data_owner = User.find_by_email('thien@unimelb.edu.au')
-      data_owner = find_default_owner if data_owner.nil?
-
-      # Create PARADISEC list automatically
-      collection_list = CollectionList.find_or_initialize_by_name('PARADISEC')
-      if collection_list.new_record?
-        collection_list.owner = data_owner
-        collection_list.private = true
-        collection_list.licence = Licence.find_by_name('PARADISEC Conditions of Access')
-        collection_list.save!
-      end
-
-      collection.owner = data_owner
-      collection.collection_list = collection_list
-      collection.save
     end
   end
 
@@ -394,6 +396,250 @@ def extract_manifest_info(rdf_file)
   end
 
   return filename, hash
+end
+
+def ingest_corpus(corpus_dir, num_spec=:all, shuffle=false, annotations=true)
+
+  label = "Ingesting...\n"
+  label += "   corpus:      #{corpus_dir}\n"
+  label += "   amount:      #{num_spec}\n"
+  label += "   random:      #{shuffle}\n"
+  label += "   annotations: #{annotations}"
+  puts label unless Rails.env.test?
+
+  check_and_create_manifest(corpus_dir)
+
+  overall_start = Time.now
+
+  manifest_file = File.open(File.join(corpus_dir, MANIFEST_FILE_NAME))
+  manifest = JSON.parse(manifest_file.read)
+  manifest_file.close
+
+  collection_name = manifest["collection_name"]
+  begin
+    collection = check_and_create_collection(collection_name, corpus_dir)
+  rescue ArgumentError => e
+    logger.error(e.message)
+    puts e.message
+    return
+  end
+
+  rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
+
+  if num_spec == :all
+    num = rdf_files.size
+  elsif num_spec.is_a? String
+    if num_spec.end_with?('%')
+      # The argument is a percentage
+      num_spec = num_spec.slice(0, num_spec.size-1) # drop the % sign
+      percentage = num_spec.to_f
+      if percentage == 0 || percentage > 100
+        puts "   Percentage should be a number between 0 and 100"
+        exit 1
+      end
+      num = ((rdf_files.size * percentage)/100).to_i
+      num = 1 if num < 1
+    else
+      # The argument is just a number. Well, it should be.
+      num = num_spec.to_i
+      if num == 0 || num > rdf_files.size
+        puts "   Amount should be a number between 0 and the number of RDF files in the corpus (#{rdf_files.size})"
+        exit 1
+      end
+    end
+  end
+
+  logger.info "Ingesting #{num} file#{(num==1) ? '' : 's'} of #{rdf_files.size}"
+  errors = {}
+  successes = {}
+
+  rdf_files.shuffle! if shuffle
+  rdf_files = rdf_files.slice(0, num)
+
+  rdf_files.each do |rdf_file|
+    begin
+      pid = ingest_rdf_file(corpus_dir, rdf_file, annotations, manifest, collection)
+
+      successes[rdf_file] = pid
+    rescue => e
+      logger.error "Error! #{e.message}\n#{e.backtrace}"
+      errors[rdf_file] = e.message
+    end
+  end
+
+  report_results(label, corpus_dir, successes, errors)
+  end_time = Time.now
+  logger.info("Time for ingesting #{corpus_dir}: (#{'%.1f' % ((end_time.to_f - overall_start.to_f)*1000)}ms)")
+
+end
+
+
+def check_corpus(corpus_dir)
+
+  puts "Checking #{corpus_dir}..."
+
+  rdf_files = Dir.glob(corpus_dir + '/*-metadata.rdf')
+
+  errors = {}
+  handles = {}
+
+  index = 0
+
+  rdf_files.each do |rdf_file|
+    begin
+      index = index + 1
+      handle = check_rdf_file(rdf_file, index, rdf_files.size)
+      handles[handle] = Set.new unless handles.has_key?(handle)
+      handles[handle].add(rdf_file)
+      if handles[handle].size > 1
+        puts "Duplicate handle #{handle} found in:"
+        handles[handle].each { |filename|
+          puts "\t#{filename}"
+        }
+      end
+    rescue => e
+      logger.error "File: #{rdf_file}: #{e.message}"
+      errors[rdf_file] = e.message
+    end
+  end
+
+  handles.keep_if { |key, value| value.size > 1 }
+  report_check_results(rdf_files.size, corpus_dir, errors, handles)
+end
+
+
+def check_rdf_file(rdf_file, index, limit)
+  unless rdf_file.to_s =~ /metadata/ # HCSVLAB-441
+    raise ArgumentError, "#{rdf_file} does not appear to be a metadata file - at least, it's name doesn't say 'metadata'"
+  end
+  logger.info "Checking file #{index} of #{limit}: #{rdf_file}"
+  graph = RDF::Graph.load(rdf_file, :format => :ttl, :validate => true)
+  query = RDF::Query.new({
+                             :item => {
+                                 RDF::URI(MetadataHelper::IS_PART_OF) => :collection,
+                                 RDF::URI(MetadataHelper::IDENTIFIER) => :identifier
+                             }
+                         })
+  result = query.execute(graph)[0]
+  identifier = result.identifier.to_s
+  collection_name = last_bit(result.collection.to_s)
+
+  # small hack to handle austalk for the time being, can be fixed up
+  # when we look at getting some form of data uniformity
+  if query.execute(graph).any? { |r| r.collection == "http://ns.austalk.edu.au/corpus" }
+    collection_name = "austalk"
+  end
+
+  handle = "#{collection_name}:#{identifier}"
+  logger.info "Handle is #{handle}"
+  return handle
+end
+
+
+def report_results(label, corpus_dir, successes, errors)
+  begin
+    logfile = "log/ingest_#{File.basename(corpus_dir)}.log"
+    logstream = File.open(logfile, "w")
+
+    message = "Successfully ingested #{successes.size} Item#{successes.size==1 ? '' : 's'}"
+    message += ", and rejected #{errors.size} Item#{errors.size==1 ? '' : 's'}" unless errors.empty?
+    logger.info message
+    logger.info "Writing summary to #{logfile}"
+
+    logstream << "#{label}" << "\n\n"
+    logstream << message << "\n"
+
+    unless successes.empty?
+      logstream << "\n"
+      logstream << "Successfully Ingested" << "\n"
+      logstream << "=====================" << "\n"
+      successes.each { |item, message|
+        logstream << "Item #{item} as #{message}" << "\n"
+      }
+    end
+
+    unless errors.empty?
+      logstream << "\n"
+      logstream << "Error Summary" << "\n"
+      logstream << "=============" << "\n"
+      errors.each { |item, message|
+        logstream << "\nItem #{item}:" << "\n\n"
+        logstream << "#{message}" << "\n"
+      }
+
+      puts "Error ingesting #{File.basename(corpus_dir)} collection. See #{logfile} for details."
+    end
+  ensure
+    logstream.close if !logstream.nil?
+  end
+end
+
+def report_check_results(size, corpus_dir, errors, handles)
+  begin
+    logfile = "log/check_#{File.basename(corpus_dir)}.log"
+    logstream = File.open(logfile, "w")
+
+    message = "Checked #{size} metadata file#{size==1 ? '' : 's'}"
+    message += ", finding #{errors.size} syntax error#{errors.size==1 ? '' : 's'}"
+    message += ", and #{handles.size} duplicate handle#{handles.size==1 ? '' : 's'}"
+    logger.info message
+    logger.info "Writing summary to #{logfile}"
+
+    logstream << "Checking #{corpus_dir}" << "\n\n"
+    logstream << message << "\n"
+
+    unless errors.empty?
+      logstream << "\n"
+      logstream << "Error Summary" << "\n"
+      logstream << "=============" << "\n"
+      errors.each { |item, message|
+        logstream << "\nItem #{item}:" << "\n\n"
+        logstream << "#{message}" << "\n"
+      }
+    end
+
+    unless handles.empty?
+      logstream << "\n"
+      logstream << "Duplicate Handles" << "\n"
+      logstream << "=================" << "\n"
+      handles.each { |handle, list|
+        logstream << "\nHandle #{handle}:" << "\n"
+        list.each { |filename|
+          logstream << "\t#{filename}" << "\n"
+        }
+      }
+    end
+  ensure
+    logstream.close
+  end
+end
+
+
+def parse_boolean(string, default=false)
+  return default if string.blank? # nil.blank? returns true, so this is also a nil guard.
+  return false if string =~ (/(false|f|no|n|0)$/i)
+  return true if string =~ (/(true|t|yes|y|1)$/i)
+  raise ArgumentError.new("invalid value for Boolean: \"#{string}\", should be \"true\" or \"false\"")
+end
+
+def find_corpus_items(corpus)
+  response = @solr.get 'select', :params => {:q => 'collection_name_facet:' + corpus,
+                                             :rows => 2147483647}
+  response['response']['docs']
+end
+
+def setup_collection_list(list_name, licence, *collection_names)
+  list = CollectionList.create_public_list(list_name, licence, *collection_names)
+  logger.warn("Didn't create CollectionList #{list_name}") if list.nil?
+end
+
+def send_solr_message(command, objectID)
+  info("Fedora_Worker", "sending instruction to Solr_Worker: #{command} #{objectID}")
+  publish :solr_worker, "#{command} #{objectID}"
+  debug("Fedora_Worker", "Cache size: #{@@cache.size}")
+  @@cache.each_pair { |key, value|
+    debug("Fedora_Worker", "   @cache[#{key}] = #{value}")
+  }
 end
 
 #

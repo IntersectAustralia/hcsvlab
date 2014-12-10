@@ -8,7 +8,7 @@ class CollectionList < ActiveRecord::Base
   validates_length_of :name, maximum: 255, message: "Name is too long (maximum is 255 characters)"
   validates_presence_of :owner_id, message: 'Collection List owner id can not be empty'
 
-  validate :same_licence_integrity_check
+  validate :same_licence_integrity_check, unless: :new_record?
 
   before_destroy :remove_collection_licences
 

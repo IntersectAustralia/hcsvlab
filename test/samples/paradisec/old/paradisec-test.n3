@@ -1,0 +1,11 @@
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix paradisec: <http://catalog.paradisec.org.au/collections/test> .
+
+paradisec: a dcmitype:Collection ;
+    dc:bibliographicCitation "Test Creator (collector), 2014;" ;
+    dc:creator "Test Creator" ;
+    dc:description "Test Description" ;
+    dc:rights "Open (subject to agreeing to PDSC access conditions)" ;
+    dc:title "Recordings of Selako (Indonesia)" .
+

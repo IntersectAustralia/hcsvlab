@@ -145,9 +145,10 @@ private
       internal_use_data[:documents_path] << doc_info[MetadataHelper::SOURCE][0].to_s unless doc_info[MetadataHelper::SOURCE].nil?
     }
 
-    store_results(object, basic_results, full_text, extras, internal_use_data, collection)
-    item.indexed_at = Time.now
-    item.save!
+    if store_results(object, basic_results, full_text, extras, internal_use_data, collection)
+      item.indexed_at = Time.now
+      item.save!
+    end
   end
 
   #
@@ -394,6 +395,12 @@ private
   def store_results(object, results, full_text, extras = nil, internal_use_data, collection)
     get_solr_connection
     document = make_solr_document(object, results, full_text, extras, internal_use_data, collection)
+
+    if document[:handle].eql?("Unknown Collection:Unknown Identifier")
+      error("Solr_Worker", "Skipping " + object.to_s + " due to missing metadata")
+      return false
+    end
+
     if object_exists_in_solr?(object)
       info("Solr_Worker", "Updating " + object.to_s)
       xml_update = make_solr_update(document)
@@ -408,6 +415,8 @@ private
       response = @@solr.commit
       info("Solr_Worker", "Commit response= #{response.to_s}")
     end
+
+    true
   end
 
   #

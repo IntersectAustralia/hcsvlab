@@ -1,0 +1,80 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix bio: <http://purl.org/vocab/bio/0.1/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dada: <http://purl.org/dada/schema/0.2#> .
+@prefix dbpedia: <http://dbpedia.org/resource/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geonam: <http://sws.geonames.org/> .
+@prefix geopol: <http://aims.fao.org/aos/geopolitical.owl#> .
+@prefix hcsvlab: <http://alveo.edu.au/vocabulary/> .
+@prefix ns1: <http://ns.ausnc.org.au/schemas/paradisec-test/> .
+@prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://ns.ausnc.org.au/schemas/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://ns.ausnc.org.au/corpora/paradisec-test/items/1-001> a ausnc:AusNCObject ;
+    hcsvlab:display_document <http://ns.ausnc.org.au/corpora/paradisec-test/source/1-001#Text> ;
+    hcsvlab:indexable_document <http://ns.ausnc.org.au/corpora/paradisec-test/source/1-001#Text> ;
+    ausnc:discourse_type ausnc:letter ;
+    ausnc:document <http://ns.ausnc.org.au/corpora/paradisec-test/source/1-001#Original>,
+        <http://ns.ausnc.org.au/corpora/paradisec-test/source/1-001#Raw>,
+        <http://ns.ausnc.org.au/corpora/paradisec-test/source/1-001#Text> ;
+    ausnc:itemwordcount 924 ;
+    ns1:register "Private Written" ;
+    ns1:texttype "Private Correspondence" ;
+    schema:localityName dbpedia:New_South_Wales ;
+    dc:created "10/11/1791" ;
+    dc:identifier "1-001" ;
+    dc:isPartOf corpus:paradisec-test ;
+    dc:source "Niall, 1998" ;
+    bibo:pages "10-11" ;
+    olac:language "eng" ;
+    olac:speaker <http://ns.ausnc.org.au/corpora/paradisec-test/person/1-001addressee>,
+        <http://ns.ausnc.org.au/corpora/paradisec-test/person/1-001author> .
+
+<http://ns.ausnc.org.au/corpora/paradisec-test/person/1-001addressee> a foaf:Person ;
+    ausnc:id "1-001addressee" ;
+    ausnc:role "addressee" ;
+    ns1:status "Upper Middle Class: educated citizens, gentlemen" ;
+    bio:place dbpedia:England ;
+    foaf:gender "male" .
+
+<http://ns.ausnc.org.au/corpora/paradisec-test/person/1-001author> a foaf:Person ;
+    ausnc:id "1-001author" ;
+    ausnc:role "author" ;
+    ns1:abode "0" ;
+    ns1:arrival "1788" ;
+    ns1:status "Upper Class: Nobility, university education, government service; Parliaments and Committees" ;
+    bio:birth "1738" ;
+    bio:place dbpedia:Great_Britain ;
+    foaf:age "50" ;
+    foaf:gender "male" ;
+    foaf:name "Philip, Arthur" .
+
+<http://ns.ausnc.org.au/corpora/paradisec-test/source/1-001#Original> a foaf:Document ;
+    dc:extent 5126 ;
+    dc:identifier "1-001.txt" ;
+    dc:source <file:///data/alveo-test/paradisec/old/paradisec-test/1-001.txt> ;
+    dc:title "1-001#Original" ;
+    dc:type "Original" .
+
+<http://ns.ausnc.org.au/corpora/paradisec-test/source/1-001#Raw> a foaf:Document ;
+    dc:extent 5126 ;
+    dc:identifier "1-001-raw.txt" ;
+    dc:source <file:///data/alveo-test/paradisec/old/paradisec-test/1-001-raw.txt> ;
+    dc:title "1-001#Raw" ;
+    dc:type "Raw" .
+
+<http://ns.ausnc.org.au/corpora/paradisec-test/source/1-001#Text> a foaf:Document ;
+    dc:extent 4960 ;
+    dc:identifier "1-001-plain.txt" ;
+    dc:source <file:///data/alveo-test/paradisec/old/paradisec-test/1-001-plain.txt> ;
+    dc:title "1-001#Text" ;
+    dc:type "Text" .
+

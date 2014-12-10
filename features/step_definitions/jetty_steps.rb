@@ -13,18 +13,28 @@ And /^I ingest "([^:]*):([^:]*)"$/ do |corpus, prefix|
   Solr_Worker.new.on_message("index #{pid}")
 end
 
+And /^I ingest the sample folder "([^:]*)"$/ do |corpus|
+  corpus_dir = "#{SAMPLE_FOLDER}/#{corpus}"
+  ingest_corpus(corpus_dir)
+end
+
+And /^I clear the collection metadata for "([^:]*)"$/ do |corpus|
+  clear_collection_metadata(corpus)
+end
+
 And /^I reindex all$/ do
   solr_worker = Solr_Worker.new
   Item.pluck(:id).each do |id|
-    # begin
-      solr_worker.on_message("index #{id}")
-    # rescue Exception => e
-    #
-    #   # Do nothing
-    # end
+    solr_worker.on_message("index #{id}")
   end
 end
 
+And /^I reindex the collection "([^:]*)"$/ do |corpus|
+  solr_worker = Solr_Worker.new
+  Collection.find_by_name(corpus).item_ids.each do |id|
+    solr_worker.on_message("index #{id}")
+  end
+end
 
 And /^I ingest licences$/ do
   create_default_licences(SAMPLE_FOLDER)
