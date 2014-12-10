@@ -55,7 +55,7 @@ class CollectionsController < ApplicationController
   #
   def add_licence_to_collection
     collection = Collection.find(params[:collection_id])
-    licence = Licence.find (params[:licence_id])
+    licence = Licence.find(params[:licence_id])
 
     collection.set_licence(licence)
 

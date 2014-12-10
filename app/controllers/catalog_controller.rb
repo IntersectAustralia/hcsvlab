@@ -559,7 +559,12 @@ class CatalogController < ApplicationController
   #
   def document
     begin
+
       doc = Document.find_by_file_name_and_item_id(params[:filename], params[:id])
+      # check if document exists in JSON metadata from Sesame/Solr
+      # This is set during Solr indexing based on a variety of metadata from Solr and Sesame
+      # See add_json_metadata_field in solr_worker.rb
+      doc = nil if doc.present? and Item.where(id: params[:id]).where("json_metadata like ?","%#{doc.file_path}%").blank?
 
       if doc.present?
 
