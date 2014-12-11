@@ -86,18 +86,37 @@ def reindex_item_to_solr(item_id, stomp_client)
 end
 
 def check_and_create_collection(collection_name, corpus_dir)
+
+  if collection_name == "ice" && File.basename(corpus_dir)!="ice" #ice has different directory structure
+    dir = File.expand_path("../../..", corpus_dir)
+  else
+    dir = File.expand_path("..", corpus_dir)
+  end
+
+  if Dir.entries(dir).include?(collection_name + ".n3")
+    coll_metadata = dir + "/" + collection_name + ".n3"
+  else
+    raise ArgumentError, "No collection metadata file found - #{dir}/#{collection_name}.n3. Stopping ingest."
+  end
+
   collection = Collection.find_by_name(collection_name)
+
   is_new = false
   if collection.nil?
     is_new = true
-    create_collection(collection_name, corpus_dir)
+    logger.info "Creating collection #{collection_name}"
+    create_collection_from_file(coll_metadata, collection_name)
     collection = Collection.find_by_name(collection_name)
+  else
+    # Update RDF file path but don't save yet.
+    collection.rdf_file_path = coll_metadata
   end
 
   paradisec_collection_setup(collection, is_new)
 
   populate_triple_store(corpus_dir, collection_name, "*-{metadata,ann}.rdf")
 
+  collection.save
   collection
 end
 
@@ -137,23 +156,6 @@ def paradisec_collection_setup(collection, is_new)
     end
   end
 
-end
-
-def create_collection(collection_name, corpus_dir)
-  logger.info "Creating collection #{collection_name}"
-  if collection_name == "ice" && File.basename(corpus_dir)!="ice" #ice has different directory structure
-    dir = File.expand_path("../../..", corpus_dir)
-  else
-    dir = File.expand_path("..", corpus_dir)
-  end
-
-  if Dir.entries(dir).include?(collection_name + ".n3")
-    coll_metadata = dir + "/" + collection_name + ".n3"
-  else
-    raise ArgumentError, "No collection metadata file found - #{dir}/#{collection_name}.n3. Stopping ingest."
-  end
-
-  create_collection_from_file(coll_metadata, collection_name)
 end
 
 def create_collection_from_file(collection_file, collection_name)

@@ -67,6 +67,23 @@ Feature: Displaying Items
     When I make a JSON request for the document content page for file "1-002-plain.txt" for item "paradisec-test:1-002" with the API token for "data_owner@intersect.org.au"
     Then I should get a 404 response code
 
+    And I clear the collection metadata for "paradisec-test"
+    And I ingest the sample folder "paradisec/new_closed/paradisec-test"
+    And I reindex the collection "paradisec-test"
+
+    And I am on the catalog page for "paradisec-test:1-001"
+    Then I should see a page with the title: "Alveo"
+    Then I should see "Sorry, you have requested a document that doesn't exist."
+    When I make a JSON request for the document content page for file "1-001-raw.txt" for item "paradisec-test:1-001" with the API token for "data_owner@intersect.org.au"
+    Then I should get a 404 response code
+
+    And I am on the catalog page for "paradisec-test:1-002"
+    Then I should see a page with the title: "Alveo"
+    Then I should see "Sorry, you have requested a document that doesn't exist."
+    When I make a JSON request for the document content page for file "1-002-plain.txt" for item "paradisec-test:1-002" with the API token for "data_owner@intersect.org.au"
+    Then I should get a 404 response code
+
+
   Scenario: PARADISEC Closed
     And I clear the collection metadata for "paradisec-test"
     And I ingest the sample folder "paradisec/new_closed/paradisec-test"

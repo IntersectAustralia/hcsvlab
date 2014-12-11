@@ -19,6 +19,6 @@
 
 # Learn more: http://github.com/javan/whenever
 
-every :day, :at => '12:02am' do
+every :day, :at => '12:00am' do
   script "paradisec_poll.sh" # will be deployed to :db and :app servers
 end
