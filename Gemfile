@@ -116,3 +116,5 @@ gem 'json-jwt'
 gem 'devise_aaf_rc_authenticatable', :git => 'https://github.com/IntersectAustralia/devise_aaf_rc_authenticatable'
 
 gem 'keepass-password-generator'
+
+gem "whenever", require: false

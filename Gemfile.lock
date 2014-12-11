@@ -132,6 +132,7 @@ GEM
       timers (>= 1.0.0)
     childprocess (0.5.5)
       ffi (~> 1.0, >= 1.0.11)
+    chronic (0.10.2)
     coderay (1.0.9)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
@@ -497,6 +498,8 @@ GEM
     warden (1.2.3)
       rack (>= 1.0)
     websocket (1.0.7)
+    whenever (0.9.4)
+      chronic (>= 0.6.3)
     whoops_logger (0.1.4)
       json
     xml-simple (1.1.2)
@@ -585,6 +588,7 @@ DEPENDENCIES
   thin
   tinymce-rails
   uglifier (>= 1.0.3)
+  whenever
   whoops_rails_logger!
   xml-simple
   xray-rails

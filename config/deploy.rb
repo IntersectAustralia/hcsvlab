@@ -5,6 +5,9 @@ require 'capistrano_colors'
 require 'rvm/capistrano'
 require 'deploy/create_deployment_record'
 
+set :whenever_environment, defer { stage }
+require "whenever/capistrano"
+
 set :shared_file_dir, "files"
 set(:shared_file_path) { File.join(shared_path, shared_file_dir) }
 
