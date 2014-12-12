@@ -4,7 +4,7 @@ require 'capistrano/ext/multistage'
 require 'capistrano_colors'
 require 'rvm/capistrano'
 require 'deploy/create_deployment_record'
-
+load 'deploy/assets'
 set :whenever_environment, defer { stage }
 require "whenever/capistrano"
 
