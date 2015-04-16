@@ -569,7 +569,6 @@ class CatalogController < ApplicationController
       if doc.present?
 
         # Log download to DocumentAudit
-        DocumentAudit.create(document: doc, user: current_user)
 
         params[:disposition] = 'Inline'
         params[:disposition].capitalize!
@@ -590,10 +589,9 @@ class CatalogController < ApplicationController
 
           send_data IO.binread(doc.file_path,length, offset), disposition: params[:disposition], type: doc.mime_type, status: response.status, stream: true
         else
+          DocumentAudit.create(document: doc, user: current_user)
           send_file doc.file_path, disposition: params[:disposition], type: doc.mime_type, status: response.status
         end
-
-
         return
       end
     rescue Exception => e
