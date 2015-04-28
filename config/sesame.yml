@@ -3,14 +3,14 @@ development:
 test: &TEST
   url: http://localhost:8983/openrdf-sesame
 qa:
-  url: http://alveo-qa.intersect.org.au:8080/openrdf-sesame
+  url: http://localhost:8080/openrdf-sesame
 qa2:
-  url: http://alveo-qa2.intersect.org.au:8080/openrdf-sesame
+  url: http://localhost:8080/openrdf-sesame
 staging:
-  url: http://alveo-staging1.intersect.org.au:8080/openrdf-sesame
+  url: http://localhost:8080/openrdf-sesame
 staging2:
-  url: http://alveo-staging2.intersect.org.au:8080/openrdf-sesame
+  url: http://localhost:8080/openrdf-sesame
 production:
-  url: http://app.alveo.edu.au:8080/openrdf-sesame
+  url: http://localhost:8080/openrdf-sesame
 cucumber:
   <<: *TEST
