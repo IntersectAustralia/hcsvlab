@@ -46,7 +46,7 @@ bundle exec rake fedora:paradisec_clear
 
 declare corpora
 
-for f in `find /data/${RAILS_ENV}_processed/paradisec -type d`
+for f in `find /data/${RAILS_ENV}_processed/paradisec -type d| sort`
 do
    if test -n "$(find ${f} -maxdepth 1 -name '*-metadata.rdf' -print -quit)"
    then

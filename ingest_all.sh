@@ -18,7 +18,7 @@ fi
 
 declare corpora
 
-for f in `find ${CORPUS_PATH} -type d`
+for f in `find ${CORPUS_PATH} -type d| sort`
 do
    if test -n "$(find ${f} -maxdepth 1 -name '*-metadata.rdf' -print -quit)"
    then
