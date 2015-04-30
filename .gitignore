@@ -19,6 +19,8 @@
 /.idea
 /coverage
 
+public/assets/**
+
 *.swp
 
 # Not everyone has a Mac...

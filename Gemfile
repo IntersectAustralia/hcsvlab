@@ -10,6 +10,7 @@ group :assets do
   gem 'coffee-rails', '~> 3.2.1'
   gem "therubyracer"
   gem 'uglifier', '>= 1.0.3'
+  gem 'turbo-sprockets-rails3'
 end
 
 gem "jquery-rails", "2.3.0"
