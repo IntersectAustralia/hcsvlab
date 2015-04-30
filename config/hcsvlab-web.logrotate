@@ -8,3 +8,14 @@
     compress
     dateext
 }
+
+/home/devel/hcsvlab-web/shared/log/*.output {
+    rotate 520
+    weekly
+    copytruncate
+    missingok
+    notifempty
+    olddir /home/devel/hcsvlab-web/shared/log_archive
+    compress
+    dateext
+}
