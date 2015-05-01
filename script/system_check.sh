@@ -14,16 +14,15 @@ REVIVE=$1
 ACTIVEMQ_URL="http://localhost:8161/"
 ACTIVEMQ_USER="admin:admin"
 
-WEB_PORT_NUMBER=3000
+WEB_URL="http://localhost:3000/version.json"
 JAVA_PORT_NUMBER=8983
 
 if [ ! -z "$RAILS_ENV" -a "$RAILS_ENV" != "development" ]
 then
-  WEB_PORT_NUMBER=80
+  WEB_URL="https://localhost/version.json"
   JAVA_PORT_NUMBER=8080
 fi
 
-WEB_URL="http://localhost:${WEB_PORT_NUMBER}/version.json"
 JAVA_URL="http://localhost:${JAVA_PORT_NUMBER}/"
 
 echo ""
@@ -156,7 +155,7 @@ let count=0
 while [ $count -lt 15 -a "$web_status" == "" ]
 do
   sleep 2
-  web_status=`curl -I  ${WEB_URL} 2>/dev/null  | head -1 | awk '{print $2}' `
+  web_status=`curl -Ik ${WEB_URL} 2>/dev/null  | head -1 | awk '{print $2}' `
   let count=count+1
 done
 
