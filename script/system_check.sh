@@ -89,6 +89,7 @@ then
   pkill -9 -f activemq
   cd $ACTIVEMQ_HOME && nohup bin/activemq start > nohup_activemq.out 2>&1
   sleep 30
+  echo "Reviving workers relying on ActiveMQ..."
   cd /home/devel/hcsvlab-web/current && nohup bundle exec rake a13g:stop_pollers a13g:start_pollers > nohup_a13g_pollers.out 2>&1
 fi
 
@@ -159,7 +160,7 @@ do
   let count=count+1
 done
 
-if [ "$web_status" == "200" -o "$web_status" == "301" -o "$web_status" == "302" ]
+if [ "$web_status" == "200" ]
 then
   echo "+ The Web App is listening on port $WEB_PORT_NUMBER (status= $web_status)"
 else
