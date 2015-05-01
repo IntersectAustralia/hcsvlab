@@ -10,7 +10,7 @@
 #
 
 RET_STATUS=0
-
+REVIVE=ARGV[1]
 ACTIVEMQ_URL="http://localhost:8161/"
 ACTIVEMQ_USER="admin:admin"
 

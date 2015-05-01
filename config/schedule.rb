@@ -24,5 +24,5 @@ every :day, :at => '12:00am' do
 end
 
 every 10.minutes do
-  script "REVIVE=true system_check.sh"
+  script "system_check.sh true"
 end
