@@ -86,13 +86,16 @@ after 'deploy:setup' do
   server_setup.filesystem.mkdir_db_dumps
 end
 
+before 'deploy:update' do
+  deploy.stop_services
+end
+
 after 'deploy:update' do
   server_setup.logging.rotation
   deploy.new_secret
   deploy.restart
   deploy.additional_symlinks
   deploy.write_tag
-  deploy.stop_services
   deploy.start_services
   # We need to use our own cleanup task since there is an issue on Capistrano deploy:cleanup task
   #https://github.com/capistrano/capistrano/issues/474
@@ -177,7 +180,6 @@ namespace :deploy do
   desc "Full redeployment, it runs deploy:update and deploy:refresh_db"
   task :full_redeploy, :except => {:no_release => true} do
     update
-    rebundle
     refresh_db
 
     configure_activemq
@@ -217,7 +219,6 @@ namespace :deploy do
   task :safe, :except => {:no_release => true} do
     require 'colorize'
     update
-    rebundle
 
     cat_migrations_output = capture("cd #{current_path} && bundle exec rake db:cat_pending_migrations 2>&1", :env => {'RAILS_ENV' => stage}).chomp
     puts cat_migrations_output

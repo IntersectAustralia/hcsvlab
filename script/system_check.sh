@@ -89,6 +89,8 @@ then
   echo "Reviving ActiveMQ..."
   pkill -9 -f activemq
   cd $ACTIVEMQ_HOME && nohup bin/activemq start > nohup_activemq.out 2>&1
+  sleep 30
+  cd /home/devel/hcsvlab-web/current && nohup bundle exec rake a13g:stop_pollers a13g:start_pollers > nohup_a13g_pollers.out 2>&1
 fi
 
 # Servlet Container - Jetty or Tomcat
