@@ -23,7 +23,7 @@ then
   JAVA_PORT_NUMBER=8080
 fi
 
-WEB_URL="http://localhost:${WEB_PORT_NUMBER}/"
+WEB_URL="http://localhost:${WEB_PORT_NUMBER}/version.json"
 JAVA_URL="http://localhost:${JAVA_PORT_NUMBER}/"
 
 echo ""
@@ -160,7 +160,7 @@ do
   let count=count+1
 done
 
-if [ "$web_status" == "200"  -o "$web_status" == "302" ]
+if [ "$web_status" == "200" -o "$web_status" == "301" -o "$web_status" == "302" ]
 then
   echo "+ The Web App is listening on port $WEB_PORT_NUMBER (status= $web_status)"
 else
