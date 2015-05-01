@@ -5,7 +5,10 @@ require 'capistrano_colors'
 require 'rvm/capistrano'
 require 'deploy/create_deployment_record'
 load 'deploy/assets'
+
 set :whenever_environment, defer { stage }
+set :whenever_command, "bundle exec whenever"
+
 require "whenever/capistrano"
 
 set :shared_file_dir, "files"
@@ -82,22 +85,25 @@ after 'deploy:setup' do
   server_setup.filesystem.dir_perms
   server_setup.filesystem.mkdir_db_dumps
 end
+
 after 'deploy:update' do
   server_setup.logging.rotation
   deploy.new_secret
   deploy.restart
   deploy.additional_symlinks
   deploy.write_tag
-  #deploy.cleanup
+  deploy.stop_services
+  deploy.start_services
   # We need to use our own cleanup task since there is an issue on Capistrano deploy:cleanup task
   #https://github.com/capistrano/capistrano/issues/474
   deploy.customcleanup
+
 end
 
 namespace :deploy do
 
   desc "Write the tag that was deployed to a file on the server so we can display it on the app"
-  task :write_tag do
+  task :write_tag, :except => {:no_release => true} do
     branchName = branch.nil? ? "HEAD" : branch
 
     availableTags = `git tag`.split( /\r?\n/ )
@@ -129,18 +135,18 @@ namespace :deploy do
   end
 
   # Remote bundle install
-  task :rebundle do
+  task :rebundle, :roles => :app, :except => {:no_release => true} do
     run "cd #{current_path} && bundle install"
     restart
   end
 
-  task :bundle_update do
+  task :bundle_update, :roles => :app, :except => {:no_release => true} do
     run "cd #{current_path} && bundle update"
     restart
   end
 
   desc "Additional Symlinks to shared_path"
-  task :additional_symlinks do
+  task :additional_symlinks, :roles => :app, :except => {:no_release => true} do
     run "rm -rf #{release_path}/tmp/shared_config"
     run "mkdir -p #{shared_path}/env_config"
     run "ln -nfs #{shared_path}/env_config #{release_path}/tmp/env_config"
@@ -168,8 +174,8 @@ namespace :deploy do
     run("cd #{current_path} && bundle exec rake db:seed", :env => {'RAILS_ENV' => "#{stage}"})
   end
 
-  desc "Full redepoyment, it runs deploy:update and deploy:refresh_db"
-  task :full_redeploy do
+  desc "Full redeployment, it runs deploy:update and deploy:refresh_db"
+  task :full_redeploy, :except => {:no_release => true} do
     update
     rebundle
     refresh_db
@@ -208,7 +214,7 @@ namespace :deploy do
   end
 
   desc "Safe redeployment"
-  task :safe do # TODO roles?
+  task :safe, :except => {:no_release => true} do
     require 'colorize'
     update
     rebundle
@@ -234,18 +240,12 @@ namespace :deploy do
 
   desc "Start ActiveMQ, Jetty, the A13g workers"
   task :start_services, :roles => :app do
-    start_activemq
-    puts "    Waiting 30 seconds for ActiveMQ to start..."
-    sleep(30)
-    start_tomcat6
     start_a13g_pollers
   end
 
   desc "Stop ActiveMQ, Jetty, the A13g workers"
   task :stop_services, :roles => :app do
     stop_a13g_pollers
-    stop_tomcat6
-    stop_activemq
   end
 
   # We need to define our own cleanup task since there is an issue on Capistrano deploy:cleanup task
@@ -273,12 +273,12 @@ end
 namespace :backup do
   namespace :db do
     desc "make a database backup"
-    task :dump do
+    task :dump, :roles => :db do
       run "cd #{current_path} && bundle exec rake db:backup", :env => {'RAILS_ENV' => stage}
     end
 
     desc "trim database backups"
-    task :trim do
+    task :trim, :roles => :db do
       run "cd #{current_path} && bundle exec rake db:trim_backups", :env => {'RAILS_ENV' => stage}
     end
   end

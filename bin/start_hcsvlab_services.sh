@@ -12,7 +12,7 @@ PATH=/home/devel/.rvm/gems/ruby-2.1.4/bin:/home/devel/.rvm/gems/ruby-2.1.4@globa
 export $PATH
 
 # Starting ActiveMQ
-$ACTIVEMQ_HOME/bin/activemq start
+cd $ACTIVEMQ_HOME && nohup bin/activemq start > nohup_activemq.out 2>&1
 sleep 5
 
 # Starting Apache Tomcat

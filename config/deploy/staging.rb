@@ -2,10 +2,10 @@
 role :web, 'alveo-staging1.intersect.org.au'
 # This may be the same as your Web server
 role :app, 'alveo-staging1.intersect.org.au'
-# Galaxy VM
-role :galaxy, '130.56.248.111'
 # This is where Rails migrations will run
 role :db,  'alveo-staging1.intersect.org.au', :primary => true
+# Galaxy VM
+role :galaxy, '130.56.248.111', :no_release => true
 
 set :server_url, "http://alveo-staging1.intersect.org.au"
 set :galaxy_url, "http://130.56.248.111"

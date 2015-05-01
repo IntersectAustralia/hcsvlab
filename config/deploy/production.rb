@@ -5,7 +5,7 @@ role :app, 'app.alveo.edu.au'
 # This is where Rails migrations will run
 role :db,  'app.alveo.edu.au', :primary => true
 # Galaxy VM
-role :galaxy, '130.56.249.65'
+role :galaxy, '130.56.249.65', :no_release => true
 
 set :server_url, "https://app.alveo.edu.au/"
 set :galaxy_url, "http://130.56.249.65"
