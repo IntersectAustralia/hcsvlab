@@ -77,6 +77,7 @@ class Solr_Worker < ApplicationProcessor
         rescue Exception => e
           error("Solr Worker", e.message)
           error("Solr Worker", e.backtrace)
+          raise ActiveMessaging::AbortMessageException
         end
       when "delete"
         delete(object)
@@ -88,7 +89,6 @@ class Solr_Worker < ApplicationProcessor
   end
 
 private
-
 
   #
   # =============================================================================

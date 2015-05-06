@@ -7,7 +7,7 @@ ActiveMessaging::Gateway.define do |s|
   #s.filter :some_filter, :only=>:orders
   #s.processor_group :group1, :order_processor
  
-  s.destination :solr_worker, '/queue/hcsvlab.solr.worker'
+  s.destination :solr_worker, '/queue/alveo.solr.worker'
 
   s.processor_group :solr_group, :solr_worker
 
