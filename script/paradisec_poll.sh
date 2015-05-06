@@ -7,26 +7,31 @@ if [ -z "$RAILS_ENV" ]; then
     RAILS_ENV=development
 fi
 
+robochef_path=/data/${RAILS_ENV}/paradisec_robochef
+raw_path=/data/${RAILS_ENV}/raw
+processed_path=/data/${RAILS_ENV}/processed
+
 echo "Rails env= $RAILS_ENV"
 
-if [ -d "/data/paradisec_robochef" ]
+if [ -d "$robochef_path" ]
 then
-    cd /data/paradisec_robochef
-    git pull https://github.com/IntersectAustralia/hcsvlab_robochef
+    cd $robochef_path
+    git pull
 else
-    git clone https://github.com/IntersectAustralia/hcsvlab_robochef /data/paradisec_robochef
-    cd /data/paradisec_robochef
+    mkdir -p $robochef_path
+    git clone https://github.com/IntersectAustralia/hcsvlab_robochef $robochef_path
+    cd $robochef_path
 fi
 
 if [ -f "bin/activate" ]
 then
     source bin/activate
 else
-    cp /data/paradisec_robochef/config.ini.dist /data/paradisec_robochef/config.ini
-    echo "DOCUMENT_BASE_URL = file:///data/production_collections/" >> /data/paradisec_robochef/config.ini
-    echo "CORPUS_BASEDIR = /data/${RAILS_ENV}_raw/" >> /data/paradisec_robochef/config.ini
-    echo "CORPUS_OUTPUTDIR = /data/${RAILS_ENV}_processed/" >> /data/paradisec_robochef/config.ini
-    curl https://bootstrap.pypa.io/ez_setup.py -o - | python
+    cp $robochef_path/config.ini.dist $robochef_path/config.ini
+    echo "DOCUMENT_BASE_URL = file:///data/production_collections/" >> $robochef_path/config.ini
+    echo "CORPUS_BASEDIR = ${raw_path}/" >> $robochef_path/config.ini
+    echo "CORPUS_OUTPUTDIR = ${processed_path}/" >> $robochef_path/config.ini
+    curl https://bootstrap.pypa.io/ez_setup.py -o - | sudo python
     easy_install-2.7 virtualenv
     virtualenv .
     source bin/activate
@@ -36,9 +41,9 @@ fi
 logfile=$DIR/../log/$( date +%Y%m%d_%H.%M.%S )_paradisec_ingest.log
 echo "Logging to $logfile"
 
-rm -r /data/${RAILS_ENV}_raw/paradisec
-bin/python2.7 hcsvlab_robochef/paradisec/harvest/harvester.py /data/${RAILS_ENV}_raw/paradisec >> $logfile 2>&1
-bin/python2.7 hcsvlab_robochef/paradisec/harvest/collection_harvester.py /data/${RAILS_ENV}_raw/paradisec >> $logfile 2>&1
+rm -r ${raw_path}/paradisec
+bin/python2.7 hcsvlab_robochef/paradisec/harvest/harvester.py ${raw_path}/paradisec >> $logfile 2>&1
+bin/python2.7 hcsvlab_robochef/paradisec/harvest/collection_harvester.py ${raw_path}/paradisec >> $logfile 2>&1
 bin/python2.7 main.py paradisec >> $logfile 2>&1
 
 cd $DIR/..
@@ -46,7 +51,7 @@ bundle exec rake fedora:paradisec_clear
 
 declare corpora
 
-for f in `find /data/${RAILS_ENV}_processed/paradisec -type d| sort`
+for f in `find ${processed_path}/paradisec -type d| sort`
 do
    if test -n "$(find ${f} -maxdepth 1 -name '*-metadata.rdf' -print -quit)"
    then
