@@ -148,6 +148,12 @@ else
   RET_STATUS=3
 fi
 
+if [ $RET_STATUS -eq 3 ] && [ "$REVIVE" == "true" ]
+then
+  echo "Reviving workers..."
+  cd /home/devel/hcsvlab-web/current && nohup bundle exec rake a13g:stop_pollers a13g:start_pollers > nohup_a13g_pollers.out 2>&1
+fi
+
 # Check the web app
 echo ""
 echo "Checking the web app..."

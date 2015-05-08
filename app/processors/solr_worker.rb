@@ -344,16 +344,6 @@ private
   #
   def make_solr_update(document)
 
-    #add_attributes = {:allowDups => false, :commitWithin => 10}
-    #
-    #xml_update = @@solr.xml.add(document, add_attributes) do | doc |
-    #  document.keys.each do | key |
-    #    if (key.to_s != 'id')
-    #      doc.field_by_name(key).attrs[:update] = 'set'
-    #    end
-    #  end
-    #end
-
     xml_update = "<add overwrite='true' allowDups='false'> <doc>"
       
     document.keys.each do | key |
