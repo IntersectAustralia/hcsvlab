@@ -38,9 +38,9 @@ else
     pip install "pyparsing<=1.5.7" xlrd "rdflib<=3.4.0" httplib2 rdfextras
 fi
 
-logfile=$DIR/../log/$( date +%Y%m%d_%H.%M.%S )_paradisec_ingest.log
+logfile=$DIR/../log/paradisec_ingest.log
 echo "Logging to $logfile"
-
+echo "===== Begin $( date '+%Y-%m-%d %H.%M.%S' )" >> $logfile
 rm -r ${raw_path}/paradisec
 bin/python2.7 hcsvlab_robochef/paradisec/harvest/harvester.py ${raw_path}/paradisec >> $logfile 2>&1
 bin/python2.7 hcsvlab_robochef/paradisec/harvest/collection_harvester.py ${raw_path}/paradisec >> $logfile 2>&1
@@ -61,3 +61,4 @@ do
 done
 
 ./nohup_ingest_all_bg.sh ${corpora} >> $logfile 2>&1
+echo "===== End $( date '+%Y-%m-%d %H.%M.%S' )" >> $logfile

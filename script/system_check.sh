@@ -28,7 +28,7 @@ JAVA_URL="http://localhost:${JAVA_PORT_NUMBER}/"
 echo ""
 echo "Checking HCS vLab environment"
 
-echo ""
+echo `date`
 echo "Rails env= $RAILS_ENV"
 echo "Java Container url= $JAVA_URL"
 echo "Web App url= $WEB_URL"

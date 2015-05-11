@@ -4,74 +4,33 @@
 # Simple yaml file for the env specific configuration of the broker connections.
 # See the wiki for more information: http://code.google.com/p/activemessaging/wiki/Configuration
 #
+common: &common
+  adapter: stomp
+  host: 127.0.0.1
+  port: 61613
+  reliable: true
+  reconnectDelay: 5
+
 development:
-    ############################
-    # Stomp Adapter Properties #
-    ############################
-    adapter: stomp
-    reliable: false
-    host: 127.0.0.1
-    port: 61613
-
-    # properties below are all defaults for this adapter
-    # login: ""
-    # passcode: ""
-    # host: localhost
-    # port: 61613
-    # reliable: true
-    # reconnectDelay: 5
-
-    # NEW! enable stomp retry logic
-    #  will resend errored out messages to be retried when on_error throws ActiveMessaging::AbortMessageException
-    #
-    # Max number of times to retry an aborted message, for 0, will not retry (default)
-    #
-    # If error still occurs after retryMax, send message to specified dead letter queue
-    retryMax: 5
-    deadLetterQueue: '/queue/alveo.solr.deadletter'
+  <<: *common
 
 test:
-    adapter: test
-    reliable: false
-    host: localhost
-    port: 61613
-    reliable: true
-    reconnectDelay: 5
-    retryMax: 5
-    deadLetterQueue: '/queue/alveo.solr.deadletter'
+  <<: *common
+  adapter: test
+  reliable: false
+
 qa:
-    adapter: stomp
-    reliable: false
-    host: 127.0.0.1
-    port: 61613
-    retryMax: 5
-    deadLetterQueue: '/queue/alveo.solr.deadletter'
+  <<: *common
+
 qa2:
-    adapter: stomp
-    reliable: false
-    host: 127.0.0.1
-    port: 61613
-    retryMax: 5
-    deadLetterQueue: '/queue/alveo.solr.deadletter'
+   <<: *common
+
 staging:
-    adapter: stomp
-    reliable: false
-    host: 127.0.0.1
-    port: 61613
-    retryMax: 5
-    deadLetterQueue: '/queue/alveo.solr.deadletter'
+  <<: *common
+
 staging2:
-    adapter: stomp
-    reliable: false
-    host: 127.0.0.1
-    port: 61613
-    retryMax: 5
-    deadLetterQueue: '/queue/alveo.solr.deadletter'
+   <<: *common
+
 production:
-    adapter: stomp
-    reliable: true
-    host: 127.0.0.1
-    port: 61613
-    retryMax: 5
-    deadLetterQueue: '/queue/alveo.solr.deadletter'
+  <<: *common
 
