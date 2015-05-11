@@ -21,6 +21,6 @@ labels:
   DC_itemType: 'Item Type'
   DC_language: 'Language'
   DC_sensitivitystatement: 'Sensitivity Statement'
-  http_www_loc_gov_loc_terms_relators_OWN: 'Owner'
+  LoC_OWN: 'Owner'
   DC_temporal: 'Temporal Coverage'
   http_purl_org_cld_terms_dateItemsCreated: 'Date Items Created'
