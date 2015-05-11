@@ -256,6 +256,7 @@ namespace :fedora do
     Collection.assign_licence("rirusyd", licences["Creative Commons v3.0 BY-NC-SA"])
     Collection.assign_licence("mbep", licences["Creative Commons v3.0 BY-NC-SA"])
     Collection.assign_licence("jakartan_indonesian", licences["Creative Commons v3.0 BY-NC-SA"])
+    Collection.assign_licence("llc", licences["LLC Terms of Use"])
   end
 
   task :paradisec_clear => :environment do

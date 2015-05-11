@@ -17,11 +17,11 @@ private
     PURL_BIBO_BASE_URI   = PURL_ROOT_URI + 'ontology/bibo/'
     PURL_VOCAB_BASE_URI  = PURL_ROOT_URI + 'vocab/bio/0.1/'
 
-  OLAC_BASE_URI       = 'http://www.language-archives.org/OLAC/1.1/'
-  FOAF_BASE_URI       = 'http://xmlns.com/foaf/0.1/'
-  RDF_BASE_URI        = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
-  LOC_BASE_URI        = 'http://id.loc.gov/vocabulary/relators/'
-  ALVEO_BASE_URI    = 'http://alveo.edu.au/vocabulary/'
+  OLAC_BASE_URI    = 'http://www.language-archives.org/OLAC/1.1/'
+  FOAF_BASE_URI    = 'http://xmlns.com/foaf/0.1/'
+  RDF_BASE_URI     = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  LOC_BASE_URI     = 'http://www.loc.gov/loc.terms/relators/'
+  ALVEO_BASE_URI   = 'http://alveo.edu.au/vocabulary/'
 
   AUSTALK_BASE_URI = 'http://ns.austalk.edu.au/'
 
@@ -46,7 +46,7 @@ private
 
     AUSTALK_BASE_URI     => "AUSTALK",
 
-    ALVEO_BASE_URI     => "Alveo"
+    ALVEO_BASE_URI       => "Alveo"
   }
 
 public
@@ -73,31 +73,32 @@ public
   # AUSTLIT
   #
   LOCATION = RDF::URI(AUSTLIT_BASE_URI + 'location') unless const_defined?(:LOCATION)
-  
+
   @@lookup[LOCATION.to_s] = prefixes[AUSTLIT_BASE_URI] + "_location"
 
   #
   # DC
   #
-  IS_PART_OF = RDF::URI(DC_TERMS_BASE_URI + 'isPartOf') unless const_defined?(:IS_PART_OF)
-  TYPE       = RDF::URI(DC_TERMS_BASE_URI + 'type') unless const_defined?(:TYPE)
-  EXTENT     = RDF::URI(DC_TERMS_BASE_URI + 'extent') unless const_defined?(:EXTENT)
-  CREATED    = RDF::URI(DC_TERMS_BASE_URI + 'created') unless const_defined?(:CREATED)
-  IDENTIFIER = RDF::URI(DC_TERMS_BASE_URI + 'identifier') unless const_defined?(:IDENTIFIER)
-  SOURCE     = RDF::URI(DC_TERMS_BASE_URI + 'source') unless const_defined?(:SOURCE)
-  TITLE      = RDF::URI(DC_TERMS_BASE_URI + 'title') unless const_defined?(:TITLE)
-  RIGHTS      = RDF::URI(DC_TERMS_BASE_URI + 'rights') unless const_defined?(:RIGHTS)
-  DESCRIPTION = RDF::URI(DC_TERMS_BASE_URI + 'description') unless const_defined?(:DESCRIPTION)
+  IS_PART_OF             = RDF::URI(DC_TERMS_BASE_URI + 'isPartOf') unless const_defined?(:IS_PART_OF)
+  TYPE                   = RDF::URI(DC_TERMS_BASE_URI + 'type') unless const_defined?(:TYPE)
+  EXTENT                 = RDF::URI(DC_TERMS_BASE_URI + 'extent') unless const_defined?(:EXTENT)
+  CREATED                = RDF::URI(DC_TERMS_BASE_URI + 'created') unless const_defined?(:CREATED)
+  IDENTIFIER             = RDF::URI(DC_TERMS_BASE_URI + 'identifier') unless const_defined?(:IDENTIFIER)
+  SOURCE                 = RDF::URI(DC_TERMS_BASE_URI + 'source') unless const_defined?(:SOURCE)
+  TITLE                  = RDF::URI(DC_TERMS_BASE_URI + 'title') unless const_defined?(:TITLE)
+  RIGHTS                 = RDF::URI(DC_TERMS_BASE_URI + 'rights') unless const_defined?(:RIGHTS)
+  DESCRIPTION            = RDF::URI(DC_TERMS_BASE_URI + 'description') unless const_defined?(:DESCRIPTION)
   BIBLIOGRAPHIC_CITATION = RDF::URI(DC_TERMS_BASE_URI + 'bibliographicCitation') unless const_defined?(:BIBLIO_CITATION)
 
-  @@lookup[IS_PART_OF.to_s] = prefixes[DC_TERMS_BASE_URI] + "_is_part_of"
-  @@lookup[EXTENT.to_s]     = prefixes[DC_TERMS_BASE_URI] + "_extent"
-  @@lookup[CREATED.to_s]    = prefixes[DC_TERMS_BASE_URI] + "_created"
-  @@lookup[IDENTIFIER.to_s] = prefixes[DC_TERMS_BASE_URI] + "_identifier"
-  @@lookup[SOURCE.to_s]     = prefixes[DC_TERMS_BASE_URI] + "_source"
-  @@lookup[TITLE.to_s]      = prefixes[DC_TERMS_BASE_URI] + "_title"
-  @@lookup[TYPE.to_s]       = prefixes[DC_TERMS_BASE_URI] + "_type_facet"
-  @@lookup[DESCRIPTION.to_s] = prefixes[DC_TERMS_BASE_URI] + "_description"
+  @@lookup[IS_PART_OF.to_s]             = prefixes[DC_TERMS_BASE_URI] + "_is_part_of"
+  @@lookup[EXTENT.to_s]                 = prefixes[DC_TERMS_BASE_URI] + "_extent"
+  @@lookup[CREATED.to_s]                = prefixes[DC_TERMS_BASE_URI] + "_created"
+  @@lookup[IDENTIFIER.to_s]             = prefixes[DC_TERMS_BASE_URI] + "_identifier"
+  @@lookup[SOURCE.to_s]                 = prefixes[DC_TERMS_BASE_URI] + "_source"
+  @@lookup[TITLE.to_s]                  = prefixes[DC_TERMS_BASE_URI] + "_title"
+  @@lookup[TYPE.to_s]                   = prefixes[DC_TERMS_BASE_URI] + "_type_facet"
+  @@lookup[RIGHTS.to_s]                 = prefixes[DC_TERMS_BASE_URI] + "_rights"
+  @@lookup[DESCRIPTION.to_s]            = prefixes[DC_TERMS_BASE_URI] + "_description"
   @@lookup[BIBLIOGRAPHIC_CITATION.to_s] = prefixes[DC_TERMS_BASE_URI] + "_bibliographicCitation"
 
   #
