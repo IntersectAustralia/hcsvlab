@@ -13,4 +13,11 @@ namespace :deploy do
   task :stop_tomcat6, :roles => :app do
     run "cd ${CATALINA_HOME} && bin/shutdown.sh", :env => {'RAILS_ENV' => stage}
   end
+
+  desc "Restart the Tomcat 6 server"
+  task  :restart_tomcat6, :roles => :app do
+    stop_tomcat6
+    start_tomcat6
+  end
+
 end

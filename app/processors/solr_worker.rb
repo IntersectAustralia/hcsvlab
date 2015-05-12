@@ -77,7 +77,10 @@ class Solr_Worker < ApplicationProcessor
         rescue Exception => e
           error("Solr Worker", e.message)
           error("Solr Worker", e.backtrace)
-          raise ActiveMessaging::AbortMessageException
+          # Create when necessary rather than leaving an open connection for each worker
+          stomp_client = Stomp::Client.open "stomp://localhost:61613"
+          stomp_client.publish('alveo.solr.worker.dlq', message)
+          stomp_client.close
         end
       when "delete"
         delete(object)

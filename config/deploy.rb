@@ -308,7 +308,6 @@ after 'multistage:ensure' do
     config/environments/#{stage}.rb
     config/deploy/#{stage}.rb
     config/aaf_rc.yml
-    config/broker.yml
     config/database.yml
     config/hcsvlab-web_config.yml
     config/linguistics.yml
