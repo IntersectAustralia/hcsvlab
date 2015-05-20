@@ -10,29 +10,29 @@
 #
 
 RET_STATUS=0
-
+REVIVE=$1
 ACTIVEMQ_URL="http://localhost:8161/"
 ACTIVEMQ_USER="admin:admin"
 
-WEB_PORT_NUMBER=3000
+WEB_URL="http://localhost:3000/version.json"
 JAVA_PORT_NUMBER=8983
 
 if [ ! -z "$RAILS_ENV" -a "$RAILS_ENV" != "development" ]
 then
-  WEB_PORT_NUMBER=80
+  WEB_URL="https://localhost/version.json"
   JAVA_PORT_NUMBER=8080
 fi
 
-WEB_URL="http://localhost:${WEB_PORT_NUMBER}/"
 JAVA_URL="http://localhost:${JAVA_PORT_NUMBER}/"
 
 echo ""
 echo "Checking HCS vLab environment"
 
-echo ""
+echo `date`
 echo "Rails env= $RAILS_ENV"
 echo "Java Container url= $JAVA_URL"
 echo "Web App url= $WEB_URL"
+echo "Attempt restart= $REVIVE"
 
 # Disk space
 
@@ -58,6 +58,7 @@ then
 else
   echo "- WARN: It looks like ActiveMQ is not running (status= $aqm_status)"
   RET_STATUS=1
+
 fi
 
 mq_url="http://localhost:8161"
@@ -82,6 +83,15 @@ else
   echo "+ ActiveMQ is listening on port 61613"
 fi
 
+if [ $RET_STATUS -eq 1 ] && [ "$REVIVE" == "true" ]
+then
+  echo "Reviving ActiveMQ..."
+  pkill -9 -f activemq
+  cd $ACTIVEMQ_HOME && nohup bin/activemq start > nohup_activemq.out 2>&1
+  sleep 30
+fi
+
+
 # Servlet Container - Jetty or Tomcat
 
 echo ""
@@ -91,29 +101,37 @@ let count=0
 while [ $count -lt 15 -a "$java_status" == "" ]
 do
   sleep 2
-  java_status=`curl -I ${JAVA_URL}solr 2>/dev/null  | head -1 | awk '{print $2}' `
+  sesame_status=`curl -I ${JAVA_URL}openrdf-sesame/home/overview.view 2>/dev/null  | head -1 | awk '{print $2}' `
   let count=count+1
 done
 
-if [ "$java_status" == "200"  -o "$java_status" == "302" ]
+# Sesame
+if [ "$sesame_status" == "200"  -o "$sesame_status" == "302" ]
 then
-  echo "+ The Java Container is listening on port $JAVA_PORT_NUMBER (status= $java_status)"
+  echo "+ It looks like Sesame is available (status= $sesame_status)"
 else
-  echo "- WARN: It looks like the Java container is not running (status= $java_status)"
-  RET_STATUS=1
+  echo "- WARN: It looks like Sesame is not running (status= $sesame_status)"
+  RET_STATUS=2
 fi
 
 # Solr
-
-solr_status=`curl -I ${JAVA_URL}solr/ 2>/dev/null  | head -1 | awk '{print $2}' `
+solr_status=`curl -I ${JAVA_URL}solr/admin/ping 2>/dev/null  | head -1 | awk '{print $2}' `
 
 if [ "$solr_status" == "200" -o "$solr_status" == "302" ]
 then
   echo "+ It looks like Solr is available (status= $solr_status)"
 else
   echo "- WARN: It looks like Solr is not running (status= $solr_status)"
-  RET_STATUS=1
+  RET_STATUS=2
 fi
+
+if [ $RET_STATUS -eq 2 ] && [ "$REVIVE" == "true" ]
+then
+  echo "Reviving Tomcat..."
+  pkill -9 -f catalina
+  $CATALINA_HOME/bin/startup.sh
+fi
+
 
 # A13g workers
 
@@ -122,16 +140,21 @@ echo "Checking A13g pollers..."
 
 a13g_status=` ps auxw | grep [p]oller | wc -l `
 
-if [ $a13g_status == 1 ]
+if [ $a13g_status -ge 1 ]
 then
   echo "+ It looks like the A13g pollers are running (processes= $a13g_status)"
 else
   echo "- WARN: It looks like something is wrong with the A13g pollers (processes= $a13g_status)"
-  RET_STATUS=1
+  RET_STATUS=3
+fi
+
+if [ $RET_STATUS -gt 0 ] && [ "$REVIVE" == "true" ]
+then
+  echo "Reviving workers..."
+  cd /home/devel/hcsvlab-web/current && nohup bundle exec rake a13g:stop_pollers a13g:start_pollers > nohup_a13g_pollers.out 2>&1
 fi
 
 # Check the web app
-
 echo ""
 echo "Checking the web app..."
 
@@ -139,16 +162,16 @@ let count=0
 while [ $count -lt 15 -a "$web_status" == "" ]
 do
   sleep 2
-  web_status=`curl -I  ${WEB_URL} 2>/dev/null  | head -1 | awk '{print $2}' `
+  web_status=`curl -Ik ${WEB_URL} 2>/dev/null  | head -1 | awk '{print $2}' `
   let count=count+1
 done
 
-if [ "$web_status" == "200"  -o "$web_status" == "302" ]
+if [ "$web_status" == "200" ]
 then
   echo "+ The Web App is listening on port $WEB_PORT_NUMBER (status= $web_status)"
 else
   echo "- WARN: It looks like the Web App is not running (status= $web_status)"
-  RET_STATUS=1
+  RET_STATUS=4
 fi
 
 # End

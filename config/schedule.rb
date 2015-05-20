@@ -5,7 +5,7 @@
 
 # Example:
 #
-# set :output, "/path/to/my/cron_log.log"
+set :output, "~/hcsvlab-web/current/log/cron.log"
 #
 # every 2.hours do
 #   command "/usr/bin/some_great_command"
@@ -20,5 +20,9 @@
 # Learn more: http://github.com/javan/whenever
 
 every :day, :at => '12:00am' do
-  script "paradisec_poll.sh" # will be deployed to :db and :app servers
+  script "paradisec_poll.sh"
+end
+
+every 10.minutes do
+  script "system_check.sh true"
 end

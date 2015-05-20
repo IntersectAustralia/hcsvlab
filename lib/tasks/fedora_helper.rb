@@ -82,7 +82,7 @@ end
 
 def reindex_item_to_solr(item_id, stomp_client)
   logger.info "Reindexing item: #{item_id}"
-  stomp_client.publish('/queue/hcsvlab.solr.worker', "index #{item_id}")
+  stomp_client.publish('/queue/alveo.solr.worker', "index #{item_id}")
 end
 
 def check_and_create_collection(collection_name, corpus_dir)
@@ -143,11 +143,7 @@ def paradisec_collection_setup(collection, is_new)
     end
 
     graph = collection.rdf_graph
-    query = RDF::Query.new({
-                               :collection => {
-                                   MetadataHelper::RIGHTS => :rights
-                               }
-                           })
+    query = RDF::Query.new({collection: {MetadataHelper::RIGHTS => :rights}})
 
     results = query.execute(graph)
     if results.present? and results[0][:rights].to_s[/Open/].blank?
@@ -240,7 +236,7 @@ def update_document(document, item, file_name, identifier, source, type, corpus_
 
     document.file_name = file_name
     document.file_path = path
-    document.doc_type      = type
+    document.doc_type = type
     document.mime_type = mime_type_lookup(file_name)
     document.item = item
     document.save
@@ -283,11 +279,7 @@ end
 def set_data_owner(collection)
 
   # See if there is a responsible person specified in the collection's metadata
-  query = RDF::Query.new({
-                             :collection => {
-                                 MetadataHelper::LOC_RESPONSIBLE_PERSON => :person
-                             }
-                         })
+  query = RDF::Query.new({collection: {MetadataHelper::LOC_RESPONSIBLE_PERSON => :person}})
 
   results = query.execute(collection.rdf_graph)
   data_owner = find_system_user(results)
@@ -357,7 +349,7 @@ def extract_manifest_collection(rdf_file)
   collection_name = last_bit(result.collection.to_s)
   # small hack to handle austalk for the time being, can be fixed up
   # when we look at getting some form of data uniformity
-  if query.execute(graph).any? {|r| r.collection == "http://ns.austalk.edu.au/corpus"}
+  if query.execute(graph).any? { |r| r.collection == "http://ns.austalk.edu.au/corpus" }
     collection_name = "austalk"
   end
 
@@ -745,7 +737,7 @@ end
 # Extract the last part of a path/URI/slash-separated-list-of-things
 #
 def last_bit(uri)
-  str = uri.to_s                # just in case it is not a String object
+  str = uri.to_s # just in case it is not a String object
   return str if str.match(/\s/) # If there are spaces, then it's not a path(?)
   return str.split('/')[-1]
 end

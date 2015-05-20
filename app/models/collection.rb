@@ -58,6 +58,7 @@ class Collection < ActiveRecord::Base
   #
 
   def rdf_graph
+    raise "Could not find collection metadata file" unless File.exist?(self.rdf_file_path)
     RDF::Graph.load(self.rdf_file_path, :format => :ttl, :validate => true)
   end
 end

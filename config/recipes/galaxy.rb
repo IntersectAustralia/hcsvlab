@@ -82,6 +82,8 @@ namespace :deploy do
 
   desc "Restart Galaxy"
   task :restart_galaxy, :roles => :galaxy do
+    set(:user) { "galaxy" }
+    set :default_shell, '/bin/bash'
     run "cd $GALAXY_HOME && ./galaxy restart"
   end
 

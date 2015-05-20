@@ -2,6 +2,8 @@ namespace :deploy do
   desc "Configure Solr"
   task :configure_solr, :roles => :app do
     run "cp -p #{current_path}/solr_conf/hcsvlab-solr.xml    $CATALINA_HOME/conf/Catalina/localhost/solr.xml", :env => {'RAILS_ENV' => stage}
+    run "mkdir -p $CATALINA_HOME/webapps/solr/WEB-INF/classes/", :env => {'RAILS_ENV' => stage}
+    run "cp -p #{current_path}/solr_conf/log4j.properties    $CATALINA_HOME/webapps/solr/WEB-INF/classes/", :env => {'RAILS_ENV' => stage}
     run "cp -p #{current_path}/solr_conf/conf/schema.xml     $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/schema.xml", :env => {'RAILS_ENV' => stage}
     run "cp -p #{current_path}/solr_conf/conf/solrconfig.xml $SOLR_HOME/hcsvlab/solr/hcsvlab-core/conf/solrconfig.xml", :env => {'RAILS_ENV' => stage}
   end

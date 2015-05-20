@@ -77,6 +77,10 @@ class Solr_Worker < ApplicationProcessor
         rescue Exception => e
           error("Solr Worker", e.message)
           error("Solr Worker", e.backtrace)
+          # Create when necessary rather than leaving an open connection for each worker
+          stomp_client = Stomp::Client.open "stomp://localhost:61613"
+          stomp_client.publish('alveo.solr.worker.dlq', message)
+          stomp_client.close
         end
       when "delete"
         delete(object)
@@ -88,7 +92,6 @@ class Solr_Worker < ApplicationProcessor
   end
 
 private
-
 
   #
   # =============================================================================
@@ -343,16 +346,6 @@ private
   # Make a Solr update document from information extracted from the Item
   #
   def make_solr_update(document)
-
-    #add_attributes = {:allowDups => false, :commitWithin => 10}
-    #
-    #xml_update = @@solr.xml.add(document, add_attributes) do | doc |
-    #  document.keys.each do | key |
-    #    if (key.to_s != 'id')
-    #      doc.field_by_name(key).attrs[:update] = 'set'
-    #    end
-    #  end
-    #end
 
     xml_update = "<add overwrite='true' allowDups='false'> <doc>"
       
