@@ -26,3 +26,10 @@ end
 every 10.minutes do
   script "system_check.sh true"
 end
+
+case @environment
+when 'production'
+    every :day, :at => '1:30am' do
+      script "galaxy_backup.sh"
+    end
+end
