@@ -55,7 +55,6 @@ function performAsperaDownloadForItemList(id) {
     requestTransferSpecForItemList(id);
   } else {
     connectOrInstallAsperaPlugin(function() {
-      console.log("aspera connected");
       requestTransferSpecForItemList(id);
     });
   }
