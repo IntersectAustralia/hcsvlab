@@ -83,6 +83,15 @@ class ItemListsController < ApplicationController
     end
   end
 
+  def transfer_spec
+    respond_to do |format|
+      format.any {
+        generate_aspera_transfer_spec(@item_list.get_item_handles)
+      }
+    end
+  end
+
+
   #
   #
   #
