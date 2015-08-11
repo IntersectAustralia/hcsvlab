@@ -25,3 +25,8 @@ public/assets/**
 
 # Not everyone has a Mac...
 .DS_Store
+
+.vagrant
+Vagrantfile
+
+tags

@@ -19,7 +19,7 @@
           %li
             = link_to("Download as ZIP", {:controller => "item_lists", :action => "show", :format=>"zip"}, :method => 'GET', :id => params[:id].to_i, :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);')
           %li
-            = link_to("Download using Aspera", '#', :onclick => "performAsperaDownloadForItemList(#{params[:id]});")
+            = link_to("Download using Aspera", '#', :onclick => "performAsperaDownloadTransferForItemList(#{params[:id]});")
           - if @item_list.user_id == current_user.id
             %li
               - if @item_list.shared?

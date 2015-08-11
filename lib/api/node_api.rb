@@ -7,7 +7,7 @@ class NodeAPI
     @port = args[:port]
     @user = args[:user]
     @password = args[:password]
-    @verify_ssl = args[:verify_ssl] || true
+    @verify_ssl = args.fetch(:verify_ssl, true)
   end
 
   def info
@@ -73,7 +73,7 @@ class NodeAPI
   private
 
   def node_url(path)
-    "https://#{user}:#{password}@#{hostname}:#{port}/#{path}"
+    "https://#{user}:#{password}@#{hostname}:#{port}#{path}"
   end
 
   def get(path)

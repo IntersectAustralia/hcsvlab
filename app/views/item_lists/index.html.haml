@@ -1,5 +1,6 @@
 = render 'display_item_lists'
 .span9
+  #flash-container
   - if (!params[:id].nil?)
     = render 'search_form'
   - else

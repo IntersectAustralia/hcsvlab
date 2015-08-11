@@ -1,12 +1,24 @@
 module Item::DownloadItemsHelper
+  require Rails.root.join('lib/api/node_api')
 
-  def generate_aspera_transfer_spec(item_handles)
+  def generate_aspera_transfer_spec(item_list)
     # create directory for storing the temporary files generated for item metadata and item log
-    metadata_dir = Dir.mkdir(nil, Rails.application.config.aspera_temp_path)
-    request = DownloadItemsInFormat.new(current_user, current_ability).create_aspera_transfer_spec(item_handles, metadata_dir)
-    render :json => {request: request}
+    metadata_dir = File.join(Rails.application.config.aspera_temp_dir, SecureRandom.uuid)
+    FileUtils.rm_rf metadata_dir if Dir.exists?(metadata_dir)
+    Dir.mkdir(metadata_dir)
+
+    transfer_spec = DownloadItemsInFormat.new(current_user, current_ability).create_aspera_transfer_spec(item_list, metadata_dir)
+
+    if transfer_spec
+      render :json => {transfer_spec: transfer_spec}.to_json
+    else
+      render :json => {message: 'No items were found to download.'}.to_json
+    end
   rescue => e
     Rails.logger.error(e.message + "\n " + e.backtrace.join("\n "))
+
+    FileUtils.rm_rf metadata_dir if metadata_dir && Dir.exists?(metadata_dir)
+
     render :json => {error: "Internal Server Error"}.to_json, :status => 500
   end
 
@@ -113,8 +125,8 @@ module Item::DownloadItemsHelper
     end
 
 
-    def create_aspera_transfer_spec(item_handles, metadata_dir)
-      get_aspera_transfer_spec_for_documents_and_metadata(item_handles, metadata_dir)
+    def create_aspera_transfer_spec(item_list, metadata_dir)
+      get_aspera_transfer_spec_for_documents_and_metadata(item_list, metadata_dir)
     end
 
     #
@@ -133,63 +145,73 @@ module Item::DownloadItemsHelper
 
     private
 
-    def get_aspera_transfer_spec_for_documents_and_metadata(item_handles, transfer_dir)
-      return {} unless items_handles.empty?
+    def get_aspera_transfer_spec_for_documents_and_metadata(item_list, transfer_dir)
+      item_handles = item_list.get_item_handles
+      return nil if item_handles.empty?
 
       result = verify_items_permissions_and_extract_metadata(item_handles)
 
-      # generate item files, metadata files and log files
-      item_files = create_items_files(result)
-      metadata_files = create_items_metadata_files(result[:metadata], transfer_dir)
+      # get item files and create metadata files and log files
+      item_files = get_items_files(result)
+      metadata_files = create_items_metadata_files(result, transfer_dir)
       log_file = create_items_log_file(result, transfer_dir)
 
-      request_apsera_transfer_spec([item_files, metadata_files, log_file].flatten)
-    rescue => e
-      FileUtils.rm_rf transfer_dir if Dir.exists? transfer_dir
-      raise e
+      request_aspera_transfer_spec(item_list.name, [item_files, metadata_files, log_file].flatten)
     end
 
-    def create_items_files(result)
-      get_filenames_from_item_results(result).map do |key, value|
+    def get_items_files(result)
+      filenames = get_filenames_from_item_results(result)
+      filenames.map do |key, value|
         dir = value[:handle]
-        value[:files].map { |file| { dir: dir, file: file } }
+        files = value[:files]
+        files.map { |file| { dir: dir, file: file } }
       end.flatten
     end
 
-    def create_items_metadata_files(items_metadata, transfer_dir)
+    def create_items_metadata_files(result, transfer_dir)
+      items_metadata = result[:metadata]
       items_metadata.map do |key, value|
-        item_metadata = value[:metadata]
-        handle = item_metadata['metadata']['handle'].gsub(":", "_")
-        metadata_file = File.join(transfer_dir, "#{handle}-metadata.json")
-        File.open(metadata_file , 'w+') do |f|
-          f.write(itemMetadata.to_json)
+        metadata = value[:metadata]
+        handle = metadata['metadata']['handle'].gsub(":", "_")
+        file = File.join(transfer_dir, "#{handle}/#{handle}-metadata.json")
+
+        # write metadata to file
+        FileUtils.mkdir_p File.dirname(file)
+        File.open(file , 'w+') do |f|
+          f.write(metadata.to_json)
         end
-        { dir: handle, file: metadata_file }
+
+        { dir: handle, file: file }
       end
     end
 
     def create_items_log_file(result, transfer_dir)
-      log_file = File.join(transfer_dir, 'log.json')
-      File.open(log_file) do |f|
+      file = File.join(transfer_dir, 'log.json')
+      File.open(file, 'w+') do |f|
         f.write(generate_json_log(result[:valids], result[:invalids]))
       end
-      { dir: '.', file: log_file }
+      { dir: '.', file: file }
     end
 
-    def request_aspera_transfer_spec(requested_files)
-      source_root = Rails.application.config.aspera_source_root
-      source_paths = requested_files.map {|file| { source: file[:file], destination: "#{file[:dir]}/#{file}" }}
+    def request_aspera_transfer_spec(items_dir, requested_files)
+      source_paths = requested_files.map {|file| { source: file[:file], destination: "/#{items_dir}/#{file[:dir]}/#{File.basename(file[:file])}" }}
       download_request = {
         transfer_requests: [
           transfer_request: {
-            source_root: source_root,
+            source_root: '',
             paths: source_paths
           }
         ]
       }
-      node_api = NodeAPI.new(Rails.application.config.aspera_nodeapi_config)
+      node_api = NodeAPI.new(aspera_nodeapi_config)
       result = node_api.download_setup(download_request)
-      result
+      transfer_spec = result['transfer_specs'][0]['transfer_spec']
+      transfer_spec['authentication'] = 'token'
+      transfer_spec
+    end
+
+    def aspera_nodeapi_config
+      Rails.application.config.aspera_nodeapi_config
     end
 
     #
