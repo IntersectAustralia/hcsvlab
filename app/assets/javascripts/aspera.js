@@ -50,7 +50,7 @@ function performAsperaDownloadTransferForItemList(id) {
 
     function flashAlert(message, type) {
         $('#flash-container').empty();
-        $('#flash-container').append("<div class=\"alert alert-" + type + " fade in\"><a class=\"close\" data-dimiss=\"alert\">x</a>" + message + "</div>")
+        $('#flash-container').append("<div class=\"alert alert-" + type + " fade in\"><a class=\"close\" data-dimiss=\"alert\">x</a>" + message + "</div>");
     }
 
     function reportError(message, error) {
