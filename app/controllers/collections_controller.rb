@@ -45,6 +45,16 @@ class CollectionsController < ApplicationController
       if (!name.nil? and !name.blank? and !(name.length > 255))
         @collection = Collection.new
         @collection.name = name
+        # Parse JSON-LD formatted collection metadata, convert to RDF and save to .n3 file
+        json_md = params[:collection_metadata]
+        graph = RDF::Graph.new << JSON::LD::API.toRdf(json_md)
+        rdf = graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
+        file_path = File.join(Rails.root.to_s, '/data/collections/',  @collection.name + '.n3')
+        #TODO: include some kind of validation to ensure existing collections are not overwritten
+        f = File.open(file_path, 'w')
+        f.puts rdf
+        f.close
+        @collection.rdf_file_path = file_path
         @collection.save
       else
         err_message = "name parameter" if name.nil? or name.blank? or name.length > 255
@@ -54,6 +64,7 @@ class CollectionsController < ApplicationController
         end
       end
     else
+      #TODO: properly handle case when a non JSON POST request is sent
       name = params[:name]
       @collection = Collection.find_or_initialize_by_name(name)
       if @collection.new_record?
