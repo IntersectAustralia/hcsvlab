@@ -39,6 +39,38 @@ class CollectionsController < ApplicationController
     end
   end
 
+  def create
+    if request.format == 'json' and request.post?
+      name = params[:name]
+      if (!name.nil? and !name.blank? and !(name.length > 255))
+        @collection = Collection.new
+        @collection.name = name
+        @collection.save
+      else
+        err_message = "name parameter" if name.nil? or name.blank? or name.length > 255
+        err_message << " not found" if !err_message.nil?
+        respond_to do |format|
+          format.any { render :json => {:error => err_message}.to_json, :status => 400 }
+        end
+      end
+    else
+      name = params[:name]
+      @collection = Collection.find_or_initialize_by_name(name)
+      if @collection.new_record?
+        if @collection.save
+          flash[:notice] = 'Collection created successfully'
+          redirect_to @collection and return
+        end
+        flash[:error] = "Error trying to create an Item list, name too long (max. 255 characters)" if (name.length > 255)
+        flash[:error] = "Error trying to create an Item list" unless (name.length > 255)
+        redirect_to :back and return
+      else
+        flash[:error] = "Collection with name '#{name}' already exists."
+        redirect_to :back and return
+      end
+    end
+  end
+
   def collections_by_name
     Collection.not_in_list.order(:name)
   end
