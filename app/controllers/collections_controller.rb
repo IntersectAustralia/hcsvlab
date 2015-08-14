@@ -42,7 +42,7 @@ class CollectionsController < ApplicationController
   def create
     if request.format == 'json' and request.post?
       name = params[:name]
-      if (!name.nil? and !name.blank? and !(name.length > 255))
+      if (!name.nil? and !name.blank? and !(name.length > 255) and !(params[:collection_metadata].nil?))
         @collection = Collection.new
         @collection.name = name
         # Parse JSON-LD formatted collection metadata, convert to RDF and save to .n3 file
@@ -57,28 +57,32 @@ class CollectionsController < ApplicationController
         @collection.rdf_file_path = file_path
         @collection.save
       else
-        err_message = "name parameter" if name.nil? or name.blank? or name.length > 255
+        invalid_name = name.nil? or name.blank? or name.length > 255
+        invalid_metadata = params[:collection_metadata].nil?
+        err_message = "name parameter" if invalid_name
+        err_message = "metadata parameter" if invalid_metadata
+        err_message = "name and metadata" if invalid_name and invalid_metadata
         err_message << " not found" if !err_message.nil?
         respond_to do |format|
           format.any { render :json => {:error => err_message}.to_json, :status => 400 }
         end
       end
     else
-      #TODO: properly handle case when a non JSON POST request is sent
-      name = params[:name]
-      @collection = Collection.find_or_initialize_by_name(name)
-      if @collection.new_record?
-        if @collection.save
-          flash[:notice] = 'Collection created successfully'
-          redirect_to @collection and return
-        end
-        flash[:error] = "Error trying to create an Item list, name too long (max. 255 characters)" if (name.length > 255)
-        flash[:error] = "Error trying to create an Item list" unless (name.length > 255)
-        redirect_to :back and return
-      else
-        flash[:error] = "Collection with name '#{name}' already exists."
-        redirect_to :back and return
-      end
+      #TODO: handle case when a non JSON POST request is sent
+      # name = params[:name]
+      # @collection = Collection.find_or_initialize_by_name(name)
+      # if @collection.new_record?
+      #   if @collection.save
+      #     flash[:notice] = 'Collection created successfully'
+      #     redirect_to @collection and return
+      #   end
+      #   flash[:error] = "Error trying to create an Item list, name too long (max. 255 characters)" if (name.length > 255)
+      #   flash[:error] = "Error trying to create an Item list" unless (name.length > 255)
+      #   redirect_to :back and return
+      # else
+      #   flash[:error] = "Collection with name '#{name}' already exists."
+      #   redirect_to :back and return
+      # end
     end
   end
 
