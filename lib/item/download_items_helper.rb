@@ -194,7 +194,7 @@ module Item::DownloadItemsHelper
     end
 
     def request_aspera_transfer_spec(items_dir, requested_files)
-      source_paths = requested_files.map {|file| { source: file[:file], destination: "/#{items_dir}/#{file[:dir]}/#{File.basename(file[:file])}" }}
+      source_paths = requested_files.map {|file| { source: File.join(aspera_base_dir, file[:file]), destination: "/#{items_dir}/#{file[:dir]}/#{File.basename(file[:file])}" }}
       download_request = {
         transfer_requests: [
           transfer_request: {
@@ -212,6 +212,10 @@ module Item::DownloadItemsHelper
 
     def aspera_nodeapi_config
       Rails.application.config.aspera_nodeapi_config
+    end
+
+    def aspera_base_dir
+      Rails.application.config.aspera_base_dir
     end
 
     #
