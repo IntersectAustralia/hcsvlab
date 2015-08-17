@@ -1,3 +1,6 @@
+require "#{Rails.root}/lib/tasks/fedora_helper.rb"
+require 'fileutils'
+
 class CollectionsController < ApplicationController
   before_filter :authenticate_user!
   #load_and_authorize_resource
@@ -5,7 +8,7 @@ class CollectionsController < ApplicationController
   set_tab :collection
 
   PER_PAGE_RESULTS = 20
-
+  NEW_COLLECTION_DIR = File.join(Rails.root.to_s, 'data', 'collections', 'api')
   #
   #
   #
@@ -41,23 +44,44 @@ class CollectionsController < ApplicationController
 
   def create
     if request.format == 'json' and request.post?
-      name = params[:name]
-      if (!name.nil? and !name.blank? and !(name.length > 255) and !(params[:collection_metadata].nil?))
-        @collection = Collection.new
-        @collection.name = name
-        # Parse JSON-LD formatted collection metadata, convert to RDF and save to .n3 file
+      collection_name = params[:name]
+      if (!collection_name.nil? and !collection_name.blank? and !(collection_name.length > 255) and !(params[:collection_metadata].nil?))
+        # Parse JSON-LD formatted collection metadata and convert to RDF
         json_md = params[:collection_metadata]
         graph = RDF::Graph.new << JSON::LD::API.toRdf(json_md)
-        rdf = graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
-        file_path = File.join(Rails.root.to_s, '/data/collections/',  @collection.name + '.n3')
-        #TODO: include some kind of validation to ensure existing collections are not overwritten
-        f = File.open(file_path, 'w')
-        f.puts rdf
-        f.close
-        @collection.rdf_file_path = file_path
-        @collection.save
+        collection_rdf = graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
+        collection_uri = graph.statements.first.subject.to_s
+        if !Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique name or uri
+          # write metadata and manifest file for ingest
+          collection_dir = NEW_COLLECTION_DIR
+          FileUtils.mkdir_p(collection_dir) unless File.directory?(collection_dir)
+          metadata_file_path = File.join(collection_dir,  collection_name + '.n3')
+          corpus_dir = File.join(collection_dir, collection_name)
+          FileUtils.mkdir_p(corpus_dir) unless File.directory?(corpus_dir)
+          manifest_file_path = File.join(corpus_dir, MANIFEST_FILE_NAME)
+          begin
+            metadata_file = File.open(metadata_file_path, 'w')
+            metadata_file.puts collection_rdf
+          ensure
+            metadata_file.close if !metadata_file.nil?
+          end
+          begin
+            manifest_hash = {"collection_name" => collection_name, "files" => {}}
+            manifest_file = File.open(manifest_file_path, 'w')
+            manifest_file.puts(manifest_hash.to_json)
+          ensure
+            manifest_file.close if !manifest_file.nil?
+          end
+
+          ingest_corpus(corpus_dir)
+        else
+          err_message = "Collection #{collection_name} (#{collection_uri}) already exists in the system - skipping"
+          respond_to do |format|
+            format.any { render :json => {:error => err_message}.to_json, :status => 400 }
+          end
+        end
       else
-        invalid_name = name.nil? or name.blank? or name.length > 255
+        invalid_name = collection_name.nil? or collection_name.blank? or collection_name.length > 255
         invalid_metadata = params[:collection_metadata].nil?
         err_message = "name parameter" if invalid_name
         err_message = "metadata parameter" if invalid_metadata
@@ -68,21 +92,7 @@ class CollectionsController < ApplicationController
         end
       end
     else
-      #TODO: handle case when a non JSON POST request is sent
-      # name = params[:name]
-      # @collection = Collection.find_or_initialize_by_name(name)
-      # if @collection.new_record?
-      #   if @collection.save
-      #     flash[:notice] = 'Collection created successfully'
-      #     redirect_to @collection and return
-      #   end
-      #   flash[:error] = "Error trying to create an Item list, name too long (max. 255 characters)" if (name.length > 255)
-      #   flash[:error] = "Error trying to create an Item list" unless (name.length > 255)
-      #   redirect_to :back and return
-      # else
-      #   flash[:error] = "Collection with name '#{name}' already exists."
-      #   redirect_to :back and return
-      # end
+      #TODO handle case when a non JSON POST request is sent
     end
   end
 
