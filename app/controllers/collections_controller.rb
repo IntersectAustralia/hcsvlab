@@ -74,6 +74,7 @@ class CollectionsController < ApplicationController
           end
 
           ingest_corpus(corpus_dir)
+          @success_message = "Request for new collection #{collection_name} (#{collection_uri}) sent to Administrator"
         else
           err_message = "Collection #{collection_name} (#{collection_uri}) already exists in the system - skipping"
           respond_to do |format|
