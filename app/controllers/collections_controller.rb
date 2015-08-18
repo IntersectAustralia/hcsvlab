@@ -53,24 +53,16 @@ class CollectionsController < ApplicationController
         collection_uri = graph.statements.first.subject.to_s
         if !Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique name or uri
           # write metadata and manifest file for ingest
-          collection_dir = NEW_COLLECTION_DIR
-          FileUtils.mkdir_p(collection_dir) unless File.directory?(collection_dir)
-          metadata_file_path = File.join(collection_dir,  collection_name + '.n3')
-          corpus_dir = File.join(collection_dir, collection_name)
-          FileUtils.mkdir_p(corpus_dir) unless File.directory?(corpus_dir)
+          corpus_dir = File.join(NEW_COLLECTION_DIR, collection_name)
+          metadata_file_path = File.join(NEW_COLLECTION_DIR,  collection_name + '.n3')
           manifest_file_path = File.join(corpus_dir, MANIFEST_FILE_NAME)
-          begin
-            metadata_file = File.open(metadata_file_path, 'w')
-            metadata_file.puts collection_rdf
-          ensure
-            metadata_file.close if !metadata_file.nil?
+          FileUtils.mkdir_p(corpus_dir)
+          File.open(metadata_file_path, 'w') do |file|
+            file.puts collection_rdf
           end
-          begin
+          File.open(manifest_file_path, 'w') do |file|
             manifest_hash = {"collection_name" => collection_name, "files" => {}}
-            manifest_file = File.open(manifest_file_path, 'w')
-            manifest_file.puts(manifest_hash.to_json)
-          ensure
-            manifest_file.close if !manifest_file.nil?
+            file.puts(manifest_hash.to_json)
           end
 
           ingest_corpus(corpus_dir)
@@ -93,7 +85,10 @@ class CollectionsController < ApplicationController
         end
       end
     else
-      #TODO handle case when a non JSON POST request is sent
+      err_message = "JSON-LD formatted metadata must be sent to the add collection api call as a POST request"
+      respond_to do |format|
+        format.any { render :json => {:error => err_message}.to_json, :status => 404 }
+      end
     end
   end
 
