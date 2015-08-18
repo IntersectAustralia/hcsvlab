@@ -1393,3 +1393,66 @@ Feature: Browsing via API
     {"success":"0 cleared from item list Test 1"}
     """
 
+  Scenario: Create new collection via the API
+    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Request for new collection 'Test' (http://collection.test) sent to Administrator"}
+    """
+
+  Scenario: Create new collection via the API with duplicate name
+    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"TEST": "http://other.collection/test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://other.collection/test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "Another test collection", "marcrel:OWN": "Data Owner"} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Request for new collection 'Test' (http://other.collection/test) sent to Administrator"}
+    """
+
+  Scenario: Create new collection via the API with duplicate uri
+    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
+      | name         | collection_metadata |
+      | Another Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "Another test collection", "marcrel:OWN": "Data Owner"} |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"Collection 'Another Test' (http://collection.test) already exists in the system - skipping"}
+    """
+
+  Scenario: Create new collection via the API without JSON params
+    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" without JSON params
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"name and metadata parameters not found"}
+    """
+
+  Scenario: Create new collection via the API without name param
+    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
+      | collection_metadata |
+      | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"name parameter not found"}
+    """
+
+  Scenario: Create new collection via the API without the metadata param
+    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
+      | name |
+      | Test |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"metadata parameter not found"}
+    """

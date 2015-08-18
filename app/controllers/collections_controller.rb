@@ -74,9 +74,9 @@ class CollectionsController < ApplicationController
           end
 
           ingest_corpus(corpus_dir)
-          @success_message = "Request for new collection #{collection_name} (#{collection_uri}) sent to Administrator"
+          @success_message = "Request for new collection '#{collection_name}' (#{collection_uri}) sent to Administrator"
         else
-          err_message = "Collection #{collection_name} (#{collection_uri}) already exists in the system - skipping"
+          err_message = "Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping"
           respond_to do |format|
             format.any { render :json => {:error => err_message}.to_json, :status => 400 }
           end
@@ -86,7 +86,7 @@ class CollectionsController < ApplicationController
         invalid_metadata = params[:collection_metadata].nil?
         err_message = "name parameter" if invalid_name
         err_message = "metadata parameter" if invalid_metadata
-        err_message = "name and metadata" if invalid_name and invalid_metadata
+        err_message = "name and metadata parameters" if invalid_name and invalid_metadata
         err_message << " not found" if !err_message.nil?
         respond_to do |format|
           format.any { render :json => {:error => err_message}.to_json, :status => 400 }
