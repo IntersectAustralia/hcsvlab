@@ -154,13 +154,13 @@ class CollectionsController < ApplicationController
 
   # Coverts JSON-LD formatted collection metadata and converts it to RDF
   def convert_json_metadata_to_rdf(json_metadata)
-    graph = RDF::Graph.new << JSON::LD::API.toRdf(json_metadata)
+    graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
     graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
   end
 
   # Gets the collection URI from JSON-LD formatted metadata
   def get_uri_from_metadata(json_metadata)
-    graph = RDF::Graph.new << JSON::LD::API.toRdf(json_metadata)
+    graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
     graph.statements.first.subject.to_s
   end
 
