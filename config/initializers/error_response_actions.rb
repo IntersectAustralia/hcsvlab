@@ -17,7 +17,7 @@ module ErrorResponseActions
         redirect_to root_url
       }
       format.xml { render :xml => exception.message, :status => 403 }
-      format.any { render :json => exception.message, :status => 403 }
+      format.any { render :json => {:error => exception.message}.to_json, :status => 403 }
     end
   end
 

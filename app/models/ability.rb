@@ -102,6 +102,13 @@ class Ability
     #      ((user.groups & aCollection.edit_groups).length > 0)
     #end
 
+    if is_data_owner or is_superuser
+      can :create, Collection
+    else if is_researcher
+        cannot :create, Collection
+      end
+    end
+
     ############################################################
     ##          PERMISSIONS OVER COLLECTION LIST              ##
     ############################################################

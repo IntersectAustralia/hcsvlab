@@ -4,6 +4,8 @@ require 'fileutils'
 class CollectionsController < ApplicationController
   before_filter :authenticate_user!
   #load_and_authorize_resource
+  load_resource :only => [:create]
+  skip_authorize_resource :only => [:create] # authorise create method with custom permission denied error
 
   set_tab :collection
 
@@ -43,6 +45,8 @@ class CollectionsController < ApplicationController
   end
 
   def create
+    authorize! :create, @collection,
+               :message => "Permission Denied: Your role within the system does not have sufficient privileges to be able to create a collection. Please contact an Alveo administrator."
     if request.format == 'json' and request.post?
       collection_name = params[:name]
       if !collection_name.nil? and !collection_name.blank? and !(collection_name.length > 255) and !(params[:collection_metadata].nil?)
@@ -154,13 +158,13 @@ class CollectionsController < ApplicationController
 
   # Coverts JSON-LD formatted collection metadata and converts it to RDF
   def convert_json_metadata_to_rdf(json_metadata)
-    graph = RDF::Graph.new << JSON::LD::API.toRdf(json_metadata)
+    graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
     graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
   end
 
   # Gets the collection URI from JSON-LD formatted metadata
   def get_uri_from_metadata(json_metadata)
-    graph = RDF::Graph.new << JSON::LD::API.toRdf(json_metadata)
+    graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
     graph.statements.first.subject.to_s
   end
 
