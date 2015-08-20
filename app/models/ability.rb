@@ -104,9 +104,8 @@ class Ability
 
     if is_data_owner or is_superuser
       can :create, Collection
-    else if is_researcher
-        cannot :create, Collection
-      end
+    else
+      cannot :create, Collection
     end
 
     ############################################################
