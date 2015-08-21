@@ -53,7 +53,7 @@ class CollectionsController < ApplicationController
         if !Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
           corpus_dir = create_metadata_and_manifest(collection_name, convert_json_metadata_to_rdf(params[:collection_metadata]))
           ingest_corpus(corpus_dir)
-          @success_message = "Request for new collection '#{collection_name}' (#{collection_uri}) sent to Administrator"
+          @success_message = "New collection '#{collection_name}' (#{collection_uri}) created"
         else
           respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
         end

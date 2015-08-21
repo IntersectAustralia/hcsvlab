@@ -1416,7 +1416,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Request for new collection 'Test' (http://collection.test) sent to Administrator"}
+    {"success":"New collection 'Test' (http://collection.test) created"}
     """
 
   @api_create_collection
@@ -1427,7 +1427,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Request for new collection 'Test' (http://collection.test) sent to Administrator"}
+    {"success":"New collection 'Test' (http://collection.test) created"}
     """
 
   @api_create_collection
@@ -1441,7 +1441,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Request for new collection 'Test' (http://other.collection/test) sent to Administrator"}
+    {"success":"New collection 'Test' (http://other.collection/test) created"}
     """
 
   @api_create_collection
