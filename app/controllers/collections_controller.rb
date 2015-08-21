@@ -4,6 +4,8 @@ require 'fileutils'
 class CollectionsController < ApplicationController
   before_filter :authenticate_user!
   #load_and_authorize_resource
+  load_resource :only => [:create]
+  skip_authorize_resource :only => [:create] # authorise create method with custom permission denied error
 
   set_tab :collection
 
@@ -43,6 +45,8 @@ class CollectionsController < ApplicationController
   end
 
   def create
+    authorize! :create, @collection,
+               :message => "Permission Denied: Your role within the system does not have sufficient privileges to be able to create a collection. Please contact an Alveo administrator."
     if request.format == 'json' and request.post?
       collection_name = params[:name]
       if !collection_name.nil? and !collection_name.blank? and !(collection_name.length > 255) and !(params[:collection_metadata].nil?)
