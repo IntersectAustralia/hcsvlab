@@ -10,7 +10,6 @@ class CollectionsController < ApplicationController
   set_tab :collection
 
   PER_PAGE_RESULTS = 20
-  NEW_COLLECTION_DIR = File.join(Rails.root.to_s, 'data', 'collections', 'api')
   #
   #
   #
@@ -170,8 +169,8 @@ class CollectionsController < ApplicationController
 
   # Writes the collection manifest as JSON and the metadata as .n3 RDF
   def create_metadata_and_manifest(collection_name, collection_rdf, collection_manifest={"collection_name" => collection_name, "files" => {}})
-    corpus_dir = File.join(NEW_COLLECTION_DIR, collection_name)
-    metadata_file_path = File.join(NEW_COLLECTION_DIR,  collection_name + '.n3')
+    corpus_dir = File.join(Rails.application.config.api_collections_location, collection_name)
+    metadata_file_path = File.join(Rails.application.config.api_collections_location,  collection_name + '.n3')
     manifest_file_path = File.join(corpus_dir, MANIFEST_FILE_NAME)
     FileUtils.mkdir_p(corpus_dir)
     File.open(metadata_file_path, 'w') do |file|

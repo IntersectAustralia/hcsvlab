@@ -1397,6 +1397,7 @@ Feature: Browsing via API
     {"success":"0 cleared from item list Test 1"}
     """
 
+  @api_create_collection
   Scenario: Create new collection via the API as a researcher
     Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
       | name | collection_metadata |
@@ -1407,6 +1408,7 @@ Feature: Browsing via API
     {"error":"Permission Denied: Your role within the system does not have sufficient privileges to be able to create a collection. Please contact an Alveo administrator."}
     """
 
+  @api_create_collection
   Scenario: Create new collection via the API as a data owner
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
@@ -1417,6 +1419,7 @@ Feature: Browsing via API
     {"success":"Request for new collection 'Test' (http://collection.test) sent to Administrator"}
     """
 
+  @api_create_collection
   Scenario: Create new collection via the API as an admin
     Given I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
       | name | collection_metadata |
@@ -1427,6 +1430,7 @@ Feature: Browsing via API
     {"success":"Request for new collection 'Test' (http://collection.test) sent to Administrator"}
     """
 
+  @api_create_collection
   Scenario: Create new collection via the API with duplicate name
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
@@ -1440,6 +1444,7 @@ Feature: Browsing via API
     {"success":"Request for new collection 'Test' (http://other.collection/test) sent to Administrator"}
     """
 
+  @api_create_collection
   Scenario: Create new collection via the API with duplicate uri
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
@@ -1453,6 +1458,7 @@ Feature: Browsing via API
     {"error":"Collection 'Another Test' (http://collection.test) already exists in the system - skipping"}
     """
 
+  @api_create_collection
   Scenario: Create new collection via the API without JSON params
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" without JSON params
     Then I should get a 400 response code
@@ -1461,6 +1467,7 @@ Feature: Browsing via API
     {"error":"name and metadata parameters not found"}
     """
 
+  @api_create_collection
   Scenario: Create new collection via the API without name param
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | collection_metadata |
@@ -1471,6 +1478,7 @@ Feature: Browsing via API
     {"error":"name parameter not found"}
     """
 
+  @api_create_collection
   Scenario: Create new collection via the API without the metadata param
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name |
