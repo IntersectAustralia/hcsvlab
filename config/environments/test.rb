@@ -8,6 +8,9 @@ HcsvlabWeb::Application.configure do
   # Base directory where user contributed annotations will be stored
   config.user_annotations_location = "/data/contributed_annotations/"
 
+  # Base directory where api created collections will be stored
+  config.api_collections_location = "#{Rails.root}/test/api/collections"
+
   # Settings specified here will take precedence over those in config/application.rb
 
   # The test environment is used exclusively to run your application's

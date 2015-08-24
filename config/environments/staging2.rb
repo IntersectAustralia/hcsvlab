@@ -11,6 +11,9 @@ HcsvlabWeb::Application.configure do
   # Base directory where user contributed annotations will be stored
   config.user_annotations_location = "/data/contributed_annotations/"
 
+  # Base directory where api created collections will be stored
+  config.api_collections_location = "/data/collections/"
+
   # Settings specified here will take precedence over those in config/application.rb
 
   # Code is not reloaded between requests

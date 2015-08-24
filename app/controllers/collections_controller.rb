@@ -10,7 +10,6 @@ class CollectionsController < ApplicationController
   set_tab :collection
 
   PER_PAGE_RESULTS = 20
-  NEW_COLLECTION_DIR = File.join(Rails.root.to_s, 'data', 'collections', 'api')
   #
   #
   #
@@ -54,7 +53,7 @@ class CollectionsController < ApplicationController
         if !Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
           corpus_dir = create_metadata_and_manifest(collection_name, convert_json_metadata_to_rdf(params[:collection_metadata]))
           ingest_corpus(corpus_dir)
-          @success_message = "Request for new collection '#{collection_name}' (#{collection_uri}) sent to Administrator"
+          @success_message = "New collection '#{collection_name}' (#{collection_uri}) created"
         else
           respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
         end
@@ -170,8 +169,8 @@ class CollectionsController < ApplicationController
 
   # Writes the collection manifest as JSON and the metadata as .n3 RDF
   def create_metadata_and_manifest(collection_name, collection_rdf, collection_manifest={"collection_name" => collection_name, "files" => {}})
-    corpus_dir = File.join(NEW_COLLECTION_DIR, collection_name)
-    metadata_file_path = File.join(NEW_COLLECTION_DIR,  collection_name + '.n3')
+    corpus_dir = File.join(Rails.application.config.api_collections_location, collection_name)
+    metadata_file_path = File.join(Rails.application.config.api_collections_location,  collection_name + '.n3')
     manifest_file_path = File.join(corpus_dir, MANIFEST_FILE_NAME)
     FileUtils.mkdir_p(corpus_dir)
     File.open(metadata_file_path, 'w') do |file|
