@@ -121,6 +121,42 @@ class CollectionsController < ApplicationController
     redirect_to licences_path
   end
 
+  def add_items_to_collection
+    collection = Collection.find_by_name(params[:id])
+    if request.format == 'json' and request.post?
+      if !collection.nil?
+        if params[:api_key] == User.find(collection.owner_id).authentication_token # authorise by comparing api key sent with request against api key of the collection owner
+          corpus_dir = File.join(Rails.application.config.api_collections_location, params[:id])
+          items = []
+          items_added = []
+          # write rdf for each item, then re-create collection manifest and ingest each item
+          params[:items].each do |item|
+            rdf_metadata = convert_json_metadata_to_rdf(item["metadata"])
+            rdf_file = create_item_rdf(corpus_dir, item["identifier"], rdf_metadata)
+            items.push({:identifier => item["identifier"], :rdf_file => rdf_file})
+          end
+          create_collection_manifest(corpus_dir)
+          items.each do |item|
+            ingest_one(corpus_dir, item[:rdf_file])
+            items_added.push(item[:identifier])
+          end
+
+          #TODO handle the upload of actual item documents
+          
+
+
+          @success_message = items_added
+        else
+          respond_with_error("User is unauthorised", 403)
+        end
+      else
+        respond_with_error("Requested collection not found", 404)
+      end
+    else
+      respond_with_error("JSON-LD formatted metadata must be sent to the api call as a POST request", 400)
+    end
+  end
+
   private
 
   #
@@ -158,7 +194,8 @@ class CollectionsController < ApplicationController
   # Coverts JSON-LD formatted collection metadata and converts it to RDF
   def convert_json_metadata_to_rdf(json_metadata)
     graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
-    graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
+    # graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
+    graph.dump(:ttl)
   end
 
   # Gets the collection URI from JSON-LD formatted metadata
@@ -180,6 +217,15 @@ class CollectionsController < ApplicationController
       file.puts(collection_manifest.to_json)
     end
     corpus_dir
+  end
+
+  # creates an item-metadata.rdf file and returns the path of that file
+  def create_item_rdf(corpus_dir, item_name, item_rdf)
+    filename = File.join(corpus_dir, item_name + '-metadata.rdf')
+    File.open(filename, 'w') do |file|
+      file.puts item_rdf
+    end
+    filename
   end
 
   # Renders the given error message as JSON

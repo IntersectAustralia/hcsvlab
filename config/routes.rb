@@ -24,6 +24,7 @@ HcsvlabWeb::Application.routes.draw do
   # Collection definitions
   get "catalog", :to => 'collections#index', :as => 'collections'
   get "catalog/:id", :to => 'collections#show', :as => 'collection'
+  post "catalog/:id", :to => 'collections#add_items_to_collection', :as => 'collection'
   post "catalog", :to => 'collections#create', :as => 'collections'
 
   # In /config/initializers/blacklight_routes.rb we are overriding one of the methods of this class
