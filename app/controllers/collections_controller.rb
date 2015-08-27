@@ -122,38 +122,87 @@ class CollectionsController < ApplicationController
   end
 
   def add_items_to_collection
+    # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
     collection = Collection.find_by_name(params[:id])
-    if request.format == 'json' and request.post?
-      if !collection.nil?
-        if params[:api_key] == User.find(collection.owner_id).authentication_token # authorise by comparing api key sent with request against api key of the collection owner
-          corpus_dir = File.join(Rails.application.config.api_collections_location, params[:id])
-          items = []
-          items_added = []
-          # write rdf for each item, then re-create collection manifest and ingest each item
-          params[:items].each do |item|
-            rdf_metadata = convert_json_metadata_to_rdf(item["metadata"])
-            rdf_file = create_item_rdf(corpus_dir, item["identifier"], rdf_metadata)
-            items.push({:identifier => item["identifier"], :rdf_file => rdf_file})
-          end
-          create_collection_manifest(corpus_dir)
-          items.each do |item|
-            ingest_one(corpus_dir, item[:rdf_file])
-            items_added.push(item[:identifier])
-          end
-
-          #TODO handle the upload of actual item documents
-          
-
-
-          @success_message = items_added
-        else
-          respond_with_error("User is unauthorised", 403)
-        end
-      else
-        respond_with_error("Requested collection not found", 404)
-      end
+    if !request.post? or params[:items].blank?
+      respond_with_error("JSON-LD formatted item metadata must be sent to the api call as a POST request", 400)
+    elsif collection.nil?
+      respond_with_error("Requested collection not found", 404)
+    elsif params[:api_key] != User.find(collection.owner_id).authentication_token
+      respond_with_error("User is unauthorised", 403) # Authorise by comparing api key sent with collection owner's api key
     else
-      respond_with_error("JSON-LD formatted metadata must be sent to the api call as a POST request", 400)
+      corpus_dir = corpus_dir(params[:id])
+      items = []
+      items_added = []
+      params[:items] = JSON.parse(params[:items]) if params[:items].is_a? String
+      params[:items].each do |item|
+        # Check none of the items already exist
+        existing_item = Item.find_by_handle("#{collection.name}:#{item["identifier"]}")
+        if existing_item
+          respond_with_error("The item #{item["identifier"]} already exists in the collection #{collection.name}", 412) if existing_item
+          return
+        end
+        # Handle document upload as JSON content
+        if !item["documents"].nil?
+          item["documents"].each do |document|
+            if document["identifier"].nil? or document["content"].nil?
+              err_message = "identifier missing from document" if document["identifier"].nil?
+              err_message = "content missing from document #{document["identifier"]}" if document["content"].nil?
+              err_message << " for item #{item["identifier"]}"
+              respond_with_error("#{err_message}", 400)
+              return
+            else
+              begin
+                doc_abs_path = upload_document_using_json(File.join(corpus_dir, document["identifier"]), document["content"], collection.name)
+              rescue ResponseError => e
+                respond_with_error(e.message, e.response_code)
+                return
+              end
+              # Update the 'dcterms:scource' of the document in the item graph with the uploaded (JSON content) file location if upload is successful
+              if !doc_abs_path.nil?
+                item['metadata']['@graph'] = update_document_source_in_graph(item['metadata']['@graph'], document["identifier"], doc_abs_path)
+              end
+            end
+          end
+        end
+
+        # Handle document upload as HTTP multipart file
+        uploaded_files = []
+        if !params[:file].nil?
+          params[:file] = [params[:file]] unless params[:file].is_a? Array # make files an array to deal with multi-file upload
+          params[:file].each do |uploaded_file|
+            if uploaded_file.is_a? ActionDispatch::Http::UploadedFile
+              begin
+                uploaded_files.push(upload_document_using_multipart(File.join(corpus_dir, uploaded_file.original_filename), uploaded_file, collection.name))
+              rescue ResponseError => e
+                respond_with_error(e.message, e.response_code)
+              end
+            else
+              respond_with_error("Error in file parameter.", 412)
+            end
+          end
+        end
+        # Update the 'dcterms:scource' of the document in the item graph with the uploaded (multipart request file) file location if upload is successful
+        uploaded_files.each do |file_path|
+          item['metadata']['@graph'] = update_document_source_in_graph(item['metadata']['@graph'], File.basename(file_path), file_path)
+        end
+
+        # Write item JSON metadata to RDF file
+        rdf_metadata = convert_json_metadata_to_rdf(item["metadata"])
+        rdf_file = create_item_rdf(corpus_dir, item["identifier"], rdf_metadata)
+        items.push({:identifier => item["identifier"], :rdf_file => rdf_file})
+      end
+      # Re-create the collection manifest and ingest each item
+      create_collection_manifest(corpus_dir)
+      if items.blank?
+        respond_with_error("No items were added", 400)
+      else
+        items.each do |item|
+          ingest_one(corpus_dir, item[:rdf_file])
+          items_added.push(item[:identifier])
+        end
+      end
+      @success_message = items_added
     end
   end
 
@@ -191,6 +240,19 @@ class CollectionsController < ApplicationController
   #  )
   #end
 
+  # Returns directory path to the given corpus
+  def corpus_dir(collection_name)
+    File.join(Rails.application.config.api_collections_location, collection_name)
+  end
+
+  # Creates a file at the specified path with the given content
+  def create_file(file_path, content)
+    FileUtils.mkdir_p(File.dirname file_path)
+    File.open(file_path, 'w') do |file|
+      file.puts content
+    end
+  end
+
   # Coverts JSON-LD formatted collection metadata and converts it to RDF
   def convert_json_metadata_to_rdf(json_metadata)
     graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
@@ -222,9 +284,7 @@ class CollectionsController < ApplicationController
   # creates an item-metadata.rdf file and returns the path of that file
   def create_item_rdf(corpus_dir, item_name, item_rdf)
     filename = File.join(corpus_dir, item_name + '-metadata.rdf')
-    File.open(filename, 'w') do |file|
-      file.puts item_rdf
-    end
+    create_file(filename, item_rdf)
     filename
   end
 
@@ -235,4 +295,48 @@ class CollectionsController < ApplicationController
     end
   end
 
+  # Uploads a document given as json content or responds with an error if appropriate
+  def upload_document_using_json(filename, json_content, collection_name)
+    if File.exists? filename
+      raise ResponseError.new(412), "The file #{File.basename filename} has already been uploaded to the collection #{collection_name}"
+    else
+      create_file(filename, json_content)
+      filename
+    end
+  end
+
+  # Uploads a document given as a http multipart uploaded file or responds with an error if appropriate
+  def upload_document_using_multipart(absolute_filename, file, collection_name)
+    if !file.is_a? ActionDispatch::Http::UploadedFile
+      raise ResponseError.new(412), "Error in file parameter."
+    elsif file.blank? or file.size == 0
+      raise ResponseError.new(412), "Uploaded file is not present or empty."
+    elsif File.exists? absolute_filename
+      raise ResponseError.new(412), "The file \"#{File.basename absolute_filename}\" has already been uploaded to the collection #{collection_name}"
+    else
+      Rails.logger.debug("Copying uploaded document file from #{file.tempfile} to #{absolute_filename}")
+      FileUtils.cp file.tempfile, absolute_filename
+      absolute_filename
+    end
+  end
+
+  # Updates the source of a document in the JSON formatted Item graph
+  def update_document_source_in_graph(json_graph, document_identifier, document_source)
+    json_graph.each do |graph_entry|
+      if graph_entry['dcterms:identifier'] == document_identifier
+        # Escape any spaces in the filename with '#x20' (RDF character for whitespace) to correctly format for RDF graph loading
+        graph_entry['dcterms:source']['@id'] = "file://#{document_source}"
+        # graph_entry['dcterms:source']['@id'] = "file://#{document_source.sub(" ", "#x20")}"
+        json_graph
+      end
+    end
+  end
+
+end
+
+class ResponseError < StandardError
+  attr_reader :response_code
+  def initialize(response_code=400)
+    @response_code = response_code
+  end
 end
