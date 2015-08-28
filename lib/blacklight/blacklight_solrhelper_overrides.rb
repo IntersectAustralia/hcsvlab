@@ -8,7 +8,7 @@ module Blacklight::SolrHelper::Overrides
     if Blacklight::version != '4.2.1'
       raise 'This method modifies the default Blacklight::SolrHelper#query_solr method. ' \
             'Update it everytime the gem is updated and remove it entirely for gem versions ' \
-            '5.0.0 and above, where the request method has become a configurable parameters.'
+            '5.0.0 and above, where the request method has become a configurable parameter.'
     end
     
     bench_start = Time.now
