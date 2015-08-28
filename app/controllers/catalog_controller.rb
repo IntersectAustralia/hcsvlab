@@ -2,6 +2,7 @@
 require 'blacklight/catalog'
 require 'yaml'
 require "#{Rails.root}/lib/item/download_items_helper.rb"
+require "#{Rails.root}/lib/blacklight/blacklight_solrhelper_overrides.rb"
 require 'net/http'
 require 'uri'
 
@@ -24,6 +25,8 @@ class CatalogController < ApplicationController
 
   include Item::DownloadItemsHelper
   include ERB::Util
+
+  include Blacklight::SolrHelper::Overrides
 
   prepend_before_filter :retrieve_and_set_item_id
 
