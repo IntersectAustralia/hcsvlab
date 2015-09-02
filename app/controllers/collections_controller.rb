@@ -324,9 +324,9 @@ class CollectionsController < ApplicationController
   def update_document_source_in_graph(json_graph, document_identifier, document_source)
     json_graph.each do |graph_entry|
       if graph_entry['dcterms:identifier'] == document_identifier
-        # Escape any spaces in the filename with '#x20' (RDF character for whitespace) to correctly format for RDF graph loading
-        graph_entry['dcterms:source']['@id'] = "file://#{document_source}"
-        # graph_entry['dcterms:source']['@id'] = "file://#{document_source.sub(" ", "#x20")}"
+        # graph_entry['dcterms:source']['@id'] = "file://#{document_source}"
+        # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
+        graph_entry['dcterms:source']['@id'] = "file://#{document_source.sub(" ", "%20")}"
         json_graph
       end
     end

@@ -204,7 +204,7 @@ def look_for_documents(item, corpus_dir, rdf_file, manifest)
   docs.each do |result|
     identifier = result["identifier"]
     source = result["source"]
-    path = URI(source).path
+    path = URI.decode(URI(source).path)
     type = result["type"]
 
     file_name = last_bit(source)
@@ -232,7 +232,7 @@ end
 
 def update_document(document, item, file_name, identifier, source, type, corpus_dir)
   begin
-    path = URI(source).path
+    path = URI.decode(URI(source).path)
 
     document.file_name = file_name
     document.file_path = path
