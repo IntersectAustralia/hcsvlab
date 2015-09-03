@@ -135,13 +135,15 @@ class CollectionsController < ApplicationController
       items = []
       items_added = []
       params[:items] = JSON.parse(params[:items]) if params[:items].is_a? String
+      # Perform an initial validation that none of the items already exist
       params[:items].each do |item|
-        # Check none of the items already exist
         existing_item = Item.find_by_handle("#{collection.name}:#{item["identifier"]}")
         if existing_item
           respond_with_error("The item #{item["identifier"]} already exists in the collection #{collection.name}", 412) if existing_item
           return
         end
+      end
+      params[:items].each do |item|
         # Handle document upload as JSON content
         if !item["documents"].nil?
           item["documents"].each do |document|
