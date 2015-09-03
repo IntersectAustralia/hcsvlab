@@ -1489,18 +1489,6 @@ Feature: Browsing via API
     {"error":"metadata parameter not found"}
     """
 
-  #  @api_add_item
-  #  Scenario: Add item to collection without post request
-  #    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
-  #      | name | collection_metadata |
-  #      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
-  #    When I make a request for the collection page for id "Test" with the API token for "researcher1@intersect.org.au"
-  #    Then I should get a 400 response code
-  #    And the JSON response should be:
-  #    """
-  #    {"error":"JSON-LD formatted metadata must be sent to the api call as a POST request"}
-  #    """
-
   @api_add_item
   Scenario: Add items to non-existing collection
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
@@ -1653,7 +1641,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The file document1.txt has already been uploaded to the collection Test"}
+    {"error":"The file \"document1.txt\" has already been uploaded to the collection Test"}
     """
 
   @api_add_item
@@ -1716,7 +1704,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"Uploaded file is not present or empty."}
+    {"error":"Uploaded file \"blank.txt\" is not present or empty."}
     """
 
   @api_add_item

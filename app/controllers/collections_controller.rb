@@ -123,88 +123,55 @@ class CollectionsController < ApplicationController
 
   def add_items_to_collection
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
-    collection = Collection.find_by_name(params[:id])
-    if !request.post? or params[:items].blank?
-      respond_with_error("JSON-LD formatted item metadata must be sent to the api call as a POST request", 400)
-    elsif collection.nil?
-      respond_with_error("Requested collection not found", 404)
-    elsif params[:api_key] != User.find(collection.owner_id).authentication_token
-      respond_with_error("User is unauthorised", 403) # Authorise by comparing api key sent with collection owner's api key
-    else
+    begin
+      # Perform parameter transformations and request validations
+      params[:items] = JSON.parse(params[:items]) if params[:items].is_a? String
+      params[:file] = [params[:file]] unless params[:file].nil? or params[:file].is_a? Array
+      validate_add_items_request(params)
+
+      collection = Collection.find_by_name(params[:id])
       corpus_dir = corpus_dir(params[:id])
       items = []
       items_added = []
-      params[:items] = JSON.parse(params[:items]) if params[:items].is_a? String
-      # Perform an initial validation that none of the items already exist
-      params[:items].each do |item|
-        existing_item = Item.find_by_handle("#{collection.name}:#{item["identifier"]}")
-        if existing_item
-          respond_with_error("The item #{item["identifier"]} already exists in the collection #{collection.name}", 412) if existing_item
-          return
+      uploaded_files = []
+
+      # Upload each of the files provided in the multipart HTTP request
+      if !params[:file].nil?
+        params[:file].each do |uploaded_file|
+          uploaded_files.push(upload_document_using_multipart(File.join(corpus_dir, uploaded_file.original_filename), uploaded_file, collection.name))
         end
       end
+
+      # Update document source in graph, convert metadata to RDF and ingest each item
       params[:items].each do |item|
-        # Handle document upload as JSON content
+        # Upload the documents whose content was given as JSON for the current item
         if !item["documents"].nil?
           item["documents"].each do |document|
-            if document["identifier"].nil? or document["content"].nil?
-              err_message = "identifier missing from document" if document["identifier"].nil?
-              err_message = "content missing from document #{document["identifier"]}" if document["content"].nil?
-              err_message << " for item #{item["identifier"]}"
-              respond_with_error("#{err_message}", 400)
-              return
-            else
-              begin
-                doc_abs_path = upload_document_using_json(File.join(corpus_dir, document["identifier"]), document["content"], collection.name)
-              rescue ResponseError => e
-                respond_with_error(e.message, e.response_code)
-                return
-              end
-              # Update the 'dcterms:scource' of the document in the item graph with the uploaded (JSON content) file location if upload is successful
-              if !doc_abs_path.nil?
-                item['metadata']['@graph'] = update_document_source_in_graph(item['metadata']['@graph'], document["identifier"], doc_abs_path)
-              end
+            doc_abs_path = upload_document_using_json(File.join(corpus_dir, document["identifier"]), document["content"], collection.name)
+            if !doc_abs_path.nil? # Update the document source in the item graph if upload is successful
+              item['metadata']['@graph'] = update_document_source_in_graph(item['metadata']['@graph'], document["identifier"], doc_abs_path)
             end
           end
         end
-
-        # Handle document upload as HTTP multipart file
-        uploaded_files = []
-        if !params[:file].nil?
-          params[:file] = [params[:file]] unless params[:file].is_a? Array # make files an array to deal with multi-file upload
-          params[:file].each do |uploaded_file|
-            if uploaded_file.is_a? ActionDispatch::Http::UploadedFile
-              begin
-                uploaded_files.push(upload_document_using_multipart(File.join(corpus_dir, uploaded_file.original_filename), uploaded_file, collection.name))
-              rescue ResponseError => e
-                respond_with_error(e.message, e.response_code)
-              end
-            else
-              respond_with_error("Error in file parameter.", 412)
-            end
-          end
-        end
-        # Update the 'dcterms:scource' of the document in the item graph with the uploaded (multipart request file) file location if upload is successful
+        # Update the document source in the item graph if there were any files uploaded from a multipart HTTP request
         uploaded_files.each do |file_path|
           item['metadata']['@graph'] = update_document_source_in_graph(item['metadata']['@graph'], File.basename(file_path), file_path)
         end
-
         # Write item JSON metadata to RDF file
         rdf_metadata = convert_json_metadata_to_rdf(item["metadata"])
         rdf_file = create_item_rdf(corpus_dir, item["identifier"], rdf_metadata)
         items.push({:identifier => item["identifier"], :rdf_file => rdf_file})
       end
-      # Re-create the collection manifest and ingest each item
-      create_collection_manifest(corpus_dir)
-      if items.blank?
-        respond_with_error("No items were added", 400)
-      else
-        items.each do |item|
-          ingest_one(corpus_dir, item[:rdf_file])
-          items_added.push(item[:identifier])
-        end
+      create_collection_manifest(corpus_dir) # Re-create the collection manifest for item ingest
+      raise ResponseError.new(400), "No items were added" if items.blank?
+      items.each do |item|
+        ingest_one(corpus_dir, item[:rdf_file])
+        items_added.push(item[:identifier])
       end
       @success_message = items_added
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
     end
   end
 
@@ -300,8 +267,9 @@ class CollectionsController < ApplicationController
   # Uploads a document given as json content or responds with an error if appropriate
   def upload_document_using_json(filename, json_content, collection_name)
     if File.exists? filename
-      raise ResponseError.new(412), "The file #{File.basename filename} has already been uploaded to the collection #{collection_name}"
+      raise ResponseError.new(412), "The file \"#{File.basename filename}\" has already been uploaded to the collection #{collection_name}"
     else
+      Rails.logger.debug("Writing uploaded document contents to new file #{filename}")
       create_file(filename, json_content)
       filename
     end
@@ -309,12 +277,13 @@ class CollectionsController < ApplicationController
 
   # Uploads a document given as a http multipart uploaded file or responds with an error if appropriate
   def upload_document_using_multipart(absolute_filename, file, collection_name)
+    filename = File.basename absolute_filename
     if !file.is_a? ActionDispatch::Http::UploadedFile
       raise ResponseError.new(412), "Error in file parameter."
     elsif file.blank? or file.size == 0
-      raise ResponseError.new(412), "Uploaded file is not present or empty."
+      raise ResponseError.new(412), "Uploaded file \"#{filename}\" is not present or empty."
     elsif File.exists? absolute_filename
-      raise ResponseError.new(412), "The file \"#{File.basename absolute_filename}\" has already been uploaded to the collection #{collection_name}"
+      raise ResponseError.new(412), "The file \"#{filename}\" has already been uploaded to the collection #{collection_name}"
     else
       Rails.logger.debug("Copying uploaded document file from #{file.tempfile} to #{absolute_filename}")
       FileUtils.cp file.tempfile, absolute_filename
@@ -326,11 +295,60 @@ class CollectionsController < ApplicationController
   def update_document_source_in_graph(json_graph, document_identifier, document_source)
     json_graph.each do |graph_entry|
       if graph_entry['dcterms:identifier'] == document_identifier
-        # graph_entry['dcterms:source']['@id'] = "file://#{document_source}"
         # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
-        graph_entry['dcterms:source']['@id'] = "file://#{document_source.sub(" ", "%20")}"
+        graph_entry.update({'dcterms:source' => {'@id' => "file://#{document_source.sub(" ", "%20")}"}})
         json_graph
       end
+    end
+  end
+
+  # Validates the request on the add items api call
+  def validate_add_items_request(params)
+    collection = Collection.find_by_name(params[:id])
+    if params[:items].blank?
+      raise ResponseError.new(400), "JSON-LD formatted item metadata must be sent to the api call as a POST request"
+    elsif collection.nil?
+      raise ResponseError.new(404), "Requested collection not found"
+    elsif params[:api_key] != User.find(collection.owner_id).authentication_token
+      raise ResponseError.new(403), "User is unauthorised" # Authorise by comparing api key sent with collection owner's api key
+    end
+    params[:items].each do |item|
+      validate_item(item, collection)
+      if !item["documents"].nil?
+        item["documents"].each do |document|
+          validate_document(document, item)
+        end
+      end
+    end
+    if !params[:file].nil?
+      params[:file].each do |uploaded_file|
+        validate_uploaded_file(uploaded_file)
+      end
+    end
+  end
+
+  # Validates the item doesn't exist in the collection
+  def validate_item(item_json, collection)
+    existing_item = Item.find_by_handle("#{collection.name}:#{item_json["identifier"]}")
+    if existing_item
+      raise ResponseError.new(412), "The item #{item_json["identifier"]} already exists in the collection #{collection.name}"
+    end
+  end
+
+  # Validates required document parameters present
+  def validate_document(document_json, item_json)
+    if document_json["identifier"].nil? or document_json["content"].nil?
+      err_message = "identifier missing from document" if document_json["identifier"].nil?
+      err_message = "content missing from document #{document_json["identifier"]}" if document_json["content"].nil?
+      err_message << " for item #{item_json["identifier"]}"
+      raise ResponseError.new(400), "#{err_message}"
+    end
+  end
+
+  # Validates the uploaded file request parameter is of the expected format
+  def validate_uploaded_file(uploaded_file_param)
+    if !uploaded_file_param.is_a? ActionDispatch::Http::UploadedFile
+      raise ResponseError.new(412), "Error in file parameter."
     end
   end
 
