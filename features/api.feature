@@ -1514,7 +1514,7 @@ Feature: Browsing via API
     Then I should get a 400 response code
     And the JSON response should be:
     """
-    {"error":"JSON-LD formatted item metadata must be sent to the api call as a POST request"}
+    {"error":"JSON-LD formatted item metadata must be sent with the api request"}
     """
 
   @api_add_item
