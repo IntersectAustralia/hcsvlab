@@ -63,6 +63,29 @@ When /^I make a JSON delete request for (.*) with the API token for "(.*)"$/ do 
   delete path_to(page_name), {:format => :json}, {'X-API-KEY' => user.authentication_token}
 end
 
+# post both the file params and the standard JSON params to the page
+When /^I make a JSON multipart request for (.*) with the API token for "(.*)" with JSON and (ill-formatted )?file params$/ do |page_name, email, force_error, table|
+  user = User.find_by_email!(email)
+  hash = table.hashes.first
+  hash.each do |k, v|
+    begin
+      if k == 'file' and !force_error.present?
+        hash[k] = []
+        file_paths = v.tr("\"", "").split(",") # this step requires file names to be enclosed in quotes and comma separated
+        file_paths.each do |file_path|
+          hash[k].push Rack::Test::UploadedFile.new(Rails.root.join(file_path), "application/octet-stream")
+        end
+      else
+        hash[k] = JSON.parse(v)
+      end
+    rescue
+      # not a json parameter, ignore
+    end
+  end
+  post path_to(page_name), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
+end
+
+# doesn't post the non-file JSON params to the page
 When /^I make a JSON multipart request for (.*) with the API token for "(.*)" with JSON params$/ do |page_name, email, table|
   user = User.find_by_email!(email)
   table = table.hashes
@@ -294,5 +317,9 @@ Then /^the JSON response should have the following annotations properties in any
 
   end
 
+end
+
+Then /^the file "(.+)" should exist in the directory for the collection "(.+)"$/ do |file_name, collection_name|
+  File.exist?(File.join(Rails.application.config.api_collections_location, collection_name, file_name)).should be(true)
 end
 

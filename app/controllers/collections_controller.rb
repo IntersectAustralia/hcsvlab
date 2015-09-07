@@ -1,4 +1,6 @@
-require "#{Rails.root}/lib/tasks/fedora_helper.rb"
+require Rails.root.join('lib/tasks/fedora_helper.rb')
+require Rails.root.join('lib/api/response_error')
+require Rails.root.join('lib/api/request_validator')
 require 'fileutils'
 
 class CollectionsController < ApplicationController
@@ -8,6 +10,8 @@ class CollectionsController < ApplicationController
   skip_authorize_resource :only => [:create] # authorise create method with custom permission denied error
 
   set_tab :collection
+
+  include RequestValidator
 
   PER_PAGE_RESULTS = 20
   #
@@ -121,6 +125,22 @@ class CollectionsController < ApplicationController
     redirect_to licences_path
   end
 
+  def add_items_to_collection
+    # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
+    begin
+      request_params = cleanse_params(params)
+      corpus_dir = corpus_dir(request_params[:id])
+      collection = validate_collection(request_params)
+      validate_add_items_request(collection, corpus_dir, request_params)
+      uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
+      items = process_items(corpus_dir, request_params, uploaded_files)
+      @success_message = ingest_items(corpus_dir, items) # Respond with a list of items added (via item ingest)
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
+    end
+  end
+
   private
 
   #
@@ -155,10 +175,24 @@ class CollectionsController < ApplicationController
   #  )
   #end
 
+  # Returns directory path to the given corpus
+  def corpus_dir(collection_name)
+    File.join(Rails.application.config.api_collections_location, collection_name)
+  end
+
+  # Creates a file at the specified path with the given content
+  def create_file(file_path, content)
+    FileUtils.mkdir_p(File.dirname file_path)
+    File.open(file_path, 'w') do |file|
+      file.puts content
+    end
+  end
+
   # Coverts JSON-LD formatted collection metadata and converts it to RDF
   def convert_json_metadata_to_rdf(json_metadata)
     graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
-    graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
+    # graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
+    graph.dump(:ttl)
   end
 
   # Gets the collection URI from JSON-LD formatted metadata
@@ -182,11 +216,126 @@ class CollectionsController < ApplicationController
     corpus_dir
   end
 
+  # creates an item-metadata.rdf file and returns the path of that file
+  def create_item_rdf(corpus_dir, item_name, item_rdf)
+    filename = File.join(corpus_dir, item_name + '-metadata.rdf')
+    create_file(filename, item_rdf)
+    filename
+  end
+
   # Renders the given error message as JSON
   def respond_with_error(message, status_code)
     respond_to do |format|
       format.any { render :json => {:error => message}.to_json, :status => status_code }
     end
+  end
+
+  # Uploads a document given as json content
+  def upload_document_using_json(corpus_dir, file_basename, json_content)
+    absolute_filename = File.join(corpus_dir, file_basename)
+    Rails.logger.debug("Writing uploaded document contents to new file #{absolute_filename}")
+    create_file(absolute_filename, json_content)
+    absolute_filename
+  end
+
+  # Uploads a document given as a http multipart uploaded file or responds with an error if appropriate
+  def upload_document_using_multipart(corpus_dir, file_basename, file, collection_name)
+    absolute_filename = File.join(corpus_dir, file_basename)
+    if !file.is_a? ActionDispatch::Http::UploadedFile
+      raise ResponseError.new(412), "Error in file parameter."
+    elsif file.blank? or file.size == 0
+      raise ResponseError.new(412), "Uploaded file \"#{file_basename}\" is not present or empty."
+    else
+      Rails.logger.debug("Copying uploaded document file from #{file.tempfile} to #{absolute_filename}")
+      FileUtils.cp file.tempfile, absolute_filename
+      absolute_filename
+    end
+  end
+
+  # Processes the metadata for each item in the supplied request parameters and recreates the corpus collection manifest
+  def process_items(corpus_dir, request_params, uploaded_files)
+    items = []
+    request_params[:items].each do |item|
+      item = process_item_documents_and_update_graph(corpus_dir, item)
+      item = update_item_graph_with_uploaded_files(uploaded_files, item)
+      items.push(write_item_metadata(corpus_dir, item)) # Convert item metadata from JSON to RDF
+    end
+    raise ResponseError.new(400), "No items were added" if items.blank?
+    create_collection_manifest(corpus_dir) # Re-create the collection manifest for item ingest
+    items
+  end
+
+  # Uploads any documents in the item metadata and returns a copy of the item metadata with its metadata graph updated
+  def process_item_documents_and_update_graph(corpus_dir, item_metadata)
+    unless item_metadata["documents"].nil?
+      item_metadata["documents"].each do |document|
+        doc_abs_path = upload_document_using_json(corpus_dir, document["identifier"], document["content"])
+        unless doc_abs_path.nil?
+          item_metadata['metadata']['@graph'] = update_document_source_in_graph(item_metadata['metadata']['@graph'], document["identifier"], doc_abs_path)
+        end
+      end
+    end
+    item_metadata
+  end
+
+  # Updates the metadata graph for the given item
+  # Returns a copy of the item with the document sourcs in the graph updates to the path of an uploaded file when appropriate
+  def update_item_graph_with_uploaded_files(uploaded_files, item_metadata)
+    uploaded_files.each do |file_path|
+      item_metadata['metadata']['@graph'] = update_document_source_in_graph(item_metadata['metadata']['@graph'], File.basename(file_path), file_path)
+    end
+    item_metadata
+  end
+
+  # Updates the source of a document in the JSON formatted Item graph
+  def update_document_source_in_graph(json_graph, document_identifier, document_source)
+    json_graph.each do |graph_entry|
+      if graph_entry['dcterms:identifier'] == document_identifier
+        # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
+        graph_entry.update({'dcterms:source' => {'@id' => "file://#{document_source.sub(" ", "%20")}"}})
+        json_graph
+      end
+    end
+  end
+
+  # Returns a cleansed copy of params for the add item api
+  def cleanse_params(request_params)
+    if request_params[:items].is_a? String
+      begin
+        request_params[:items] = JSON.parse(request_params[:items])
+      rescue JSON::ParserError
+        raise ResponseError.new(400), "JSON item metadata is ill-formatted"
+      end
+    end
+    request_params[:file] = [] if request_params[:file].nil?
+    request_params[:file] = [request_params[:file]] unless request_params[:file].is_a? Array
+    request_params
+  end
+
+  # Processes files uploaded as part of a multipart request
+  def process_uploaded_files(corpus_dir, collection_name, files)
+    uploaded_files = []
+    files.each do |uploaded_file|
+      uploaded_files.push(upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection_name))
+    end
+    uploaded_files
+  end
+
+  # Ingests a list of items
+  def ingest_items(corpus_dir, items)
+    items_ingested = []
+    items.each do |item|
+      ingest_one(corpus_dir, item[:rdf_file])
+      items_ingested.push(item[:identifier])
+    end
+    items_ingested
+  end
+
+  # Write item JSON metadata to RDF file
+  def write_item_metadata(corpus_dir, item_json)
+    rdf_metadata = convert_json_metadata_to_rdf(item_json["metadata"])
+    rdf_file = create_item_rdf(corpus_dir, item_json["identifier"], rdf_metadata)
+    {:identifier => item_json["identifier"], :rdf_file => rdf_file}
   end
 
 end
