@@ -124,26 +124,15 @@ class CollectionsController < ApplicationController
   def add_items_to_collection
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
     begin
-      cleanse_params
-      collection = validate_collection(params)
-      corpus_dir = corpus_dir(params[:id])
-      validate_add_items_request(collection, corpus_dir, params)
-      uploaded_files = process_uploaded_files(corpus_dir, collection.name)
+      request_params = cleanse_params(params)
+      collection = validate_collection(request_params)
+      corpus_dir = corpus_dir(request_params[:id])
+      validate_add_items_request(collection, corpus_dir, request_params)
+      uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
       items = []
-      params[:items].each do |item|
-        # Upload the documents whose content was given as JSON for the current item
-        if !item["documents"].nil?
-          item["documents"].each do |document|
-            doc_abs_path = upload_document_using_json(corpus_dir, document["identifier"], document["content"])
-            if !doc_abs_path.nil? # Update the document source in the item graph if upload is successful
-              item['metadata']['@graph'] = update_document_source_in_graph(item['metadata']['@graph'], document["identifier"], doc_abs_path)
-            end
-          end
-        end
-        # Update the document source in the item graph if there were any files uploaded from a multipart HTTP request
-        uploaded_files.each do |file_path|
-          item['metadata']['@graph'] = update_document_source_in_graph(item['metadata']['@graph'], File.basename(file_path), file_path)
-        end
+      request_params[:items].each do |item|
+        item = process_item_documents_and_update_graph(corpus_dir, item)
+        item = update_item_graph_with_uploaded_files(uploaded_files, item)
         items.push(write_item_metadata(corpus_dir, item)) # Convert item metadata from JSON to RDF
       end
       create_collection_manifest(corpus_dir) # Re-create the collection manifest for item ingest
@@ -266,6 +255,30 @@ class CollectionsController < ApplicationController
     end
   end
 
+  # Uploads any documents in the item metadata and returns a copy of the item metadata with its metadata graph updated
+  def process_item_documents_and_update_graph(corpus_dir, item_metadata)
+    unless item_metadata["documents"].nil?
+      item_metadata["documents"].each do |document|
+        doc_abs_path = upload_document_using_json(corpus_dir, document["identifier"], document["content"])
+        unless doc_abs_path.nil?
+          item_metadata['metadata']['@graph'] = update_document_source_in_graph(item_metadata['metadata']['@graph'], document["identifier"], doc_abs_path)
+        end
+      end
+    end
+    item_metadata
+  end
+
+  # Updates the metadata graph for the given item
+  # Returns a copy of the item with the document sourcs in the graph updates to the path of an uploaded file when appropriate
+  def update_item_graph_with_uploaded_files(uploaded_files, item_metadata)
+    unless uploaded_files.nil?
+      uploaded_files.each do |file_path|
+        item_metadata['metadata']['@graph'] = update_document_source_in_graph(item_metadata['metadata']['@graph'], File.basename(file_path), file_path)
+      end
+    end
+    item_metadata
+  end
+
   # Updates the source of a document in the JSON formatted Item graph
   def update_document_source_in_graph(json_graph, document_identifier, document_source)
     json_graph.each do |graph_entry|
@@ -287,20 +300,23 @@ class CollectionsController < ApplicationController
     end
   end
 
-  # Cleanses params for the add item api
-  def cleanse_params
-    if params[:items].is_a? String
-      raise ResponseError.new(400), "JSON item metadata is ill-formatted" unless valid_json?(params[:items])
-      params[:items] = JSON.parse(params[:items])
+  # Returns a cleansed copy of params for the add item api
+  def cleanse_params(request_params)
+    unless request_params.nil?
+      if request_params[:items].is_a? String
+        raise ResponseError.new(400), "JSON item metadata is ill-formatted" unless valid_json?(request_params[:items])
+        request_params[:items] = JSON.parse(request_params[:items])
+      end
+      request_params[:file] = [request_params[:file]] unless request_params[:file].nil? or request_params[:file].is_a? Array
     end
-    params[:file] = [params[:file]] unless params[:file].nil? or params[:file].is_a? Array
+    request_params
   end
 
   # Processes files uploaded as part of a multipart request
-  def process_uploaded_files(corpus_dir, collection_name)
+  def process_uploaded_files(corpus_dir, collection_name, files)
     uploaded_files = []
-    if !params[:file].nil?
-      params[:file].each do |uploaded_file|
+    unless files.nil?
+      files.each do |uploaded_file|
         uploaded_files.push(upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection_name))
       end
     end
@@ -325,18 +341,18 @@ class CollectionsController < ApplicationController
   end
 
   # Validates the request on the add items api call
-  def validate_add_items_request(collection, corpus_dir, params)
-    validate_items(params[:items], collection, corpus_dir)
-    validate_files(params[:file], collection, corpus_dir)
-    validate_document_identifiers(get_document_identifiers(params[:file], params[:items]))
+  def validate_add_items_request(collection, corpus_dir, request_params)
+    validate_items(request_params[:items], collection, corpus_dir)
+    validate_files(request_params[:file], collection, corpus_dir)
+    validate_document_identifiers(get_document_identifiers(request_params[:file], request_params[:items]))
   end
 
   # Validates the collection exists and the user is authorised to modify it
-  def validate_collection(params)
-    collection = Collection.find_by_name(params[:id])
+  def validate_collection(request_params)
+    collection = Collection.find_by_name(request_params[:id])
     if collection.nil?
       raise ResponseError.new(404), "Requested collection not found"
-    elsif params[:api_key] != User.find(collection.owner_id).authentication_token
+    elsif request_params[:api_key] != User.find(collection.owner_id).authentication_token
       raise ResponseError.new(403), "User is unauthorised" # Authorise by comparing api key sent with collection owner's api key
     end
     collection
@@ -380,7 +396,7 @@ class CollectionsController < ApplicationController
     if existing_item
       raise ResponseError.new(412), "The item #{item_metadata["identifier"]} already exists in the collection #{collection.name}"
     end
-    if !item_metadata["documents"].nil?
+    unless item_metadata["documents"].nil?
       item_metadata["documents"].each do |document|
         validate_document(document, item_metadata, collection, corpus_dir)
       end
@@ -408,7 +424,7 @@ class CollectionsController < ApplicationController
 
   # Validates each of the uploaded files
   def validate_files(uploaded_files, collection, corpus_dir)
-    if !uploaded_files.nil?
+    unless uploaded_files.nil?
       uploaded_files.each do |uploaded_file|
         validate_uploaded_file(uploaded_file, collection, corpus_dir)
       end
@@ -417,7 +433,7 @@ class CollectionsController < ApplicationController
 
   # Validates the uploaded file request parameter is of the expected format
   def validate_uploaded_file(uploaded_file, collection, corpus_dir)
-    if !uploaded_file.is_a? ActionDispatch::Http::UploadedFile
+    unless uploaded_file.is_a? ActionDispatch::Http::UploadedFile
       raise ResponseError.new(412), "Error in file parameter."
     end
     validate_new_document_file(corpus_dir, uploaded_file.original_filename, collection)
