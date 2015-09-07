@@ -1,4 +1,6 @@
-require "#{Rails.root}/lib/tasks/fedora_helper.rb"
+require Rails.root.join('lib/tasks/fedora_helper.rb')
+require Rails.root.join('lib/api/response_error')
+require Rails.root.join('lib/api/request_validator')
 require 'fileutils'
 
 class CollectionsController < ApplicationController
@@ -8,6 +10,8 @@ class CollectionsController < ApplicationController
   skip_authorize_resource :only => [:create] # authorise create method with custom permission denied error
 
   set_tab :collection
+
+  include RequestValidator
 
   PER_PAGE_RESULTS = 20
   #
@@ -125,18 +129,11 @@ class CollectionsController < ApplicationController
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
     begin
       request_params = cleanse_params(params)
-      collection = validate_collection(request_params)
       corpus_dir = corpus_dir(request_params[:id])
+      collection = validate_collection(request_params)
       validate_add_items_request(collection, corpus_dir, request_params)
       uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
-      items = []
-      request_params[:items].each do |item|
-        item = process_item_documents_and_update_graph(corpus_dir, item)
-        item = update_item_graph_with_uploaded_files(uploaded_files, item)
-        items.push(write_item_metadata(corpus_dir, item)) # Convert item metadata from JSON to RDF
-      end
-      create_collection_manifest(corpus_dir) # Re-create the collection manifest for item ingest
-      raise ResponseError.new(400), "No items were added" if items.blank?
+      items = process_items(corpus_dir, request_params, uploaded_files)
       @success_message = ingest_items(corpus_dir, items) # Respond with a list of items added (via item ingest)
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
@@ -255,6 +252,19 @@ class CollectionsController < ApplicationController
     end
   end
 
+  # Processes the metadata for each item in the supplied request parameters and recreates the corpus collection manifest
+  def process_items(corpus_dir, request_params, uploaded_files)
+    items = []
+    request_params[:items].each do |item|
+      item = process_item_documents_and_update_graph(corpus_dir, item)
+      item = update_item_graph_with_uploaded_files(uploaded_files, item)
+      items.push(write_item_metadata(corpus_dir, item)) # Convert item metadata from JSON to RDF
+    end
+    raise ResponseError.new(400), "No items were added" if items.blank?
+    create_collection_manifest(corpus_dir) # Re-create the collection manifest for item ingest
+    items
+  end
+
   # Uploads any documents in the item metadata and returns a copy of the item metadata with its metadata graph updated
   def process_item_documents_and_update_graph(corpus_dir, item_metadata)
     unless item_metadata["documents"].nil?
@@ -271,10 +281,8 @@ class CollectionsController < ApplicationController
   # Updates the metadata graph for the given item
   # Returns a copy of the item with the document sourcs in the graph updates to the path of an uploaded file when appropriate
   def update_item_graph_with_uploaded_files(uploaded_files, item_metadata)
-    unless uploaded_files.nil?
-      uploaded_files.each do |file_path|
-        item_metadata['metadata']['@graph'] = update_document_source_in_graph(item_metadata['metadata']['@graph'], File.basename(file_path), file_path)
-      end
+    uploaded_files.each do |file_path|
+      item_metadata['metadata']['@graph'] = update_document_source_in_graph(item_metadata['metadata']['@graph'], File.basename(file_path), file_path)
     end
     item_metadata
   end
@@ -290,35 +298,25 @@ class CollectionsController < ApplicationController
     end
   end
 
-  # Checks if json is valid
-  def valid_json?(json)
-    begin
-      JSON.parse(json)
-      true
-    rescue
-      false
-    end
-  end
-
   # Returns a cleansed copy of params for the add item api
   def cleanse_params(request_params)
-    unless request_params.nil?
-      if request_params[:items].is_a? String
-        raise ResponseError.new(400), "JSON item metadata is ill-formatted" unless valid_json?(request_params[:items])
+    if request_params[:items].is_a? String
+      begin
         request_params[:items] = JSON.parse(request_params[:items])
+      rescue JSON::ParserError
+        raise ResponseError.new(400), "JSON item metadata is ill-formatted"
       end
-      request_params[:file] = [request_params[:file]] unless request_params[:file].nil? or request_params[:file].is_a? Array
     end
+    request_params[:file] = [] if request_params[:file].nil?
+    request_params[:file] = [request_params[:file]] unless request_params[:file].is_a? Array
     request_params
   end
 
   # Processes files uploaded as part of a multipart request
   def process_uploaded_files(corpus_dir, collection_name, files)
     uploaded_files = []
-    unless files.nil?
-      files.each do |uploaded_file|
-        uploaded_files.push(upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection_name))
-      end
+    files.each do |uploaded_file|
+      uploaded_files.push(upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection_name))
     end
     uploaded_files
   end
@@ -340,111 +338,4 @@ class CollectionsController < ApplicationController
     {:identifier => item_json["identifier"], :rdf_file => rdf_file}
   end
 
-  # Validates the request on the add items api call
-  def validate_add_items_request(collection, corpus_dir, request_params)
-    validate_items(request_params[:items], collection, corpus_dir)
-    validate_files(request_params[:file], collection, corpus_dir)
-    validate_document_identifiers(get_document_identifiers(request_params[:file], request_params[:items]))
-  end
-
-  # Validates the collection exists and the user is authorised to modify it
-  def validate_collection(request_params)
-    collection = Collection.find_by_name(request_params[:id])
-    if collection.nil?
-      raise ResponseError.new(404), "Requested collection not found"
-    elsif request_params[:api_key] != User.find(collection.owner_id).authentication_token
-      raise ResponseError.new(403), "User is unauthorised" # Authorise by comparing api key sent with collection owner's api key
-    end
-    collection
-  end
-
-  # Validates the metadata for each of the items
-  def validate_items(items_metadata, collection, corpus_dir)
-    raise ResponseError.new(400), "JSON-LD formatted item metadata must be sent with the api request" if items_metadata.blank?
-    items_metadata.each do |item|
-      validate_item(item, collection, corpus_dir)
-    end
-  end
-
-  # Iterates over the uploaded files and JSON document content and returns a list of document identifiers/filenames
-  def get_document_identifiers(uploaded_files, items_metadata)
-    document_identifiers = []
-    items_metadata.each do |item|
-      unless item["documents"].nil?
-        item["documents"].each do |document|
-          document_identifiers.push(document["identifier"])
-        end
-      end
-    end
-    unless uploaded_files.nil?
-      uploaded_files.each do |uploaded_file|
-        document_identifiers.push(uploaded_file.original_filename)
-      end
-    end
-    document_identifiers
-  end
-
-  # Validates that each of the document identifiers are unique
-  def validate_document_identifiers(document_identifiers)
-    duplicate_id = document_identifiers.detect{|identifier| document_identifiers.count(identifier) > 1}
-    raise ResponseError.new(412), "The identifier \"#{duplicate_id}\" is used for multiple documents" unless duplicate_id.nil?
-  end
-
-  # Validates the item doesn't exist in the collection and validates any document metadata with the item
-  def validate_item(item_metadata, collection, corpus_dir)
-    existing_item = Item.find_by_handle("#{collection.name}:#{item_metadata["identifier"]}")
-    if existing_item
-      raise ResponseError.new(412), "The item #{item_metadata["identifier"]} already exists in the collection #{collection.name}"
-    end
-    unless item_metadata["documents"].nil?
-      item_metadata["documents"].each do |document|
-        validate_document(document, item_metadata, collection, corpus_dir)
-      end
-    end
-  end
-
-  # Validates required document parameters present and document file isn't already in the collection directory
-  def validate_document(document_metadata, item_metadata, collection, corpus_dir)
-    if document_metadata["identifier"].nil? or document_metadata["content"].nil?
-      err_message = "identifier missing from document" if document_metadata["identifier"].nil?
-      err_message = "content missing from document #{document_metadata["identifier"]}" if document_metadata["content"].nil?
-      err_message << " for item #{item_metadata["identifier"]}"
-      raise ResponseError.new(400), "#{err_message}"
-    end
-    validate_new_document_file(corpus_dir, document_metadata["identifier"], collection)
-  end
-
-  # Validates that the document file to be created/uploaded doesn't already exist in the collection directory
-  def validate_new_document_file(corpus_dir, file_basename, collection)
-    absolute_filename = File.join(corpus_dir, file_basename)
-    if File.exists? absolute_filename
-      raise ResponseError.new(412), "The file \"#{file_basename}\" has already been uploaded to the collection #{collection.name}"
-    end
-  end
-
-  # Validates each of the uploaded files
-  def validate_files(uploaded_files, collection, corpus_dir)
-    unless uploaded_files.nil?
-      uploaded_files.each do |uploaded_file|
-        validate_uploaded_file(uploaded_file, collection, corpus_dir)
-      end
-    end
-  end
-
-  # Validates the uploaded file request parameter is of the expected format
-  def validate_uploaded_file(uploaded_file, collection, corpus_dir)
-    unless uploaded_file.is_a? ActionDispatch::Http::UploadedFile
-      raise ResponseError.new(412), "Error in file parameter."
-    end
-    validate_new_document_file(corpus_dir, uploaded_file.original_filename, collection)
-  end
-
-end
-
-# Exception class for raising HTTP response errors
-class ResponseError < StandardError
-  attr_reader :response_code
-  def initialize(response_code=400)
-    @response_code = response_code
-  end
 end
