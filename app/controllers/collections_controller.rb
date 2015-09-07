@@ -124,17 +124,17 @@ class CollectionsController < ApplicationController
   def add_items_to_collection
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
     begin
-      collection = Collection.find_by_name(params[:id])
-      corpus_dir = corpus_dir(params[:id])
       cleanse_params
-      validate_add_items_request(params)
+      collection = validate_collection(params)
+      corpus_dir = corpus_dir(params[:id])
+      validate_add_items_request(collection, corpus_dir, params)
       uploaded_files = process_uploaded_files(corpus_dir, collection.name)
       items = []
       params[:items].each do |item|
         # Upload the documents whose content was given as JSON for the current item
         if !item["documents"].nil?
           item["documents"].each do |document|
-            doc_abs_path = upload_document_using_json(corpus_dir, document["identifier"], document["content"], collection.name)
+            doc_abs_path = upload_document_using_json(corpus_dir, document["identifier"], document["content"])
             if !doc_abs_path.nil? # Update the document source in the item graph if upload is successful
               item['metadata']['@graph'] = update_document_source_in_graph(item['metadata']['@graph'], document["identifier"], doc_abs_path)
             end
@@ -244,16 +244,12 @@ class CollectionsController < ApplicationController
     end
   end
 
-  # Uploads a document given as json content or responds with an error if appropriate
-  def upload_document_using_json(corpus_dir, file_basename, json_content, collection_name)
+  # Uploads a document given as json content
+  def upload_document_using_json(corpus_dir, file_basename, json_content)
     absolute_filename = File.join(corpus_dir, file_basename)
-    if File.exists? absolute_filename
-      raise ResponseError.new(412), "The file \"#{file_basename}\" has already been uploaded to the collection #{collection_name}"
-    else
-      Rails.logger.debug("Writing uploaded document contents to new file #{absolute_filename}")
-      create_file(absolute_filename, json_content)
-      absolute_filename
-    end
+    Rails.logger.debug("Writing uploaded document contents to new file #{absolute_filename}")
+    create_file(absolute_filename, json_content)
+    absolute_filename
   end
 
   # Uploads a document given as a http multipart uploaded file or responds with an error if appropriate
@@ -263,8 +259,6 @@ class CollectionsController < ApplicationController
       raise ResponseError.new(412), "Error in file parameter."
     elsif file.blank? or file.size == 0
       raise ResponseError.new(412), "Uploaded file \"#{file_basename}\" is not present or empty."
-    elsif File.exists? absolute_filename
-      raise ResponseError.new(412), "The file \"#{file_basename}\" has already been uploaded to the collection #{collection_name}"
     else
       Rails.logger.debug("Copying uploaded document file from #{file.tempfile} to #{absolute_filename}")
       FileUtils.cp file.tempfile, absolute_filename
@@ -283,9 +277,22 @@ class CollectionsController < ApplicationController
     end
   end
 
+  # Checks if json is valid
+  def valid_json?(json)
+    begin
+      JSON.parse(json)
+      true
+    rescue
+      false
+    end
+  end
+
   # Cleanses params for the add item api
   def cleanse_params
-    params[:items] = JSON.parse(params[:items]) if params[:items].is_a? String
+    if params[:items].is_a? String
+      raise ResponseError.new(400), "JSON item metadata is ill-formatted" unless valid_json?(params[:items])
+      params[:items] = JSON.parse(params[:items])
+    end
     params[:file] = [params[:file]] unless params[:file].nil? or params[:file].is_a? Array
   end
 
@@ -318,12 +325,13 @@ class CollectionsController < ApplicationController
   end
 
   # Validates the request on the add items api call
-  def validate_add_items_request(params)
-    collection = validate_collection(params)
-    validate_items(params[:items], collection)
-    validate_files(params[:file])
+  def validate_add_items_request(collection, corpus_dir, params)
+    validate_items(params[:items], collection, corpus_dir)
+    validate_files(params[:file], collection, corpus_dir)
+    validate_document_identifiers(get_document_identifiers(params[:file], params[:items]))
   end
 
+  # Validates the collection exists and the user is authorised to modify it
   def validate_collection(params)
     collection = Collection.find_by_name(params[:id])
     if collection.nil?
@@ -334,53 +342,90 @@ class CollectionsController < ApplicationController
     collection
   end
 
-  def validate_items(items_metadata, collection)
+  # Validates the metadata for each of the items
+  def validate_items(items_metadata, collection, corpus_dir)
     raise ResponseError.new(400), "JSON-LD formatted item metadata must be sent with the api request" if items_metadata.blank?
     items_metadata.each do |item|
-      validate_item(item, collection)
+      validate_item(item, collection, corpus_dir)
     end
   end
 
-  # Validates the item doesn't exist in the collection
-  def validate_item(item_metadata, collection)
+  # Iterates over the uploaded files and JSON document content and returns a list of document identifiers/filenames
+  def get_document_identifiers(uploaded_files, items_metadata)
+    document_identifiers = []
+    items_metadata.each do |item|
+      unless item["documents"].nil?
+        item["documents"].each do |document|
+          document_identifiers.push(document["identifier"])
+        end
+      end
+    end
+    unless uploaded_files.nil?
+      uploaded_files.each do |uploaded_file|
+        document_identifiers.push(uploaded_file.original_filename)
+      end
+    end
+    document_identifiers
+  end
+
+  # Validates that each of the document identifiers are unique
+  def validate_document_identifiers(document_identifiers)
+    duplicate_id = document_identifiers.detect{|identifier| document_identifiers.count(identifier) > 1}
+    raise ResponseError.new(412), "The identifier \"#{duplicate_id}\" is used for multiple documents" unless duplicate_id.nil?
+  end
+
+  # Validates the item doesn't exist in the collection and validates any document metadata with the item
+  def validate_item(item_metadata, collection, corpus_dir)
     existing_item = Item.find_by_handle("#{collection.name}:#{item_metadata["identifier"]}")
     if existing_item
       raise ResponseError.new(412), "The item #{item_metadata["identifier"]} already exists in the collection #{collection.name}"
     end
     if !item_metadata["documents"].nil?
       item_metadata["documents"].each do |document|
-        validate_document(document, item_metadata)
+        validate_document(document, item_metadata, collection, corpus_dir)
       end
     end
   end
 
-  # Validates required document parameters present
-  def validate_document(document_metadata, item_metadata)
+  # Validates required document parameters present and document file isn't already in the collection directory
+  def validate_document(document_metadata, item_metadata, collection, corpus_dir)
     if document_metadata["identifier"].nil? or document_metadata["content"].nil?
       err_message = "identifier missing from document" if document_metadata["identifier"].nil?
       err_message = "content missing from document #{document_metadata["identifier"]}" if document_metadata["content"].nil?
       err_message << " for item #{item_metadata["identifier"]}"
       raise ResponseError.new(400), "#{err_message}"
     end
+    validate_new_document_file(corpus_dir, document_metadata["identifier"], collection)
   end
 
-  def validate_files(uploaded_files)
+  # Validates that the document file to be created/uploaded doesn't already exist in the collection directory
+  def validate_new_document_file(corpus_dir, file_basename, collection)
+    absolute_filename = File.join(corpus_dir, file_basename)
+    if File.exists? absolute_filename
+      raise ResponseError.new(412), "The file \"#{file_basename}\" has already been uploaded to the collection #{collection.name}"
+    end
+  end
+
+  # Validates each of the uploaded files
+  def validate_files(uploaded_files, collection, corpus_dir)
     if !uploaded_files.nil?
       uploaded_files.each do |uploaded_file|
-        validate_uploaded_file(uploaded_file)
+        validate_uploaded_file(uploaded_file, collection, corpus_dir)
       end
     end
   end
 
   # Validates the uploaded file request parameter is of the expected format
-  def validate_uploaded_file(uploaded_file)
+  def validate_uploaded_file(uploaded_file, collection, corpus_dir)
     if !uploaded_file.is_a? ActionDispatch::Http::UploadedFile
       raise ResponseError.new(412), "Error in file parameter."
     end
+    validate_new_document_file(corpus_dir, uploaded_file.original_filename, collection)
   end
 
 end
 
+# Exception class for raising HTTP response errors
 class ResponseError < StandardError
   attr_reader :response_code
   def initialize(response_code=400)
