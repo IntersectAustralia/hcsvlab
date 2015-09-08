@@ -24,7 +24,6 @@ HcsvlabWeb::Application.routes.draw do
   # Collection definitions
   get "catalog", :to => 'collections#index', :as => 'collections'
   get "catalog/:id", :to => 'collections#show', :as => 'collection'
-  post "catalog/:id", :to => 'collections#add_items_to_collection', :as => 'collection'
   post "catalog", :to => 'collections#create', :as => 'collections'
 
   # In /config/initializers/blacklight_routes.rb we are overriding one of the methods of this class
@@ -42,6 +41,7 @@ HcsvlabWeb::Application.routes.draw do
   post 'catalog/download_items', :to => 'catalog#download_items', :as => 'catalog_download_items_api'
   #get 'catalog/download_annotation/:id', :to => 'catalog#download_annotation', :as => 'catalog_download_annotation'
 
+  post "catalog/:id", :to => 'collections#add_items_to_collection', :as => 'collection'
 
   HydraHead.add_routes(self)
 
