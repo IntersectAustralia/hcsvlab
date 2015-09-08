@@ -313,5 +313,6 @@ after 'multistage:ensure' do
     config/linguistics.yml
     config/solr.yml
     config/newrelic.yml
+    config/aspera.yml
     )
 end
