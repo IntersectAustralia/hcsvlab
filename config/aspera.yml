@@ -2,11 +2,15 @@
   :hostname: 'dtn2.rdsi-test.intersect.org.au'
   :port: '9092'
   :verify_ssl: false
+  :user: 'alveo'
+  :password: <%= ENV["NODE_USER_PASSWORD"] %>
 
 :qa:
-  :hostname: 'dtn-1.rdsi-test.intersect.org.au'
+  :hostname: 'dtn2.rdsi-test.intersect.org.au'
   :port: '9092'
-  :verify_ssl: true
+  :verify_ssl: false
+  :user: 'alveo'
+  :password: <%= ENV["NODE_USER_PASSWORD"] %>
 
 :production:
 
