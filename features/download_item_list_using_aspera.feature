@@ -11,6 +11,7 @@ Feature: Managing Item Lists
       | data_owner@intersect.org.au  | Data       | Owner     |
     And "researcher@intersect.org.au" has role "researcher"
     And "data_owner@intersect.org.au" has role "data owner"
+    And "researcher@intersect.org.au" has an api token
     And I ingest "cooee:1-001"
     And I ingest "cooee:1-002"
     And I have user "researcher@intersect.org.au" with the following groups
@@ -35,3 +36,13 @@ Feature: Managing Item Lists
 
   #Scenario: I can download files using aspera connect plugin
   # Note: cannot test this scenario due to external dependency on having aspera connect plugin installed on system
+
+  Scenario: Get an aspera transfer specification for an empty item list
+    Given I make a JSON post request for the transfer spec page for item list "Test" with the API token for "researcher@intersect.org.au" without JSON params
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {
+      "message":"No items were found to download"
+    }
+    """

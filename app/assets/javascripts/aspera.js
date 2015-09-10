@@ -81,7 +81,7 @@ function performAsperaDownloadTransferForItemList(id) {
 
         showProgressAnimation();
 
-        $.post('/item_lists/' + id + '/transfer_spec', {}, undefined, 'json').done(function(data) {
+        $.post('/item_lists/' + id + '/aspera_transfer_spec', {}, undefined, 'json').done(function(data) {
             if (data['transfer_spec'] !== undefined) {
                 var transferSpec = data['transfer_spec'];
                 transferSpec['destination_root'] = directory;

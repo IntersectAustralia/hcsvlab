@@ -73,7 +73,7 @@ HcsvlabWeb::Application.routes.draw do
         get 'download_item_list'
         post 'share'
         post 'unshare'
-        post 'transfer_spec'
+        post 'aspera_transfer_spec'
       end
   end
 

@@ -2,6 +2,10 @@ module Item::DownloadItemsHelper
   require Rails.root.join('lib/api/node_api')
 
   def generate_aspera_transfer_spec(item_list)
+    if item_list.items.empty?
+      render :json => {message: 'No items were found to download'}.to_json and return
+    end
+
     # create directory for storing the temporary files generated for item metadata and item log
     metadata_dir = File.join(Rails.application.config.aspera_temp_dir, SecureRandom.uuid)
     FileUtils.rm_rf metadata_dir if Dir.exists?(metadata_dir)
@@ -12,7 +16,7 @@ module Item::DownloadItemsHelper
     if transfer_spec
       render :json => {transfer_spec: transfer_spec}.to_json
     else
-      render :json => {message: 'No items were found to download.'}.to_json
+      render :json => {message: 'Unexpected error occurred'}.to_json
     end
   rescue => e
     Rails.logger.error(e.message + "\n " + e.backtrace.join("\n "))

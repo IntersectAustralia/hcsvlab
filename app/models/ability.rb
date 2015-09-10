@@ -29,7 +29,7 @@ class Ability
     # alias reject_as_spam to reject so they are considered the same
     alias_action :reject_as_spam, :to => :reject
 
-    alias_action :transfer_spec, :to => :read
+    alias_action :aspera_transfer_spec, :to => :read
 
     return if user.nil? || ! defined?(user.role)
     #return unless user.role
