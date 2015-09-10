@@ -157,6 +157,21 @@ class CollectionsController < ApplicationController
     end
   end
 
+  def edit_collection
+    begin
+      request_params = params
+      collection = validate_collection(request_params[:id], request_params[:api_key])
+      new_metadata = format_update_collection_metadata(collection, request_params)
+      validate_edit_collection_metadata(collection, new_metadata)
+      write_metadata_graph_to_file(new_metadata, collection.rdf_file_path, format=:ttl)
+      # update_collection_from_graph(collection)
+      @success_message = "Updated collection #{collection.name}"
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
+    end
+  end
+
   private
 
   #
@@ -433,6 +448,39 @@ class CollectionsController < ApplicationController
       Rails.logger.error e.inspect
       false
     end
+  end
+
+  # Writes a metadata RDF graph to a file in some optional format
+  def write_metadata_graph_to_file(metadata_graph, file_path, format=:ttl)
+    File.open(file_path, 'w') do |file|
+      file.puts metadata_graph.dump(format)
+    end
+  end
+
+  # Updates the given collection from its metadata graph
+  def update_collection_from_graph(collection)
+    #TODO: uncomment if URI change is allowed
+    # collection.uri = collection.rdf_graph.statements.first.subject.to_s
+    # collection.save
+  end
+
+  # Returns a copy of the combination of the given graphs
+  # If there are conflicting statements between the graphs then graph2 statements are given priority over graph1 statements
+  def combine_graphs(graph1, graph2)
+    temp_graph = RDF::Graph.new
+    temp_graph << graph1
+    temp_graph << graph2
+    temp_graph
+  end
+
+  # Formats the collection metadata given as part of the update/edit collection API request
+  # Returns an RDF graph of the updated/overwritten collection
+  def format_update_collection_metadata(collection, request_params)
+    new_metadata = RDF::Graph.new << JSON::LD::API.toRDF(request_params[:collection_metadata])
+    unless request_params[:overwrite].is_a? String and request_params[:overwrite].downcase == 'true'
+      new_metadata = combine_graphs(new_metadata, collection.rdf_graph)
+    end
+    new_metadata
   end
 
 end

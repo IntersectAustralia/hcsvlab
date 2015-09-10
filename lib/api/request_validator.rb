@@ -32,6 +32,21 @@ module RequestValidator
     validate_document_identifiers(get_document_identifiers(files_param, items_param))
   end
 
+  # Validates new collection metadata to be used for an edit collection API request
+  def validate_edit_collection_metadata(collection, new_metadata_graph)
+    raise ResponseError.new(400), "Collection metadata invalid" if new_metadata_graph.nil?
+    new_uri = new_metadata_graph.statements.first.subject.to_s
+    # TODO: uncomment if URI change is allowed
+    # collection_matching_uri = Collection.find_by_uri(new_uri)
+    # if collection_matching_uri.present?
+    #   raise ResponseError.new(400), "Collection URI (#{new_uri}) already in use" unless collection_matching_uri == collection
+    # end
+    # TODO: uncomment if URI change is not allowed
+    if new_uri != collection.uri
+      raise ResponseError.new(400), "Collection URI #{collection.uri} cannot be changed"
+    end
+  end
+
   private
 
   # Iterates over the uploaded files and JSON document content and returns a list of document identifiers/filenames

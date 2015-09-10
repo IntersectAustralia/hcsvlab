@@ -319,6 +319,12 @@ Then /^the JSON response should have the following annotations properties in any
 
 end
 
+Then(/^the file "(.+)" should (not )?exist in the directory for the api collections$/) do |file_name, not_exist|
+  status = true
+  status = false if not_exist.present?
+  File.exist?(File.join(Rails.application.config.api_collections_location, file_name)).should be(status)
+end
+
 Then /^the file "(.+)" should (not )?exist in the directory for the collection "(.+)"$/ do |file_name, not_exist, collection_name|
   status = true
   status = false if not_exist.present?
