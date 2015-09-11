@@ -3,21 +3,33 @@ require Rails.root.join('lib/api/response_error')
 module RequestValidator
 
   # Validates the collection exists and the user is authorised to modify it
-  def validate_collection(request_params)
-    collection = Collection.find_by_name(request_params[:id])
-    if collection.nil?
-      raise ResponseError.new(404), "Requested collection not found"
-    elsif request_params[:api_key] != User.find(collection.owner_id).authentication_token
+  def validate_collection(collection_id, api_key)
+    collection = validate_collection_exists(collection_id)
+    if api_key != User.find(collection.owner_id).authentication_token
       raise ResponseError.new(403), "User is unauthorised" # Authorise by comparing api key sent with collection owner's api key
     end
     collection
   end
 
+  # Validates a collection with a matching name exists
+  def validate_collection_exists(collection_id)
+    collection = Collection.find_by_name(collection_id)
+    raise ResponseError.new(404), "Requested collection not found" if collection.nil?
+    collection
+  end
+
+  # Validates an item with a matching handle exists under the collection
+  def validate_item_exists (collection, item_id)
+    item = collection.items.find_by_handle("#{collection.name}:#{item_id}")
+    raise ResponseError.new(404), "Requested item not found" if item.nil?
+    item
+  end
+
   # Validates the request on the add items api call
-  def validate_add_items_request(collection, corpus_dir, request_params)
-    validate_items(request_params[:items], collection, corpus_dir)
-    validate_files(request_params[:file], collection, corpus_dir)
-    validate_document_identifiers(get_document_identifiers(request_params[:file], request_params[:items]))
+  def validate_add_items_request(collection, corpus_dir, items_param, files_param)
+    validate_items(items_param, collection, corpus_dir)
+    validate_files(files_param, collection, corpus_dir)
+    validate_document_identifiers(get_document_identifiers(files_param, items_param))
   end
 
   private

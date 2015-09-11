@@ -319,7 +319,45 @@ Then /^the JSON response should have the following annotations properties in any
 
 end
 
-Then /^the file "(.+)" should exist in the directory for the collection "(.+)"$/ do |file_name, collection_name|
-  File.exist?(File.join(Rails.application.config.api_collections_location, collection_name, file_name)).should be(true)
+Then /^the file "(.+)" should (not )?exist in the directory for the collection "(.+)"$/ do |file_name, not_exist, collection_name|
+  status = true
+  status = false if not_exist.present?
+  File.exist?(File.join(Rails.application.config.api_collections_location, collection_name, file_name)).should be(status)
 end
 
+Then /^the item "(.+)" in collection "(.+)" should (not )?exist in the database$/ do |item_name, collection_name, not_exist|
+  status = true
+  status = false if not_exist.present?
+  Item.find_by_handle("#{collection_name}:#{item_name}").nil?.should be (!status)
+end
+
+Then /^the document "(.+)" in collection "(.+)" should (not )?exist in the database$/ do |document_file_name, collection_name, not_exist|
+  status = true
+  status = false if not_exist.present?
+  corpus_directory = File.join(Rails.application.config.api_collections_location, collection_name)
+  file_path = File.join(corpus_directory, document_file_name)
+  Document.find_by_file_path(file_path).nil?.should be (!status)
+end
+
+Then /^Sesame should not contain an item with uri "(.+)" in collection "(.+)"$/ do |item_uri, collection_name|
+  server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+  repository = server.repository(collection_name)
+  # query the collection repo for any statements with a subject uri matching the item uri
+  query = RDF::Query.new do
+    pattern [RDF::URI.new(item_uri), :predicate, :object]
+  end
+  repository.query(query).count.should be 0
+end
+
+Then /^Sesame should not contain a document with file_name "(.+)" in collection "(.+)"$/ do |document_file_name, collection_name|
+  corpus_directory = File.join(Rails.application.config.api_collections_location, collection_name)
+  file_path = File.join(corpus_directory, document_file_name)
+  server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+  repository = server.repository(collection_name)
+  # query the collection repo for any statements with a source matching the document file path
+  query = RDF::Query.new do
+    pattern [:subject, MetadataHelper::IDENTIFIER, "#{document_file_name}"]
+    pattern [:subject, MetadataHelper::SOURCE, RDF::URI.new("file://#{file_path}")]
+  end
+  repository.query(query).count.should be 0
+end
