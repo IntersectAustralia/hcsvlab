@@ -390,39 +390,44 @@ class CollectionsController < ApplicationController
 
   # Removes an item and its documents from the database, filesystem, Sesame and Solr
   def remove_item(item, collection, corpus_dir)
-    # Remove from filesystem
+    delete_item_from_filesystem(item, corpus_dir)
+    delete_from_sesame(item, collection)
+    delete_from_solr(item)
+    item.destroy # Remove from database (item, its documents and their document audits)
+  end
+
+  # Removes the metadata and document files for an item
+  def delete_item_from_filesystem(item, corpus_dir)
     item_name = item.handle.split(":")[1]
     delete_file(File.join(corpus_dir, "#{item_name}-metadata.rdf"))
     item.documents.each do |document|
       delete_file(document.file_path)
     end
-    # Remove from Sesame
+  end
+
+  # Deletes an item and its documents from Sesame
+  def delete_from_sesame(item, collection)
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     repository = server.repository(collection.name)
     delete_item_from_sesame(item, repository)
     item.documents.each do |document|
       delete_document_from_sesame(document, repository)
     end
-    # Remove from Solr
+  end
+
+  # Deletes an items index from Solr
+  def delete_from_solr(item)
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
     deindex_item_from_solr(item.id, stomp_client)
     stomp_client.close
-    # Remove from database (item, its documents and their document audits)
-    item.destroy
   end
 
   # Attempts to delete a file or logs any exceptions raised
   def delete_file(file_path)
     begin
-      if File.exists?(file_path)
-        File.delete(file_path)
-      else
-        Rails.logger.error "Could not find file to delete: #{file_path}"
-        false
-      end
+      File.delete(file_path)
     rescue => e
       Rails.logger.error e.inspect
-      Rails.logger.error "Could not delete file: #{file_path}"
       false
     end
   end
