@@ -85,6 +85,15 @@ def reindex_item_to_solr(item_id, stomp_client)
   stomp_client.publish('/queue/alveo.solr.worker', "index #{item_id}")
 end
 
+def deindex_item_from_solr(item_id, stomp_client)
+  logger.info "Deindexing item: #{item_id}"
+  if Rails.env.test?
+    Solr_Worker.new.on_message("delete #{item_id}")
+  else
+    stomp_client.publish('alveo.solr.worker.dlq', "delete #{item_id}")
+  end
+end
+
 def check_and_create_collection(collection_name, corpus_dir)
 
   if collection_name == "ice" && File.basename(corpus_dir)!="ice" #ice has different directory structure

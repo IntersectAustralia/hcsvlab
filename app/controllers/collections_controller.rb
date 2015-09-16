@@ -130,11 +130,24 @@ class CollectionsController < ApplicationController
     begin
       request_params = cleanse_params(params)
       corpus_dir = corpus_dir(request_params[:id])
-      collection = validate_collection(request_params)
-      validate_add_items_request(collection, corpus_dir, request_params)
+      collection = validate_collection(request_params[:id], request_params[:api_key])
+      validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
       uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
       items = process_items(corpus_dir, request_params, uploaded_files)
       @success_message = ingest_items(corpus_dir, items) # Respond with a list of items added (via item ingest)
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
+    end
+  end
+
+  def delete_item_from_collection
+    begin
+      corpus_dir = corpus_dir(params[:collectionId])
+      collection = validate_collection(params[:collectionId], params[:api_key])
+      item = validate_item_exists(collection, params[:itemId])
+      remove_item(item, collection, corpus_dir)
+      @success_message = "Deleted the item #{params[:itemId]} (and its documents) from collection #{params[:collectionId]}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -336,6 +349,87 @@ class CollectionsController < ApplicationController
     rdf_metadata = convert_json_metadata_to_rdf(item_json["metadata"])
     rdf_file = create_item_rdf(corpus_dir, item_json["identifier"], rdf_metadata)
     {:identifier => item_json["identifier"], :rdf_file => rdf_file}
+  end
+
+  # Deletes statements with the item's URI from Sesame
+  def delete_item_from_sesame(item, repository)
+    item_subject = RDF::URI.new(item.uri)
+    item_query = RDF::Query.new do
+      pattern [item_subject, :predicate, :object]
+    end
+    item_statements = repository.query(item_query)
+    item_statements.each do |item_statement|
+      repository.delete(RDF::Statement(item_subject, item_statement[:predicate], item_statement[:object]))
+    end
+  end
+
+  # Deletes statements with the document's derived URI from Sesame
+  def delete_document_from_sesame(document, repository)
+    document_query = RDF::Query.new do
+      pattern [:subject, MetadataHelper::SOURCE, RDF::URI.new("file://#{document.file_path}")]
+      pattern [:subject, MetadataHelper::IDENTIFIER, "#{document.file_name}"]
+    end
+    document_URIs = repository.query(document_query)
+    if document_URIs.count == 1
+      document_URI = document_URIs.first[:subject]
+      document_statements_query = RDF::Query.new do
+        pattern [document_URI, :predicate, :object]
+      end
+      document_statements = repository.query(document_statements_query)
+      document_statements.each do |document_statement|
+        repository.delete(RDF::Statement(document_URI, document_statement[:predicate], document_statement[:object]))
+      end
+    else
+      Rails.logger.error "Cannot delete document RDF as multiple distinct document URIs match the document file name and path"
+      document_URIs.each do |statement|
+        Rails.logger.debug "#{RDF::Statement(statement[:subject], MetadataHelper::SOURCE, RDF::URI.new("file://#{document.file_path}"))}"
+        Rails.logger.debug "#{RDF::Statement(statement[:subject], MetadataHelper::IDENTIFIER, "#{document.file_name}")}"
+      end
+    end
+  end
+
+  # Removes an item and its documents from the database, filesystem, Sesame and Solr
+  def remove_item(item, collection, corpus_dir)
+    delete_item_from_filesystem(item, corpus_dir)
+    delete_from_sesame(item, collection)
+    delete_from_solr(item)
+    item.destroy # Remove from database (item, its documents and their document audits)
+  end
+
+  # Removes the metadata and document files for an item
+  def delete_item_from_filesystem(item, corpus_dir)
+    item_name = item.handle.split(":")[1]
+    delete_file(File.join(corpus_dir, "#{item_name}-metadata.rdf"))
+    item.documents.each do |document|
+      delete_file(document.file_path)
+    end
+  end
+
+  # Deletes an item and its documents from Sesame
+  def delete_from_sesame(item, collection)
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repository = server.repository(collection.name)
+    delete_item_from_sesame(item, repository)
+    item.documents.each do |document|
+      delete_document_from_sesame(document, repository)
+    end
+  end
+
+  # Deletes an items index from Solr
+  def delete_from_solr(item)
+    stomp_client = Stomp::Client.open "stomp://localhost:61613"
+    deindex_item_from_solr(item.id, stomp_client)
+    stomp_client.close
+  end
+
+  # Attempts to delete a file or logs any exceptions raised
+  def delete_file(file_path)
+    begin
+      File.delete(file_path)
+    rescue => e
+      Rails.logger.error e.inspect
+      false
+    end
   end
 
 end

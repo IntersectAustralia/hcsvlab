@@ -1,6 +1,6 @@
 class Item < ActiveRecord::Base
 
-  has_many :documents
+  has_many :documents, dependent: :destroy
 
   belongs_to :collection
 

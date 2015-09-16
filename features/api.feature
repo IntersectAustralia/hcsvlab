@@ -1788,3 +1788,102 @@ Feature: Browsing via API
     """
     {"error":"The identifier \"1-001-plain.txt\" is used for multiple documents"}
     """
+
+  @api_delete_item
+  Scenario: Delete an item from a non-existing collection
+    When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "data_owner@intersect.org.au"
+    Then I should get a 404 response code
+    And the JSON response should be:
+    """
+    {"error":"Requested collection not found"}
+    """
+
+  @api_delete_item
+  Scenario: Delete a non-existing item from a collection
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "data_owner@intersect.org.au"
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And I should get a 404 response code
+    And the JSON response should be:
+    """
+    {"error":"Requested item not found"}
+    """
+
+  @api_delete_item
+  Scenario: Delete an item as someone other than the collection owner
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "identifier": "item1", "documents": [ { "identifier": "document1-plain.txt", "content":"Hello World." } ], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:identifier":"document1-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" } } ] } } ] |
+    When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "researcher1@intersect.org.au"
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
+    And the file "document1-plain.txt" should exist in the directory for the collection "Test"
+    And I should get a 403 response code
+    And the JSON response should be:
+    """
+    {"error":"User is unauthorised"}
+    """
+
+  @api_delete_item @javascript
+  Scenario: Delete an item as the collection owner
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "identifier": "item1", "documents": [ { "identifier": "document1-plain.txt", "content":"Hello World." } ], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:identifier":"document1-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" } } ] } } ] |
+    And I reindex the collection "Test"
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the home page
+    When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "data_owner@intersect.org.au"
+    And I have done a search with collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
+    And the file "document1-plain.txt" should not exist in the directory for the collection "Test"
+    And the item "item1" in collection "Test" should not exist in the database
+    And the document "document1-plain.txt" in collection "Test" should not exist in the database
+    And Sesame should not contain an item with uri "http://ns.ausnc.org.au/corpora/art/items/item1" in collection "Test"
+    And Sesame should not contain a document with file_name "document1-plain.txt" in collection "Test"
+    # No identifiers should be in the blacklight results since the only collection item has been deleted
+    And I should see "blacklight_results" table with
+      | Identifier | Type(s) |
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Deleted the item item1 (and its documents) from collection Test"}
+    """
+
+#  ToDo (HCSVLAB-1019): append the add item tests with bits to look at Sesame and Solr
+#  @api_delete_item @javascript @test
+#  Scenario: Delete an item as the collection owner
+#    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+#      | name | collection_metadata |
+#      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+#    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+#      | items |
+#      | [ { "identifier": "item1", "documents": [ { "identifier": "document1-plain.txt", "content":"Hello World." } ], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:identifier":"document1-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" } } ] } } ] |
+#    And I reindex all
+#    And I am logged in as "data_owner@intersect.org.au"
+#    And I am on the home page
+#    When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "data_owner@intersect.org.au"
+#    And I have done a search with collection "Test"
+#    Then the file "manifest.json" should exist in the directory for the collection "Test"
+#    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
+#    And the file "document1-plain.txt" should not exist in the directory for the collection "Test"
+#    And the item "item1" in collection "Test" should not exist in the database
+#    And the document "document1-plain.txt" in collection "Test" should not exist in the database
+#    And Sesame should not contain an item with uri "http://ns.ausnc.org.au/corpora/art/items/item1" in collection "Test"
+#    And Sesame should not contain a document with file_name "document1-plain.txt" in collection "Test"
+#    And I should see "blacklight_results" table with
+#      | Identifier |
+#      | Test:item1 |
+#    And I should get a 200 response code
+#    And the JSON response should be:
+#    """
+#    {"success":"Deleted the item item1 (and its documents) from collection Test"}
+#    """

@@ -112,6 +112,9 @@ module NavigationHelpers
       when /^the collections page$/
         collections_path(options)
 
+      when /^the delete item "(.*)" from collection "(.*)" page/
+        delete_collection_item_path($2, $1, options)
+
       when /^the licence agreements page$/
         account_licence_agreements_path(options)
 
