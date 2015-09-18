@@ -56,7 +56,10 @@ class CollectionsController < ApplicationController
         collection_uri = get_uri_from_metadata(params[:collection_metadata])
         if !Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
           corpus_dir = create_metadata_and_manifest(collection_name, convert_json_metadata_to_rdf(params[:collection_metadata]))
-          ingest_corpus(corpus_dir)
+          # Create the collection without doing a full ingest since it won't contain any item metadata
+          collection = check_and_create_collection(collection_name, corpus_dir)
+          collection.owner = User.find_by_authentication_token(params[:api_key])
+          collection.save
           @success_message = "New collection '#{collection_name}' (#{collection_uri}) created"
         else
           respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
