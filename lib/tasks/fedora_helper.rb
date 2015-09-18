@@ -90,7 +90,7 @@ def deindex_item_from_solr(item_id, stomp_client)
   if Rails.env.test?
     Solr_Worker.new.on_message("delete #{item_id}")
   else
-    stomp_client.publish('alveo.solr.worker.dlq', "delete #{item_id}")
+    stomp_client.publish('alveo.solr.worker', "delete #{item_id}")
   end
 end
 
