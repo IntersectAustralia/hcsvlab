@@ -28,5 +28,24 @@ module Blacklight::SolrHelper::Overrides
     solr_response
   end
 
+  # This overrides the BlackLight gems find method so that POST
+  # requests are used for queries instead of GETs, to avoid the problem
+  # where large GET queries are truncated and break Alveo.
+  def find(*args)
+    if Blacklight::version != '4.2.1'
+      raise 'This method modifies the default Blacklight::SolrHelper#query_solr method. ' \
+            'Update it everytime the gem is updated and remove it entirely for gem versions ' \
+            '5.0.0 and above, where the request method has become a configurable parameter.'
+    end
+
+    path = blacklight_config.solr_path
+    # response = blacklight_solr.get(path, :params=> args[1])
+    response = blacklight_solr.send_and_receive(path, :data=>args[1], :method => :post)
+    Blacklight::SolrResponse.new(force_to_utf8(response), args[1])
+  rescue Errno::ECONNREFUSED => e
+    raise Blacklight::Exceptions::ECONNREFUSED.new("Unable to connect to Solr instance using #{blacklight_solr.inspect}")
+  end
+
+
 
 end
