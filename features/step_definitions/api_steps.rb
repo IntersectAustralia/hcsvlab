@@ -361,3 +361,9 @@ Then /^Sesame should not contain a document with file_name "(.+)" in collection 
   end
   repository.query(query).count.should be 0
 end
+
+Then /^the owner of collection "(.+)" should be "(.+)"$/ do |collection_name, user_email|
+  collection = Collection.find_by_name(collection_name)
+  user = User.find_by_email(user_email)
+  expect(collection.owner).to eq(user)
+end
