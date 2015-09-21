@@ -159,12 +159,10 @@ class CollectionsController < ApplicationController
 
   def edit_collection
     begin
-      request_params = params
-      collection = validate_collection(request_params[:id], request_params[:api_key])
-      new_metadata = format_update_collection_metadata(collection, request_params)
-      validate_edit_collection_metadata(collection, new_metadata)
+      collection = validate_collection(params[:id], params[:api_key])
+      validate_jsonld(params[:collection_metadata])
+      new_metadata = format_update_collection_metadata(collection, params[:collection_metadata], params[:overwrite])
       write_metadata_graph_to_file(new_metadata, collection.rdf_file_path, format=:ttl)
-      # update_collection_from_graph(collection)
       @success_message = "Updated collection #{collection.name}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
@@ -457,13 +455,6 @@ class CollectionsController < ApplicationController
     end
   end
 
-  # Updates the given collection from its metadata graph
-  def update_collection_from_graph(collection)
-    #TODO: uncomment if URI change is allowed
-    # collection.uri = collection.rdf_graph.statements.first.subject.to_s
-    # collection.save
-  end
-
   # Returns a copy of the combination of the given graphs
   # If there are conflicting statements between the graphs then graph2 statements are given priority over graph1 statements
   def combine_graphs(graph1, graph2)
@@ -475,9 +466,10 @@ class CollectionsController < ApplicationController
 
   # Formats the collection metadata given as part of the update/edit collection API request
   # Returns an RDF graph of the updated/overwritten collection
-  def format_update_collection_metadata(collection, request_params)
-    new_metadata = RDF::Graph.new << JSON::LD::API.toRDF(request_params[:collection_metadata])
-    unless request_params[:overwrite].is_a? String and request_params[:overwrite].downcase == 'true'
+  def format_update_collection_metadata(collection, edited_metadata, overwrite)
+    edited_metadata["@id"] = collection.uri # Collection URI not allowed to change
+    new_metadata = RDF::Graph.new << JSON::LD::API.toRDF(edited_metadata)
+    unless overwrite.is_a? String and overwrite.downcase == 'true'
       new_metadata = combine_graphs(new_metadata, collection.rdf_graph)
     end
     new_metadata
