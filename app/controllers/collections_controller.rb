@@ -408,7 +408,7 @@ class CollectionsController < ApplicationController
   def remove_item(item, collection, corpus_dir)
     delete_item_from_filesystem(item, corpus_dir)
     delete_from_sesame(item, collection)
-    delete_from_solr(item)
+    delete_item_from_solr(item.id)
     item.destroy # Remove from database (item, its documents and their document audits)
   end
 
@@ -429,13 +429,6 @@ class CollectionsController < ApplicationController
     item.documents.each do |document|
       delete_document_from_sesame(document, repository)
     end
-  end
-
-  # Deletes an items index from Solr
-  def delete_from_solr(item)
-    stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    deindex_item_from_solr(item.id, stomp_client)
-    stomp_client.close
   end
 
   # Attempts to delete a file or logs any exceptions raised
