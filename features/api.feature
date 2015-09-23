@@ -1925,3 +1925,249 @@ Feature: Browsing via API
 #    """
 #    {"success":"Deleted the item item1 (and its documents) from collection Test"}
 #    """
+
+  @api_edit_collection
+  Scenario: Edit a collection with a full set of metadata, specifying to overwrite existing metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | true      | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "An updated test collection", "marcrel:OWN": "Data Owner"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should see "Creator: Pam Peters"
+    And I should see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: English Language"
+    And I should see "Title: An updated test collection"
+    And I should see "Owner: Data Owner"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection with a full set of metadata, without specifying to overwrite existing metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | collection_metadata |
+      | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "An updated test collection", "marcrel:OWN": "Data Owner"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should see "Creator: Pam Peters"
+    And I should see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: English Language"
+    And I should see "Title: An updated test collection"
+    And I should see "Owner: Data Owner"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection with a partial set of metadata, specifying to overwrite the metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | true      | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:title": "An updated test collection", "dc:subject": "Updated Language"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should not see "Creator: Pam Peters"
+    And I should not see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: Updated Language"
+    And I should see "Title: An updated test collection"
+    And I should not see "Owner: Data Owner"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection with a partial set of metadata, specifying to update the metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | false     | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:title": "An updated test collection", "dc:subject": "Updated Language"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should see "Creator: Pam Peters"
+    And I should see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: Updated Language"
+    And I should see "Title: An updated test collection"
+    And I should see "Owner: Data Owner"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection with a minimal set of metadata, specifying to update the metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | false     | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/"}, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:title": "An updated test collection"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should see "Creator: Pam Peters"
+    And I should see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: English Language"
+    And I should see "Title: An updated test collection"
+    And I should see "Owner: Data Owner"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection with the least amount of metadata possible, specifying to update the metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | false     | {"@id": "http://collection.test", "http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should see "Creator: Pam Peters"
+    And I should see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: English Language"
+    And I should see "Title: An updated test collection"
+    And I should see "Owner: Data Owner"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection with a random URI doesn't report an error
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | false     | {"@id": "http://random.uri", "http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should see "Creator: Pam Peters"
+    And I should see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: English Language"
+    And I should not see "Title: A test collection"
+    And I should see "Owner: Data Owner"
+    And I should see "Title: An updated test collection"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection without being the collection owner
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "researcher1@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | false     | {"@id": "http://collection.test", "http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should see "Creator: Pam Peters"
+    And I should see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: English Language"
+    And I should see "Title: A test collection"
+    And I should see "Owner: Data Owner"
+    And I should not see "Title: An updated test collection"
+    And I should get a 403 response code
+    And the JSON response should be:
+    """
+    {"error":"User is unauthorised"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection without providing a URI, specifying to overwrite
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | true      | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@type": "dcmitype:Collection", "dc:title": "An updated test collection", "dc:subject": "Updated Language"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should not see "Creator: Pam Peters"
+    And I should not see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: Updated Language"
+    And I should see "Title: An updated test collection"
+    And I should not see "Owner: Data Owner"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection without providing a URI, specifying to update
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | false     | {"http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the collections page
+    And I follow "Test"
+    Then the file "Test.n3" should exist in the directory for the api collections
+    And I should see "Creator: Pam Peters"
+    And I should see "Rights: All rights reserved to Data Owner"
+    And I should see "Subject: English Language"
+    And I should see "Title: An updated test collection"
+    And I should see "Owner: Data Owner"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated collection Test"}
+    """
+
+  @api_edit_collection
+  Scenario: Edit a collection with invalid metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON put request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | overwrite | collection_metadata |
+      | false     | {"http://purl.org/dc/elements/1.1/ title": "An updated test collection"} |
+    And I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"Invalid metadata"}
+    """

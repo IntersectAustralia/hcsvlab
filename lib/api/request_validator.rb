@@ -2,6 +2,17 @@ require Rails.root.join('lib/api/response_error')
 
 module RequestValidator
 
+  # Validates JSON-LD metadata
+  def validate_jsonld(graph)
+    rdf_graph = RDF::Graph.new << JSON::LD::API.toRDF(graph)
+    validate_rdf_graph(rdf_graph)
+  end
+
+  # Validates RDF metadata
+  def validate_rdf_graph(graph)
+    raise ResponseError.new(400), "Invalid metadata" if graph.invalid?
+  end
+
   # Validates the collection exists and the user is authorised to modify it
   def validate_collection(collection_id, api_key)
     collection = validate_collection_exists(collection_id)

@@ -157,6 +157,19 @@ class CollectionsController < ApplicationController
     end
   end
 
+  def edit_collection
+    begin
+      collection = validate_collection(params[:id], params[:api_key])
+      validate_jsonld(params[:collection_metadata])
+      new_metadata = format_update_collection_metadata(collection, params[:collection_metadata], params[:overwrite])
+      write_metadata_graph_to_file(new_metadata, collection.rdf_file_path, format=:ttl)
+      @success_message = "Updated collection #{collection.name}"
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
+    end
+  end
+
   private
 
   #
@@ -433,6 +446,33 @@ class CollectionsController < ApplicationController
       Rails.logger.error e.inspect
       false
     end
+  end
+
+  # Writes a metadata RDF graph to a file in some optional format
+  def write_metadata_graph_to_file(metadata_graph, file_path, format=:ttl)
+    File.open(file_path, 'w') do |file|
+      file.puts metadata_graph.dump(format)
+    end
+  end
+
+  # Returns a copy of the combination of the given graphs
+  # If there are conflicting statements between the graphs then graph2 statements are given priority over graph1 statements
+  def combine_graphs(graph1, graph2)
+    temp_graph = RDF::Graph.new
+    temp_graph << graph1
+    temp_graph << graph2
+    temp_graph
+  end
+
+  # Formats the collection metadata given as part of the update/edit collection API request
+  # Returns an RDF graph of the updated/overwritten collection
+  def format_update_collection_metadata(collection, edited_metadata, overwrite)
+    edited_metadata["@id"] = collection.uri # Collection URI not allowed to change
+    new_metadata = RDF::Graph.new << JSON::LD::API.toRDF(edited_metadata)
+    unless overwrite.is_a? String and overwrite.downcase == 'true'
+      new_metadata = combine_graphs(new_metadata, collection.rdf_graph)
+    end
+    new_metadata
   end
 
 end
