@@ -136,8 +136,9 @@ class CollectionsController < ApplicationController
       collection = validate_collection(request_params[:id], request_params[:api_key])
       validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
       uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
-      items = process_items(corpus_dir, request_params, uploaded_files)
-      @success_message = ingest_items(corpus_dir, items) # Respond with a list of items added (via item ingest)
+      processed_items = process_items(corpus_dir, request_params, uploaded_files)
+      create_collection_manifest(corpus_dir)
+      @success_message = ingest_items(corpus_dir, processed_items[:successes]) # Respond with a list of items added (via item ingest)
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -255,8 +256,16 @@ class CollectionsController < ApplicationController
   # Renders the given error message as JSON
   def respond_with_error(message, status_code)
     respond_to do |format|
-      format.any { render :json => {:error => message}.to_json, :status => status_code }
+      response = {:error => message}
+      response[:failures] = params[:failures] unless params[:failures].blank?
+      format.any { render :json => response.to_json, :status => status_code }
     end
+  end
+
+  # Adds the given message to the failures param
+  def add_failure_response(message)
+    params[:failures] = [] if params[:failures].nil?
+    params[:failures].push(message)
   end
 
   # Uploads a document given as json content
@@ -281,17 +290,32 @@ class CollectionsController < ApplicationController
     end
   end
 
-  # Processes the metadata for each item in the supplied request parameters and recreates the corpus collection manifest
+  # Processes the metadata for each item in the supplied request parameters
+  # Returns a hash containing :successes and :failures of processed items
   def process_items(corpus_dir, request_params, uploaded_files)
     items = []
+    failures = []
     request_params[:items].each do |item|
       item = process_item_documents_and_update_graph(corpus_dir, item)
       item = update_item_graph_with_uploaded_files(uploaded_files, item)
-      items.push(write_item_metadata(corpus_dir, item)) # Convert item metadata from JSON to RDF
+      begin
+        validate_jsonld(item["metadata"])
+        item_hash = write_item_metadata(corpus_dir, item) # Convert item metadata from JSON to RDF
+        items.push(item_hash)
+      rescue ResponseError
+        failures.push("#{item["identifier"]} contains invalid metadata")
+      end
     end
+    process_item_failures(failures) unless failures.empty?
     raise ResponseError.new(400), "No items were added" if items.blank?
-    create_collection_manifest(corpus_dir) # Re-create the collection manifest for item ingest
-    items
+    {:successes => items, :failures => failures}
+  end
+
+  # Adds failure message to response params
+  def process_item_failures(failures)
+    failures.each do |message|
+      add_failure_response(message)
+    end
   end
 
   # Uploads any documents in the item metadata and returns a copy of the item metadata with its metadata graph updated
@@ -319,9 +343,11 @@ class CollectionsController < ApplicationController
   # Updates the source of a document in the JSON formatted Item graph
   def update_document_source_in_graph(json_graph, document_identifier, document_source)
     json_graph.each do |graph_entry|
-      if graph_entry['dcterms:identifier'] == document_identifier
+      if graph_entry['dcterms:identifier'] == document_identifier or graph_entry[MetadataHelper::IDENTIFIER.to_s] == document_identifier
         # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
-        graph_entry.update({'dcterms:source' => {'@id' => "file://#{document_source.sub(" ", "%20")}"}})
+        ['dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
+          graph_entry.update({source => {'@id' => "file://#{document_source.sub(" ", "%20")}"}}) if graph_entry.has_key?(source)
+        end
         json_graph
       end
     end
@@ -360,7 +386,7 @@ class CollectionsController < ApplicationController
     items_ingested
   end
 
-  # Write item JSON metadata to RDF file
+  # Write item JSON metadata to RDF file and returns a hash containing :identifier, :rdf_file
   def write_item_metadata(corpus_dir, item_json)
     rdf_metadata = convert_json_metadata_to_rdf(item_json["metadata"])
     rdf_file = create_item_rdf(corpus_dir, item_json["identifier"], rdf_metadata)

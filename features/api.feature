@@ -1827,6 +1827,81 @@ Feature: Browsing via API
     {"error":"The identifier \"1-001-plain.txt\" is used for multiple documents"}
     """
 
+  @api_add_item
+  Scenario: Add an item with invalid RDF should fail
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    # The invalid RDF of the following add item JSON-LD metadata is that there is a space in the corpus part of "dcterms:isPartOf":{ "@id":"corpus: Test" }
+    When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "identifier": "item1", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document2.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
+    And I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"No items were added", "failures":["item1 contains invalid metadata"]}
+    """
+
+  @api_add_item
+  Scenario: Add many items should fail if all items have invalid metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    # The invalid RDF of the item1 and item2 JSON-LD metadata is that there is a space in the corpus part of "dcterms:isPartOf":{ "@id":"corpus: Test" }
+    When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "identifier": "item1", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document2.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } }, { "identifier": "item2", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document2-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document1.txt" }, "dcterms:title":"document2#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item2", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document2#Text" } ], "dcterms:identifier":"item2", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document2#Text" } } ] } } ] |
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
+    And the file "item2-metadata.rdf" should not exist in the directory for the collection "Test"
+    And I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"No items were added", "failures":["item1 contains invalid metadata", "item2 contains invalid metadata"]}
+    """
+
+  @api_add_item
+  Scenario: Add many items should succeed if some items have invalid metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    # The invalid RDF of the item1 JSON-LD metadata is that there is a space in the corpus part of "dcterms:isPartOf":{ "@id":"corpus: Test" }
+    When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "identifier": "item1", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document2.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } }, { "identifier": "item2", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document2-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document1.txt" }, "dcterms:title":"document2#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item2", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document2#Text" } ], "dcterms:identifier":"item2", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document2#Text" } } ] } } ] |
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
+    And the file "item2-metadata.rdf" should exist in the directory for the collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":["item2"], "failures":["item1 contains invalid metadata"]}
+    """
+
+#  ToDo: test when adding an item with corrected metadata and the file it uploaded when it had invalid metadata
+#  @api_add_item
+#  Scenario: Add corrected item metadata with a file that has already been uploaded
+#    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+#      | name | collection_metadata |
+#      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+#    # The invalid RDF of the following add item JSON-LD metadata is that there is a space in the corpus part of "dcterms:isPartOf":{ "@id":"corpus: Test" }
+#    And I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
+#      | file                                 | items |
+#      | "test/samples/cooee/1-001-plain.txt" | [ { "identifier": "item1", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"1-001-plain.txt", "dcterms:source":{ "@id":"file://foo.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
+#    When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
+#      | file                                 | items |
+#      | "test/samples/cooee/1-001-plain.txt" | [ { "identifier": "item1", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"1-001-plain.txt", "dcterms:source":{ "@id":"file://foo.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
+#    Then the file "manifest.json" should exist in the directory for the collection "Test"
+#    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
+#    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
+#    And I should get a 200 response code
+#    And the JSON response should be:
+#    """
+#    {"success":"[item1]"}
+#    """
+
   @api_delete_item
   Scenario: Delete an item from a non-existing collection
     When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "data_owner@intersect.org.au"
