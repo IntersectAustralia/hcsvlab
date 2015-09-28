@@ -174,8 +174,8 @@ class CollectionsController < ApplicationController
     begin
       collection = validate_collection(params[:collectionId], params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
-      validate_jsonld(params[:item_metadata])
-      new_metadata = format_update_item_metadata(item, params[:item_metadata])
+      validate_jsonld(params[:metadata])
+      new_metadata = format_update_item_metadata(item, params[:metadata])
       update_sesame_with_graph(new_metadata, collection)
       update_item_in_solr(item)
       @success_message = "Updated item #{item.handle.split(':').last} in collection #{collection.name}"

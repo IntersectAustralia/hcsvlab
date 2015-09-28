@@ -45,6 +45,11 @@ When /^I make a JSON post request for (.*) with the API token for "(.*)" without
   post path_to(page_name), {:format => :json}, {'X-API-KEY' => user.authentication_token}
 end
 
+When /^I make a JSON put request for (.*) with the API token for "(.*)" without JSON params$/ do |page_name, email|
+  user = User.find_by_email!(email)
+  put path_to(page_name), {:format => :json}, {'X-API-KEY' => user.authentication_token}
+end
+
 When /^I make a JSON put request for (.*) with the API token for "(.*)" with JSON params$/ do |page_name, email, table|
   user = User.find_by_email!(email)
   hash = table.hashes.first
