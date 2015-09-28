@@ -170,6 +170,21 @@ class CollectionsController < ApplicationController
     end
   end
 
+  def update_item
+    begin
+      collection = validate_collection(params[:collectionId], params[:api_key])
+      item = validate_item_exists(collection, params[:itemId])
+      validate_jsonld(params[:metadata])
+      new_metadata = format_update_item_metadata(item, params[:metadata])
+      update_sesame_with_graph(new_metadata, collection)
+      update_item_in_solr(item)
+      @success_message = "Updated item #{item.handle.split(':').last} in collection #{collection.name}"
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
+    end
+  end
+
   private
 
   #
@@ -466,6 +481,46 @@ class CollectionsController < ApplicationController
       new_metadata = combine_graphs(new_metadata, collection.rdf_graph)
     end
     new_metadata
+  end
+
+  # Formats the item metadata given as part of the update item API request
+  # Returns an RDF graph of the updated item metadata
+  def format_update_item_metadata(item, metadata)
+    metadata["@id"] = item.uri # Overwrite the item subject URI
+    new_metadata = RDF::Graph.new << JSON::LD::API.toRDF(metadata)
+    item_subject = RDF::URI.new(item.uri)
+    # Remove any changes to un-editable metadata fields
+    query = RDF::Query.new do
+      pattern [item_subject, MetadataHelper::IDENTIFIER, :obj_identifier]
+    end
+    new_metadata.query(query).distinct.each do |solution|
+      new_metadata.delete([item_subject, MetadataHelper::IDENTIFIER, solution[:obj_identifier]])
+    end
+    new_metadata
+  end
+
+  # Inserts the metadata graph into the collection repository on the Sesame server
+  def update_sesame_with_graph(graph, collection)
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repository = server.repository(collection.name)
+    insert_graph_into_repository(graph, repository)
+  end
+
+  # Inserts the statements of the graph into the Sesame repository
+  def insert_graph_into_repository(graph, repository)
+    graph.each_statement { |statement| repository.insert(statement) }
+  end
+
+  # Updates the item in Solr by re-indexing that item
+  def update_item_in_solr(item)
+    # ToDo: refactor this workaround into a proper test mock/stub
+    if Rails.env.test?
+      Solr_Worker.new.on_message("index #{item.id}")
+    else
+      stomp_client = Stomp::Client.open "stomp://localhost:61613"
+      reindex_item_to_solr(item.id, stomp_client)
+      stomp_client.close
+    end
   end
 
 end

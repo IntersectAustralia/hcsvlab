@@ -15,6 +15,7 @@
 //= require jquery-ui
 // Required by Blacklight
 //= require blacklight/blacklight
+//= require blacklight/search_context.js
 //= require_tree .
 //= require bootstrap
 //= require eopas

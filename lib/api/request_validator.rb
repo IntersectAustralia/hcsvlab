@@ -4,6 +4,7 @@ module RequestValidator
 
   # Validates JSON-LD metadata
   def validate_jsonld(graph)
+    raise ResponseError.new(400), "Invalid metadata" if graph.blank?
     rdf_graph = RDF::Graph.new << JSON::LD::API.toRDF(graph)
     validate_rdf_graph(rdf_graph)
   end
