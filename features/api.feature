@@ -2335,28 +2335,3 @@ Feature: Browsing via API
     And I should see "Item Details"
     And I should see "Identifier: item1"
     And I should not see "Identifier: updated_id"
-
-#  @api_update_item
-#  Scenario: Updating an item's dc:is_part_of should not result in any changes
-#    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
-#      | name | collection_metadata |
-#      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
-#    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
-#      | items |
-#      | [ { "identifier": "item1", "documents": [ { "identifier": "document1-plain.txt", "content":"Hello World." } ], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:identifier":"document1-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" } } ] } } ] |
-#    And I reindex the collection "Test"
-#    And I am logged in as "data_owner@intersect.org.au"
-#    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
-#      | item_metadata |
-#      | { "http://purl.org/dc/terms/isPartOf": { "@id":"corpus:updated_corpus" } } |
-#    And I go to the catalog page for "Test:item1"
-#    Then the file "manifest.json" should exist in the directory for the collection "Test"
-#    And I should get a 200 response code
-#    And the JSON response should be:
-#    """
-#    {"success":"Updated item item1 in collection Test"}
-#    """
-#    And I should see "Item Details"
-#    And I should see "Identifier: item1"
-#    And I should see "Collection: Test"
-#    And I should not see "Collection: updated_corpus"

@@ -492,11 +492,9 @@ class CollectionsController < ApplicationController
     # Remove any changes to un-editable metadata fields
     query = RDF::Query.new do
       pattern [item_subject, MetadataHelper::IDENTIFIER, :obj_identifier]
-      # pattern [item_subject, MetadataHelper::IS_PART_OF, :obj_is_part_of]
     end
     new_metadata.query(query).distinct.each do |solution|
       new_metadata.delete([item_subject, MetadataHelper::IDENTIFIER, solution[:obj_identifier]])
-      # new_metadata.delete([item_subject, MetadataHelper::IS_PART_OF, solution[:obj_is_part_of]])
     end
     new_metadata
   end
