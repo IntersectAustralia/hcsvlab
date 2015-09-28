@@ -17,9 +17,9 @@ HcsvlabWeb::Application.routes.draw do
 
   # :show and :update are for backwards-compatibility with catalog_url named routes
   get 'catalog/:collection/:itemId', :to => 'catalog#show', :as => "catalog", :constraints => catalogRoutesConstraintsIncludingJson
-  put 'catalog/:collection/:itemId', :to => 'catalog#update', :as => "catalog", :constraints => catalogRoutesConstraintsIncludingJson
+  # put 'catalog/:collection/:itemId', :to => 'catalog#update', :as => "catalog", :constraints => catalogRoutesConstraintsIncludingJson
   get 'catalog/:collection/:itemId', :to => 'catalog#show', :as => "solr_document", :constraints => catalogRoutesConstraintsIncludingJson
-  put 'catalog/:collection/:itemId', :to => 'catalog#update', :as => "solr_document", :constraints => catalogRoutesConstraintsIncludingJson
+  # put 'catalog/:collection/:itemId', :to => 'catalog#update', :as => "solr_document", :constraints => catalogRoutesConstraintsIncludingJson
 
   # Collection definitions
   get "catalog", :to => 'collections#index', :as => 'collections'
@@ -27,7 +27,7 @@ HcsvlabWeb::Application.routes.draw do
   put "catalog/:id", :to => 'collections#edit_collection', :as => 'collection'
   post "catalog", :to => 'collections#create', :as => 'collections'
   delete "catalog/:collectionId/:itemId",:to => 'collections#delete_item_from_collection', :as => 'delete_collection_item'
-  # put "catalog/:collectionId/:itemId", :to => 'collections#update_item', :as => 'update_collection_item', :constraints => catalogRoutesConstraints
+  put "catalog/:collectionId/:itemId", :to => 'collections#update_item', :as => 'update_collection_item', :constraints => catalogRoutesConstraints
 
   # In /config/initializers/blacklight_routes.rb we are overriding one of the methods of this class
   Blacklight::Routes.new(self, :except => [:solr_document]).draw
