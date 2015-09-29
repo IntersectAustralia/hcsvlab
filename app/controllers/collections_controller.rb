@@ -533,6 +533,7 @@ class CollectionsController < ApplicationController
       is_doc = node["@type"].first == MetadataHelper::DOCUMENT.to_s || node["@type"].first == MetadataHelper::FOAF_DOCUMENT.to_s
       if is_current_item
         node["@id"] = create_item_url(item_identifier, collection_name)
+        node[MetadataHelper::IS_PART_OF.to_s] = [{"@id" => create_collection_url(collection_name)}]
       #Todo: handle items which aren't the current item (isn't a use case if api doc is followed)
       elsif is_doc
         dc_identifier = node[MetadataHelper::IDENTIFIER.to_s].first["@value"]
