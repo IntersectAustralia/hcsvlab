@@ -301,7 +301,7 @@ class CollectionsController < ApplicationController
       item = update_item_graph_with_uploaded_files(uploaded_files, item)
       begin
         validate_jsonld(item["metadata"])
-        item["metadata"] = add_metadata_urls(item["metadata"], item["identifier"], collection_name)
+        item["metadata"] = override_is_part_of_corpus(item["metadata"], item["identifier"], collection_name)
         item_hash = write_item_metadata(corpus_dir, item) # Convert item metadata from JSON to RDF
         items.push(item_hash)
       rescue ResponseError
@@ -523,25 +523,15 @@ class CollectionsController < ApplicationController
     "#{get_server_url()}/catalog/#{collection_name}/#{item_dc_identifier}/document/#{document_dc_identifier}"
   end
 
-  # Adds the Alveo structured item and document subject URIs and is_part_of_corpus to the jsonld
-  def add_metadata_urls(item_json_ld, item_identifier, collection_name)
-    #Todo: finish implementing the automatic assignment of Alveo item and document urls
+  # Overrides the jsonld is_part_of_corpus with the collection's Alveo url
+  def override_is_part_of_corpus(item_json_ld, item_identifier, collection_name)
     expanded_json = JSON::LD::API.expand(item_json_ld)
-    binding.pry
     expanded_json.each do |node|
       is_current_item = node[MetadataHelper::IDENTIFIER.to_s].first["@value"] == item_identifier
-      is_doc = node["@type"].first == MetadataHelper::DOCUMENT.to_s || node["@type"].first == MetadataHelper::FOAF_DOCUMENT.to_s
       if is_current_item
-        node["@id"] = create_item_url(item_identifier, collection_name)
         node[MetadataHelper::IS_PART_OF.to_s] = [{"@id" => create_collection_url(collection_name)}]
-      #Todo: handle items which aren't the current item (isn't a use case if api doc is followed)
-      elsif is_doc
-        dc_identifier = node[MetadataHelper::IDENTIFIER.to_s].first["@value"]
-        node["@id"] = create_document_url(dc_identifier, item_identifier, collection_name)
-        #Todo: reflect the new uri in any references to that document within the metadata
       end
     end
-    binding.pry
     expanded_json
   end
 
