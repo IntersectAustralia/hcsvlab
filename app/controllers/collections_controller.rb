@@ -130,7 +130,6 @@ class CollectionsController < ApplicationController
 
   def add_items_to_collection
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
-    #Todo: use item identifier as the metadata dc:identifier
     begin
       request_params = cleanse_params(params)
       corpus_dir = corpus_dir(request_params[:id])
@@ -247,6 +246,12 @@ class CollectionsController < ApplicationController
     corpus_dir
   end
 
+  # Creates a combined metadata.rdf file and returns the path of that file.
+  # The file name takes the form of 'item1-item2-itemN-metadata.rdf'
+  def create_combined_item_rdf(corpus_dir, item_names, item_rdf)
+    create_item_rdf(corpus_dir, item_names.join("-"), item_rdf)
+  end
+
   # creates an item-metadata.rdf file and returns the path of that file
   def create_item_rdf(corpus_dir, item_name, item_rdf)
     filename = File.join(corpus_dir, item_name + '-metadata.rdf')
@@ -301,11 +306,11 @@ class CollectionsController < ApplicationController
       item = update_item_graph_with_uploaded_files(uploaded_files, item)
       begin
         validate_jsonld(item["metadata"])
-        item["metadata"] = override_is_part_of_corpus(item["metadata"], item["identifier"], collection_name)
+        item["metadata"] = override_is_part_of_corpus(item["metadata"], collection_name)
         item_hash = write_item_metadata(corpus_dir, item) # Convert item metadata from JSON to RDF
         items.push(item_hash)
       rescue ResponseError
-        failures.push("#{item["identifier"]} contains invalid metadata")
+        failures.push('Unknown item contains invalid metadata')
       end
     end
     process_item_failures(failures) unless failures.empty?
@@ -383,7 +388,7 @@ class CollectionsController < ApplicationController
     items_ingested = []
     items.each do |item|
       ingest_one(corpus_dir, item[:rdf_file])
-      items_ingested.push(item[:identifier])
+      item[:identifier].each {|id| items_ingested.push(id)}
     end
     items_ingested
   end
@@ -391,8 +396,13 @@ class CollectionsController < ApplicationController
   # Write item JSON metadata to RDF file and returns a hash containing :identifier, :rdf_file
   def write_item_metadata(corpus_dir, item_json)
     rdf_metadata = convert_json_metadata_to_rdf(item_json["metadata"])
-    rdf_file = create_item_rdf(corpus_dir, item_json["identifier"], rdf_metadata)
-    {:identifier => item_json["identifier"], :rdf_file => rdf_file}
+    item_identifiers = get_item_identifiers(item_json["metadata"])
+    if item_identifiers.count == 1
+      rdf_file = create_item_rdf(corpus_dir, item_identifiers.first, rdf_metadata)
+    else
+      rdf_file = create_combined_item_rdf(corpus_dir, item_identifiers, rdf_metadata)
+    end
+    {:identifier => item_identifiers, :rdf_file => rdf_file}
   end
 
   # Deletes statements with the item's URI from Sesame
@@ -524,11 +534,11 @@ class CollectionsController < ApplicationController
   end
 
   # Overrides the jsonld is_part_of_corpus with the collection's Alveo url
-  def override_is_part_of_corpus(item_json_ld, item_identifier, collection_name)
+  def override_is_part_of_corpus(item_json_ld, collection_name)
     expanded_json = JSON::LD::API.expand(item_json_ld)
     expanded_json.each do |node|
-      is_current_item = node[MetadataHelper::IDENTIFIER.to_s].first["@value"] == item_identifier
-      if is_current_item
+      is_doc = node["@type"].first == MetadataHelper::DOCUMENT.to_s || node["@type"].first == MetadataHelper::FOAF_DOCUMENT.to_s
+      unless is_doc
         node[MetadataHelper::IS_PART_OF.to_s] = [{"@id" => create_collection_url(collection_name)}]
       end
     end

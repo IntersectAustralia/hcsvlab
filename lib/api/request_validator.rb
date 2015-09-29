@@ -67,6 +67,28 @@ module RequestValidator
     raise ResponseError.new(412), "The identifier \"#{duplicate_id}\" is used for multiple documents" unless duplicate_id.nil?
   end
 
+  # Iterates over the item metadata and returns an array of all item dc:identifiers
+  def get_item_identifiers(item_metadata)
+    expanded_json = JSON::LD::API.expand(item_metadata)
+    dc_identifiers = []
+    expanded_json.each do |node|
+      is_doc = node["@type"].first == MetadataHelper::DOCUMENT.to_s || node["@type"].first == MetadataHelper::FOAF_DOCUMENT.to_s
+      unless is_doc
+        if node.has_key?(MetadataHelper::IDENTIFIER.to_s)
+          dc_identifiers.push(node[MetadataHelper::IDENTIFIER.to_s].first["@value"])
+        end
+      end
+    end
+    dc_identifiers
+  end
+
+  # Validates the item identifier
+  def validate_item_identifier(item_identifier, collection_name)
+    raise ResponseError.new(400), "There is an item with a missing or blank identifier" if item_identifier.blank?
+    existing_item = Item.find_by_handle("#{collection_name}:#{item_identifier}")
+    raise ResponseError.new(412), "The item #{item_identifier} already exists in the collection #{collection_name}" if existing_item
+  end
+
   # Validates the metadata for each of the items
   def validate_items(items_json, collection, corpus_dir)
     raise ResponseError.new(400), "JSON-LD formatted item metadata must be sent with the api request" if items_json.blank?
@@ -77,24 +99,22 @@ module RequestValidator
 
   # Validates the item doesn't exist in the collection and validates any document metadata with the item
   def validate_item(item_json, collection, corpus_dir)
-    raise ResponseError.new(400), "There is an item with a missing or blank identifier" if item_json["identifier"].blank?
-    existing_item = Item.find_by_handle("#{collection.name}:#{item_json["identifier"]}")
-    if existing_item
-      raise ResponseError.new(412), "The item #{item_json["identifier"]} already exists in the collection #{collection.name}"
+    item_identifiers = get_item_identifiers(item_json["metadata"])
+    item_identifiers.each do |item_identifier|
+      validate_item_identifier(item_identifier, collection.name)
     end
     unless item_json["documents"].nil?
       item_json["documents"].each do |document|
-        validate_document(document, item_json, collection, corpus_dir)
+        validate_document(document, collection, corpus_dir)
       end
     end
   end
 
   # Validates required document parameters present and document file isn't already in the collection directory
-  def validate_document(document_metadata, item_metadata, collection, corpus_dir)
+  def validate_document(document_metadata, collection, corpus_dir)
     if document_metadata["identifier"].nil? or document_metadata["content"].nil?
       err_message = "identifier missing from document" if document_metadata["identifier"].nil?
       err_message = "content missing from document #{document_metadata["identifier"]}" if document_metadata["content"].nil?
-      err_message << " for item #{item_metadata["identifier"]}"
       raise ResponseError.new(400), "#{err_message}"
     end
     validate_new_document_file(corpus_dir, document_metadata["identifier"], collection)
