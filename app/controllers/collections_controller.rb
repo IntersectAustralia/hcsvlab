@@ -130,13 +130,14 @@ class CollectionsController < ApplicationController
 
   def add_items_to_collection
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
+    #Todo: use item identifier as the metadata dc:identifier
     begin
       request_params = cleanse_params(params)
       corpus_dir = corpus_dir(request_params[:id])
       collection = validate_collection(request_params[:id], request_params[:api_key])
       validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
       uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
-      processed_items = process_items(corpus_dir, request_params, uploaded_files)
+      processed_items = process_items(collection.name, corpus_dir, request_params, uploaded_files)
       create_collection_manifest(corpus_dir)
       @success_message = ingest_items(corpus_dir, processed_items[:successes]) # Respond with a list of items added (via item ingest)
     rescue ResponseError => e
@@ -292,7 +293,7 @@ class CollectionsController < ApplicationController
 
   # Processes the metadata for each item in the supplied request parameters
   # Returns a hash containing :successes and :failures of processed items
-  def process_items(corpus_dir, request_params, uploaded_files)
+  def process_items(collection_name, corpus_dir, request_params, uploaded_files)
     items = []
     failures = []
     request_params[:items].each do |item|
@@ -300,6 +301,7 @@ class CollectionsController < ApplicationController
       item = update_item_graph_with_uploaded_files(uploaded_files, item)
       begin
         validate_jsonld(item["metadata"])
+        item["metadata"] = add_metadata_urls(item["metadata"], item["identifier"], collection_name)
         item_hash = write_item_metadata(corpus_dir, item) # Convert item metadata from JSON to RDF
         items.push(item_hash)
       rescue ResponseError
@@ -499,6 +501,47 @@ class CollectionsController < ApplicationController
       new_metadata = combine_graphs(new_metadata, collection.rdf_graph)
     end
     new_metadata
+  end
+
+  # Returns the URL that the Rails app is running on
+  def get_server_url
+    request.protocol + request.host
+  end
+
+  # Returns the Alveo structured URL for the collection
+  def create_collection_url(collection_name)
+    "#{get_server_url()}/catalog/#{collection_name}"
+  end
+
+  # Returns the Alveo structured URL for the item
+  def create_item_url(dc_identifier, collection_name)
+    "#{get_server_url()}/catalog/#{collection_name}/#{dc_identifier}"
+  end
+
+  # Returns the Alveo structured URL for the document
+  def create_document_url(document_dc_identifier, item_dc_identifier, collection_name)
+    "#{get_server_url()}/catalog/#{collection_name}/#{item_dc_identifier}/document/#{document_dc_identifier}"
+  end
+
+  # Adds the Alveo structured item and document subject URIs and is_part_of_corpus to the jsonld
+  def add_metadata_urls(item_json_ld, item_identifier, collection_name)
+    #Todo: finish implementing the automatic assignment of Alveo item and document urls
+    expanded_json = JSON::LD::API.expand(item_json_ld)
+    binding.pry
+    expanded_json.each do |node|
+      is_current_item = node[MetadataHelper::IDENTIFIER.to_s].first["@value"] == item_identifier
+      is_doc = node["@type"].first == MetadataHelper::DOCUMENT.to_s || node["@type"].first == MetadataHelper::FOAF_DOCUMENT.to_s
+      if is_current_item
+        node["@id"] = create_item_url(item_identifier, collection_name)
+      #Todo: handle items which aren't the current item (isn't a use case if api doc is followed)
+      elsif is_doc
+        dc_identifier = node[MetadataHelper::IDENTIFIER.to_s].first["@value"]
+        node["@id"] = create_document_url(dc_identifier, item_identifier, collection_name)
+        #Todo: reflect the new uri in any references to that document within the metadata
+      end
+    end
+    binding.pry
+    expanded_json
   end
 
 end
