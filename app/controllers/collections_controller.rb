@@ -352,9 +352,15 @@ class CollectionsController < ApplicationController
     json_graph.each do |graph_entry|
       if graph_entry['dcterms:identifier'] == document_identifier or graph_entry[MetadataHelper::IDENTIFIER.to_s] == document_identifier
         # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
+        meta_source_path = {'@id' => "file://#{document_source.sub(" ", "%20")}"}
+        doc_has_source = false
         ['dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
-          graph_entry.update({source => {'@id' => "file://#{document_source.sub(" ", "%20")}"}}) if graph_entry.has_key?(source)
+          if graph_entry.has_key?(source)
+            graph_entry.update({source => meta_source_path})
+            doc_has_source = true
+          end
         end
+        graph_entry.update({MetadataHelper::SOURCE.to_s => meta_source_path}) unless doc_has_source
         json_graph
       end
     end
