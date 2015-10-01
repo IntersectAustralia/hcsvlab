@@ -3,7 +3,7 @@ role :web, 'alveo-staging2.intersect.org.au'
 # This may be the same as your Web server
 role :app, 'alveo-staging2.intersect.org.au'
 # This is where Rails migrations will run
-role :db,  'alveo-staging2.intersect.org.au', :primary => true
+role :db,  'alveo-qa-pg.intersect.org.au', :primary => true
 # Galaxy VM
 role :galaxy, '130.220.209.74', :no_release => true
 
