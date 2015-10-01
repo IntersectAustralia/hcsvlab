@@ -456,26 +456,45 @@ class CollectionsController < ApplicationController
   end
 
   # Returns a copy of the combination of the given graphs
-  # If there are conflicting statements between the graphs then graph2 statements are given priority over graph1 statements
   def combine_graphs(graph1, graph2)
-    #Todo: update not append
     temp_graph = RDF::Graph.new
     temp_graph << graph1
     temp_graph << graph2
     temp_graph
   end
 
+  # Updates an old graph with the statements of a new graph
+  #  Any statements in the old graph which have a matching subject and predicate as those in the new graph are deleted
+  #  to ensure the graph is updated rather than appended to.
+  def update_graph(old_graph, new_graph)
+    temp_graph = combine_graphs(old_graph, new_graph)
+    new_graph.each do |new_statement|
+      matches = RDF::Query.execute(old_graph) {pattern [new_statement.subject, new_statement.predicate, :object]}
+      matches.each do |match|
+        # when combining graphs the resulting graph only contains distinct statements, so don't delete any fully matching statements
+        unless match[:object] == new_statement.object
+          temp_graph.delete([new_statement.subject, new_statement.predicate, match[:object]])
+        end
+      end
+    end
+    temp_graph
+  end
+
   # Formats the collection metadata given as part of the update collection API request
   # Returns an RDF graph of the updated/replaced collection metadata
-  def format_update_collection_metadata(collection, edited_metadata, replace)
-    edited_metadata["@id"] = collection.uri # Collection URI not allowed to change
+  def format_update_collection_metadata(collection, new_jsonld_metadata, replace)
+    new_jsonld_metadata["@id"] = collection.uri # Collection URI not allowed to change
     replacing_metadata = (replace == true) || (replace.is_a? String and replace.downcase == 'true')
-    new_metadata = RDF::Graph.new << JSON::LD::API.toRDF(edited_metadata)
+    new_metadata = RDF::Graph.new << JSON::LD::API.toRDF(new_jsonld_metadata)
     if replacing_metadata
       return new_metadata
     else
-      return combine_graphs(new_metadata, collection.rdf_graph)
+      return update_graph(collection.rdf_graph, new_metadata)
     end
   end
 
+  # Prints the statements of the graph to screen for easier inspection
+  def inspect_graph_statements(graph)
+    graph.each { |statement| puts statement.inspect }
+  end
 end
