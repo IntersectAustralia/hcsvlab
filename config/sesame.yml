@@ -9,8 +9,7 @@ qa2:
 staging:
   url: http://localhost:8080/openrdf-sesame
 staging2:
-  # url: http://localhost:8080/openrdf-sesame
-  url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
+  url: http://localhost:8080/openrdf-sesame
 production:
   url: http://localhost:8080/openrdf-sesame
 cucumber:
