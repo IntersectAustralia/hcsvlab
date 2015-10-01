@@ -5,7 +5,7 @@ test: &TEST
 qa:
   url: http://localhost:8080/openrdf-sesame
 qa2:
-  url: http://localhost:8080/openrdf-sesame
+  url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
 staging:
   url: http://localhost:8080/openrdf-sesame
 staging2:
