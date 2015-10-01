@@ -39,3 +39,4 @@ qa: &qa
 qa2: &qa2
   <<: *common
   database: hcsvlab
+  host: alveo-qa-pg.intersect.org.au
