@@ -135,6 +135,9 @@ class CollectionsController < ApplicationController
       corpus_dir = corpus_dir(request_params[:id])
       collection = validate_collection(request_params[:id], request_params[:api_key])
       validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
+      request_params[:items].each do |item_json|
+        update_ids_in_jsonld(item_json["metadata"], collection)
+      end
       uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
       processed_items = process_items(collection.name, corpus_dir, request_params, uploaded_files)
       create_collection_manifest(corpus_dir)
@@ -347,22 +350,42 @@ class CollectionsController < ApplicationController
     item_metadata
   end
 
-  # Updates the source of a document in the JSON formatted Item graph
-  def update_document_source_in_graph(json_graph, document_identifier, document_source)
-    json_graph.each do |graph_entry|
-      if graph_entry['dcterms:identifier'] == document_identifier or graph_entry[MetadataHelper::IDENTIFIER.to_s] == document_identifier
-        # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
-        meta_source_path = {'@id' => "file://#{document_source.sub(" ", "%20")}"}
-        doc_has_source = false
-        ['dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
-          if graph_entry.has_key?(source)
-            graph_entry.update({source => meta_source_path})
-            doc_has_source = true
+  # Updates the source of a specific document in the JSON formatted Item graph
+  def update_document_source_in_graph(jsonld_graph, doc_identifier, doc_source)
+    jsonld_graph.each do |graph_entry|
+      # Handle documents nested within item metadata
+      ["ausnc:document", MetadataHelper::DOCUMENT].each do |ausnc_doc|
+        if graph_entry.has_key?(ausnc_doc)
+          if graph_entry[ausnc_doc].is_a? Array
+            graph_entry[ausnc_doc].each do |doc|
+              update_doc_source(doc, doc_identifier, doc_source) # handle array of doc hashes
+            end
+          else
+            update_doc_source(graph_entry[ausnc_doc], doc_identifier, doc_source) # handle single doc hash
           end
         end
-        graph_entry.update({MetadataHelper::SOURCE.to_s => meta_source_path}) unless doc_has_source
-        json_graph
       end
+
+      # Handle documents contained in the same hash as item metadata
+      update_doc_source(graph_entry, doc_identifier, doc_source)
+    end
+    jsonld_graph
+  end
+
+  # Updates the source of a specific document
+  def update_doc_source(doc_metadata, doc_identifier, doc_source)
+    if doc_metadata['dcterms:identifier'] == doc_identifier || doc_metadata[MetadataHelper::IDENTIFIER.to_s] == doc_identifier
+      # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
+      formatted_source_path = {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
+      doc_has_source = false
+      # Replace any existing document source with the formatted one or add one in if there aren't any existing
+      ['dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
+        if doc_metadata.has_key?(source)
+          doc_metadata.update({source => formatted_source_path})
+          doc_has_source = true
+        end
+      end
+      doc_metadata.update({MetadataHelper::SOURCE.to_s => formatted_source_path}) unless doc_has_source
     end
   end
 
@@ -519,36 +542,94 @@ class CollectionsController < ApplicationController
     new_metadata
   end
 
-  # Returns the URL that the Rails app is running on
-  def get_server_url
-    request.protocol + request.host
+  # Returns an Alveo formatted collection full URL
+  def format_collection_url(collection_name)
+    collection_url(collection_name)
   end
 
-  # Returns the Alveo structured URL for the collection
-  def create_collection_url(collection_name)
-    "#{get_server_url()}/catalog/#{collection_name}"
+  # Returns an Alevo formatted item full URL
+  def format_item_url(collection_name, item_name)
+    catalog_url(collection_name, item_name)
   end
 
-  # Returns the Alveo structured URL for the item
-  def create_item_url(dc_identifier, collection_name)
-    "#{get_server_url()}/catalog/#{collection_name}/#{dc_identifier}"
-  end
-
-  # Returns the Alveo structured URL for the document
-  def create_document_url(document_dc_identifier, item_dc_identifier, collection_name)
-    "#{get_server_url()}/catalog/#{collection_name}/#{item_dc_identifier}/document/#{document_dc_identifier}"
+  # Retuns an Alveo formatted document full URL
+  def format_document_url(collection_name, item_name, document_name)
+    catalog_document_url(collection_name, item_name, document_name)
   end
 
   # Overrides the jsonld is_part_of_corpus with the collection's Alveo url
   def override_is_part_of_corpus(item_json_ld, collection_name)
-    expanded_json = JSON::LD::API.expand(item_json_ld)
-    expanded_json.each do |node|
-      is_doc = node["@type"].first == MetadataHelper::DOCUMENT.to_s || node["@type"].first == MetadataHelper::FOAF_DOCUMENT.to_s
+    item_json_ld["@graph"].each do |node|
+      is_doc = node["@type"] == MetadataHelper::DOCUMENT.to_s || node["@type"] == MetadataHelper::FOAF_DOCUMENT.to_s
       unless is_doc
-        node[MetadataHelper::IS_PART_OF.to_s] = [{"@id" => create_collection_url(collection_name)}]
+        ["dcterms:isPartOf", MetadataHelper::IS_PART_OF.to_s].each do |is_part_of|
+          node[is_part_of]["@id"] = format_collection_url(collection_name) if node.has_key?(is_part_of)
+        end
       end
     end
-    expanded_json
+    item_json_ld
+  end
+
+  # Updates the @ids found in the JSON-LD to be the alveo catalog url
+  def update_ids_in_jsonld(jsonld_metadata, collection)
+    # NOTE: it is assumed that the metadata will contain only items at the outermost level and documents nested within them
+    jsonld_metadata["@graph"].each do |item_metadata|
+      # Update item @ids
+      item_id = get_dc_identifier(item_metadata)
+      item_metadata = update_jsonld_item_id(item_metadata, collection.name)
+      # Update document @ids
+      ['ausnc:document', MetadataHelper::DOCUMENT.to_s].each do |doc_predicate|
+        if item_metadata.has_key?(doc_predicate)
+          if item_metadata[doc_predicate].is_a? Array
+            # When "ausnc:document" contains an array of document hashes
+            item_metadata[doc_predicate].each do |document_metadata|
+              document_metadata = update_jsonld_document_id(document_metadata, collection.name, item_id)
+            end
+          else
+            # When "ausnc:document" contains a single document hash
+            item_metadata[doc_predicate] = update_jsonld_document_id(item_metadata[doc_predicate], collection.name, item_id)
+          end
+        end
+      end
+      # Update display document @ids
+      ["hcsvlab:display_document", MetadataHelper::DISPLAY_DOCUMENT.to_s].each do |display_doc|
+        if item_metadata.has_key?(display_doc)
+          doc_short_id = item_metadata[display_doc]["@id"]
+          item_metadata[display_doc]["@id"] = format_document_url(collection.name, item_id, doc_short_id)
+        end
+      end
+      # Update indexable document @ids
+      ["hcsvlab:indexable_document", MetadataHelper::INDEXABLE_DOCUMENT].each do |indexable_doc|
+        if item_metadata.has_key?(indexable_doc)
+          doc_short_id = item_metadata[indexable_doc]["@id"]
+          item_metadata[indexable_doc]["@id"] = format_document_url(collection.name, item_id, doc_short_id)
+        end
+      end
+    end
+    jsonld_metadata
+  end
+
+  # Extracts the value of the dc:identifier from a metadata hash
+  def get_dc_identifier(metadata)
+    dc_id = nil
+    ['dcterms:identifier', MetadataHelper::IDENTIFIER.to_s].each do |dc_id_predicate|
+      dc_id = metadata[dc_id_predicate] if metadata.has_key?(dc_id_predicate)
+    end
+    dc_id
+  end
+
+  # Updates the @id of an item in JSON-LD to the Alveo catalog URL for that item
+  def update_jsonld_item_id(item_metadata, collection_name)
+    item_id = get_dc_identifier(item_metadata)
+    item_metadata["@id"] = format_item_url(collection_name, item_id) unless item_id.nil?
+    item_metadata
+  end
+
+  # Updates the @id of an document in JSON-LD to the Alveo catalog URL for that document
+  def update_jsonld_document_id(document_metadata, collection_name, item_name)
+    doc_id = get_dc_identifier(document_metadata)
+    document_metadata["@id"] = format_document_url(collection_name, item_name, doc_id) unless doc_id.nil?
+    document_metadata
   end
 
 end

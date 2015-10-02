@@ -1704,10 +1704,10 @@ Feature: Browsing via API
       | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
-      | [ { "documents": [ { "identifier": "document1.txt", "content":"This is a doc." }], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file://uploaded/file.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
+      | [ { "documents": [ { "identifier": "document1.txt", "content":"This is a doc." }], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1.txt", "dcterms:source":{ "@id":"file://uploaded/file.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
-      | [ { "documents": [ { "identifier": "document1.txt", "content":"This is a doc." }], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file://uploaded/file.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item2", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
+      | [ { "documents": [ { "identifier": "document1.txt", "content":"This is a doc." }], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1.txt", "dcterms:source":{ "@id":"file://uploaded/file.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item2", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
     Then the file "manifest.json" should exist in the directory for the collection "Test"
     And the file "document1.txt" should exist in the directory for the collection "Test"
     And I should get a 412 response code
@@ -1928,6 +1928,70 @@ Feature: Browsing via API
     And the JSON response should be:
     """
     {"error":"There is an item with a missing or blank identifier"}
+    """
+
+  #ToDo: test @id setting with existing document files, document content as JSON and multipart uploaded files
+  @api_add_item
+  Scenario: Add an item with nested (referenced) documents and shortened @ids
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document1.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document1.txt" }, "hcsvlab:display_document": { "@id": "document1.txt" } } ] } } ] |
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
+    And the item "item1" in collection "Test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
+    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":["item1"]}
+    """
+
+  @api_add_item
+  Scenario: Add an item with nested (doc content in JSON) documents and shortened @ids
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:source": { "@id": "file://uploaded/file.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
+    And the file "document1.txt" should exist in the directory for the collection "Test"
+    And the item "item1" in collection "Test" should exist in the database
+    And the document "document1.txt" in collection "Test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
+    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
+    And Sesame should contain a document with file_name "document1.txt" in collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":["item1"]}
+    """
+
+  @api_add_item
+  Scenario: Add an item with nested (multipart uploaded) documents and shortened @ids
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
+      | file                                 | items |
+      | "test/samples/cooee/1-001-plain.txt" | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "1-001-plain.txt", "dcterms:source": { "@id": "file://foo.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "1-001-plain.txt" }, "hcsvlab:indexable_document": { "@id": "1-001-plain.txt" } } ] } } ] |
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
+    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
+    And the item "item1" in collection "Test" should exist in the database
+    And the document "1-001-plain.txt" in collection "Test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
+    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
+    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":["item1"]}
     """
 
   @api_delete_item

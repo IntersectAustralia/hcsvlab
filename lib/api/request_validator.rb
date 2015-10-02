@@ -68,14 +68,15 @@ module RequestValidator
   end
 
   # Iterates over the item metadata and returns an array of all item dc:identifiers
-  def get_item_identifiers(item_metadata)
-    expanded_json = JSON::LD::API.expand(item_metadata)
+  def get_item_identifiers(item_json_ld)
     dc_identifiers = []
-    expanded_json.each do |node|
-      is_doc = node["@type"].first == MetadataHelper::DOCUMENT.to_s || node["@type"].first == MetadataHelper::FOAF_DOCUMENT.to_s
+    item_json_ld["@graph"].each do |node|
+      is_ausnc_doc = node["@type"] == "ausnc:document" || node["@type"] == MetadataHelper::DOCUMENT.to_s
+      is_foaf_doc = node["@type"] == "foaf:Document" || node["@type"] == MetadataHelper::FOAF_DOCUMENT.to_s
+      is_doc = is_ausnc_doc || is_foaf_doc
       unless is_doc
-        if node.has_key?(MetadataHelper::IDENTIFIER.to_s)
-          dc_identifiers.push(node[MetadataHelper::IDENTIFIER.to_s].first["@value"])
+        ["dcterms:identifier", MetadataHelper::IDENTIFIER.to_s].each do |dc_identifier|
+          dc_identifiers.push(node[dc_identifier]) if node.has_key?(dc_identifier)
         end
       end
     end

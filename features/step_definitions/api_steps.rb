@@ -346,12 +346,25 @@ Then /^the document "(.+)" in collection "(.+)" should (not )?exist in the datab
 end
 
 Then /^Sesame should (not )?contain an item with uri "(.+)" in collection "(.+)"$/ do |not_exist, item_uri, collection_name|
-
   server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
   repository = server.repository(collection_name)
   # query the collection repo for any statements with a subject uri matching the item uri
   query = RDF::Query.new do
     pattern [RDF::URI.new(item_uri), :predicate, :object]
+  end
+  if not_exist.present?
+    repository.query(query).count.should be 0
+  else
+    repository.query(query).count.should be > 0
+  end
+end
+
+Then /^Sesame should (not )?contain a document with uri "(.+)" in collection "(.+)"$/ do |not_exist, document_uri, collection_name|
+  server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+  repository = server.repository(collection_name)
+  # query the collection repo for any statements with a subject uri matching the document uri
+  query = RDF::Query.new do
+    pattern [RDF::URI.new(document_uri), :predicate, :object]
   end
   if not_exist.present?
     repository.query(query).count.should be 0
