@@ -561,9 +561,16 @@ class CollectionsController < ApplicationController
   def override_is_part_of_corpus(item_json_ld, collection_name)
     item_json_ld["@graph"].each do |node|
       is_doc = node["@type"] == MetadataHelper::DOCUMENT.to_s || node["@type"] == MetadataHelper::FOAF_DOCUMENT.to_s
+      part_of_exists= false
       unless is_doc
         ["dcterms:isPartOf", MetadataHelper::IS_PART_OF.to_s].each do |is_part_of|
-          node[is_part_of]["@id"] = format_collection_url(collection_name) if node.has_key?(is_part_of)
+          if node.has_key?(is_part_of)
+            node[is_part_of]["@id"] = format_collection_url(collection_name)
+            part_of_exists = true
+          end
+        end
+        unless part_of_exists
+          node[MetadataHelper::IS_PART_OF.to_s] = {"@id" => format_collection_url(collection_name)}
         end
       end
     end
