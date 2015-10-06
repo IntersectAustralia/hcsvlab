@@ -146,6 +146,13 @@ public
   DISPLAY_DOCUMENT  = RDF::URI(ALVEO_BASE_URI + 'display_document') unless const_defined?(:DISPLAY_DOCUMENT)
 
   #
+  # FOAF
+  #
+  FOAF_DOCUMENT = RDF::URI(FOAF_BASE_URI + 'Document') unless const_defined?(:FOAF_DOCUMENT)
+
+  @@lookup[FOAF_DOCUMENT.to_s] = prefixes[FOAF_BASE_URI] + "_Document"
+
+  #
   # short_form - return a shortened form of the given uri (which will
   #              be .to_s'ed first)
   #

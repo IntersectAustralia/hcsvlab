@@ -135,9 +135,13 @@ class CollectionsController < ApplicationController
       corpus_dir = corpus_dir(request_params[:id])
       collection = validate_collection(request_params[:id], request_params[:api_key])
       validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
+      request_params[:items].each do |item_json|
+        update_ids_in_jsonld(item_json["metadata"], collection)
+      end
       uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
-      items = process_items(corpus_dir, request_params, uploaded_files)
-      @success_message = ingest_items(corpus_dir, items) # Respond with a list of items added (via item ingest)
+      processed_items = process_items(collection.name, corpus_dir, request_params, uploaded_files)
+      create_collection_manifest(corpus_dir)
+      @success_message = ingest_items(corpus_dir, processed_items[:successes]) # Respond with a list of items added (via item ingest)
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -260,6 +264,12 @@ class CollectionsController < ApplicationController
     corpus_dir
   end
 
+  # Creates a combined metadata.rdf file and returns the path of that file.
+  # The file name takes the form of 'item1-item2-itemN-metadata.rdf'
+  def create_combined_item_rdf(corpus_dir, item_names, item_rdf)
+    create_item_rdf(corpus_dir, item_names.join("-"), item_rdf)
+  end
+
   # creates an item-metadata.rdf file and returns the path of that file
   def create_item_rdf(corpus_dir, item_name, item_rdf)
     filename = File.join(corpus_dir, item_name + '-metadata.rdf')
@@ -270,8 +280,16 @@ class CollectionsController < ApplicationController
   # Renders the given error message as JSON
   def respond_with_error(message, status_code)
     respond_to do |format|
-      format.any { render :json => {:error => message}.to_json, :status => status_code }
+      response = {:error => message}
+      response[:failures] = params[:failures] unless params[:failures].blank?
+      format.any { render :json => response.to_json, :status => status_code }
     end
+  end
+
+  # Adds the given message to the failures param
+  def add_failure_response(message)
+    params[:failures] = [] if params[:failures].nil?
+    params[:failures].push(message)
   end
 
   # Uploads a document given as json content
@@ -296,17 +314,33 @@ class CollectionsController < ApplicationController
     end
   end
 
-  # Processes the metadata for each item in the supplied request parameters and recreates the corpus collection manifest
-  def process_items(corpus_dir, request_params, uploaded_files)
+  # Processes the metadata for each item in the supplied request parameters
+  # Returns a hash containing :successes and :failures of processed items
+  def process_items(collection_name, corpus_dir, request_params, uploaded_files)
     items = []
+    failures = []
     request_params[:items].each do |item|
       item = process_item_documents_and_update_graph(corpus_dir, item)
       item = update_item_graph_with_uploaded_files(uploaded_files, item)
-      items.push(write_item_metadata(corpus_dir, item)) # Convert item metadata from JSON to RDF
+      begin
+        validate_jsonld(item["metadata"])
+        item["metadata"] = override_is_part_of_corpus(item["metadata"], collection_name)
+        item_hash = write_item_metadata(corpus_dir, item) # Convert item metadata from JSON to RDF
+        items.push(item_hash)
+      rescue ResponseError
+        failures.push('Unknown item contains invalid metadata')
+      end
     end
+    process_item_failures(failures) unless failures.empty?
     raise ResponseError.new(400), "No items were added" if items.blank?
-    create_collection_manifest(corpus_dir) # Re-create the collection manifest for item ingest
-    items
+    {:successes => items, :failures => failures}
+  end
+
+  # Adds failure message to response params
+  def process_item_failures(failures)
+    failures.each do |message|
+      add_failure_response(message)
+    end
   end
 
   # Uploads any documents in the item metadata and returns a copy of the item metadata with its metadata graph updated
@@ -331,14 +365,42 @@ class CollectionsController < ApplicationController
     item_metadata
   end
 
-  # Updates the source of a document in the JSON formatted Item graph
-  def update_document_source_in_graph(json_graph, document_identifier, document_source)
-    json_graph.each do |graph_entry|
-      if graph_entry['dcterms:identifier'] == document_identifier
-        # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
-        graph_entry.update({'dcterms:source' => {'@id' => "file://#{document_source.sub(" ", "%20")}"}})
-        json_graph
+  # Updates the source of a specific document in the JSON formatted Item graph
+  def update_document_source_in_graph(jsonld_graph, doc_identifier, doc_source)
+    jsonld_graph.each do |graph_entry|
+      # Handle documents nested within item metadata
+      ["ausnc:document", MetadataHelper::DOCUMENT].each do |ausnc_doc|
+        if graph_entry.has_key?(ausnc_doc)
+          if graph_entry[ausnc_doc].is_a? Array
+            graph_entry[ausnc_doc].each do |doc|
+              update_doc_source(doc, doc_identifier, doc_source) # handle array of doc hashes
+            end
+          else
+            update_doc_source(graph_entry[ausnc_doc], doc_identifier, doc_source) # handle single doc hash
+          end
+        end
       end
+
+      # Handle documents contained in the same hash as item metadata
+      update_doc_source(graph_entry, doc_identifier, doc_source)
+    end
+    jsonld_graph
+  end
+
+  # Updates the source of a specific document
+  def update_doc_source(doc_metadata, doc_identifier, doc_source)
+    if doc_metadata['dcterms:identifier'] == doc_identifier || doc_metadata[MetadataHelper::IDENTIFIER.to_s] == doc_identifier
+      # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
+      formatted_source_path = {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
+      doc_has_source = false
+      # Replace any existing document source with the formatted one or add one in if there aren't any existing
+      ['dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
+        if doc_metadata.has_key?(source)
+          doc_metadata.update({source => formatted_source_path})
+          doc_has_source = true
+        end
+      end
+      doc_metadata.update({MetadataHelper::SOURCE.to_s => formatted_source_path}) unless doc_has_source
     end
   end
 
@@ -370,16 +432,45 @@ class CollectionsController < ApplicationController
     items_ingested = []
     items.each do |item|
       ingest_one(corpus_dir, item[:rdf_file])
-      items_ingested.push(item[:identifier])
+      item[:identifier].each {|id| items_ingested.push(id)}
     end
     items_ingested
   end
 
-  # Write item JSON metadata to RDF file
+  # Write item JSON metadata to RDF file and returns a hash containing :identifier, :rdf_file
   def write_item_metadata(corpus_dir, item_json)
     rdf_metadata = convert_json_metadata_to_rdf(item_json["metadata"])
-    rdf_file = create_item_rdf(corpus_dir, item_json["identifier"], rdf_metadata)
-    {:identifier => item_json["identifier"], :rdf_file => rdf_file}
+    item_identifiers = get_item_identifiers(item_json["metadata"])
+    if item_identifiers.count == 1
+      rdf_file = create_item_rdf(corpus_dir, item_identifiers.first, rdf_metadata)
+    else
+      rdf_file = create_combined_item_rdf(corpus_dir, item_identifiers, rdf_metadata)
+    end
+    {:identifier => item_identifiers, :rdf_file => rdf_file}
+  end
+
+  # Updates the item in Solr by re-indexing that item
+  def update_item_in_solr(item)
+    # ToDo: refactor this workaround into a proper test mock/stub
+    if Rails.env.test?
+      Solr_Worker.new.on_message("index #{item.id}")
+    else
+      stomp_client = Stomp::Client.open "stomp://localhost:61613"
+      reindex_item_to_solr(item.id, stomp_client)
+      stomp_client.close
+    end
+  end
+
+  # Inserts the statements of the graph into the Sesame repository
+  def insert_graph_into_repository(graph, repository)
+    graph.each_statement { |statement| repository.insert(statement) }
+  end
+
+  # Inserts the metadata graph into the collection repository on the Sesame server
+  def update_sesame_with_graph(graph, collection)
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    repository = server.repository(collection.name)
+    insert_graph_into_repository(graph, repository)
   end
 
   # Deletes statements with the item's URI from Sesame
@@ -488,6 +579,11 @@ class CollectionsController < ApplicationController
     temp_graph
   end
 
+  # Prints the statements of the graph to screen for easier inspection
+  def inspect_graph_statements(graph)
+    graph.each { |statement| puts statement.inspect }
+  end
+
   # Formats the collection metadata given as part of the update collection API request
   # Returns an RDF graph of the updated/replaced collection metadata
   def format_update_collection_metadata(collection, new_jsonld_metadata, replace)
@@ -517,32 +613,97 @@ class CollectionsController < ApplicationController
     new_metadata
   end
 
-  # Inserts the metadata graph into the collection repository on the Sesame server
-  def update_sesame_with_graph(graph, collection)
-    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-    repository = server.repository(collection.name)
-    insert_graph_into_repository(graph, repository)
+  # Returns an Alveo formatted collection full URL
+  def format_collection_url(collection_name)
+    collection_url(collection_name)
   end
 
-  # Inserts the statements of the graph into the Sesame repository
-  def insert_graph_into_repository(graph, repository)
-    graph.each_statement { |statement| repository.insert(statement) }
+  # Returns an Alevo formatted item full URL
+  def format_item_url(collection_name, item_name)
+    catalog_url(collection_name, item_name)
   end
 
-  # Updates the item in Solr by re-indexing that item
-  def update_item_in_solr(item)
-    # ToDo: refactor this workaround into a proper test mock/stub
-    if Rails.env.test?
-      Solr_Worker.new.on_message("index #{item.id}")
-    else
-      stomp_client = Stomp::Client.open "stomp://localhost:61613"
-      reindex_item_to_solr(item.id, stomp_client)
-      stomp_client.close
+  # Retuns an Alveo formatted document full URL
+  def format_document_url(collection_name, item_name, document_name)
+    catalog_document_url(collection_name, item_name, document_name)
+  end
+
+  # Overrides the jsonld is_part_of_corpus with the collection's Alveo url
+  def override_is_part_of_corpus(item_json_ld, collection_name)
+    item_json_ld["@graph"].each do |node|
+      is_doc = node["@type"] == MetadataHelper::DOCUMENT.to_s || node["@type"] == MetadataHelper::FOAF_DOCUMENT.to_s
+      part_of_exists= false
+      unless is_doc
+        ["dcterms:isPartOf", MetadataHelper::IS_PART_OF.to_s].each do |is_part_of|
+          if node.has_key?(is_part_of)
+            node[is_part_of]["@id"] = format_collection_url(collection_name)
+            part_of_exists = true
+          end
+        end
+        unless part_of_exists
+          node[MetadataHelper::IS_PART_OF.to_s] = {"@id" => format_collection_url(collection_name)}
+        end
+      end
     end
+    item_json_ld
   end
 
-  # Prints the statements of the graph to screen for easier inspection
-  def inspect_graph_statements(graph)
-    graph.each { |statement| puts statement.inspect }
+  # Updates the @ids found in the JSON-LD to be the alveo catalog url
+  def update_ids_in_jsonld(jsonld_metadata, collection)
+    # NOTE: it is assumed that the metadata will contain only items at the outermost level and documents nested within them
+    jsonld_metadata["@graph"].each do |item_metadata|
+      item_id = get_dc_identifier(item_metadata)
+      item_metadata = update_jsonld_item_id(item_metadata, collection.name) # Update item @ids
+      item_metadata = update_document_ids_in_item(item_metadata, collection.name, item_id) # Update document @ids
+      # Update display document and indexable document @ids
+      doc_types = ["hcsvlab:display_document", MetadataHelper::DISPLAY_DOCUMENT.to_s, "hcsvlab:indexable_document", MetadataHelper::INDEXABLE_DOCUMENT]
+      doc_types.each do |doc_type|
+        if item_metadata.has_key?(doc_type)
+          doc_short_id = item_metadata[doc_type]["@id"]
+          item_metadata[doc_type]["@id"] = format_document_url(collection.name, item_id, doc_short_id)
+        end
+      end
+    end
+    jsonld_metadata
   end
+
+  # Extracts the value of the dc:identifier from a metadata hash
+  def get_dc_identifier(metadata)
+    dc_id = nil
+    ['dcterms:identifier', MetadataHelper::IDENTIFIER.to_s].each do |dc_id_predicate|
+      dc_id = metadata[dc_id_predicate] if metadata.has_key?(dc_id_predicate)
+    end
+    dc_id
+  end
+
+  # Updates the @id of an item in JSON-LD to the Alveo catalog URL for that item
+  def update_jsonld_item_id(item_metadata, collection_name)
+    item_id = get_dc_identifier(item_metadata)
+    item_metadata["@id"] = format_item_url(collection_name, item_id) unless item_id.nil?
+    item_metadata
+  end
+
+  # Updates the @id of an document in JSON-LD to the Alveo catalog URL for that document
+  def update_jsonld_document_id(document_metadata, collection_name, item_name)
+    doc_id = get_dc_identifier(document_metadata)
+    document_metadata["@id"] = format_document_url(collection_name, item_name, doc_id) unless doc_id.nil?
+    document_metadata
+  end
+
+  # Updates the @id of documents within items in JSON-LD to the Alveo catalog URL for those documents
+  def update_document_ids_in_item(item_metadata, collection_name, item_name)
+    ['ausnc:document', MetadataHelper::DOCUMENT.to_s].each do |doc_predicate|
+      if item_metadata.has_key?(doc_predicate)
+        if item_metadata[doc_predicate].is_a? Array # When "ausnc:document" contains an array of document hashes
+          item_metadata[doc_predicate].each do |document_metadata|
+            document_metadata = update_jsonld_document_id(document_metadata, collection_name, item_name)
+          end
+        else # When "ausnc:document" contains a single document hash
+          item_metadata[doc_predicate] = update_jsonld_document_id(item_metadata[doc_predicate], collection_name, item_name)
+        end
+      end
+    end
+    item_metadata
+  end
+
 end
