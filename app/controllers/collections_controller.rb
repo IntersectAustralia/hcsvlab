@@ -581,21 +581,9 @@ class CollectionsController < ApplicationController
   def update_ids_in_jsonld(jsonld_metadata, collection)
     # NOTE: it is assumed that the metadata will contain only items at the outermost level and documents nested within them
     jsonld_metadata["@graph"].each do |item_metadata|
-      # Update item @ids
       item_id = get_dc_identifier(item_metadata)
-      item_metadata = update_jsonld_item_id(item_metadata, collection.name)
-      # Update document @ids
-      ['ausnc:document', MetadataHelper::DOCUMENT.to_s].each do |doc_predicate|
-        if item_metadata.has_key?(doc_predicate)
-          if item_metadata[doc_predicate].is_a? Array # When "ausnc:document" contains an array of document hashes
-            item_metadata[doc_predicate].each do |document_metadata|
-              document_metadata = update_jsonld_document_id(document_metadata, collection.name, item_id)
-            end
-          else # When "ausnc:document" contains a single document hash
-            item_metadata[doc_predicate] = update_jsonld_document_id(item_metadata[doc_predicate], collection.name, item_id)
-          end
-        end
-      end
+      item_metadata = update_jsonld_item_id(item_metadata, collection.name) # Update item @ids
+      item_metadata = update_document_ids_in_item(item_metadata, collection.name, item_id) # Update document @ids
       # Update display document and indexable document @ids
       doc_types = ["hcsvlab:display_document", MetadataHelper::DISPLAY_DOCUMENT.to_s, "hcsvlab:indexable_document", MetadataHelper::INDEXABLE_DOCUMENT]
       doc_types.each do |doc_type|
@@ -629,6 +617,22 @@ class CollectionsController < ApplicationController
     doc_id = get_dc_identifier(document_metadata)
     document_metadata["@id"] = format_document_url(collection_name, item_name, doc_id) unless doc_id.nil?
     document_metadata
+  end
+
+  # Updates the @id of documents within items in JSON-LD to the Alveo catalog URL for those documents
+  def update_document_ids_in_item(item_metadata, collection_name, item_name)
+    ['ausnc:document', MetadataHelper::DOCUMENT.to_s].each do |doc_predicate|
+      if item_metadata.has_key?(doc_predicate)
+        if item_metadata[doc_predicate].is_a? Array # When "ausnc:document" contains an array of document hashes
+          item_metadata[doc_predicate].each do |document_metadata|
+            document_metadata = update_jsonld_document_id(document_metadata, collection_name, item_name)
+          end
+        else # When "ausnc:document" contains a single document hash
+          item_metadata[doc_predicate] = update_jsonld_document_id(item_metadata[doc_predicate], collection_name, item_name)
+        end
+      end
+    end
+    item_metadata
   end
 
 end
