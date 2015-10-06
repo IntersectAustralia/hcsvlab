@@ -161,6 +161,21 @@ class CollectionsController < ApplicationController
     end
   end
 
+  def delete_document_from_item
+    begin
+      collection = validate_collection(params[:collectionId], params[:api_key])
+      item = validate_item_exists(collection, params[:itemId])
+      document = validate_document_exists(item, params[:filename])
+      remove_document(document, collection)
+      delete_item_from_solr(item.id)
+      update_item_in_solr(item)
+      @success_message = "Deleted the document #{params[:filename]} from item #{params[:itemId]} in collection #{params[:collectionId]}"
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
+    end
+  end
+
   def edit_collection
     begin
       collection = validate_collection(params[:id], params[:api_key])
@@ -485,29 +500,31 @@ class CollectionsController < ApplicationController
     end
   end
 
-  # Deletes statements with the document's derived URI from Sesame
+  # Deletes statements from Sesame where the RDF subject matches the document URI
   def delete_document_from_sesame(document, repository)
-    document_query = RDF::Query.new do
-      pattern [:subject, MetadataHelper::SOURCE, RDF::URI.new("file://#{document.file_path}")]
-      pattern [:subject, MetadataHelper::IDENTIFIER, "#{document.file_name}"]
+    item_name = document.item.handle.split(":")[1]
+    document_URI = RDF::URI.new(format_document_url(document.item.collection.name, item_name, document.file_name))
+    triples_with_doc_subject = RDF::Query.execute(repository) do
+      pattern [document_URI, :predicate, :object]
     end
-    document_URIs = repository.query(document_query)
-    if document_URIs.count == 1
-      document_URI = document_URIs.first[:subject]
-      document_statements_query = RDF::Query.new do
-        pattern [document_URI, :predicate, :object]
-      end
-      document_statements = repository.query(document_statements_query)
-      document_statements.each do |document_statement|
-        repository.delete(RDF::Statement(document_URI, document_statement[:predicate], document_statement[:object]))
-      end
-    else
-      Rails.logger.error "Cannot delete document RDF as multiple distinct document URIs match the document file name and path"
-      document_URIs.each do |statement|
-        Rails.logger.debug "#{RDF::Statement(statement[:subject], MetadataHelper::SOURCE, RDF::URI.new("file://#{document.file_path}"))}"
-        Rails.logger.debug "#{RDF::Statement(statement[:subject], MetadataHelper::IDENTIFIER, "#{document.file_name}")}"
-      end
+    triples_with_doc_subject.each do |statement|
+      repository.delete(RDF::Statement(document_URI, statement[:predicate], statement[:object]))
     end
+    triples_with_doc_object = RDF::Query.execute(repository) do
+      pattern [:subject, :predicate, document_URI]
+    end
+    triples_with_doc_object.each do |statement|
+      repository.delete(RDF::Statement(statement[:subject], statement[:predicate], document_URI))
+    end
+  end
+
+  # Removes a document from the database, filesystem, Sesame and Solr
+  def remove_document(document, collection)
+    delete_file(document.file_path)
+    repository = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s).repository(collection.name)
+    delete_document_from_sesame(document, repository)
+    delete_document_from_solr(document.id)
+    document.destroy # Remove document and document audits from database
   end
 
   # Removes an item and its documents from the database, filesystem, Sesame and Solr
@@ -582,6 +599,12 @@ class CollectionsController < ApplicationController
   # Prints the statements of the graph to screen for easier inspection
   def inspect_graph_statements(graph)
     graph.each { |statement| puts statement.inspect }
+  end
+
+  # Prints the RDF statements in a collection repository for easier inspection
+  def inspect_repository_statements(collection)
+    repository = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s).repository(collection.name)
+    inspect_graph_statements(repository)
   end
 
   # Formats the collection metadata given as part of the update collection API request

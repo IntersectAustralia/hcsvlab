@@ -37,6 +37,12 @@ module RequestValidator
     item
   end
 
+  def validate_document_exists (item, document_name)
+    document = item.documents.find_by_file_name(document_name)
+    raise ResponseError.new(404), "Requested document not found" if document.nil?
+    document
+  end
+
   # Validates the request on the add items api call
   def validate_add_items_request(collection, corpus_dir, items_param, files_param)
     validate_items(items_param, collection, corpus_dir)
