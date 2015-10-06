@@ -587,29 +587,21 @@ class CollectionsController < ApplicationController
       # Update document @ids
       ['ausnc:document', MetadataHelper::DOCUMENT.to_s].each do |doc_predicate|
         if item_metadata.has_key?(doc_predicate)
-          if item_metadata[doc_predicate].is_a? Array
-            # When "ausnc:document" contains an array of document hashes
+          if item_metadata[doc_predicate].is_a? Array # When "ausnc:document" contains an array of document hashes
             item_metadata[doc_predicate].each do |document_metadata|
               document_metadata = update_jsonld_document_id(document_metadata, collection.name, item_id)
             end
-          else
-            # When "ausnc:document" contains a single document hash
+          else # When "ausnc:document" contains a single document hash
             item_metadata[doc_predicate] = update_jsonld_document_id(item_metadata[doc_predicate], collection.name, item_id)
           end
         end
       end
-      # Update display document @ids
-      ["hcsvlab:display_document", MetadataHelper::DISPLAY_DOCUMENT.to_s].each do |display_doc|
-        if item_metadata.has_key?(display_doc)
-          doc_short_id = item_metadata[display_doc]["@id"]
-          item_metadata[display_doc]["@id"] = format_document_url(collection.name, item_id, doc_short_id)
-        end
-      end
-      # Update indexable document @ids
-      ["hcsvlab:indexable_document", MetadataHelper::INDEXABLE_DOCUMENT].each do |indexable_doc|
-        if item_metadata.has_key?(indexable_doc)
-          doc_short_id = item_metadata[indexable_doc]["@id"]
-          item_metadata[indexable_doc]["@id"] = format_document_url(collection.name, item_id, doc_short_id)
+      # Update display document and indexable document @ids
+      doc_types = ["hcsvlab:display_document", MetadataHelper::DISPLAY_DOCUMENT.to_s, "hcsvlab:indexable_document", MetadataHelper::INDEXABLE_DOCUMENT]
+      doc_types.each do |doc_type|
+        if item_metadata.has_key?(doc_type)
+          doc_short_id = item_metadata[doc_type]["@id"]
+          item_metadata[doc_type]["@id"] = format_document_url(collection.name, item_id, doc_short_id)
         end
       end
     end
