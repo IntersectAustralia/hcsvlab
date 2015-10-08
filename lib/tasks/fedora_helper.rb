@@ -86,13 +86,21 @@ def reindex_item_to_solr(item_id, stomp_client)
 end
 
 def delete_item_from_solr(item_id)
-  logger.info "Deindexing item: #{item_id}"
+  delete_object_from_solr(item_id)
+end
+
+def delete_document_from_solr(document_id)
+  delete_object_from_solr(document_id)
+end
+
+def delete_object_from_solr(object_id)
+  logger.info "Deindexing item: #{object_id}"
   #ToDo: refactor this workaround into a proper test mock/stub
   if Rails.env.test?
-    Solr_Worker.new.on_message("delete #{item_id}")
+    Solr_Worker.new.on_message("delete #{object_id}")
   else
     stomp_client = Stomp::Client.open "stomp://localhost:61613"
-    stomp_client.publish('alveo.solr.worker', "delete #{item_id}")
+    stomp_client.publish('alveo.solr.worker', "delete #{object_id}")
     stomp_client.close
   end
 end
