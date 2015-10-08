@@ -148,6 +148,107 @@ class CollectionsController < ApplicationController
     end
   end
 
+  def add_document_to_item
+    begin
+      # Extract variables from the request
+      corpus_dir = corpus_dir(params[:collectionId])
+      collection = validate_collection(params[:collectionId], params[:api_key])
+      item = validate_item_exists(collection, params[:itemId])
+      document_metadata = params[:metadata]
+      document_content = params[:document_content]
+      uploaded_file = params[:file]
+      uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
+      document_filename = get_dc_identifier(document_metadata) # the document filename is the document id
+
+      # Validate the add document request
+      def validate_add_document_request(corpus_dir, collection, document_metadata, document_filename, document_content, uploaded_file)
+        # Validate the metadata contains the dc:identifier
+        raise ResponseError.new(400), "Document identifier missing" if document_filename.nil?
+        # Validate if a file was uploaded that it is valid and that the filename isn't in use
+        validate_uploaded_file(uploaded_file, collection, corpus_dir) unless uploaded_file.nil?
+        # Validate if document content was provided that it is not empty and that the filename isn't in use
+        unless document_content.nil?
+          raise ResponseError.new(400), "Document content missing" if document_content.blank?
+          validate_new_document_file(corpus_dir, document_filename, collection)
+        end
+      end
+      validate_add_document_request(corpus_dir,collection, document_metadata, document_filename, document_content, uploaded_file)
+
+      # Format the add document metadata
+      def format_add_document_metadata(corpus_dir, collection, item, document_metadata, document_filename, document_content, uploaded_file)
+        # Update the document @id to the Alveo catalog URI
+        document_metadata = update_jsonld_document_id(document_metadata, collection.name, item.get_name)
+        # Update the document source metadata with the uploaded file location
+        unless uploaded_file.nil?
+          processed_file = upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection.name)
+          update_doc_source(document_metadata, document_filename, processed_file)
+        end
+        # Update the document source metadata with the document content created file location
+        unless document_content.blank?
+          processed_file = upload_document_using_json(corpus_dir, document_filename, document_content)
+          update_doc_source(document_metadata, document_filename, processed_file)
+        end
+        document_metadata
+      end
+      document_metadata = format_add_document_metadata(corpus_dir, collection, item, document_metadata, document_filename, document_content, uploaded_file)
+      validate_jsonld(document_metadata)
+      def validate_document_source(document_metadata)
+        expanded_metadata = JSON::LD::API.expand(document_metadata).first
+        source_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+        meta_source_basename = File.basename(source_path)
+        rdf_subject_basename = File.basename(expanded_metadata['@id'])
+        meta_id = expanded_metadata[MetadataHelper::IDENTIFIER.to_s].first['@value']
+        raise ResponseError.new(400), "Document file name in @id doesn't match the document source file name" if meta_source_basename != rdf_subject_basename
+        raise ResponseError.new(400), "Document dc:identifier doesn't match the document source file name" if meta_source_basename != meta_id
+      end
+      validate_document_source(document_metadata)
+
+      def create_document(item, document_metadata)
+        expanded_metadata = JSON::LD::API.expand(document_metadata).first
+        file_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+        file_name = File.basename(file_path)
+        doc_type = expanded_metadata[MetadataHelper::TYPE.to_s]
+        doc_type = doc_type.first['@value'] unless doc_type.nil?
+        document = item.documents.find_or_initialize_by_file_name(file_name)
+        if document.new_record?
+          begin
+            document.file_path = file_path
+            document.doc_type = doc_type
+            document.mime_type = mime_type_lookup(file_name)
+            document.item = item
+            document.item_id = item.id
+            document.save
+            logger.info "#{doc_type} Document = #{document.id.to_s}" unless Rails.env.test?
+          rescue Exception => e
+            logger.error("Error creating document: #{e.message}")
+          end
+        else
+          raise ResponseError.new(412), "A file named \"#{file_name}\" is already in use by another document of item \"#{item.get_name}\""
+        end
+      end
+      create_document(item, document_metadata)
+
+      #ToDo: perform the equivalent of an item ingest
+      def add_document(item, document_metadata)
+        #ToDo: upload doc rdf to seasame
+        
+
+        #ToDo: add link in item rdf to doc rdf in sesame
+
+
+        #ToDo: reindex item in Solr
+        # delete_item_from_solr(item.id)
+        update_item_in_solr(item)
+      end
+      add_document()
+
+      @success_message = "Added the document #{document_filename} to item #{params[:itemId]} in collection #{params[:collectionId]}"
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
+    end
+  end
+
   def delete_item_from_collection
     begin
       corpus_dir = corpus_dir(params[:collectionId])
@@ -182,7 +283,7 @@ class CollectionsController < ApplicationController
       new_metadata = format_update_item_metadata(item, params[:metadata])
       update_sesame_with_graph(new_metadata, collection)
       update_item_in_solr(item)
-      @success_message = "Updated item #{item.handle.split(':').last} in collection #{collection.name}"
+      @success_message = "Updated item #{item.get_name} in collection #{collection.name}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -520,7 +621,7 @@ class CollectionsController < ApplicationController
 
   # Removes the metadata and document files for an item
   def delete_item_from_filesystem(item, corpus_dir)
-    item_name = item.handle.split(":")[1]
+    item_name = item.get_name
     delete_file(File.join(corpus_dir, "#{item_name}-metadata.rdf"))
     item.documents.each do |document|
       delete_file(document.file_path)

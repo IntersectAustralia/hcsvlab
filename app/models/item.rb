@@ -37,4 +37,8 @@ class Item < ActiveRecord::Base
      MetadataHelper::short_form(MetadataHelper::DISPLAY_DOCUMENT) + '_tesim',
      MetadataHelper::short_form(MetadataHelper::INDEXABLE_DOCUMENT) + '_tesim']
   end
+
+  def get_name
+    self.handle.split(':').last
+  end
 end

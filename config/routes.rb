@@ -28,6 +28,7 @@ HcsvlabWeb::Application.routes.draw do
   post "catalog", :to => 'collections#create', :as => 'collections'
   delete "catalog/:collectionId/:itemId",:to => 'collections#delete_item_from_collection', :as => 'delete_collection_item'
   put "catalog/:collectionId/:itemId", :to => 'collections#update_item', :as => 'update_collection_item', :constraints => catalogRoutesConstraints
+  post "catalog/:collectionId/:itemId", :to => 'collections#add_document_to_item', :as => 'add_item_document', :constraints => catalogRoutesConstraints
 
   # In /config/initializers/blacklight_routes.rb we are overriding one of the methods of this class
   Blacklight::Routes.new(self, :except => [:solr_document]).draw

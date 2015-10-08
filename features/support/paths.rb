@@ -120,6 +120,11 @@ module NavigationHelpers
         itemIdentifier = $1.split(':').last
         update_collection_item_path(collectionName, itemIdentifier, options)
 
+      when /^the add document to item page for "(.*)"/
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        add_item_document_path(collectionName, itemIdentifier, options)
+
       when /^the licence agreements page$/
         account_licence_agreements_path(options)
 

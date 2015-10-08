@@ -44,6 +44,11 @@ module RequestValidator
     validate_document_identifiers(get_document_identifiers(files_param, items_param))
   end
 
+  # Validates the request on the add document api call
+  # def validate_add_document_request(collection, corpus_dir, document_metadata, uploaded_file)
+  #   ToDo: perform all add document request validations here
+  # end
+
   private
 
   # Iterates over the uploaded files and JSON document content and returns a list of document identifiers/filenames
