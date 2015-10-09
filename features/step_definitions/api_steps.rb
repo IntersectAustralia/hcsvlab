@@ -342,12 +342,17 @@ Then /^the item "(.+)" in collection "(.+)" should (not )?exist in the database$
   Item.find_by_handle("#{collection_name}:#{item_name}").nil?.should be (!status)
 end
 
-Then /^the document "(.+)" in collection "(.+)" should (not )?exist in the database$/ do |document_file_name, collection_name, not_exist|
+Then /^the document "(.+)" under item "(.+)" in collection "(.+)" should (not )?exist in the database$/ do |document_base_name, item_name, collection_name, not_exist|
   status = true
   status = false if not_exist.present?
-  corpus_directory = File.join(Rails.application.config.api_collections_location, collection_name)
-  file_path = File.join(corpus_directory, document_file_name)
-  Document.find_by_file_path(file_path).nil?.should be (!status)
+  item = Item.find_by_handle("#{collection_name}:#{item_name}")
+  has_doc = false
+  unless item.nil?
+    item.documents.each do |document|
+      has_doc = true if document.file_name == document_base_name
+    end
+  end
+  has_doc.should be (status)
 end
 
 Then /^Sesame should (not )?contain an item with uri "(.+)" in collection "(.+)"$/ do |not_exist, item_uri, collection_name|
