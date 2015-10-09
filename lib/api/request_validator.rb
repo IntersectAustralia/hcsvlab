@@ -70,7 +70,7 @@ module RequestValidator
   # Validates that each of the document identifiers are unique
   def validate_document_identifiers(document_identifiers)
     duplicate_id = document_identifiers.detect{|identifier| document_identifiers.count(identifier) > 1}
-    raise ResponseError.new(412), "The identifier \"#{duplicate_id}\" is used for multiple documents" unless duplicate_id.nil?
+    raise ResponseError.new(412), "The identifier #{duplicate_id} is used for multiple documents" unless duplicate_id.nil?
   end
 
   # Iterates over the item metadata and returns an array of all item dc:identifiers
@@ -131,7 +131,7 @@ module RequestValidator
   def validate_new_document_file(corpus_dir, file_basename, collection)
     absolute_filename = File.join(corpus_dir, file_basename)
     if File.exists? absolute_filename
-      raise ResponseError.new(412), "The file \"#{file_basename}\" has already been uploaded to the collection #{collection.name}"
+      raise ResponseError.new(412), "The file #{file_basename} has already been uploaded to the collection #{collection.name}"
     end
   end
 

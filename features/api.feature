@@ -1714,7 +1714,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The file \"document1.txt\" has already been uploaded to the collection Test"}
+    {"error":"The file document1.txt has already been uploaded to the collection Test"}
     """
 
   @api_add_item
@@ -1729,7 +1729,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The identifier \"document1.txt\" is used for multiple documents"}
+    {"error":"The identifier document1.txt is used for multiple documents"}
     """
 
   @api_add_item
@@ -1744,7 +1744,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The identifier \"document1.txt\" is used for multiple documents"}
+    {"error":"The identifier document1.txt is used for multiple documents"}
     """
 
   @api_add_item @test
@@ -1848,7 +1848,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"Uploaded file \"blank.txt\" is not present or empty."}
+    {"error":"Uploaded file blank.txt is not present or empty."}
     """
 
   @api_add_item
@@ -1867,7 +1867,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The file \"1-001-plain.txt\" has already been uploaded to the collection Test"}
+    {"error":"The file 1-001-plain.txt has already been uploaded to the collection Test"}
     """
 
   @api_add_item
@@ -1882,7 +1882,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The identifier \"1-001-plain.txt\" is used for multiple documents"}
+    {"error":"The identifier 1-001-plain.txt is used for multiple documents"}
     """
 
   @api_add_item
@@ -2809,7 +2809,7 @@ Feature: Browsing via API
     Then I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"Uploaded file \"blank.txt\" is not present or empty."}
+    {"error":"Uploaded file blank.txt is not present or empty."}
     """
 
   @api_add_document

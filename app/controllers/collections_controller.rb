@@ -223,7 +223,7 @@ class CollectionsController < ApplicationController
             logger.error("Error creating document: #{e.message}")
           end
         else
-          raise ResponseError.new(412), "A file named \"#{file_name}\" is already in use by another document of item \"#{item.get_name}\""
+          raise ResponseError.new(412), "A file named #{file_name} is already in use by another document of item #{item.get_name}"
         end
       end
       create_document(item, document_metadata)
@@ -407,7 +407,7 @@ class CollectionsController < ApplicationController
     if !file.is_a? ActionDispatch::Http::UploadedFile
       raise ResponseError.new(412), "Error in file parameter."
     elsif file.blank? or file.size == 0
-      raise ResponseError.new(412), "Uploaded file \"#{file_basename}\" is not present or empty."
+      raise ResponseError.new(412), "Uploaded file #{file_basename} is not present or empty."
     else
       Rails.logger.debug("Copying uploaded document file from #{file.tempfile} to #{absolute_filename}")
       FileUtils.cp file.tempfile, absolute_filename
