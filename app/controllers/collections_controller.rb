@@ -150,99 +150,19 @@ class CollectionsController < ApplicationController
 
   def add_document_to_item
     begin
-      # Extract variables from the request
       corpus_dir = corpus_dir(params[:collectionId])
       collection = validate_collection(params[:collectionId], params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
-      document_metadata = params[:metadata]
-      document_content = params[:document_content]
+      doc_metadata = params[:metadata]
+      doc_content = params[:document_content]
       uploaded_file = params[:file]
       uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
-      document_filename = get_dc_identifier(document_metadata) # the document filename is the document id
+      doc_filename = get_dc_identifier(doc_metadata) # the document filename is the document id
 
-      # Validate the add document request
-      def validate_add_document_request(corpus_dir, collection, document_metadata, document_filename, document_content, uploaded_file)
-        # Validate the metadata contains the dc:identifier
-        raise ResponseError.new(400), "Document identifier missing" if document_filename.nil?
-        # Validate if a file was uploaded that it is valid and that the filename isn't in use
-        validate_uploaded_file(uploaded_file, collection, corpus_dir) unless uploaded_file.nil?
-        # Validate if document content was provided that it is not empty and that the filename isn't in use
-        unless document_content.nil?
-          raise ResponseError.new(400), "Document content missing" if document_content.blank?
-          validate_new_document_file(corpus_dir, document_filename, collection)
-        end
-      end
-      validate_add_document_request(corpus_dir,collection, document_metadata, document_filename, document_content, uploaded_file)
-
-      # Format the add document metadata
-      def format_add_document_metadata(corpus_dir, collection, item, document_metadata, document_filename, document_content, uploaded_file)
-        # Update the document @id to the Alveo catalog URI
-        document_metadata = update_jsonld_document_id(document_metadata, collection.name, item.get_name)
-        # Update the document source metadata with the uploaded file location
-        unless uploaded_file.nil?
-          processed_file = upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection.name)
-          update_doc_source(document_metadata, document_filename, processed_file)
-        end
-        # Update the document source metadata with the document content created file location
-        unless document_content.blank?
-          processed_file = upload_document_using_json(corpus_dir, document_filename, document_content)
-          update_doc_source(document_metadata, document_filename, processed_file)
-        end
-        document_metadata
-      end
-      document_metadata = format_add_document_metadata(corpus_dir, collection, item, document_metadata, document_filename, document_content, uploaded_file)
-      validate_jsonld(document_metadata)
-      def validate_document_source(document_metadata)
-        expanded_metadata = JSON::LD::API.expand(document_metadata).first
-        source_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
-        meta_source_basename = File.basename(source_path)
-        rdf_subject_basename = File.basename(expanded_metadata['@id'])
-        meta_id = expanded_metadata[MetadataHelper::IDENTIFIER.to_s].first['@value']
-        raise ResponseError.new(400), "Document file name in @id doesn't match the document source file name" if meta_source_basename != rdf_subject_basename
-        raise ResponseError.new(400), "Document dc:identifier doesn't match the document source file name" if meta_source_basename != meta_id
-      end
-      validate_document_source(document_metadata)
-
-      def create_document(item, document_metadata)
-        expanded_metadata = JSON::LD::API.expand(document_metadata).first
-        file_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
-        file_name = File.basename(file_path)
-        doc_type = expanded_metadata[MetadataHelper::TYPE.to_s]
-        doc_type = doc_type.first['@value'] unless doc_type.nil?
-        document = item.documents.find_or_initialize_by_file_name(file_name)
-        if document.new_record?
-          begin
-            document.file_path = file_path
-            document.doc_type = doc_type
-            document.mime_type = mime_type_lookup(file_name)
-            document.item = item
-            document.item_id = item.id
-            document.save
-            logger.info "#{doc_type} Document = #{document.id.to_s}" unless Rails.env.test?
-          rescue Exception => e
-            logger.error("Error creating document: #{e.message}")
-          end
-        else
-          raise ResponseError.new(412), "A file named #{file_name} is already in use by another document of item #{item.get_name}"
-        end
-      end
-      create_document(item, document_metadata)
-
-      #ToDo: perform the equivalent of an item ingest
-      def add_document(item, document_metadata)
-        #ToDo: upload doc rdf to seasame
-        
-
-        #ToDo: add link in item rdf to doc rdf in sesame
-
-
-        #ToDo: reindex item in Solr
-        # delete_item_from_solr(item.id)
-        update_item_in_solr(item)
-      end
-      add_document()
-
-      @success_message = "Added the document #{document_filename} to item #{params[:itemId]} in collection #{params[:collectionId]}"
+      doc_metadata = format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
+      create_document(item, doc_metadata)
+      add_and_index_document(item, doc_metadata)
+      @success_message = "Added the document #{doc_filename} to item #{params[:itemId]} in collection #{params[:collectionId]}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -685,6 +605,12 @@ class CollectionsController < ApplicationController
     graph.each { |statement| puts statement.inspect }
   end
 
+  # Prints the RDF statements in a collection repository for easier inspection
+  def inspect_repository_statements(collection)
+    repository = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s).repository(collection.name)
+    inspect_graph_statements(repository)
+  end
+
   # Formats the collection metadata given as part of the update collection API request
   # Returns an RDF graph of the updated/replaced collection metadata
   def format_update_collection_metadata(collection, new_jsonld_metadata, replace)
@@ -805,6 +731,70 @@ class CollectionsController < ApplicationController
       end
     end
     item_metadata
+  end
+
+  # Performs add document validations and returns the formatted metadata with the automatically generated metadata fields
+  def format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
+    validate_add_document_request(corpus_dir, collection, doc_metadata, doc_filename, doc_content, uploaded_file)
+    doc_metadata = format_add_document_metadata(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
+    validate_jsonld(doc_metadata)
+    validate_document_source(doc_metadata)
+    doc_metadata
+  end
+
+  # Format the add document metadata and add doc to file system
+  def format_add_document_metadata(corpus_dir, collection, item, document_metadata, document_filename, document_content, uploaded_file)
+    # Update the document @id to the Alveo catalog URI
+    document_metadata = update_jsonld_document_id(document_metadata, collection.name, item.get_name)
+    processed_file = nil
+    unless uploaded_file.nil?
+      processed_file = upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection.name)
+    end
+    unless document_content.blank?
+      processed_file = upload_document_using_json(corpus_dir, document_filename, document_content)
+    end
+    update_doc_source(document_metadata, document_filename, processed_file) unless processed_file.nil?
+    document_metadata
+  end
+
+  # Creates a document in the database from Json-ld document metadata
+  def create_document(item, document_json_ld)
+    expanded_metadata = JSON::LD::API.expand(document_json_ld).first
+    file_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+    file_name = File.basename(file_path)
+    doc_type = expanded_metadata[MetadataHelper::TYPE.to_s]
+    doc_type = doc_type.first['@value'] unless doc_type.nil?
+    document = item.documents.find_or_initialize_by_file_name(file_name)
+    if document.new_record?
+      begin
+        document.file_path = file_path
+        document.doc_type = doc_type
+        document.mime_type = mime_type_lookup(file_name)
+        document.item = item
+        document.item_id = item.id
+        document.save
+        logger.info "#{doc_type} Document = #{document.id.to_s}" unless Rails.env.test?
+      rescue Exception => e
+        logger.error("Error creating document: #{e.message}")
+      end
+    else
+      raise ResponseError.new(412), "A file named #{file_name} is already in use by another document of item #{item.get_name}"
+    end
+  end
+
+  # Adds a document to Sesame and updates the corresponding item in Solr
+  def add_and_index_document(item, document_json_ld)
+    # Upload doc rdf to seasame
+    document_RDF = RDF::Graph.new << JSON::LD::API.toRDF(document_json_ld)
+    update_sesame_with_graph(document_RDF, item.collection)
+    #Add link in item rdf to doc rdf in sesame
+    document_RDF_URI = RDF::URI.new(document_json_ld['@id'])
+    item_document_link = {'@id' => item.uri, MetadataHelper::DOCUMENT.to_s => document_RDF_URI}
+    append_item_graph = RDF::Graph.new << JSON::LD::API.toRDF(item_document_link)
+    update_sesame_with_graph(append_item_graph, item.collection)
+    #Reindex item in Solr
+    delete_item_from_solr(item.id)
+    update_item_in_solr(item)
   end
 
 end
