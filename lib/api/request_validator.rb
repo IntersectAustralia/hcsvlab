@@ -82,7 +82,7 @@ module RequestValidator
       is_foaf_doc = node["@type"] == "foaf:Document" || node["@type"] == MetadataHelper::FOAF_DOCUMENT.to_s
       is_doc = is_ausnc_doc || is_foaf_doc
       unless is_doc
-        ["dcterms:identifier", MetadataHelper::IDENTIFIER.to_s].each do |dc_identifier|
+        ['dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s].each do |dc_identifier|
           dc_identifiers.push(node[dc_identifier]) if node.has_key?(dc_identifier)
         end
       end

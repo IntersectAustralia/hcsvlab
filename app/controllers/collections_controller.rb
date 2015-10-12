@@ -404,12 +404,12 @@ class CollectionsController < ApplicationController
 
   # Updates the source of a specific document
   def update_doc_source(doc_metadata, doc_identifier, doc_source)
-    if doc_metadata['dcterms:identifier'] == doc_identifier || doc_metadata[MetadataHelper::IDENTIFIER.to_s] == doc_identifier
+    if doc_metadata['dc:identifier'] == doc_identifier || doc_metadata['dcterms:identifier'] == doc_identifier || doc_metadata[MetadataHelper::IDENTIFIER.to_s] == doc_identifier
       # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
       formatted_source_path = {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
       doc_has_source = false
       # Replace any existing document source with the formatted one or add one in if there aren't any existing
-      ['dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
+      ['dc:source', 'dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
         if doc_metadata.has_key?(source)
           doc_metadata.update({source => formatted_source_path})
           doc_has_source = true
@@ -657,7 +657,7 @@ class CollectionsController < ApplicationController
       is_doc = node["@type"] == MetadataHelper::DOCUMENT.to_s || node["@type"] == MetadataHelper::FOAF_DOCUMENT.to_s
       part_of_exists= false
       unless is_doc
-        ["dcterms:isPartOf", MetadataHelper::IS_PART_OF.to_s].each do |is_part_of|
+        ['dc:isPartOf', 'dcterms:isPartOf', MetadataHelper::IS_PART_OF.to_s].each do |is_part_of|
           if node.has_key?(is_part_of)
             node[is_part_of]["@id"] = format_collection_url(collection_name)
             part_of_exists = true
@@ -693,7 +693,7 @@ class CollectionsController < ApplicationController
   # Extracts the value of the dc:identifier from a metadata hash
   def get_dc_identifier(metadata)
     dc_id = nil
-    ['dcterms:identifier', MetadataHelper::IDENTIFIER.to_s].each do |dc_id_predicate|
+    ['dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s].each do |dc_id_predicate|
       dc_id = metadata[dc_id_predicate] if metadata.has_key?(dc_id_predicate)
     end
     dc_id
