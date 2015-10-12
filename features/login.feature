@@ -30,9 +30,11 @@ Feature: Logging In
   Scenario: Home page is the search page once logged in
     Given I am on the login page
     And I attempt to login with "georgina@intersect.org.au" and "Pas$w0rd"
-    Then I should see "Human Communication Science Virtual Laboratory"
+    Then I should see "Above and Beyond Speech, Language and Music"
+    Then I should see "A Virtual Lab for Human Communication Science"
     When I am on the home page
-    Then I should see "Human Communication Science Virtual Laboratory"
+    Then I should see "Above and Beyond Speech, Language and Music"
+    Then I should see "A Virtual Lab for Human Communication Science"
 
   Scenario: Should be redirected to the login page when trying to access a secure page
     Given I am on the list users page
