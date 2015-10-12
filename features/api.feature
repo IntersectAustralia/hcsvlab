@@ -1399,7 +1399,7 @@ Feature: Browsing via API
 
   @api_create_collection
   Scenario: Create new collection via the API as a researcher
-    Given I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "researcher1@intersect.org.au" with JSON params
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 403 response code
@@ -1410,24 +1410,24 @@ Feature: Browsing via API
 
   @api_create_collection
   Scenario: Create new collection via the API as a data owner
-    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://collection.test) created"}
+    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
     """
 
   @api_create_collection
   Scenario: Create new collection via the API as an admin
-    Given I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://collection.test) created"}
+    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
     """
 
   @api_create_collection
@@ -1435,32 +1435,18 @@ Feature: Browsing via API
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
-    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://other.collection/test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://other.collection/test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "Another test collection", "marcrel:OWN": "Data Owner"} |
-    Then I should get a 200 response code
-    And the JSON response should be:
-    """
-    {"success":"New collection 'Test' (http://other.collection/test) created"}
-    """
-
-  @api_create_collection
-  Scenario: Create new collection via the API with duplicate uri
-    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
-      | name | collection_metadata |
-      | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
-    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
-      | name         | collection_metadata |
-      | Another Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "Another test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 400 response code
     And the JSON response should be:
     """
-    {"error":"Collection 'Another Test' (http://collection.test) already exists in the system - skipping"}
+    {"error":"Collection 'Test' (http://example.org/catalog/Test) already exists in the system - skipping"}
     """
 
   @api_create_collection
   Scenario: Create new collection via the API without JSON params
-    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" without JSON params
+    When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" without JSON params
     Then I should get a 400 response code
     And the JSON response should be:
     """
@@ -1469,7 +1455,7 @@ Feature: Browsing via API
 
   @api_create_collection
   Scenario: Create new collection via the API without name param
-    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | collection_metadata |
       | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 400 response code
@@ -1480,7 +1466,7 @@ Feature: Browsing via API
 
   @api_create_collection
   Scenario: Create new collection via the API without the metadata param
-    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name |
       | Test |
     Then I should get a 400 response code
@@ -1492,39 +1478,61 @@ Feature: Browsing via API
   @api_create_collection
   Scenario: Create new collection assigns collection owner to api key user
     # admin user is used since the default collection owner in test env is data_owner@intersect.org.au
-    Given I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 200 response code
     And the owner of collection "Test" should be "admin@intersect.org.au"
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://collection.test) created"}
+    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
     """
 
   @api_create_collection
   Scenario: Create new collection assigns collection owner to api key user who is also the default collection owner
-    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 200 response code
     And the owner of collection "Test" should be "data_owner@intersect.org.au"
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://collection.test) created"}
+    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
     """
 
   @api_create_collection
   Scenario: Create new collection assigns collection owner to api key user even if they specify an owner in the metadata
     # assign the collection owner to be "researcher1@intersect.org.au" in the collection metadata (using the marcel:rpy tag)
-    Given I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
+    When I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:rpy": "researcher1@intersect.org.au"} |
     Then I should get a 200 response code
     And the owner of collection "Test" should be "admin@intersect.org.au"
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://collection.test) created"}
+    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    """
+
+  @api_create_collection
+  Scenario: Create new collection automatically generates the catalog URL
+    When I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/" }, "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection" } |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    """
+
+  @api_create_collection
+  Scenario: Create new collection overwrites any supplied catalog URI with the catalog URL
+    When I make a JSON post request for the collections page with the API token for "admin@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection" } |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
     """
 
   @api_add_item
