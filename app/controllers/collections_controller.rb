@@ -476,16 +476,41 @@ class CollectionsController < ApplicationController
     end
   end
 
+  # Returns a collection repository from the Sesame server
+  def get_sesame_repository(collection)
+    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
+    server.repository(collection.name)
+  end
+
   # Inserts the statements of the graph into the Sesame repository
   def insert_graph_into_repository(graph, repository)
     graph.each_statement { |statement| repository.insert(statement) }
   end
 
-  # Inserts the metadata graph into the collection repository on the Sesame server
+  # Updates Sesame with the metadata graph
+  # If statements already exist this updates the statement object rather than appending new statements
   def update_sesame_with_graph(graph, collection)
-    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-    repository = server.repository(collection.name)
-    insert_graph_into_repository(graph, repository)
+    repository = get_sesame_repository(collection)
+    graph.each_statement do |statement|
+      if statement.predicate == MetadataHelper::DOCUMENT
+        # An item can contain multiple document statements (same subj and pred, different obj)
+        repository.insert(statement)
+      else
+        # All other statements should have unique subjects and predicates
+        matches = RDF::Query.execute(repository) {pattern [statement.subject, statement.predicate, :object]}
+        if matches.count == 0
+          repository.insert(statement)
+        else
+          matches.each do |match|
+            unless match[:object] == statement.object
+              repository.delete([statement.subject, statement.predicate, match[:object]])
+              repository.insert(statement)
+            end
+          end
+        end
+      end
+    end
+    repository
   end
 
   # Deletes statements with the item's URI from Sesame
@@ -521,8 +546,7 @@ class CollectionsController < ApplicationController
   # Removes a document from the database, filesystem, Sesame and Solr
   def remove_document(document, collection)
     delete_file(document.file_path)
-    repository = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s).repository(collection.name)
-    delete_document_from_sesame(document, repository)
+    delete_document_from_sesame(document, get_sesame_repository(collection))
     delete_document_from_solr(document.id)
     document.destroy # Remove document and document audits from database
   end
@@ -546,8 +570,7 @@ class CollectionsController < ApplicationController
 
   # Deletes an item and its documents from Sesame
   def delete_from_sesame(item, collection)
-    server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-    repository = server.repository(collection.name)
+    repository = get_sesame_repository(collection)
     delete_item_from_sesame(item, repository)
     item.documents.each do |document|
       delete_document_from_sesame(document, repository)
@@ -603,8 +626,7 @@ class CollectionsController < ApplicationController
 
   # Prints the RDF statements in a collection repository for easier inspection
   def inspect_repository_statements(collection)
-    repository = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s).repository(collection.name)
-    inspect_graph_statements(repository)
+    inspect_graph_statements(get_sesame_repository(collection))
   end
 
   # Formats the collection metadata given as part of the update collection API request
@@ -627,10 +649,10 @@ class CollectionsController < ApplicationController
     new_metadata = RDF::Graph.new << JSON::LD::API.toRDF(metadata)
     item_subject = RDF::URI.new(item.uri)
     # Remove any changes to un-editable metadata fields
-    query = RDF::Query.new do
+    dc_id_query = RDF::Query.new do
       pattern [item_subject, MetadataHelper::IDENTIFIER, :obj_identifier]
     end
-    new_metadata.query(query).distinct.each do |solution|
+    new_metadata.query(dc_id_query).distinct.each do |solution|
       new_metadata.delete([item_subject, MetadataHelper::IDENTIFIER, solution[:obj_identifier]])
     end
     new_metadata

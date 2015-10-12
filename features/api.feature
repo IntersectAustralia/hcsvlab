@@ -2592,6 +2592,32 @@ Feature: Browsing via API
     And I should see "Mode: An updated test mode"
 
   @api_update_item
+  Scenario: Updating an item shouldn't append existing metadata values
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:mode": "Original Mode", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    And I reindex the collection "Test"
+    And I am logged in as "data_owner@intersect.org.au"
+    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+      | metadata |
+      | { "http://ns.ausnc.org.au/schemas/ausnc_md_model/mode":"Updated Mode" } |
+    And I go to the catalog page for "Test:item1"
+    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Updated item item1 in collection Test"}
+    """
+    And I should see "Item Details"
+    And I should see "Mode: Updated Mode"
+    And I should not see "Mode: Original Mode"
+    And I should not see "Mode: Original Mode, Updated Mode"
+    And I should not see "Mode: Updated Mode, Original Mode"
+
+  @api_update_item
   Scenario: Update an item with a context and view the changes
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
