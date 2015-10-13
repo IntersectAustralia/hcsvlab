@@ -45,6 +45,16 @@ class ItemListsController < ApplicationController
       format.html {
         @response = @item_list.get_items(params[:page], params[:per_page])
         @document_list = @response["response"]["docs"]
+        file_types = []
+        @item_list.get_item_handles.each do |handle|
+          item = Item.find_by_handle(handle)
+          item.documents.each do |doc|
+             file_types.push(File.extname(doc.file_name.downcase))
+          end
+        end
+        @doc_filetypes = Hash.new(0)
+        file_types.each {|name| @doc_filetypes[name] += 1}
+
 
         authorised_item_handles = @item_list.get_authorised_item_handles
         if @response['response']['numFound'] > authorised_item_handles.size
@@ -70,7 +80,21 @@ class ItemListsController < ApplicationController
           redirect_to @item_list and return
         end
 
-        download_as_zip(@item_list.get_item_handles, "#{@item_list.name}.zip")
+        regexp = Regexp.new(Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER)
+        unless params[:regexp].blank?
+          begin
+            if params[:regexp].is_a? Array
+              regexp = Regexp.union(params[:regexp])
+            else
+              regexp = Regexp.new(params[:regexp])
+            end
+          rescue RegexpError => e
+            Rails.logger.error(e.message)
+            flash[:error] = "Error with regular expression: #{e.message}"
+            redirect_to @item_list and return
+          end
+        end
+        download_as_zip(@item_list.get_item_handles, "#{@item_list.name}.zip", regexp)
       }
       format.warc {
         if @item_list.get_item_handles.length == 0
@@ -86,7 +110,9 @@ class ItemListsController < ApplicationController
   def aspera_transfer_spec
     respond_to do |format|
       format.any {
-        generate_aspera_transfer_spec(@item_list)
+        regexp = Regexp.new(Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER)
+        regexp = Regexp.new(params[:regexp]) unless params[:regexp].blank?
+        generate_aspera_transfer_spec(@item_list, regexp)
       }
     end
   end

@@ -318,3 +318,18 @@ end
 Then /^I should see a page with the title: "([^"]*)"$/ do |page_title|
   expect(page).to have_title page_title
 end
+
+Then /^I should receive a file(?: "([^"]*)")?/ do |file|
+  right_content_type = page.response_headers['Content-Type'].should == "application/octet-stream"
+  if right_content_type
+    page.response_headers['Content-Disposition'].should =~ /#{file}/
+  end
+end
+
+
+Then /^I should receive a zip file(?: "([^"]*)")?/ do |file|
+  right_content_type = page.response_headers['Content-Type'].should == "application/zip"
+  if right_content_type
+    page.response_headers['Content-Disposition'].should =~ /#{file}/
+  end
+end

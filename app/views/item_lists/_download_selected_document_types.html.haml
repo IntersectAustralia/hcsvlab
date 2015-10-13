@@ -1,0 +1,10 @@
+= form_for @item_list, :method => 'GET', :url => url_for(:controller => 'item_lists', :action => 'show', :format => 'zip', :id => params[:id].to_i) do |f|
+  #download_selected_document_types_dialog.modal-body
+    %p
+      = f.label 'Download only files of a particular type'
+      - @doc_filetypes.each do |key, value|
+        = check_box_tag :regexp, key
+        = label_tag key, "#{key} (#{value})", :class => "checkbox inline"
+
+  .modal-separator
+    = f.submit 'Download Selected', class: 'btn btn-primary', :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);'
