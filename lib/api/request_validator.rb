@@ -50,6 +50,16 @@ module RequestValidator
     validate_document_identifiers(get_document_identifiers(files_param, items_param))
   end
 
+  # Validates the request on the add document api call
+  def validate_add_document_request(corpus_dir, collection, document_metadata, document_filename, document_content, uploaded_file)
+    raise ResponseError.new(400), "Document identifier missing" if document_filename.nil?
+    validate_uploaded_file(uploaded_file, collection, corpus_dir) unless uploaded_file.nil?
+    unless document_content.nil?
+      raise ResponseError.new(400), "Document content missing" if document_content.blank?
+      validate_new_document_file(corpus_dir, document_filename, collection)
+    end
+  end
+
   private
 
   # Iterates over the uploaded files and JSON document content and returns a list of document identifiers/filenames
@@ -71,7 +81,7 @@ module RequestValidator
   # Validates that each of the document identifiers are unique
   def validate_document_identifiers(document_identifiers)
     duplicate_id = document_identifiers.detect{|identifier| document_identifiers.count(identifier) > 1}
-    raise ResponseError.new(412), "The identifier \"#{duplicate_id}\" is used for multiple documents" unless duplicate_id.nil?
+    raise ResponseError.new(412), "The identifier #{duplicate_id} is used for multiple documents" unless duplicate_id.nil?
   end
 
   # Iterates over the item metadata and returns an array of all item dc:identifiers
@@ -132,7 +142,7 @@ module RequestValidator
   def validate_new_document_file(corpus_dir, file_basename, collection)
     absolute_filename = File.join(corpus_dir, file_basename)
     if File.exists? absolute_filename
-      raise ResponseError.new(412), "The file \"#{file_basename}\" has already been uploaded to the collection #{collection.name}"
+      raise ResponseError.new(412), "The file #{file_basename} has already been uploaded to the collection #{collection.name}"
     end
   end
 
@@ -149,6 +159,17 @@ module RequestValidator
       raise ResponseError.new(412), "Error in file parameter."
     end
     validate_new_document_file(corpus_dir, uploaded_file.original_filename, collection)
+  end
+
+  # Validates all the document filenames match (in the @id, dc:identifier, dc:source)
+  def validate_document_source(document_json_ld)
+    expanded_metadata = JSON::LD::API.expand(document_json_ld).first
+    source_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+    meta_source_basename = File.basename(source_path)
+    rdf_subject_basename = File.basename(expanded_metadata['@id'])
+    meta_id = expanded_metadata[MetadataHelper::IDENTIFIER.to_s].first['@value']
+    raise ResponseError.new(400), "Document file name in @id doesn't match the document source file name" if meta_source_basename != rdf_subject_basename
+    raise ResponseError.new(400), "Document dc:identifier doesn't match the document source file name" if meta_source_basename != meta_id
   end
 
 end

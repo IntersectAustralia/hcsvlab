@@ -1660,7 +1660,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
     And the file "document1.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" in collection "Test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
     And Sesame should contain a document with file_name "document1.txt" in collection "Test"
@@ -1714,7 +1714,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The file \"document1.txt\" has already been uploaded to the collection Test"}
+    {"error":"The file document1.txt has already been uploaded to the collection Test"}
     """
 
   @api_add_item
@@ -1729,7 +1729,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The identifier \"document1.txt\" is used for multiple documents"}
+    {"error":"The identifier document1.txt is used for multiple documents"}
     """
 
   @api_add_item
@@ -1744,7 +1744,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The identifier \"document1.txt\" is used for multiple documents"}
+    {"error":"The identifier document1.txt is used for multiple documents"}
     """
 
   @api_add_item @test
@@ -1759,7 +1759,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
     And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "1-001-plain.txt" in collection "Test" should exist in the database
+    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
     And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
@@ -1784,8 +1784,8 @@ Feature: Browsing via API
 #    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
 #    And the file "1-002-plain.txt" should exist in the directory for the collection "Test"
 #    And the item "item1" in collection "Test" should exist in the database
-#    And the document "1-001-plain.txt" in collection "Test" should exist in the database
-#    And the document "1-002-plain.txt" in collection "Test" should exist in the database
+#    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
+#    And the document "1-002-plain.txt" under item "item1" in collection "Test" should exist in the database
 #    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
 #    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
 #    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-002-plain.txt" in collection "Test"
@@ -1811,7 +1811,7 @@ Feature: Browsing via API
     And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
     And the file "1-002-plain.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "1-001-plain.txt" in collection "Test" should exist in the database
+    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
     And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
@@ -1848,7 +1848,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"Uploaded file \"blank.txt\" is not present or empty."}
+    {"error":"Uploaded file blank.txt is not present or empty."}
     """
 
   @api_add_item
@@ -1867,7 +1867,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The file \"1-001-plain.txt\" has already been uploaded to the collection Test"}
+    {"error":"The file 1-001-plain.txt has already been uploaded to the collection Test"}
     """
 
   @api_add_item
@@ -1882,7 +1882,7 @@ Feature: Browsing via API
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The identifier \"1-001-plain.txt\" is used for multiple documents"}
+    {"error":"The identifier 1-001-plain.txt is used for multiple documents"}
     """
 
   @api_add_item
@@ -2003,7 +2003,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
     And the file "document1.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" in collection "Test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
     And Sesame should contain a document with file_name "document1.txt" in collection "Test"
@@ -2025,7 +2025,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
     And the file "document1.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" in collection "Test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
     And Sesame should contain a document with file_name "document1.txt" in collection "Test"
@@ -2047,7 +2047,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
     And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "1-001-plain.txt" in collection "Test" should exist in the database
+    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
     And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
@@ -2069,7 +2069,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
     And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "1-001-plain.txt" in collection "Test" should exist in the database
+    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
     And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
@@ -2206,7 +2206,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
     And the file "document1-plain.txt" should not exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should not exist in the database
-    And the document "document1-plain.txt" in collection "Test" should not exist in the database
+    And the document "document1-plain.txt" under item "item1" in collection "Test" should not exist in the database
     And Sesame should not contain an item with uri "http://ns.ausnc.org.au/corpora/art/items/item1" in collection "Test"
     And Sesame should not contain a document with file_name "document1-plain.txt" in collection "Test"
     # No identifiers should be in the blacklight results since the only collection item has been deleted
@@ -2764,6 +2764,201 @@ Feature: Browsing via API
 
   #ToDo: update all @api_update_document tests so that they use the new format for adding items as in the refactored @api_add_item story
 
+   #ToDo: Add this (add_doc) context to all API ingest tests, since it is the proper 'Alveo Json-ld schema' context with the addition of the 'dc:terms' mapping to the dc namespace
+  @api_add_document
+  Scenario: Add a document with document content as JSON
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+      | document_content | metadata |
+      | "Hello World!"   | { "@context":{"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"dada":{"@id":"http://purl.org/dada/schema/0.2#"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"alveo":{"@id":"http://alveo.edu.au/schema/"},"ace":{"@id":"http://ns.ausnc.org.au/schemas/ace/"},"ausnc":{"@id":"http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk":{"@id":"http://ns.austalk.edu.au/"},"austlit":{"@id":"http://ns.ausnc.org.au/schemas/austlit/"},"bibo":{"@id":"http://purl.org/ontology/bibo/"},"cooee":{"@id":"http://ns.ausnc.org.au/schemas/cooee/"},"dc":{"@id":"http://purl.org/dc/terms/"},"dcterms":"http://purl.org/dc/terms/","foaf":{"@id":"http://xmlns.com/foaf/0.1/"},"gcsause":{"@id":"http://ns.ausnc.org.au/schemas/gcsause/"},"ice":{"@id":"http://ns.ausnc.org.au/schemas/ice/"},"olac":{"@id":"http://www.language-archives.org/OLAC/1.1/"},"purl":{"@id":"http://purl.org/"},"rdf":{"@id":"http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema":{"@id":"http://schema.org/"},"xsd":{"@id":"http://www.w3.org/2001/XMLSchema#"}}, "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text" } |
+    Then the file "document2.txt" should exist in the directory for the collection "Test"
+    And the document "document2.txt" under item "item1" in collection "Test" should exist in the database
+    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document2.txt" in collection "Test"
+    And Sesame should contain a document with file_name "document2.txt" in collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    """
+
+  @api_add_document
+  Scenario: Add a document with a referenced file
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+      | metadata |
+      | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2.txt" } } |
+    Then the document "document2.txt" under item "item1" in collection "Test" should exist in the database
+    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document2.txt" in collection "Test"
+    And Sesame should contain a document with file_path "/data/test_collections/ausnc/test/document2.txt" in collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    """
+
+  @api_add_document
+  Scenario: Add a document with an empty uploaded file
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    When I make a JSON multipart request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
+      | file                         | metadata |
+      | "test/samples/api/blank.txt" | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "blank.txt", "@type": "foaf:Document", "dcterms:identifier": "blank.txt", "dcterms:title": "blank#Text", "dcterms:type": "Text" } |
+    Then I should get a 412 response code
+    And the JSON response should be:
+    """
+    {"error":"Uploaded file blank.txt is not present or empty."}
+    """
+
+  @api_add_document
+  Scenario: Add a document with an uploaded file
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    When I make a JSON multipart request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
+      | file                                 | metadata |
+      | "test/samples/cooee/1-001-plain.txt" | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "1-001#Text", "dcterms:type": "Text" } |
+    Then the file "1-001-plain.txt" should exist in the directory for the collection "Test"
+    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
+    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
+    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Added the document 1-001-plain.txt to item item1 in collection Test"}
+    """
+
+  @api_add_document
+  Scenario: Add a document with JSON content and view the item
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    And I reindex the collection "Test"
+    And I am logged in as "data_owner@intersect.org.au"
+    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+      | document_content | metadata |
+      | "Hello World!"   | { "@context":{"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"dada":{"@id":"http://purl.org/dada/schema/0.2#"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"alveo":{"@id":"http://alveo.edu.au/schema/"},"ace":{"@id":"http://ns.ausnc.org.au/schemas/ace/"},"ausnc":{"@id":"http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk":{"@id":"http://ns.austalk.edu.au/"},"austlit":{"@id":"http://ns.ausnc.org.au/schemas/austlit/"},"bibo":{"@id":"http://purl.org/ontology/bibo/"},"cooee":{"@id":"http://ns.ausnc.org.au/schemas/cooee/"},"dc":{"@id":"http://purl.org/dc/terms/"},"dcterms":"http://purl.org/dc/terms/","foaf":{"@id":"http://xmlns.com/foaf/0.1/"},"gcsause":{"@id":"http://ns.ausnc.org.au/schemas/gcsause/"},"ice":{"@id":"http://ns.ausnc.org.au/schemas/ice/"},"olac":{"@id":"http://www.language-archives.org/OLAC/1.1/"},"purl":{"@id":"http://purl.org/"},"rdf":{"@id":"http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema":{"@id":"http://schema.org/"},"xsd":{"@id":"http://www.w3.org/2001/XMLSchema#"}}, "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text" } |
+    And I go to the catalog page for "Test:item1"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    """
+    And I should see "Documents: document1.txt, document2.txt"
+    And I should see "Documents"
+    And I should see "document1.txt"
+    And I should see "document2.txt"
+
+  @api_add_document
+  Scenario: Add a document with a referenced file and view the item
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    And I reindex the collection "Test"
+    And I am logged in as "data_owner@intersect.org.au"
+    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+      | metadata |
+      | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2.txt" } } |
+    And I go to the catalog page for "Test:item1"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    """
+    And I should see "Documents: document1.txt, document2.txt"
+    And I should see "Documents"
+    And I should see "document1.txt"
+    And I should see "document2.txt"
+
+  @api_add_document
+  Scenario: Add a document with an uploaded file and view the item
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    And I reindex the collection "Test"
+    And I am logged in as "data_owner@intersect.org.au"
+    When I make a JSON multipart request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
+      | file                                 | metadata |
+      | "test/samples/cooee/1-001-plain.txt" | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "1-001#Text", "dcterms:type": "Text" } |
+    And I go to the catalog page for "Test:item1"
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Added the document 1-001-plain.txt to item item1 in collection Test"}
+    """
+    And I should see "Documents: document1.txt, 1-001-plain.txt"
+    And I should see "Documents"
+    And I should see "document1.txt"
+    And I should see "1-001-plain.txt"
+
+  @api_add_document
+  Scenario: Add a document and @id is automatically overwritten
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+      | document_content | metadata |
+      | "Hello World!"   | { "@context":{"dc":{"@id":"http://purl.org/dc/terms/"},"dcterms":"http://purl.org/dc/terms/","foaf":{"@id":"http://xmlns.com/foaf/0.1/"}}, "@id": "http://document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text" } |
+    Then Sesame should not contain a document with uri "http://document2.txt" in collection "Test"
+    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document2.txt" in collection "Test"
+    And I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    """
+
+  @api_add_document
+  Scenario: Add a document with invalid metadata
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    # Invalid metadata is space in dcterms: title
+    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+      | document_content | metadata |
+      | "Hello World!"   | { "@context":{"dc":{"@id":"http://purl.org/dc/terms/"},"dcterms":"http://purl.org/dc/terms/","foaf":{"@id":"http://xmlns.com/foaf/0.1/"}}, "@id": "http://document2.txt", "@type": "foaf:Document", "dcterms:identifier":"document2.txt", "dcterms: title": "document2#Text", "dcterms:type": "Text" } |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"Invalid metadata"}
+    """
+
+    #ToDo: test validation of invalid metadata
+
+    #ToDo: test validation regarding empty document content, empty uploaded files
+
+    #ToDo: clarify whether referenced files should just point to the referenced file or make a copy of it (since delete document deletes the file)
+
   @api_delete_document
   Scenario: When removing a document the user must be the collection owner
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
@@ -2849,7 +3044,7 @@ Feature: Browsing via API
       | [ { "documents": [ { "identifier": "document1.txt", "content": "Hello World" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
     When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "Test" page with the API token for "data_owner@intersect.org.au"
     Then the file "document1.txt" should not exist in the directory for the collection "Test"
-    And the document "document1.text" in collection "Test" should not exist in the database
+    And the document "document1.text" under item "item1" in collection "Test" should not exist in the database
     And Sesame should not contain a document with file_name "document1.txt" in collection "Test"
     And I should get a 200 response code
     And the JSON response should be:

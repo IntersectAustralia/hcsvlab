@@ -148,6 +148,27 @@ class CollectionsController < ApplicationController
     end
   end
 
+  def add_document_to_item
+    begin
+      corpus_dir = corpus_dir(params[:collectionId])
+      collection = validate_collection(params[:collectionId], params[:api_key])
+      item = validate_item_exists(collection, params[:itemId])
+      doc_metadata = params[:metadata]
+      doc_content = params[:document_content]
+      uploaded_file = params[:file]
+      uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
+      doc_filename = get_dc_identifier(doc_metadata) # the document filename is the document id
+
+      doc_metadata = format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
+      create_document(item, doc_metadata)
+      add_and_index_document(item, doc_metadata)
+      @success_message = "Added the document #{doc_filename} to item #{params[:itemId]} in collection #{params[:collectionId]}"
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
+    end
+  end
+
   def delete_item_from_collection
     begin
       corpus_dir = corpus_dir(params[:collectionId])
@@ -197,7 +218,7 @@ class CollectionsController < ApplicationController
       new_metadata = format_update_item_metadata(item, params[:metadata])
       update_sesame_with_graph(new_metadata, collection)
       update_item_in_solr(item)
-      @success_message = "Updated item #{item.handle.split(':').last} in collection #{collection.name}"
+      @success_message = "Updated item #{item.get_name} in collection #{collection.name}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -321,7 +342,7 @@ class CollectionsController < ApplicationController
     if !file.is_a? ActionDispatch::Http::UploadedFile
       raise ResponseError.new(412), "Error in file parameter."
     elsif file.blank? or file.size == 0
-      raise ResponseError.new(412), "Uploaded file \"#{file_basename}\" is not present or empty."
+      raise ResponseError.new(412), "Uploaded file #{file_basename} is not present or empty."
     else
       Rails.logger.debug("Copying uploaded document file from #{file.tempfile} to #{absolute_filename}")
       FileUtils.cp file.tempfile, absolute_filename
@@ -561,7 +582,7 @@ class CollectionsController < ApplicationController
 
   # Removes the metadata and document files for an item
   def delete_item_from_filesystem(item, corpus_dir)
-    item_name = item.handle.split(":")[1]
+    item_name = item.get_name
     delete_file(File.join(corpus_dir, "#{item_name}-metadata.rdf"))
     item.documents.each do |document|
       delete_file(document.file_path)
@@ -749,6 +770,70 @@ class CollectionsController < ApplicationController
       end
     end
     item_metadata
+  end
+
+  # Performs add document validations and returns the formatted metadata with the automatically generated metadata fields
+  def format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
+    validate_add_document_request(corpus_dir, collection, doc_metadata, doc_filename, doc_content, uploaded_file)
+    doc_metadata = format_add_document_metadata(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
+    validate_jsonld(doc_metadata)
+    validate_document_source(doc_metadata)
+    doc_metadata
+  end
+
+  # Format the add document metadata and add doc to file system
+  def format_add_document_metadata(corpus_dir, collection, item, document_metadata, document_filename, document_content, uploaded_file)
+    # Update the document @id to the Alveo catalog URI
+    document_metadata = update_jsonld_document_id(document_metadata, collection.name, item.get_name)
+    processed_file = nil
+    unless uploaded_file.nil?
+      processed_file = upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection.name)
+    end
+    unless document_content.blank?
+      processed_file = upload_document_using_json(corpus_dir, document_filename, document_content)
+    end
+    update_doc_source(document_metadata, document_filename, processed_file) unless processed_file.nil?
+    document_metadata
+  end
+
+  # Creates a document in the database from Json-ld document metadata
+  def create_document(item, document_json_ld)
+    expanded_metadata = JSON::LD::API.expand(document_json_ld).first
+    file_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+    file_name = File.basename(file_path)
+    doc_type = expanded_metadata[MetadataHelper::TYPE.to_s]
+    doc_type = doc_type.first['@value'] unless doc_type.nil?
+    document = item.documents.find_or_initialize_by_file_name(file_name)
+    if document.new_record?
+      begin
+        document.file_path = file_path
+        document.doc_type = doc_type
+        document.mime_type = mime_type_lookup(file_name)
+        document.item = item
+        document.item_id = item.id
+        document.save
+        logger.info "#{doc_type} Document = #{document.id.to_s}" unless Rails.env.test?
+      rescue Exception => e
+        logger.error("Error creating document: #{e.message}")
+      end
+    else
+      raise ResponseError.new(412), "A file named #{file_name} is already in use by another document of item #{item.get_name}"
+    end
+  end
+
+  # Adds a document to Sesame and updates the corresponding item in Solr
+  def add_and_index_document(item, document_json_ld)
+    # Upload doc rdf to seasame
+    document_RDF = RDF::Graph.new << JSON::LD::API.toRDF(document_json_ld)
+    update_sesame_with_graph(document_RDF, item.collection)
+    #Add link in item rdf to doc rdf in sesame
+    document_RDF_URI = RDF::URI.new(document_json_ld['@id'])
+    item_document_link = {'@id' => item.uri, MetadataHelper::DOCUMENT.to_s => document_RDF_URI}
+    append_item_graph = RDF::Graph.new << JSON::LD::API.toRDF(item_document_link)
+    update_sesame_with_graph(append_item_graph, item.collection)
+    #Reindex item in Solr
+    delete_item_from_solr(item.id)
+    update_item_in_solr(item)
   end
 
 end
