@@ -2099,7 +2099,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
     And the file "document1.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" in collection "Test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
     And Sesame should contain a document with file_name "document1.txt" in collection "Test"
@@ -2122,7 +2122,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
     And the file "document1.txt" should exist in the directory for the collection "Test"
     And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" in collection "Test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
     And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
     And Sesame should contain a document with file_name "document1.txt" in collection "Test"
@@ -2147,7 +2147,7 @@ Feature: Browsing via API
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Collection1"
     And the file "document1.txt" should exist in the directory for the collection "Collection1"
     And the item "item1" in collection "Collection1" should exist in the database
-    And the document "document1.txt" in collection "Collection1" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "Collection1" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/Collection1/item1" in collection "Collection1"
     And Sesame should contain a document with uri "http://example.org/catalog/Collection1/item1/document/document1.txt" in collection "Collection1"
     And Sesame should contain a document with file_name "document1.txt" in collection "Collection1"
