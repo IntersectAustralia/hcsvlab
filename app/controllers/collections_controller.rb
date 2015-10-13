@@ -50,28 +50,31 @@ class CollectionsController < ApplicationController
   def create
     authorize! :create, @collection,
                :message => "Permission Denied: Your role within the system does not have sufficient privileges to be able to create a collection. Please contact an Alveo administrator."
-    if request.format == 'json' and request.post?
+    if request.format == 'json' && request.post?
+      collection_metadata = params[:collection_metadata]
       collection_name = params[:name]
-      if !collection_name.nil? and !collection_name.blank? and !(collection_name.length > 255) and !(params[:collection_metadata].nil?)
-        collection_uri = get_uri_from_metadata(params[:collection_metadata])
-        if !Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
-          corpus_dir = create_metadata_and_manifest(collection_name, convert_json_metadata_to_rdf(params[:collection_metadata]))
+      if collection_name.blank? || collection_name.length > 255 || collection_metadata.nil?
+        invalid_name = (collection_name.nil? || collection_name.blank? || collection_name.length > 255)
+        invalid_metadata = collection_metadata.nil?
+        err_message = nil
+        err_message = "name parameter" if invalid_name
+        err_message = "metadata parameter" if invalid_metadata
+        err_message = "name and metadata parameters" if invalid_name && invalid_metadata
+        err_message << " not found" unless err_message.nil?
+        respond_with_error(err_message, 400)
+      else
+        collection_metadata = update_jsonld_collection_id(collection_metadata, collection_name)
+        collection_uri = collection_metadata['@id']
+        if Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
+          respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
+        else
+          corpus_dir = create_metadata_and_manifest(collection_name, convert_json_metadata_to_rdf(collection_metadata))
           # Create the collection without doing a full ingest since it won't contain any item metadata
           collection = check_and_create_collection(collection_name, corpus_dir)
           collection.owner = User.find_by_authentication_token(params[:api_key])
           collection.save
           @success_message = "New collection '#{collection_name}' (#{collection_uri}) created"
-        else
-          respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
         end
-      else
-        invalid_name = collection_name.nil? or collection_name.blank? or collection_name.length > 255
-        invalid_metadata = params[:collection_metadata].nil?
-        err_message = "name parameter" if invalid_name
-        err_message = "metadata parameter" if invalid_metadata
-        err_message = "name and metadata parameters" if invalid_name and invalid_metadata
-        err_message << " not found" if !err_message.nil?
-        respond_with_error(err_message, 400)
       end
     else
       respond_with_error("JSON-LD formatted metadata must be sent to the add collection api call as a POST request", 404)
@@ -277,12 +280,6 @@ class CollectionsController < ApplicationController
     graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
     # graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
     graph.dump(:ttl)
-  end
-
-  # Gets the collection URI from JSON-LD formatted metadata
-  def get_uri_from_metadata(json_metadata)
-    graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
-    graph.statements.first.subject.to_s
   end
 
   # Writes the collection manifest as JSON and the metadata as .n3 RDF
@@ -740,6 +737,12 @@ class CollectionsController < ApplicationController
       dc_id = metadata[dc_id_predicate] if metadata.has_key?(dc_id_predicate)
     end
     dc_id
+  end
+
+  #Updates the @id of a collection in JSON-LD to the Alveo catalog URL for that collection
+  def update_jsonld_collection_id(collection_metadata, collection_name)
+    collection_metadata["@id"] = format_collection_url(collection_name)
+    collection_metadata
   end
 
   # Updates the @id of an item in JSON-LD to the Alveo catalog URL for that item
