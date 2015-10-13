@@ -50,30 +50,31 @@ class CollectionsController < ApplicationController
   def create
     authorize! :create, @collection,
                :message => "Permission Denied: Your role within the system does not have sufficient privileges to be able to create a collection. Please contact an Alveo administrator."
-    if request.format == 'json' and request.post?
+    if request.format == 'json' && request.post?
       collection_metadata = params[:collection_metadata]
       collection_name = params[:name]
-      if !collection_name.nil? and !collection_name.blank? and !(collection_name.length > 255) and !(collection_metadata.nil?)
+      if collection_name.blank? || collection_name.length > 255 || collection_metadata.nil?
+        invalid_name = (collection_name.nil? || collection_name.blank? || collection_name.length > 255)
+        invalid_metadata = collection_metadata.nil?
+        err_message = nil
+        err_message = "name parameter" if invalid_name
+        err_message = "metadata parameter" if invalid_metadata
+        err_message = "name and metadata parameters" if invalid_name && invalid_metadata
+        err_message << " not found" unless err_message.nil?
+        respond_with_error(err_message, 400)
+      else
         collection_metadata = update_jsonld_collection_id(collection_metadata, collection_name)
         collection_uri = collection_metadata['@id']
-        if !Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
+        if Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
+          respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
+        else
           corpus_dir = create_metadata_and_manifest(collection_name, convert_json_metadata_to_rdf(collection_metadata))
           # Create the collection without doing a full ingest since it won't contain any item metadata
           collection = check_and_create_collection(collection_name, corpus_dir)
           collection.owner = User.find_by_authentication_token(params[:api_key])
           collection.save
           @success_message = "New collection '#{collection_name}' (#{collection_uri}) created"
-        else
-          respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
         end
-      else
-        invalid_name = collection_name.nil? or collection_name.blank? or collection_name.length > 255
-        invalid_metadata = collection_metadata.nil?
-        err_message = "name parameter" if invalid_name
-        err_message = "metadata parameter" if invalid_metadata
-        err_message = "name and metadata parameters" if invalid_name and invalid_metadata
-        err_message << " not found" if !err_message.nil?
-        respond_with_error(err_message, 400)
       end
     else
       respond_with_error("JSON-LD formatted metadata must be sent to the add collection api call as a POST request", 404)
