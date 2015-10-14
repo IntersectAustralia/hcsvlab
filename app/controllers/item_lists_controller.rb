@@ -111,7 +111,13 @@ class ItemListsController < ApplicationController
     respond_to do |format|
       format.any {
         regexp = Regexp.new(Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER)
-        regexp = Regexp.new(params[:regexp]) unless params[:regexp].blank?
+        begin
+          regexp = Regexp.new(params[:regexp]) unless params[:regexp].blank?
+        rescue RegexpError => e
+          Rails.logger.error(e.message)
+          render :json => {:error => "Error with regular expression: #{e.message}"}.to_json, :status => 400
+          return
+        end
         generate_aspera_transfer_spec(@item_list, regexp)
       }
     end

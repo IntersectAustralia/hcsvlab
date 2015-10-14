@@ -635,7 +635,16 @@ class CatalogController < ApplicationController
           download_as_warc(itemHandles, "items.warc")
         }
         format.any {
-          download_as_zip(itemHandles, "items.zip")
+          if params[:regexp].present? && !params[:regexp].blank?
+            begin
+              download_as_zip(itemHandles, "items.zip", Regexp.new(params[:regexp]))
+            rescue RegexpError => e
+              Rails.logger.error(e.message)
+              render :json => {:error => "Error with regular expression: #{e.message}"}.to_json, :status => 400
+            end
+          else
+            download_as_zip(itemHandles, "items.zip")
+          end
         }
       end
     else
