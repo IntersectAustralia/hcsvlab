@@ -39,42 +39,11 @@ Feature: Managing Item Lists
     And the item list "Test1" has items cooee:1-002
     When I am on the item list page for "Test1"
     And I click "Download as ZIP"
-    Then I should see "Download all files within the selected item list"
+    Then I should see "Download Options for Item List: Test1"
+    And I should see "Download all files"
     And I should see "Download All"
     And I should see "Download only files of a particular type"
+    And I should see "txt"
     And I should see "Download Selected"
     And I should see "Download only files that match a particular regular expression"
     And I should see "Download Matches"
-
-  Scenario: I can download all items in item list as a zip
-    Given "researcher@intersect.org.au" has item lists
-      | name  |
-      | Test1 |
-    And the item list "Test1" has items cooee:1-001
-    And the item list "Test1" has items cooee:1-002
-    When I am on the item list page for "Test1"
-    And I click "Download as ZIP"
-    And I click "Download All"
-    Then I should receive a zip file "Test1.zip"
-
-  Scenario: I can download selected items in item list as a zip
-    Given "researcher@intersect.org.au" has item lists
-      | name  |
-      | Test1 |
-    And the item list "Test1" has items cooee:1-001
-    And the item list "Test1" has items cooee:1-002
-    When I am on the item list page for "Test1"
-    And I click "Download as ZIP"
-    And I click "Download Selected"
-    Then I should receive a zip file "Test1.zip"
-
-  Scenario: I can download matching items in item list as a zip
-    Given "researcher@intersect.org.au" has item lists
-      | name  |
-      | Test1 |
-    And the item list "Test1" has items cooee:1-001
-    And the item list "Test1" has items cooee:1-002
-    When I am on the item list page for "Test1"
-    And I click "Download as ZIP"
-    And I click "Download Matches"
-    Then I should receive a zip file "Test1.zip"
