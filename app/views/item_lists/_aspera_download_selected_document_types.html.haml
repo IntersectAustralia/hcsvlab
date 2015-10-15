@@ -1,0 +1,19 @@
+#download_selected_document_types_dialog.modal-body
+  %p
+    = label_tag 'Download only files of a particular type'
+    - @doc_filetypes.each do |key, value|
+      = check_box_tag :aspera_checkbox_regexp, key
+      = label_tag key, "#{key} (#{value})", :class => "checkbox inline"
+
+.modal-separator
+  :javascript
+    function getCheckedCheckboxValues(checkboxElements) {
+      var checkedValues = []
+      for (var i = 0; i < checkboxElements.length; i++) {
+        if (checkboxElements[i].checked) {
+          checkedValues.push(checkboxElements[i].value);
+        }
+      }
+      return checkedValues
+    }
+  = button_tag 'Download Selected', class: 'btn btn-primary', "aria-hidden" => "true", "data-dismiss" => "modal", :onclick => "performAsperaDownloadTransferForItemList(#{params[:id]}, getCheckedCheckboxValues(document.getElementsByName('aspera_checkbox_regexp')));"

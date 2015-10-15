@@ -161,16 +161,15 @@ module Item::DownloadItemsHelper
       item_files = get_items_files(result, document_filter)
       metadata_files = create_items_metadata_files(result, transfer_dir)
       log_file = create_items_log_file(result, transfer_dir)
-
+      
       request_aspera_transfer_spec(item_list.name, [item_files, metadata_files, log_file].flatten)
     end
 
     def get_items_files(result, document_filter)
       filenames = get_filenames_from_item_results(result)
-      filenames = filter_item_files(filenames, document_filter)
       filenames.map do |key, value|
         dir = value[:handle]
-        files = value[:files]
+        files = filter_item_files(value[:files], document_filter)
         files.map { |file| { dir: dir, file: file } }
       end.flatten
     end

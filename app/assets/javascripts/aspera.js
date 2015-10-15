@@ -45,7 +45,7 @@ function checkAsperaConnectInstalled(callback) {
     asperaWeb.initSession();
 }
 
-function performAsperaDownloadTransferForItemList(id) {
+function performAsperaDownloadTransferForItemList(id, regexp) {
     console.log("perform aspera download transfer for item list: ", id);
 
     function flashAlert(message, type) {
@@ -81,7 +81,7 @@ function performAsperaDownloadTransferForItemList(id) {
 
         showProgressAnimation();
 
-        $.post('/item_lists/' + id + '/aspera_transfer_spec', {}, undefined, 'json').done(function(data) {
+        $.post('/item_lists/' + id + '/aspera_transfer_spec?regexp=' + regexp, {}, undefined, 'json').done(function(data) {
             if (data['transfer_spec'] !== undefined) {
                 var transferSpec = data['transfer_spec'];
                 transferSpec['destination_root'] = directory;
