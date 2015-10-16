@@ -2,7 +2,7 @@
   #download_matching_documents_dialog.modal-body
     %p
       = f.label 'Download only files that match a particular regular expression'
-      = text_field_tag :regexp, nil, :placeholder => 'e.g. .*-raw.txt'
+      = text_field_tag :regexp, nil, :placeholder => 'e.g. .*-raw\.txt$'
 
   .modal-separator
     = f.submit 'Download Matches', class: 'btn btn-primary', :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);'

@@ -1,7 +1,7 @@
 #download_matching_documents_dialog.modal-body
   %p
     = label_tag 'Download only files that match a particular regular expression'
-    = text_field_tag :aspera_textbox_regexp, nil, :placeholder => 'e.g. .*-raw.txt'
+    = text_field_tag :aspera_textbox_regexp, nil, :placeholder => 'e.g. .*-raw\.txt$'
 
 .modal-separator
   = button_tag 'Download Matches', class: 'btn btn-primary', "aria-hidden" => "true", "data-dismiss" => "modal", :onclick => "performAsperaDownloadTransferForItemList(#{params[:id]}, document.getElementById('aspera_textbox_regexp').value);"
