@@ -126,6 +126,20 @@ module RequestValidator
         validate_document(document, collection, corpus_dir)
       end
     end
+
+    # If the item documents contain both a dc:source and dc:identifier, check that they are the same
+    expanded_item = JSON::LD::API.expand(item_json['metadata']).first
+    unless expanded_item[MetadataHelper::DOCUMENT.to_s].nil?
+      expanded_item[MetadataHelper::DOCUMENT.to_s].each do |document|
+        unless document[MetadataHelper::IDENTIFIER.to_s].blank?  || document[MetadataHelper::SOURCE.to_s].blank?
+          dc_id = document[MetadataHelper::IDENTIFIER.to_s].last['@value']
+          dc_source = File.basename(document[MetadataHelper::SOURCE.to_s].last['@id'])
+          unless dc_id == dc_source
+            raise ResponseError.new(400), "Document dc:identifier #{dc_id} doesn't match the document source file name #{dc_source}"
+          end
+        end
+      end
+    end
   end
 
   # Validates required document parameters present and document file isn't already in the collection directory

@@ -1,0 +1,1 @@
+This is a new document for use in the Alveo Ingest API add item request.
