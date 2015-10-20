@@ -80,21 +80,19 @@ class ItemListsController < ApplicationController
           redirect_to @item_list and return
         end
 
-        regexp = Regexp.new(Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER)
-        unless params[:regexp].blank?
-          begin
-            if params[:regexp].is_a? Array
-              regexp = Regexp.union(params[:regexp])
+        doc_filter = Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER
+        unless params[:doc_filter].blank?
+          if params[:doc_filter].is_a? Array
+            if params[:doc_filter].length > 1
+              doc_filter = "{#{params[:doc_filter].join(',')}}"
             else
-              regexp = Regexp.new(params[:regexp])
+              doc_filter = params[:doc_filter].first
             end
-          rescue RegexpError => e
-            Rails.logger.error(e.message)
-            flash[:error] = "Error with regular expression: #{e.message}"
-            redirect_to @item_list and return
+          else
+            doc_filter = params[:doc_filter]
           end
         end
-        download_as_zip(@item_list.get_item_handles, "#{@item_list.name}.zip", regexp)
+        download_as_zip(@item_list.get_item_handles, "#{@item_list.name}.zip", doc_filter)
       }
       format.warc {
         if @item_list.get_item_handles.length == 0
@@ -110,15 +108,9 @@ class ItemListsController < ApplicationController
   def aspera_transfer_spec
     respond_to do |format|
       format.any {
-        regexp = Regexp.new(Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER)
-        begin
-          regexp = Regexp.new(params[:regexp]) unless params[:regexp].blank?
-        rescue RegexpError => e
-          Rails.logger.error(e.message)
-          render :json => {:error => "Error with regular expression: #{e.message}"}.to_json, :status => 400
-          return
-        end
-        generate_aspera_transfer_spec(@item_list, regexp)
+        doc_filter = Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER
+        doc_filter = params[:doc_filter] unless params[:doc_filter].blank?
+        generate_aspera_transfer_spec(@item_list, doc_filter)
       }
     end
   end

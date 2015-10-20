@@ -2,6 +2,6 @@
   #download_all_documents_dialog.modal-body
     %p
       = f.label 'Download all files within the selected item list'
-      = hidden_field_tag :regexp, '.*'
+      = hidden_field_tag :doc_filter, Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER
   .modal-separator
     = f.submit 'Download All', class: 'btn btn-primary', :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);'

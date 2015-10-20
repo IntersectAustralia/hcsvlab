@@ -1,7 +1,8 @@
 module Item::DownloadItemsHelper
   require Rails.root.join('lib/api/node_api')
 
-  DEFAULT_DOCUMENT_FILTER = /.*/
+  DEFAULT_DOCUMENT_FILTER = '*'
+  EXAMPLE_DOCUMENT_FILTER = '*-raw.txt'
 
   def generate_aspera_transfer_spec(item_list, document_filter=DEFAULT_DOCUMENT_FILTER)
     if item_list.items.empty?
@@ -105,6 +106,18 @@ module Item::DownloadItemsHelper
     end
   end
 
+  def self.filter_item_files(filenames, filter=DEFAULT_DOCUMENT_FILTER)
+    if filter == DEFAULT_DOCUMENT_FILTER
+      filenames
+    else
+      filtered_filenames = []
+      filenames.each do |filename|
+        filtered_filenames.push filename if File.fnmatch(filter, File.basename(filename), File::FNM_EXTGLOB)
+      end
+      filtered_filenames
+    end
+  end
+
   class DownloadItemsInFormat
     include Blacklight::Configurable
     include Blacklight::SolrHelper
@@ -169,7 +182,7 @@ module Item::DownloadItemsHelper
       filenames = get_filenames_from_item_results(result)
       filenames.map do |key, value|
         dir = value[:handle]
-        files = filter_item_files(value[:files], document_filter)
+        files = Item::DownloadItemsHelper.filter_item_files(value[:files], document_filter)
         files.map { |file| { dir: dir, file: file } }
       end.flatten
     end
@@ -399,7 +412,7 @@ module Item::DownloadItemsHelper
         filenames = info[:files]
         handle = (info[:handle].nil?)? itemId.gsub(":", "_") : info[:handle]
 
-        filenames = filter_item_files(filenames, document_filter)
+        filenames = Item::DownloadItemsHelper.filter_item_files(filenames, document_filter)
         filenames.each do |file|
           if (File.exist?(file))
             title = file.split('/').last
@@ -481,18 +494,6 @@ module Item::DownloadItemsHelper
       json_log[:unsuccessful] = invalids.length
       json_log[:unsuccessful_items] = invalids
       json_log.to_json
-    end
-
-    def filter_item_files(filenames, regexp_filter=DEFAULT_DOCUMENT_FILTER)
-      if regexp_filter.eql?(DEFAULT_DOCUMENT_FILTER)
-        filenames
-      else
-        filtered_filenames = []
-        filenames.each do |filename|
-          filtered_filenames.push filename unless regexp_filter.match(File.basename(filename)).nil?
-        end
-        filtered_filenames
-      end
     end
 
     #
