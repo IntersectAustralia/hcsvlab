@@ -45,6 +45,16 @@ class ItemListsController < ApplicationController
       format.html {
         @response = @item_list.get_items(params[:page], params[:per_page])
         @document_list = @response["response"]["docs"]
+        file_types = []
+        @item_list.get_item_handles.each do |handle|
+          item = Item.find_by_handle(handle)
+          item.documents.each do |doc|
+             file_types.push(File.extname(doc.file_name.downcase))
+          end
+        end
+        @doc_filetypes = Hash.new(0)
+        file_types.each {|name| @doc_filetypes[name] += 1}
+
 
         authorised_item_handles = @item_list.get_authorised_item_handles
         if @response['response']['numFound'] > authorised_item_handles.size
@@ -70,7 +80,19 @@ class ItemListsController < ApplicationController
           redirect_to @item_list and return
         end
 
-        download_as_zip(@item_list.get_item_handles, "#{@item_list.name}.zip")
+        doc_filter = Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER
+        unless params[:doc_filter].blank?
+          if params[:doc_filter].is_a? Array
+            if params[:doc_filter].length > 1
+              doc_filter = "{#{params[:doc_filter].join(',')}}"
+            else
+              doc_filter = params[:doc_filter].first
+            end
+          else
+            doc_filter = params[:doc_filter]
+          end
+        end
+        download_as_zip(@item_list.get_item_handles, "#{@item_list.name}.zip", doc_filter)
       }
       format.warc {
         if @item_list.get_item_handles.length == 0
@@ -86,7 +108,9 @@ class ItemListsController < ApplicationController
   def aspera_transfer_spec
     respond_to do |format|
       format.any {
-        generate_aspera_transfer_spec(@item_list)
+        doc_filter = Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER
+        doc_filter = params[:doc_filter] unless params[:doc_filter].blank?
+        generate_aspera_transfer_spec(@item_list, doc_filter)
       }
     end
   end

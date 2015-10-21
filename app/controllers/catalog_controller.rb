@@ -635,7 +635,11 @@ class CatalogController < ApplicationController
           download_as_warc(itemHandles, "items.warc")
         }
         format.any {
-          download_as_zip(itemHandles, "items.zip")
+          if params[:doc_filter].present? && !params[:doc_filter].blank?
+            download_as_zip(itemHandles, "items.zip", params[:doc_filter])
+          else
+            download_as_zip(itemHandles, "items.zip")
+          end
         }
       end
     else

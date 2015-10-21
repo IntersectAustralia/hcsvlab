@@ -1,0 +1,5 @@
+#download_all_documents_dialog.modal-body
+  %p
+    = label_tag 'Download all files within the selected item list'
+.modal-separator
+  = button_tag 'Download All', class: 'btn btn-primary', "aria-hidden" => "true", "data-dismiss" => "modal", :onclick => "performAsperaDownloadTransferForItemList(#{params[:id]}, '#{Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER}');"

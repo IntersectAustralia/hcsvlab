@@ -17,9 +17,12 @@
             %a{"data-toggle" => "modal", :href => "#get_r_script", :role => "button"} Use in Emu/R
             =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
           %li
-            = link_to("Download as ZIP", {:controller => "item_lists", :action => "show", :format=>"zip"}, :method => 'GET', :id => params[:id].to_i, :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);')
+            %a{"data-toggle" => "modal", :href => "#download_item_list", :role => "button"} Download as ZIP
+            -#{:controller => "item_lists", :action => "show", :format=>"zip"}, :method => 'GET', :id => params[:id].to_i,
+            -#=#:onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);')
           %li
-            = link_to("Download using Aspera", '#', :onclick => "performAsperaDownloadTransferForItemList(#{params[:id]});")
+            %a{"data-toggle" => "modal", :href => "#download_item_list_using_aspera", :role => "button"} Download using Aspera
+            -#= link_to("Download using Aspera", '#', :onclick => "performAsperaDownloadTransferForItemList(#{params[:id]});")
           - if @item_list.user_id == current_user.id
             %li
               - if @item_list.shared?
@@ -84,6 +87,21 @@
         %a.btn.btn-primary.pull-left{"aria-hidden" => "true()", "data-dismiss" => "modal"} Close
         = f.submit "Rename Item List", class: "btn btn-primary"
 
+  .modal.hide.fade.in{:id => "download_item_list", "aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+      %h3#myModalLabel= "Download Options for Item List: #{@item_list.name}"
+    = render 'download_all_documents'
+    = render 'download_selected_document_types'
+    = render 'download_matching_documents'
+
+  .modal.hide.fade.in{:id => "download_item_list_using_aspera", "aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+      %h3#myModalLabel= "Download Options for Item List: #{@item_list.name}"
+    = render 'aspera_download_all_documents'
+    = render 'aspera_download_selected_document_types'
+    = render 'aspera_download_matching_documents'
 
 :javascript
 

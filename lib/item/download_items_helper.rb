@@ -1,7 +1,10 @@
 module Item::DownloadItemsHelper
   require Rails.root.join('lib/api/node_api')
 
-  def generate_aspera_transfer_spec(item_list)
+  DEFAULT_DOCUMENT_FILTER = '*'
+  EXAMPLE_DOCUMENT_FILTER = '*-raw.txt'
+
+  def generate_aspera_transfer_spec(item_list, document_filter=DEFAULT_DOCUMENT_FILTER)
     if item_list.items.empty?
       render :json => {message: 'No items were found to download'}.to_json and return
     end
@@ -11,7 +14,7 @@ module Item::DownloadItemsHelper
     FileUtils.rm_rf metadata_dir if Dir.exists?(metadata_dir)
     Dir.mkdir(metadata_dir)
 
-    transfer_spec = DownloadItemsInFormat.new(current_user, current_ability).create_aspera_transfer_spec(item_list, metadata_dir)
+    transfer_spec = DownloadItemsInFormat.new(current_user, current_ability).create_aspera_transfer_spec(item_list, metadata_dir, document_filter)
 
     if transfer_spec
       render :json => {transfer_spec: transfer_spec}.to_json
@@ -26,14 +29,14 @@ module Item::DownloadItemsHelper
     render :json => {error: "Internal Server Error"}.to_json, :status => 500
   end
 
-  def download_as_zip(itemHandles, file_name)
+  def download_as_zip(itemHandles, file_name, document_filter=DEFAULT_DOCUMENT_FILTER)
     begin
       cookies.delete("download_finished")
 
       bench_start = Time.now
 
       # Creates a ZIP file containing the documents and item's metadata
-      zip_path = DownloadItemsInFormat.new(current_user, current_ability).createAndRetrieveZipPath(itemHandles)
+      zip_path = DownloadItemsInFormat.new(current_user, current_ability).createAndRetrieveZipPath(itemHandles, document_filter)
 
       # Sends the zipped file
       send_data IO.read(zip_path), :type => 'application/zip',
@@ -103,6 +106,18 @@ module Item::DownloadItemsHelper
     end
   end
 
+  def self.filter_item_files(filenames, filter=DEFAULT_DOCUMENT_FILTER)
+    if filter == DEFAULT_DOCUMENT_FILTER
+      filenames
+    else
+      filtered_filenames = []
+      filenames.each do |filename|
+        filtered_filenames.push filename if File.fnmatch(filter, File.basename(filename), File::FNM_EXTGLOB)
+      end
+      filtered_filenames
+    end
+  end
+
   class DownloadItemsInFormat
     include Blacklight::Configurable
     include Blacklight::SolrHelper
@@ -129,15 +144,15 @@ module Item::DownloadItemsHelper
     end
 
 
-    def create_aspera_transfer_spec(item_list, metadata_dir)
-      get_aspera_transfer_spec_for_documents_and_metadata(item_list, metadata_dir)
+    def create_aspera_transfer_spec(item_list, metadata_dir, document_filter)
+      get_aspera_transfer_spec_for_documents_and_metadata(item_list, metadata_dir, document_filter)
     end
 
     #
     #
     #
-    def createAndRetrieveZipPath(itemHandles)
-      get_zip_with_documents_and_metadata_powered(itemHandles)
+    def createAndRetrieveZipPath(itemHandles, document_filter)
+      get_zip_with_documents_and_metadata_powered(itemHandles, document_filter)
     end
 
     #
@@ -149,25 +164,25 @@ module Item::DownloadItemsHelper
 
     private
 
-    def get_aspera_transfer_spec_for_documents_and_metadata(item_list, transfer_dir)
+    def get_aspera_transfer_spec_for_documents_and_metadata(item_list, transfer_dir, document_filter)
       item_handles = item_list.get_item_handles
       return nil if item_handles.empty?
 
       result = verify_items_permissions_and_extract_metadata(item_handles)
 
       # get item files and create metadata files and log files
-      item_files = get_items_files(result)
+      item_files = get_items_files(result, document_filter)
       metadata_files = create_items_metadata_files(result, transfer_dir)
       log_file = create_items_log_file(result, transfer_dir)
-
+      
       request_aspera_transfer_spec(item_list.name, [item_files, metadata_files, log_file].flatten)
     end
 
-    def get_items_files(result)
+    def get_items_files(result, document_filter)
       filenames = get_filenames_from_item_results(result)
       filenames.map do |key, value|
         dir = value[:handle]
-        files = value[:files]
+        files = Item::DownloadItemsHelper.filter_item_files(value[:files], document_filter)
         files.map { |file| { dir: dir, file: file } }
       end.flatten
     end
@@ -337,7 +352,7 @@ module Item::DownloadItemsHelper
     # Creates a ZIP file containing all the documents and metadata for the items listed in 'itemHandles'.
     # The returned format respect the BagIt format (http://en.wikipedia.org/wiki/BagIt)
     #
-    def get_zip_with_documents_and_metadata_powered(item_handles)
+    def get_zip_with_documents_and_metadata_powered(item_handles, document_filter)
       if item_handles.present?
         begin
           result = verify_items_permissions_and_extract_metadata(item_handles)
@@ -355,7 +370,7 @@ module Item::DownloadItemsHelper
           add_items_metadata_to_the_bag_powered(result[:metadata], bag)
 
           # add items documents to the bag
-          add_items_documents_to_the_bag(fileNamesByItem, bag)
+          add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter)
 
           # Add Log File
           bag.add_file("log.json") do |io|
@@ -392,11 +407,12 @@ module Item::DownloadItemsHelper
     #                            "hcsvlab:1034"=>{handle: "handle2", files:["full_path4, full_path5, .."]}}
     # bag = BagIt::Bag object
     #
-    def add_items_documents_to_the_bag(fileNamesByItem, bag)
+    def add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter)
       fileNamesByItem.each_pair do |itemId, info|
         filenames = info[:files]
         handle = (info[:handle].nil?)? itemId.gsub(":", "_") : info[:handle]
 
+        filenames = Item::DownloadItemsHelper.filter_item_files(filenames, document_filter)
         filenames.each do |file|
           if (File.exist?(file))
             title = file.split('/').last
@@ -479,7 +495,6 @@ module Item::DownloadItemsHelper
       json_log[:unsuccessful_items] = invalids
       json_log.to_json
     end
-
 
     #
     # blacklight uses this method to get the SOLR connection.

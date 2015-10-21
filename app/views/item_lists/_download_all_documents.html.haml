@@ -1,0 +1,7 @@
+= form_for @item_list, :method => 'GET', :url => url_for(:controller => 'item_lists', :action => 'show', :format => 'zip', :id => params[:id].to_i) do |f|
+  #download_all_documents_dialog.modal-body
+    %p
+      = f.label 'Download all files within the selected item list'
+      = hidden_field_tag :doc_filter, Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER
+  .modal-separator
+    = f.submit 'Download All', class: 'btn btn-primary', :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);'

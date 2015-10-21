@@ -630,9 +630,37 @@ Feature: Browsing via API
 
   Scenario: Download items metadata and files in Zip format including non-existent items
     Given I ingest "cooee:1-001"
-    Given I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
       | format | items                                                                                    |
       | zip    | ["http://example.org/catalog/cooee/1-001","http://example.org/catalog/cooee/non-exists"] |
+    Then I should get a 200 response code
+
+  Scenario: Download items metadata and files in Zip format only including txt files
+    Given I ingest "cooee:1-001"
+    When I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
+      | format | items                                                                               | doc_filter |
+      | zip    | ["http://example.org/catalog/cooee/1-001","http://example.org/catalog/cooee/1-002"] | *.txt      |
+    Then I should get a 200 response code
+
+  Scenario: Download items metadata and files in Zip format only including -plain.txt files
+    Given I ingest "cooee:1-001"
+    When I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
+      | format | items                                                                               | doc_filter   |
+      | zip    | ["http://example.org/catalog/cooee/1-001","http://example.org/catalog/cooee/1-002"] | *-plain.txt |
+    Then I should get a 200 response code
+
+  Scenario: Download items metadata and files in Zip format only including -raw.txt files
+    Given I ingest "cooee:1-001"
+    When I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
+      | format | items                                                                               | doc_filter |
+      | zip    | ["http://example.org/catalog/cooee/1-001","http://example.org/catalog/cooee/1-002"] | *-raw.txt  |
+    Then I should get a 200 response code
+
+  Scenario: Download items metadata and files in Zip format only including -plain or -raw .txt files
+    Given I ingest "cooee:1-001"
+    When I make a JSON post request for the download_items page with the API token for "researcher1@intersect.org.au" with JSON params
+      | format | items                                                                               | doc_filter         |
+      | zip    | ["http://example.org/catalog/cooee/1-001","http://example.org/catalog/cooee/1-002"] | *-{plain,raw}.txt} |
     Then I should get a 200 response code
 
   Scenario: Download items metadata and files in Warc format
