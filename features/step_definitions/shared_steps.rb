@@ -76,6 +76,10 @@ Then /^I should not see link "([^"]*)"$/ do |text|
   page.should_not have_link(text)
 end
 
+Then /^I should not see link "([^"]*)" to "([^"]*)"$/ do |text, url|
+  page.should_not have_link(text, {:href => url})
+end
+
 Then /^I should see link "([^\"]*)" within "([^\"]*)"$/ do |text, scope|
   with_scope(scope) do
     page.should have_link(text)

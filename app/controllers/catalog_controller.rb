@@ -30,6 +30,8 @@ class CatalogController < ApplicationController
 
   prepend_before_filter :retrieve_and_set_item_id
 
+  before_filter :check_item_indexed, :only => [:show, :document, :primary_text, :annotations, :upload_annotation]
+
   # These before_filters apply the hydra access controls
   before_filter :wrapped_enforce_show_permissions, :only => [:show, :document, :primary_text, :annotations, :upload_annotation]
   # This applies appropriate access controls to all solr queries
@@ -349,6 +351,7 @@ class CatalogController < ApplicationController
   #
   def show
     if Item.where(id: params[:id]).count != 0
+      @item = Item.find_by_handle("#{params[:collection]}:#{params[:itemId]}")
       @response, @document = get_solr_response_for_doc_id
 
       # For some reason blacklight stopped to fullfill the counter value in the session since we changed
@@ -929,6 +932,26 @@ class CatalogController < ApplicationController
         end
       end
       params[:id] = item.id
+    end
+  end
+
+  #
+  # Ensures that the item is indexed in Solr and displays an appropriate response otherwise
+  #
+  def check_item_indexed
+    item = nil
+    item = Item.find(params[:id]) unless params[:id].blank?
+    unless item.nil?
+      if item.indexed_at.nil?
+        respond_to do |format|
+          format.html {
+            flash.keep(:notice) # Persist flash notices from the previous request
+            flash[:error] = "Sorry, the item you requested is being indexed and will be available shortly."
+            redirect_to root_url and return
+          }
+          format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+        end
+      end
     end
   end
 
