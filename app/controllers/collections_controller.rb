@@ -135,7 +135,7 @@ class CollectionsController < ApplicationController
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
     begin
       request_params = cleanse_params(params)
-      corpus_dir = corpus_dir(request_params[:id])
+      corpus_dir = api_corpus_dir(request_params[:id])
       collection = validate_collection(request_params[:id], request_params[:api_key])
       validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
       request_params[:items].each do |item_json|
@@ -153,7 +153,7 @@ class CollectionsController < ApplicationController
 
   def add_document_to_item
     begin
-      corpus_dir = corpus_dir(params[:collectionId])
+      corpus_dir = api_corpus_dir(params[:collectionId])
       collection = validate_collection(params[:collectionId], params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
       doc_metadata = params[:metadata]
@@ -174,15 +174,29 @@ class CollectionsController < ApplicationController
 
   def delete_item_from_collection
     begin
-      corpus_dir = corpus_dir(params[:collectionId])
       collection = validate_collection(params[:collectionId], params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
-      remove_item(item, collection, corpus_dir)
-      @success_message = "Deleted the item #{params[:itemId]} (and its documents) from collection #{params[:collectionId]}"
+      @success_message = delete_item_core(item)
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
     end
+  end
+
+  def delete_item_via_web_app
+    authorize! :delete_item_via_web_app, Collection.find_by_name(params[:collectionId])
+    item = Item.find_by_handle("#{params[:collectionId]}:#{params[:itemId]}")
+    begin
+      msg = delete_item_core(item)
+      redirect_to catalog_index_path, notice: msg
+    rescue ResponseError => e
+      flash[:error] = e.message
+    end
+  end
+
+  def delete_item_core(item)
+    remove_item(item, item.collection, api_corpus_dir(item.collection.name))
+    "Deleted the item #{item.get_name} (and its documents) from collection #{item.collection.name}"
   end
 
   def delete_document_from_item
@@ -263,7 +277,7 @@ class CollectionsController < ApplicationController
   #end
 
   # Returns directory path to the given corpus
-  def corpus_dir(collection_name)
+  def api_corpus_dir(collection_name)
     File.join(Rails.application.config.api_collections_location, collection_name)
   end
 

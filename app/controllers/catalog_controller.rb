@@ -349,6 +349,7 @@ class CatalogController < ApplicationController
   #
   def show
     if Item.where(id: params[:id]).count != 0
+      @item = Item.find_by_handle("#{params[:collection]}:#{params[:itemId]}")
       @response, @document = get_solr_response_for_doc_id
 
       # For some reason blacklight stopped to fullfill the counter value in the session since we changed

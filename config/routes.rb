@@ -26,10 +26,12 @@ HcsvlabWeb::Application.routes.draw do
   get "catalog/:id", :to => 'collections#show', :as => 'collection'
   put "catalog/:id", :to => 'collections#edit_collection', :as => 'collection'
   post "catalog", :to => 'collections#create', :as => 'collections'
-  delete "catalog/:collectionId/:itemId",:to => 'collections#delete_item_from_collection', :as => 'delete_collection_item'
+  delete "catalog/:collectionId/:itemId",:to => 'collections#delete_item_from_collection', :as => 'delete_collection_item', :constraints => catalogRoutesConstraintsIncludingJson
   put "catalog/:collectionId/:itemId", :to => 'collections#update_item', :as => 'update_collection_item', :constraints => catalogRoutesConstraints
   post "catalog/:collectionId/:itemId", :to => 'collections#add_document_to_item', :as => 'add_item_document', :constraints => catalogRoutesConstraints
   delete "catalog/:collectionId/:itemId/document/:filename", :to => 'collections#delete_document_from_item', :as => 'delete_item_document', :filename => /.*/, :constraints => catalogRoutesConstraints
+
+  get 'catalog/:collectionId/:itemId/delete', :to => 'collections#delete_item_via_web_app', :as => "delete_item_web", :constraints => catalogRoutesConstraintsIncludingJson
 
   # In /config/initializers/blacklight_routes.rb we are overriding one of the methods of this class
   Blacklight::Routes.new(self, :except => [:solr_document]).draw

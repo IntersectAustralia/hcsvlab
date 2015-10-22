@@ -115,6 +115,11 @@ module NavigationHelpers
       when /^the delete item "(.*)" from collection "(.*)" page/
         delete_collection_item_path($2, $1, options)
 
+      when /^the delete item web path for "(.*)"$/
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        delete_item_web_path(collectionName, itemIdentifier, options)
+
       when /^the delete document "(.*)" from "item "(.*)" in collection "(.*)" page/
         delete_item_document_path($3, $2, $1, options)
 
