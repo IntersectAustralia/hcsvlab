@@ -41,7 +41,7 @@ Feature: Document Audit
       | Test1 |
     And the item list "Test1" has items cooee:1-001
     And I am on the item list page for "Test1"
-    And I follow "Download as ZIP"
+    And I follow element with id "download_all_as_zip"
     Then I am logged out
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the document audit page
@@ -59,7 +59,7 @@ Feature: Document Audit
       | Test1 |
     And the item list "Test1" has items cooee:1-001
     And I am on the item list page for "Test1"
-    And I follow "Download as ZIP"
+    And I follow element with id "download_all_as_zip"
     Then I am logged out
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the document audit page

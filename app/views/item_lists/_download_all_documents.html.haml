@@ -4,4 +4,4 @@
       = f.label 'Download all files within the selected item list'
       = hidden_field_tag :doc_filter, Item::DownloadItemsHelper::DEFAULT_DOCUMENT_FILTER
   .modal-separator
-    = f.submit 'Download All', class: 'btn btn-primary', :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);'
+    = f.submit 'Download All', class: 'btn btn-primary', :id => "download_all_as_zip", :onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);'
