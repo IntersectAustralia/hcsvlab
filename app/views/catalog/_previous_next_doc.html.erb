@@ -4,6 +4,9 @@
     <div class="well clearfix" id="previousNextDocument">
       <div class="pull-left">
         <%= link_back_to_catalog %>
+        <% if can? :delete_item_via_web_app, @item.collection %>
+            <%= render "delete_item" %>
+        <% end %>
       </div>
       <%= link_to_previous_document @previous_document %> |
 
@@ -17,6 +20,9 @@
     </div>
   <% else %>
     <%= link_to "Go back", :back, :class => "btn"%>
+    <% if can? :delete_item_via_web_app, @item.collection %>
+        <%= render "delete_item" %>
+    <% end %>
   <% end %>
 <% else %>
   <%= link_to "Back to Item List", item_list_path(params[:il]), :class => "btn" %>
