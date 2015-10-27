@@ -48,6 +48,9 @@ HcsvlabWeb::Application.routes.draw do
 
   post "catalog/:id", :to => 'collections#add_items_to_collection', :as => 'collection'
 
+  get 'catalog-create', :to => 'collections#web_create_collection', :as => 'web_create_collection'
+  post 'catalog-create', :to => 'collections#web_create_collection'
+
   HydraHead.add_routes(self)
 
   devise_for :users, controllers: {registrations: "user_registers", passwords: "user_passwords"}

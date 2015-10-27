@@ -104,6 +104,7 @@ class Ability
 
     if is_data_owner or is_superuser
       can :create, Collection
+      can :web_create_collection, Collection
     else
       cannot :create, Collection
     end

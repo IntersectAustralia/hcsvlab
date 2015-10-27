@@ -37,6 +37,10 @@ Then /^I should see button "([^"]*)"$/ do |arg1|
   page.should have_xpath("//input[@value='#{arg1}']")
 end
 
+Then /^I should see button with text "([^"]*)"$/ do |arg1|
+  page.should have_xpath("//button[text()='#{arg1}']")
+end
+
 Then /^I should see image "([^"]*)"$/ do |arg1|
   page.should have_xpath("//img[contains(@src, #{arg1})]")
 end
@@ -72,12 +76,12 @@ Then /^I should see link "([^"]*)"(?: to "([^"]*)")?$/ do |text, url|
 
 end
 
-Then /^I should not see link "([^"]*)"(?: to "([^"]*)")$/ do |text, url|
-  if url
-    page.should_not have_link(text, {:href => url})
-  else
-    page.should_not have_link(text)
-  end
+Then /^I should not see link "([^"]*)"$/ do |text|
+  page.should_not have_link(text)
+end
+
+Then /^I should not see link "([^"]*)" to "([^"]*)"$/ do |text, url|
+  page.should_not have_link(text, {:href => url})
 end
 
 Then /^I should see link "([^\"]*)" within "([^\"]*)"$/ do |text, scope|

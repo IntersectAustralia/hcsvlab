@@ -1,6 +1,7 @@
 require Rails.root.join('lib/tasks/fedora_helper.rb')
 require Rails.root.join('lib/api/response_error')
 require Rails.root.join('lib/api/request_validator')
+require Rails.root.join('lib/json-ld/json_ld_helper.rb')
 require 'fileutils'
 
 class CollectionsController < ApplicationController
@@ -63,17 +64,12 @@ class CollectionsController < ApplicationController
         err_message << " not found" unless err_message.nil?
         respond_with_error(err_message, 400)
       else
-        collection_metadata = update_jsonld_collection_id(collection_metadata, collection_name)
-        collection_uri = collection_metadata['@id']
-        if Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
-          respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
-        else
-          corpus_dir = create_metadata_and_manifest(collection_name, convert_json_metadata_to_rdf(collection_metadata))
-          # Create the collection without doing a full ingest since it won't contain any item metadata
-          collection = check_and_create_collection(collection_name, corpus_dir)
-          collection.owner = User.find_by_authentication_token(params[:api_key])
-          collection.save
-          @success_message = "New collection '#{collection_name}' (#{collection_uri}) created"
+        owner = User.find_by_authentication_token(params[:api_key])
+        begin
+          @success_message = create_collection_core(collection_name, collection_metadata, owner)
+        rescue ResponseError => e
+          respond_with_error(e.message, e.response_code)
+          return # Only respond with one error at a time
         end
       end
     else
@@ -129,6 +125,59 @@ class CollectionsController < ApplicationController
     UserLicenceAgreement.where(name: collection.name, collection_type: 'collection').destroy_all
     flash[:notice] = "All access to #{collection.name} has been successfully revoked"
     redirect_to licences_path
+  end
+
+  def create_collection_core(name, metadata, owner)
+    name = sanitize_collection_name(name)
+    metadata = update_jsonld_collection_id(metadata, name)
+    uri = metadata['@id']
+    if Collection.find_by_uri(uri).present?  # ingest skips collections with non-unique uri
+      raise ResponseError.new(400), "A collection with the name '#{name}' already exists"
+    else
+      corpus_dir = create_metadata_and_manifest(name, convert_json_metadata_to_rdf(metadata))
+      # Create the collection without doing a full ingest since it won't contain any item metadata
+      collection = check_and_create_collection(name, corpus_dir)
+      collection.owner = owner
+      collection.save
+      "New collection '#{name}' (#{uri}) created"
+    end
+  end
+
+  def web_create_collection
+    authorize! :web_create_collection, Collection
+    if request.post?
+      required_fields = {:collection_name => 'collection name', :collection_title => 'collection title'}
+      protected_field_keys = ['@id', '@type', '@context',
+                             'dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s,
+                             'dc:title', 'dcterms:title', MetadataHelper::TITLE.to_s]
+      begin
+        required_fields.each do |key, value|
+          raise ResponseError.new(400), "Required field '#{value}' is missing" if params[key].blank?
+        end
+        name = sanitize_collection_name(params[:collection_name])
+        title = params[:collection_title]
+        json_ld = {'@context' => JsonLdHelper::default_context, '@type' => 'dcmitype:Collection', MetadataHelper::TITLE.to_s => title}
+
+        additional_metadata = []
+        if params.has_key?(:additional_key) && params.has_key?(:additional_value)
+          additional_metadata = params[:additional_key].zip(params[:additional_value])
+          additional_metadata.delete(['','']) # delete any pairs with empty key and value
+          additional_metadata.each do |key, value|
+            unless key.blank? && value.blank?
+              raise ResponseError.new(400), 'An additional metadata field is missing a key' if key.blank?
+              raise ResponseError.new(400), "Additional metadata field '#{key}' is missing a value" if value.blank?
+              json_ld[key.strip] = value.strip unless protected_field_keys.include?(key.strip)
+            end
+          end
+        end
+
+        json_ld = JSON.parse(json_ld.to_json) # convert symbols in context to strings as expected in JSON-LD parser
+        msg = create_collection_core(name, json_ld, current_user)
+        redirect_to collection_path(id: name), notice: msg
+      rescue ResponseError => e
+        flash[:error] = e.message
+      end
+    end
   end
 
   def add_items_to_collection
@@ -837,6 +886,10 @@ class CollectionsController < ApplicationController
     #Reindex item in Solr
     delete_item_from_solr(item.id)
     update_item_in_solr(item)
+  end
+
+  def sanitize_collection_name(name)
+    name.downcase.delete(' ')
   end
 
 end

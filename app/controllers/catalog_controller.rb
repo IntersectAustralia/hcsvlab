@@ -1,6 +1,7 @@
 # -*- encoding : utf-8 -*-
 require 'blacklight/catalog'
 require 'yaml'
+require Rails.root.join('lib/json-ld/json_ld_helper.rb')
 require "#{Rails.root}/lib/item/download_items_helper.rb"
 require "#{Rails.root}/lib/blacklight/blacklight_solrhelper_overrides.rb"
 require 'net/http'
@@ -520,21 +521,9 @@ class CatalogController < ApplicationController
   #
   #
   def annotation_context
-    @predefinedProperties = collect_predefined_context_properties
-
-    avoid_context = collect_restricted_predefined_vocabulary
-
-    @vocab_hash = {}
-    RDF::Vocabulary.each { |vocab|
-      if !avoid_context.include?(vocab.to_uri) and vocab.to_uri.qname.present?
-        prefix = vocab.to_uri.qname.first.to_s
-        uri = vocab.to_uri.to_s
-        @vocab_hash[prefix] = {:@id => uri}
-      end
-    }
+    @default_context = JsonLdHelper::default_context
     request.format = 'json'
     respond_to 'json'
-
   end
 
   #
@@ -1022,7 +1011,7 @@ class CatalogController < ApplicationController
     commonProperties = {}
 
     # Look for properties defined in the project's Json-LD
-    predefinedProperties = collect_predefined_context_properties()
+    predefinedProperties = JsonLdHelper::predefined_context_properties
     predefinedPropertiesMap = {}
     predefinedProperties.map { |key, value|
       if (value.is_a?(String))
@@ -1173,68 +1162,6 @@ class CatalogController < ApplicationController
       Rails.logger.error "Could not connect to triplestore - #{SESAME_CONFIG["url"].to_s}"
     end
     return nil
-  end
-
-  #
-  #
-  #
-  def collect_predefined_context_properties
-    predefinedProperties = {}
-    predefinedProperties[:commonProperties] = {:@id => "http://purl.org/dada/schema/0.2#commonProperties"}
-    predefinedProperties[:dada] = {:@id => "http://purl.org/dada/schema/0.2#"}
-    predefinedProperties[:type] = {:@id => "http://purl.org/dada/schema/0.2#type"}
-    predefinedProperties[:start] = {:@id => "http://purl.org/dada/schema/0.2#start"}
-    predefinedProperties[:end] = {:@id => "http://purl.org/dada/schema/0.2#end"}
-    predefinedProperties[:label] = {:@id => "http://purl.org/dada/schema/0.2#label"}
-    predefinedProperties[:"#{PROJECT_PREFIX_NAME}"] = {:@id => "#{PROJECT_SCHEMA_LOCATION}"}
-
-    predefinedProperties
-  end
-
-  #
-  # Returns an array of predefined vocabularies that should no be shown
-  # in the json ld schema.
-  #
-  def collect_restricted_predefined_vocabulary
-    avoid_context = []
-    avoid_context << RDF::CC.to_uri
-    avoid_context << RDF::CERT.to_uri
-    avoid_context << RDF::DC11.to_uri
-    avoid_context << RDF::DOAP.to_uri
-    avoid_context << RDF::EXIF.to_uri
-    avoid_context << RDF::GEO.to_uri
-    avoid_context << RDF::GR.to_uri
-    avoid_context << RDF::HCalendar.to_uri
-    avoid_context << RDF::HCard.to_uri
-    avoid_context << RDF::HTTP.to_uri
-    avoid_context << RDF::ICAL.to_uri
-    avoid_context << RDF::LOG.to_uri
-    avoid_context << RDF::MA.to_uri
-    avoid_context << RDF::MD.to_uri
-    avoid_context << RDF::OG.to_uri
-    avoid_context << RDF::OWL.to_uri
-    avoid_context << RDF::PROV.to_uri
-    avoid_context << RDF::PTR.to_uri
-    avoid_context << RDF::RDFA.to_uri
-    avoid_context << RDF::RDFS.to_uri
-    avoid_context << RDF::REI.to_uri
-    avoid_context << RDF::RSA.to_uri
-    avoid_context << RDF::RSS.to_uri
-    avoid_context << RDF::SIOC.to_uri
-    avoid_context << RDF::SKOS.to_uri
-    avoid_context << RDF::SKOSXL.to_uri
-    avoid_context << RDF::V.to_uri
-    avoid_context << RDF::VCARD.to_uri
-    avoid_context << RDF::VOID.to_uri
-    avoid_context << RDF::WDRS.to_uri
-    avoid_context << RDF::WOT.to_uri
-    avoid_context << RDF::XHTML.to_uri
-    avoid_context << RDF::XHV.to_uri
-
-    avoid_context << SPARQL::Grammar::SPARQL_GRAMMAR.to_uri
-
-    avoid_context << "http://rdfs.org/sioc/types#"
-    avoid_context
   end
 
   def user_params
