@@ -72,12 +72,12 @@ Then /^I should see link "([^"]*)"(?: to "([^"]*)")?$/ do |text, url|
 
 end
 
-Then /^I should not see link "([^"]*)"(?: to "([^"]*)")$/ do |text, url|
-  if url
-    page.should_not have_link(text, {:href => url})
-  else
-    page.should_not have_link(text)
-  end
+Then /^I should not see link "([^"]*)"$/ do |text|
+  page.should_not have_link(text)
+end
+
+Then /^I should not see link "([^"]*)" to "([^"]*)"$/ do |text, url|
+  page.should_not have_link(text, {:href => url})
 end
 
 Then /^I should see link "([^\"]*)" within "([^\"]*)"$/ do |text, scope|
