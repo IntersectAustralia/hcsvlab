@@ -2,8 +2,9 @@
   %p
     = label_tag 'Download only files of a particular type'
     - @doc_filetypes.each do |key, value|
-      = check_box_tag :aspera_checkbox_filter, "*#{key}"
-      = label_tag key, "#{key} (#{value})", :class => "checkbox inline"
+      .item_list-checkbox_filter
+        = check_box_tag :aspera_checkbox_filter, "*#{key}"
+        = label_tag key, "#{key} (#{value})", :class => "checkbox inline"
 
 .modal-separator
   :javascript
