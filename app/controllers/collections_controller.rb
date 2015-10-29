@@ -167,25 +167,78 @@ class CollectionsController < ApplicationController
     begin
       request_params = cleanse_params(params)
       collection = validate_collection(request_params[:id], request_params[:api_key])
-      corpus_dir = api_corpus_dir(collection.name)
-      validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
+      validate_add_items_request(collection, collection.corpus_dir, request_params[:items], request_params[:file])
       request_params[:items].each do |item_json|
         update_ids_in_jsonld(item_json["metadata"], collection)
       end
-      uploaded_files = process_uploaded_files(corpus_dir, collection.name, request_params[:file])
-      processed_items = process_items(collection.name, corpus_dir, request_params, uploaded_files)
-      create_collection_manifest(corpus_dir)
-      @success_message = ingest_items(corpus_dir, processed_items[:successes]) # Respond with a list of items added (via item ingest)
+      uploaded_files = process_uploaded_files(collection.corpus_dir, collection.name, request_params[:file])
+      processed_items = process_items(collection.name, collection.corpus_dir, request_params, uploaded_files)
+      @success_message = add_item_core(collection, processed_items[:successes])
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
     end
   end
 
+  #
+  # Core functionality common to add item ingest (via api and web app)
+  # Returns a list of item identifiers corresponding to the items ingested
+  #
+  def add_item_core (collection, item_id_and_file_hash)
+    rdf_files = []
+    item_id_and_file_hash.each do |item|
+      rdf_files.push(item[:rdf_file])
+    end
+    update_collection_manifest(collection.corpus_dir, rdf_files)
+    ingest_items(collection.corpus_dir, item_id_and_file_hash)
+  end
+
+  def web_add_item
+    collection = Collection.find_by_name(params[:id])
+    authorize! :web_add_item, collection
+    if request.post?
+      begin
+        # Check required fields
+        required_fields = {:item_name => 'item name', :item_title => 'item title'}
+        required_fields.each do |key, value|
+          raise ResponseError.new(400), "Required field '#{value}' is missing" if params[key].blank?
+        end
+
+        # Check item name is unique within the collection
+        item_name = Item.sanitise_name(params[:item_name])
+        if collection.items.find_by_handle("#{collection.name}:#{item_name}").present?
+          raise ResponseError.new(400), "An item with the name '#{item_name}' already exists in this collection"
+        end
+
+        # Validate and sanitise additional metadata fields
+        additional_metadata = validate_item_additional_metadata(params)
+
+        # Construct item Json-ld
+        item_metadata = { '@id' => catalog_url(collection.name, item_name),
+                          MetadataHelper::IDENTIFIER.to_s => item_name,
+                          MetadataHelper::IS_PART_OF.to_s => {'@id' => collection.uri}
+        }
+        item_metadata.merge!(additional_metadata) {|key, val1, val2| val1}
+        json_ld = {'@context' => JsonLdHelper::default_context, '@graph' => [item_metadata]}
+
+        # Write the item metadata to a rdf file and ingest the file
+        processed_items = process_items(collection.name, collection.corpus_dir, {:items => [{'metadata' => json_ld}]})
+        msg = add_item_core(collection, processed_items[:successes])
+
+        # Format the item creation message
+        msg = "Created new item: #{msg.first}"
+
+        redirect_to catalog_path(collection: collection.name, itemId: item_name), notice: msg
+        # redirect_to collection_path(id: collection.name), notice: msg
+      rescue ResponseError => e
+        flash[:error] = e.message
+      end
+    end
+  end
+
   def add_document_to_item
     begin
       collection = validate_collection(params[:collectionId], params[:api_key])
-      corpus_dir = api_corpus_dir(collection.name)
       item = validate_item_exists(collection, params[:itemId])
       doc_metadata = params[:metadata]
       doc_content = params[:document_content]
@@ -193,7 +246,7 @@ class CollectionsController < ApplicationController
       uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
       doc_filename = get_dc_identifier(doc_metadata) # the document filename is the document id
 
-      doc_metadata = format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
+      doc_metadata = format_and_validate_add_document_request(collection.corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
       create_document(item, doc_metadata)
       add_and_index_document(item, doc_metadata)
       @success_message = "Added the document #{doc_filename} to item #{item.get_name} in collection #{collection.name}"
@@ -226,7 +279,7 @@ class CollectionsController < ApplicationController
   end
 
   def delete_item_core(item)
-    remove_item(item, item.collection, api_corpus_dir(item.collection.name))
+    remove_item(item, item.collection)
     "Deleted the item #{item.get_name} (and its documents) from collection #{item.collection.name}"
   end
 
@@ -327,11 +380,6 @@ class CollectionsController < ApplicationController
   #  )
   #end
 
-  # Returns directory path to the given corpus
-  def api_corpus_dir(collection_name)
-    File.join(Rails.application.config.api_collections_location, collection_name)
-  end
-
   # Creates a file at the specified path with the given content
   def create_file(file_path, content)
     FileUtils.mkdir_p(File.dirname file_path)
@@ -414,7 +462,7 @@ class CollectionsController < ApplicationController
 
   # Processes the metadata for each item in the supplied request parameters
   # Returns a hash containing :successes and :failures of processed items
-  def process_items(collection_name, corpus_dir, request_params, uploaded_files)
+  def process_items(collection_name, corpus_dir, request_params, uploaded_files=[])
     items = []
     failures = []
     request_params[:items].each do |item|
@@ -659,17 +707,17 @@ class CollectionsController < ApplicationController
   end
 
   # Removes an item and its documents from the database, filesystem, Sesame and Solr
-  def remove_item(item, collection, corpus_dir)
-    delete_item_from_filesystem(item, corpus_dir)
+  def remove_item(item, collection)
+    delete_item_from_filesystem(item)
     delete_from_sesame(item, collection)
     delete_item_from_solr(item.id)
     item.destroy # Remove from database (item, its documents and their document audits)
   end
 
   # Removes the metadata and document files for an item
-  def delete_item_from_filesystem(item, corpus_dir)
+  def delete_item_from_filesystem(item)
     item_name = item.get_name
-    delete_file(File.join(corpus_dir, "#{item_name}-metadata.rdf"))
+    delete_file(File.join(item.collection.corpus_dir, "#{item_name}-metadata.rdf"))
     item.documents.each do |document|
       delete_file(document.file_path)
     end
@@ -948,7 +996,7 @@ class CollectionsController < ApplicationController
   end
 
   #
-  # Returns a validated hash of the additional metadata params
+  # Returns a validated hash of the collection additional metadata params
   #
   def validate_collection_additional_metadata(params)
     if params.has_key?(:additional_key) && params.has_key?(:additional_value)
@@ -956,6 +1004,18 @@ class CollectionsController < ApplicationController
                                      'dc:abstract', 'dcterms:abstract', MetadataHelper::ABSTRACT.to_s,
                                      'marcrel:OWN', MetadataHelper::LOC_OWNER.to_s]
       validate_additional_metadata(params[:additional_key].zip(params[:additional_value]), protected_collection_fields)
+    else
+      {}
+    end
+  end
+
+  #
+  # Returns a validated hash of the item additional metadata params
+  #
+  def validate_item_additional_metadata(params)
+    if params.has_key?(:additional_key) && params.has_key?(:additional_value)
+      protected_item_fields = ['dc:isPartOf', 'dcterms:isPartOf', MetadataHelper::IS_PART_OF.to_s]
+      validate_additional_metadata(params[:additional_key].zip(params[:additional_value]), protected_item_fields)
     else
       {}
     end

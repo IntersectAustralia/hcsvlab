@@ -115,6 +115,9 @@ module NavigationHelpers
       when /^the create collection page$/
         web_create_collection_path(options)
 
+      when /^the add item page for "(.*)"$/
+        web_add_item_path($1, options)
+
       when /^the delete item "(.*)" from collection "(.*)" page/
         delete_collection_item_path($2, $1, options)
 

@@ -17,6 +17,11 @@ class Collection < ActiveRecord::Base
     name.downcase.delete(' ')
   end
 
+  # Returns the directory in which the collection manifest and item metadata files are stored in
+  def corpus_dir
+    File.join(File.dirname(self.rdf_file_path), self.name)
+  end
+
   def set_licence(licence)
     self.licence = licence
     self.save!

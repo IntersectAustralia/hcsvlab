@@ -324,6 +324,34 @@ def check_and_create_manifest(corpus_dir)
 end
 
 #
+# Updates an existing collection manifest for a directory with the info for new rdf files
+#
+def update_collection_manifest(corpus_dir, rdf_files)
+  logger.info("Updating collection manifest for #{corpus_dir}")
+  overall_start = Time.now
+  failures = []
+
+  manifest_file = File.join(corpus_dir, MANIFEST_FILE_NAME)
+  manifest_hash = JSON.parse(IO.read(manifest_file))
+
+  rdf_files.each do |rdf_file|
+    filename, manifest_entry = extract_manifest_info(rdf_file)
+    manifest_hash["files"][filename] = manifest_entry
+    if !manifest_entry["error"].nil?
+      failures << filename
+    end
+  end
+
+  File.open(manifest_file, 'w') do |file|
+    file.puts(manifest_hash.to_json)
+  end
+
+  endTime = Time.now
+  logger.debug("Time for updating manifest for #{corpus_dir}: (#{'%.1f' % ((endTime.to_f - overall_start.to_f)*1000)}ms)")
+  logger.debug("Failures: #{failures.to_s}") if failures.size > 0
+end
+
+#
 # Create the collection manifest file for a directory
 #
 def create_collection_manifest(corpus_dir)
