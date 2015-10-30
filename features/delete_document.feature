@@ -53,6 +53,14 @@ Feature: Deleting Documents
     When I go to the delete document web path for "1-001-plain.txt" in "cooee:1-001"
     Then I should get a security error "You are not authorised to access this page"
 
+  @javascript
+  Scenario: Verify confirmation popup appears when deleting a document
+    Given I ingest "cooee:1-001"
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the catalog page for "cooee:1-001"
+    When I click the delete icon for document "1-001-plain.txt" of item "cooee:1-001"
+    Then The popup text should contain "Are you sure you want to delete this document?"
+
 # ToDo: include this test if it can be  resolved why request.host gives 'www.example.org' during JSON request steps and 'http://127.0.0.1:58506' during web interface steps
 #  @web_delete_document @javascript
 #  Scenario: Delete a document as the item owner (API ingested collection)
