@@ -1444,7 +1444,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    {"success":"New collection 'test' (http://example.org/catalog/test) created"}
     """
 
   @api_create_collection
@@ -1455,7 +1455,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    {"success":"New collection 'test' (http://example.org/catalog/test) created"}
     """
 
   @api_create_collection
@@ -1469,7 +1469,7 @@ Feature: Browsing via API
     Then I should get a 400 response code
     And the JSON response should be:
     """
-    {"error":"Collection 'Test' (http://example.org/catalog/Test) already exists in the system - skipping"}
+    {"error":"A collection with the name 'test' already exists"}
     """
 
   @api_create_collection
@@ -1510,10 +1510,10 @@ Feature: Browsing via API
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 200 response code
-    And the owner of collection "Test" should be "admin@intersect.org.au"
+    And the owner of collection "test" should be "admin@intersect.org.au"
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    {"success":"New collection 'test' (http://example.org/catalog/test) created"}
     """
 
   @api_create_collection
@@ -1522,10 +1522,10 @@ Feature: Browsing via API
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     Then I should get a 200 response code
-    And the owner of collection "Test" should be "data_owner@intersect.org.au"
+    And the owner of collection "test" should be "data_owner@intersect.org.au"
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    {"success":"New collection 'test' (http://example.org/catalog/test) created"}
     """
 
   @api_create_collection
@@ -1535,10 +1535,10 @@ Feature: Browsing via API
       | name | collection_metadata |
       | Test | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:rpy": "researcher1@intersect.org.au"} |
     Then I should get a 200 response code
-    And the owner of collection "Test" should be "admin@intersect.org.au"
+    And the owner of collection "test" should be "admin@intersect.org.au"
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    {"success":"New collection 'test' (http://example.org/catalog/test) created"}
     """
 
   @api_create_collection
@@ -1549,7 +1549,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    {"success":"New collection 'test' (http://example.org/catalog/test) created"}
     """
 
   @api_create_collection
@@ -1560,7 +1560,7 @@ Feature: Browsing via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"New collection 'Test' (http://example.org/catalog/Test) created"}
+    {"success":"New collection 'test' (http://example.org/catalog/test) created"}
     """
 
   @api_add_item
@@ -1618,7 +1618,7 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | } [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document1.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document1.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document1.txt" }, "hcsvlab:display_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 400 response code
     And the JSON response should be:
     """
@@ -1633,10 +1633,10 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document1.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document1.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document1.txt" }, "hcsvlab:display_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -1654,11 +1654,11 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document1.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document1.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document1.txt" }, "hcsvlab:display_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The item item1 already exists in the collection Test"}
+    {"error":"The item item1 already exists in the collection test"}
     """
 
   @api_add_item
@@ -1671,13 +1671,13 @@ Feature: Browsing via API
       # ToDo: fix rpec post request merging hashes in array, see: http://stackoverflow.com/questions/18337609/rspec-request-test-merges-hashes-in-array-in-post-json-params
 #      | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document1.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document1.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document1.txt" }, "hcsvlab:display_document": { "@id": "document1.txt" } } ] } }, { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document2.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2.txt" }, "dcterms:title": "document2#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item2", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document2.txt" }, "hcsvlab:display_document": { "@id": "document2.txt" } } ] } } ] |
       | [ { "dummy": "value1", "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document1.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document1.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document1.txt" }, "hcsvlab:display_document": { "@id": "document1.txt" } } ] } }, { "dummy": "value2", "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document2.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2.txt" }, "dcterms:title": "document2#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item2", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document2.txt" }, "hcsvlab:display_document": { "@id": "document2.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And the file "item2-metadata.rdf" should exist in the directory for the collection "Test"
-    And the item "item2" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item2" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And the file "item2-metadata.rdf" should exist in the directory for the collection "test"
+    And the item "item2" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item2" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -1692,14 +1692,14 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "document1.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
-    And Sesame should contain a document with file_name "document1.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "document1.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document1.txt" in collection "test"
+    And Sesame should contain a document with file_name "document1.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -1745,12 +1745,12 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item2", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item2", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "document1.txt" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "document1.txt" should exist in the directory for the collection "test"
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The file document1.txt has already been uploaded to the collection Test"}
+    {"error":"The file document1.txt has already been uploaded to the collection test"}
     """
 
   @api_add_item
@@ -1761,7 +1761,7 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content":"This is a doc." }, { "identifier": "document1.txt", "content":"This is the same doc again!" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 412 response code
     And the JSON response should be:
     """
@@ -1776,7 +1776,7 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This is a doc." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } }, { "documents": [ { "identifier": "document1.txt", "content": "This is the same doc again!." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 412 response code
     And the JSON response should be:
     """
@@ -1791,14 +1791,14 @@ Feature: Browsing via API
     When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                                 | items |
       | "test/samples/cooee/1-001-plain.txt" | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "1-001-plain.txt" }, "hcsvlab:indexable_document": { "@id": "1-001-plain.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
-    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "1-001-plain.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "1-001-plain.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/1-001-plain.txt" in collection "test"
+    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -1815,18 +1815,18 @@ Feature: Browsing via API
 #      | file                                                                      | items |
 #      | "test/samples/cooee/1-001-plain.txt","test/samples/cooee/1-002-plain.txt" | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" }, { "@id": "1-002-plain.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "1-002-plain.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "1-001-plain.txt" }, "hcsvlab:indexable_document": { "@id": "1-001-plain.txt" } } ] } } ] |
 ##      | "test/samples/cooee/1-001-plain.txt","test/samples/cooee/1-002-plain.txt" | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "1-001-plain.txt" }, "hcsvlab:indexable_document": { "@id": "1-001-plain.txt" } } ] } } ] |
-#    Then the file "manifest.json" should exist in the directory for the collection "Test"
-#    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-#    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
-#    And the file "1-002-plain.txt" should exist in the directory for the collection "Test"
-#    And the item "item1" in collection "Test" should exist in the database
-#    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
-#    And the document "1-002-plain.txt" under item "item1" in collection "Test" should exist in the database
-#    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-#    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
-#    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-002-plain.txt" in collection "Test"
-#    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
-#    And Sesame should contain a document with file_name "1-002-plain.txt" in collection "Test"
+#    Then the file "manifest.json" should exist in the directory for the collection "test"
+#    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+#    And the file "1-001-plain.txt" should exist in the directory for the collection "test"
+#    And the file "1-002-plain.txt" should exist in the directory for the collection "test"
+#    And the item "item1" in collection "test" should exist in the database
+#    And the document "1-001-plain.txt" under item "item1" in collection "test" should exist in the database
+#    And the document "1-002-plain.txt" under item "item1" in collection "test" should exist in the database
+#    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+#    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/1-001-plain.txt" in collection "test"
+#    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/1-002-plain.txt" in collection "test"
+#    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "test"
+#    And Sesame should contain a document with file_name "1-002-plain.txt" in collection "test"
 #    And I should get a 200 response code
 #    And the JSON response should be:
 #    """
@@ -1842,15 +1842,15 @@ Feature: Browsing via API
     When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                                                                      | items |
       | "test/samples/cooee/1-001-plain.txt","test/samples/cooee/1-002-plain.txt" | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "1-001-plain.txt" }, "hcsvlab:indexable_document": { "@id": "1-001-plain.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
-    And the file "1-002-plain.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
-    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "1-001-plain.txt" should exist in the directory for the collection "test"
+    And the file "1-002-plain.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "1-001-plain.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/1-001-plain.txt" in collection "test"
+    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -1865,7 +1865,7 @@ Feature: Browsing via API
     When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and ill-formatted file params
       | file                                 | items |
       | "test/samples/cooee/1-001-plain.txt" | [ { "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"1-001-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 412 response code
     And the JSON response should be:
     """
@@ -1880,7 +1880,7 @@ Feature: Browsing via API
     When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                         | items |
       | "test/samples/api/blank.txt" | [ { "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"1-001-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 412 response code
     And the JSON response should be:
     """
@@ -1898,12 +1898,12 @@ Feature: Browsing via API
     And I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                                 | items |
       | "test/samples/cooee/1-001-plain.txt" | [ { "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"1-001-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item2", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "1-001-plain.txt" should exist in the directory for the collection "test"
     And I should get a 412 response code
     And the JSON response should be:
     """
-    {"error":"The file 1-001-plain.txt has already been uploaded to the collection Test"}
+    {"error":"The file 1-001-plain.txt has already been uploaded to the collection test"}
     """
 
   @api_add_item
@@ -1914,7 +1914,7 @@ Feature: Browsing via API
     When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                                 | items |
       | "test/samples/cooee/1-001-plain.txt" | [ { "documents": [ { "identifier": "1-001-plain.txt", "content":"This is a doc." } ], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"1-001-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 412 response code
     And the JSON response should be:
     """
@@ -1930,8 +1930,8 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document1-plain.txt.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should not exist in the directory for the collection "test"
     And I should get a 400 response code
     And the JSON response should be:
     """
@@ -1949,9 +1949,9 @@ Feature: Browsing via API
       # ToDo: fix rpec post request merging hashes in array, see: http://stackoverflow.com/questions/18337609/rspec-request-test-merges-hashes-in-array-in-post-json-params
       | [ {"dummy":"value1", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document1-plain.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } }, {"dummy":"value2", "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document2-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document2-plain.txt" }, "dcterms:title":"document2#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item2", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document2#Text" } ], "dcterms:identifier":"item2", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document2#Text" } } ] } } ] |
 #      | [ { "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document1-plain.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } }, { "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document2-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document2-plain.txt" }, "dcterms:title":"document2#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item2", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document2#Text" } ], "dcterms:identifier":"item2", "dcterms:isPartOf":{ "@id":"corpus: Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document2#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
-    And the file "item2-metadata.rdf" should not exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should not exist in the directory for the collection "test"
+    And the file "item2-metadata.rdf" should not exist in the directory for the collection "test"
     And I should get a 400 response code
     And the JSON response should be:
     """
@@ -1969,9 +1969,9 @@ Feature: Browsing via API
       # ToDo: fix rpec post request merging hashes in array, see: http://stackoverflow.com/questions/18337609/rspec-request-test-merges-hashes-in-array-in-post-json-params
       | [ { "dummy": "value2", "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "http://ns.ausnc.org.au/corpora/art/items/item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1-plain.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document1-plain.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus: Test" }, "hcsvlab:display_document": { "@id": "http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } }, { "dummy": "value2", "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "http://ns.ausnc.org.au/corpora/art/items/item2", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document2-plain.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2-plain.txt" }, "dcterms:title": "document2#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item2", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "http://ns.ausnc.org.au/corpora/source/document2#Text" } } ] } } ] |
 #      | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "http://ns.ausnc.org.au/corpora/art/items/item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1-plain.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document1-plain.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus: Test" }, "hcsvlab:display_document": { "@id": "http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } }, { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "http://ns.ausnc.org.au/corpora/art/items/item2", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document2-plain.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2-plain.txt" }, "dcterms:title": "document2#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item2", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "http://ns.ausnc.org.au/corpora/source/document2#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
-    And the file "item2-metadata.rdf" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should not exist in the directory for the collection "test"
+    And the file "item2-metadata.rdf" should exist in the directory for the collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -1986,7 +1986,7 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document1-plain.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 400 response code
     And the JSON response should be:
     """
@@ -2001,7 +2001,7 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/", "hcsvlab":"http://hcsvlab.org/vocabulary/", "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs":"http://www.w3.org/2000/01/rdf-schema#", "xsd":"http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:extent":72636, "dcterms:identifier":"document1-plain.txt", "dcterms:source":{ "@id":"file:///data/test_collections/ausnc/test/document1-plain.txt" }, "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"   ", "dcterms:isPartOf":{ "@id":"corpus:Test" }, "hcsvlab:display_document":{ "@id":"http://ns.ausnc.org.au/corpora/source/document1#Text" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 400 response code
     And the JSON response should be:
     """
@@ -2030,11 +2030,11 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1", "@type": "foaf:Document", "dcterms:extent": 1234, "dcterms:identifier": "document1.txt", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document1.txt" }, "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:indexable_document": { "@id": "document1.txt" }, "hcsvlab:display_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document1.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -2049,14 +2049,14 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "document1.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
-    And Sesame should contain a document with file_name "document1.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "document1.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document1.txt" in collection "test"
+    And Sesame should contain a document with file_name "document1.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -2071,14 +2071,14 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "document1.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
-    And Sesame should contain a document with file_name "document1.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "document1.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document1.txt" in collection "test"
+    And Sesame should contain a document with file_name "document1.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -2093,14 +2093,14 @@ Feature: Browsing via API
     When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                                 | items |
       | "test/samples/cooee/1-001-plain.txt" | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dcterms:isPartOf": { "@id": "corpus:Test" }, "hcsvlab:display_document": { "@id": "1-001-plain.txt" }, "hcsvlab:indexable_document": { "@id": "1-001-plain.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
-    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "1-001-plain.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "1-001-plain.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/1-001-plain.txt" in collection "test"
+    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -2115,14 +2115,14 @@ Feature: Browsing via API
     When I make a JSON multipart request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                                 | items |
       | "test/samples/cooee/1-001-plain.txt" | [ { "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "1-001-plain.txt" }, "hcsvlab:indexable_document": { "@id": "1-001-plain.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "1-001-plain.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
-    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "1-001-plain.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "1-001-plain.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/1-001-plain.txt" in collection "test"
+    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -2137,14 +2137,14 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "A Test." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dc:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dc:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "document1.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
-    And Sesame should contain a document with file_name "document1.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "document1.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document1.txt" in collection "test"
+    And Sesame should contain a document with file_name "document1.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -2160,14 +2160,14 @@ Feature: Browsing via API
       | items |
 
       | [ { "documents": [ { "identifier": "document1.txt", "content": "A Test." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "document1.txt" should exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should exist in the database
-    And the document "document1.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Test/item1" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document1.txt" in collection "Test"
-    And Sesame should contain a document with file_name "document1.txt" in collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "document1.txt" should exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/test/item1" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document1.txt" in collection "test"
+    And Sesame should contain a document with file_name "document1.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -2188,11 +2188,11 @@ Feature: Browsing via API
     Then the file "manifest.json" should exist in the directory for the collection "Collection1"
     And the file "item1-metadata.rdf" should exist in the directory for the collection "Collection1"
     And the file "document1.txt" should exist in the directory for the collection "Collection1"
-    And the item "item1" in collection "Collection1" should exist in the database
-    And the document "document1.txt" under item "item1" in collection "Collection1" should exist in the database
-    And Sesame should contain an item with uri "http://example.org/catalog/Collection1/item1" in collection "Collection1"
-    And Sesame should contain a document with uri "http://example.org/catalog/Collection1/item1/document/document1.txt" in collection "Collection1"
-    And Sesame should contain a document with file_name "document1.txt" in collection "Collection1"
+    And the item "item1" in collection "collection1" should exist in the database
+    And the document "document1.txt" under item "item1" in collection "collection1" should exist in the database
+    And Sesame should contain an item with uri "http://example.org/catalog/collection1/item1" in collection "collection1"
+    And Sesame should contain a document with uri "http://example.org/catalog/collection1/item1/document/document1.txt" in collection "collection1"
+    And Sesame should contain a document with file_name "document1.txt" in collection "collection1"
     And I should get a 200 response code
     And the JSON response should be:
     """
@@ -2214,7 +2214,7 @@ Feature: Browsing via API
       | name | collection_metadata |
       | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "data_owner@intersect.org.au"
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 404 response code
     And the JSON response should be:
     """
@@ -2230,9 +2230,9 @@ Feature: Browsing via API
       | items |
       | [ { "documents": [ { "identifier": "document1-plain.txt", "content":"Hello World." } ], "metadata": { "@context": { "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus":"http://ns.ausnc.org.au/corpora/", "dc":"http://purl.org/dc/terms/", "dcterms":"http://purl.org/dc/terms/", "foaf":"http://xmlns.com/foaf/0.1/" }, "@graph": [ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text", "@type":"foaf:Document", "dcterms:identifier":"document1-plain.txt", "dcterms:title":"document1#Text", "dcterms:type":"Text" }, { "@id":"http://ns.ausnc.org.au/corpora/art/items/item1", "@type":"ausnc:AusNCObject", "ausnc:document":[ { "@id":"http://ns.ausnc.org.au/corpora/test/source/document1#Text" } ], "dcterms:identifier":"item1", "dcterms:isPartOf":{ "@id":"corpus:Test" } } ] } } ] |
     When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "researcher1@intersect.org.au"
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Test"
-    And the file "document1-plain.txt" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
+    And the file "document1-plain.txt" should exist in the directory for the collection "test"
     And I should get a 403 response code
     And the JSON response should be:
     """
@@ -2247,25 +2247,25 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the home page
     When I make a JSON delete request for the delete item "item1" from collection "Test" page with the API token for "data_owner@intersect.org.au"
-    And I have done a search with collection "Test"
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
-    And the file "item1-metadata.rdf" should not exist in the directory for the collection "Test"
-    And the file "document1-plain.txt" should not exist in the directory for the collection "Test"
-    And the item "item1" in collection "Test" should not exist in the database
-    And the document "document1-plain.txt" under item "item1" in collection "Test" should not exist in the database
-    And Sesame should not contain an item with uri "http://ns.ausnc.org.au/corpora/art/items/item1" in collection "Test"
-    And Sesame should not contain a document with file_name "document1-plain.txt" in collection "Test"
+    And I have done a search with collection "test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
+    And the file "item1-metadata.rdf" should not exist in the directory for the collection "test"
+    And the file "document1-plain.txt" should not exist in the directory for the collection "test"
+    And the item "item1" in collection "test" should not exist in the database
+    And the document "document1-plain.txt" under item "item1" in collection "test" should not exist in the database
+    And Sesame should not contain an item with uri "http://ns.ausnc.org.au/corpora/art/items/item1" in collection "test"
+    And Sesame should not contain a document with file_name "document1-plain.txt" in collection "test"
     # No identifiers should be in the blacklight results since the only collection item has been deleted
     And I should see "blacklight_results" table with
       | Identifier | Type(s) |
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Deleted the item item1 (and its documents) from collection Test"}
+    {"success":"Deleted the item item1 (and its documents) from collection test"}
     """
 
   @api_edit_collection
@@ -2278,8 +2278,8 @@ Feature: Browsing via API
       | true      | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "An updated test collection", "marcrel:OWN": "Data Owner"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: English Language"
@@ -2288,7 +2288,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2301,8 +2301,8 @@ Feature: Browsing via API
       | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "An updated test collection", "marcrel:OWN": "Data Owner"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: English Language"
@@ -2311,7 +2311,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2324,8 +2324,8 @@ Feature: Browsing via API
       | true      | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:title": "An updated test collection", "dc:subject": "Updated Language"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should not see "Creator: Pam Peters"
     And I should not see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: Updated Language"
@@ -2334,7 +2334,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2347,8 +2347,8 @@ Feature: Browsing via API
       | false     | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:title": "An updated test collection", "dc:subject": "Updated Language"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: Updated Language"
@@ -2357,7 +2357,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2370,8 +2370,8 @@ Feature: Browsing via API
       | false     | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/"}, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:title": "An updated test collection"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: English Language"
@@ -2380,7 +2380,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2393,8 +2393,8 @@ Feature: Browsing via API
       | false     | {"@id": "http://collection.test", "http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: English Language"
@@ -2403,7 +2403,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2416,8 +2416,8 @@ Feature: Browsing via API
       | true      | {"http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should not see "Creator: Pam Peters"
     And I should not see "Rights: All rights reserved to Data Owner"
     And I should not see "Subject: English Language"
@@ -2426,7 +2426,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2439,8 +2439,8 @@ Feature: Browsing via API
       | false     | {"@id": "http://random.uri", "http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: English Language"
@@ -2450,7 +2450,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2463,8 +2463,8 @@ Feature: Browsing via API
       | false     | {"@id": "http://collection.test", "http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: English Language"
@@ -2487,8 +2487,8 @@ Feature: Browsing via API
       | true      | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@type": "dcmitype:Collection", "dc:title": "An updated test collection", "dc:subject": "Updated Language"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should not see "Creator: Pam Peters"
     And I should not see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: Updated Language"
@@ -2497,7 +2497,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2510,8 +2510,8 @@ Feature: Browsing via API
       | false     | {"http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: English Language"
@@ -2520,7 +2520,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_edit_collection
@@ -2547,8 +2547,8 @@ Feature: Browsing via API
       | {"http://purl.org/dc/elements/1.1/title": "An updated test collection"} |
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the collections page
-    And I follow "Test"
-    Then the file "Test.n3" should exist in the directory for the api collections
+    And I follow "test"
+    Then the file "test.n3" should exist in the directory for the api collections
     And I should see "Creator: Pam Peters"
     And I should see "Rights: All rights reserved to Data Owner"
     And I should see "Subject: English Language"
@@ -2559,7 +2559,7 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated collection Test"}
+    {"success":"Updated collection test"}
     """
 
   @api_update_item
@@ -2570,10 +2570,10 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "researcher1@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "researcher1@intersect.org.au" with JSON params
       | metadata |
       | {"http://purl.org/dc/elements/1.1/title": "An updated test item"} |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 403 response code
     And the JSON response should be:
     """
@@ -2588,10 +2588,10 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | {"http://purl.org/dc/elements/1.1/ title": "An updated test item"} |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 400 response code
     And the JSON response should be:
     """
@@ -2606,8 +2606,8 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" without JSON params
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" without JSON params
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 400 response code
     And the JSON response should be:
     """
@@ -2622,10 +2622,10 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | {} |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 400 response code
     And the JSON response should be:
     """
@@ -2643,7 +2643,7 @@ Feature: Browsing via API
     When I make a JSON put request for the update item page for "Test2:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | {"http://purl.org/dc/elements/1.1/title": "An updated test item"} |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 404 response code
     And the JSON response should be:
     """
@@ -2658,10 +2658,10 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON put request for the update item page for "Test:item2" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item2" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | {"http://purl.org/dc/elements/1.1/title": "An updated test item"} |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 404 response code
     And the JSON response should be:
     """
@@ -2676,14 +2676,14 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | {"http://purl.org/dc/elements/1.1/title": "An updated test item"} |
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated item item1 in collection Test"}
+    {"success":"Updated item item1 in collection test"}
     """
 
   @api_update_item
@@ -2694,21 +2694,21 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | { "http://ns.ausnc.org.au/schemas/ausnc_md_model/mode":"An updated test mode" } |
-    And I go to the catalog page for "Test:item1"
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And I go to the catalog page for "test:item1"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated item item1 in collection Test"}
+    {"success":"Updated item item1 in collection test"}
     """
     And I should see "Item Details"
     And I should see "Identifier: item1"
-    And I should see "Collection: Test"
+    And I should see "Collection: test"
     And I should see "Mode: An updated test mode"
 
   @api_update_item
@@ -2719,17 +2719,17 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:mode": "Original Mode", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | { "http://ns.ausnc.org.au/schemas/ausnc_md_model/mode":"Updated Mode" } |
-    And I go to the catalog page for "Test:item1"
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And I go to the catalog page for "test:item1"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated item item1 in collection Test"}
+    {"success":"Updated item item1 in collection test"}
     """
     And I should see "Item Details"
     And I should see "Mode: Updated Mode"
@@ -2745,21 +2745,21 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | { "@context":{ "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/" }, "ausnc:speech_style":"An updated speech style" } |
-    And I go to the catalog page for "Test:item1"
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And I go to the catalog page for "test:item1"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated item item1 in collection Test"}
+    {"success":"Updated item item1 in collection test"}
     """
     And I should see "Item Details"
     And I should see "Identifier: item1"
-    And I should see "Collection: Test"
+    And I should see "Collection: test"
     And I should see "Speech Style: An updated speech style"
 
   @api_update_item
@@ -2770,21 +2770,21 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | { "@context":{ "ausnc":"http://ns.ausnc.org.au/schemas/ausnc_md_model/" }, "ausnc:speech_style":"An updated speech style", "ausnc:mode":"An updated mode" } |
-    And I go to the catalog page for "Test:item1"
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And I go to the catalog page for "test:item1"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated item item1 in collection Test"}
+    {"success":"Updated item item1 in collection test"}
     """
     And I should see "Item Details"
     And I should see "Identifier: item1"
-    And I should see "Collection: Test"
+    And I should see "Collection: test"
     And I should see "Speech Style: An updated speech style"
     And I should see "Mode: An updated mode"
 
@@ -2796,17 +2796,17 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON put request for the update item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON put request for the update item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | { "http://purl.org/dc/terms/identifier":"updated_id" } |
-    And I go to the catalog page for "Test:item1"
-    Then the file "manifest.json" should exist in the directory for the collection "Test"
+    And I go to the catalog page for "test:item1"
+    Then the file "manifest.json" should exist in the directory for the collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Updated item item1 in collection Test"}
+    {"success":"Updated item item1 in collection test"}
     """
     And I should see "Item Details"
     And I should see "Identifier: item1"
@@ -2823,17 +2823,17 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | document_content | metadata |
       | "Hello World!"   | { "@context":{"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"dada":{"@id":"http://purl.org/dada/schema/0.2#"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"alveo":{"@id":"http://alveo.edu.au/schema/"},"ace":{"@id":"http://ns.ausnc.org.au/schemas/ace/"},"ausnc":{"@id":"http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk":{"@id":"http://ns.austalk.edu.au/"},"austlit":{"@id":"http://ns.ausnc.org.au/schemas/austlit/"},"bibo":{"@id":"http://purl.org/ontology/bibo/"},"cooee":{"@id":"http://ns.ausnc.org.au/schemas/cooee/"},"dc":{"@id":"http://purl.org/dc/terms/"},"dcterms":"http://purl.org/dc/terms/","foaf":{"@id":"http://xmlns.com/foaf/0.1/"},"gcsause":{"@id":"http://ns.ausnc.org.au/schemas/gcsause/"},"ice":{"@id":"http://ns.ausnc.org.au/schemas/ice/"},"olac":{"@id":"http://www.language-archives.org/OLAC/1.1/"},"purl":{"@id":"http://purl.org/"},"rdf":{"@id":"http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema":{"@id":"http://schema.org/"},"xsd":{"@id":"http://www.w3.org/2001/XMLSchema#"}}, "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text" } |
-    Then the file "document2.txt" should exist in the directory for the collection "Test"
-    And the document "document2.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document2.txt" in collection "Test"
-    And Sesame should contain a document with file_name "document2.txt" in collection "Test"
+    Then the file "document2.txt" should exist in the directory for the collection "test"
+    And the document "document2.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document2.txt" in collection "test"
+    And Sesame should contain a document with file_name "document2.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    {"success":"Added the document document2.txt to item item1 in collection test"}
     """
 
   @api_add_document
@@ -2844,16 +2844,16 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2.txt" } } |
-    Then the document "document2.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document2.txt" in collection "Test"
-    And Sesame should contain a document with file_path "/data/test_collections/ausnc/test/document2.txt" in collection "Test"
+    Then the document "document2.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document2.txt" in collection "test"
+    And Sesame should contain a document with file_path "/data/test_collections/ausnc/test/document2.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    {"success":"Added the document document2.txt to item item1 in collection test"}
     """
 
   @api_add_document
@@ -2864,7 +2864,7 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON multipart request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
+    When I make a JSON multipart request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                         | metadata |
       | "test/samples/api/blank.txt" | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "blank.txt", "@type": "foaf:Document", "dcterms:identifier": "blank.txt", "dcterms:title": "blank#Text", "dcterms:type": "Text" } |
     Then I should get a 412 response code
@@ -2881,17 +2881,17 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON multipart request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
+    When I make a JSON multipart request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                                 | metadata |
       | "test/samples/cooee/1-001-plain.txt" | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "1-001#Text", "dcterms:type": "Text" } |
-    Then the file "1-001-plain.txt" should exist in the directory for the collection "Test"
-    And the document "1-001-plain.txt" under item "item1" in collection "Test" should exist in the database
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/1-001-plain.txt" in collection "Test"
-    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "Test"
+    Then the file "1-001-plain.txt" should exist in the directory for the collection "test"
+    And the document "1-001-plain.txt" under item "item1" in collection "test" should exist in the database
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/1-001-plain.txt" in collection "test"
+    And Sesame should contain a document with file_name "1-001-plain.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Added the document 1-001-plain.txt to item item1 in collection Test"}
+    {"success":"Added the document 1-001-plain.txt to item item1 in collection test"}
     """
 
   @api_add_document
@@ -2902,16 +2902,16 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | document_content | metadata |
       | "Hello World!"   | { "@context":{"commonProperties":{"@id":"http://purl.org/dada/schema/0.2#commonProperties"},"dada":{"@id":"http://purl.org/dada/schema/0.2#"},"type":{"@id":"http://purl.org/dada/schema/0.2#type"},"start":{"@id":"http://purl.org/dada/schema/0.2#start"},"end":{"@id":"http://purl.org/dada/schema/0.2#end"},"label":{"@id":"http://purl.org/dada/schema/0.2#label"},"alveo":{"@id":"http://alveo.edu.au/schema/"},"ace":{"@id":"http://ns.ausnc.org.au/schemas/ace/"},"ausnc":{"@id":"http://ns.ausnc.org.au/schemas/ausnc_md_model/"},"austalk":{"@id":"http://ns.austalk.edu.au/"},"austlit":{"@id":"http://ns.ausnc.org.au/schemas/austlit/"},"bibo":{"@id":"http://purl.org/ontology/bibo/"},"cooee":{"@id":"http://ns.ausnc.org.au/schemas/cooee/"},"dc":{"@id":"http://purl.org/dc/terms/"},"dcterms":"http://purl.org/dc/terms/","foaf":{"@id":"http://xmlns.com/foaf/0.1/"},"gcsause":{"@id":"http://ns.ausnc.org.au/schemas/gcsause/"},"ice":{"@id":"http://ns.ausnc.org.au/schemas/ice/"},"olac":{"@id":"http://www.language-archives.org/OLAC/1.1/"},"purl":{"@id":"http://purl.org/"},"rdf":{"@id":"http://www.w3.org/1999/02/22-rdf-syntax-ns#"},"schema":{"@id":"http://schema.org/"},"xsd":{"@id":"http://www.w3.org/2001/XMLSchema#"}}, "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text" } |
-    And I go to the catalog page for "Test:item1"
+    And I go to the catalog page for "test:item1"
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    {"success":"Added the document document2.txt to item item1 in collection test"}
     """
     And I should see "Documents: document1.txt, document2.txt"
     And I should see "Documents"
@@ -2926,16 +2926,16 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | metadata |
       | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text", "dcterms:source": { "@id": "file:///data/test_collections/ausnc/test/document2.txt" } } |
-    And I go to the catalog page for "Test:item1"
+    And I go to the catalog page for "test:item1"
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    {"success":"Added the document document2.txt to item item1 in collection test"}
     """
     And I should see "Documents: document1.txt, document2.txt"
     And I should see "Documents"
@@ -2950,16 +2950,16 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON multipart request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
+    When I make a JSON multipart request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON and file params
       | file                                 | metadata |
       | "test/samples/cooee/1-001-plain.txt" | { "@context": {"dcterms": "http://purl.org/dc/terms/"}, "@id": "1-001-plain.txt", "@type": "foaf:Document", "dcterms:identifier": "1-001-plain.txt", "dcterms:title": "1-001#Text", "dcterms:type": "Text" } |
-    And I go to the catalog page for "Test:item1"
+    And I go to the catalog page for "test:item1"
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Added the document 1-001-plain.txt to item item1 in collection Test"}
+    {"success":"Added the document 1-001-plain.txt to item item1 in collection test"}
     """
     And I should see "Documents: document1.txt, 1-001-plain.txt"
     And I should see "Documents"
@@ -2974,15 +2974,15 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | document_content | metadata |
       | "Hello World!"   | { "@context":{"dc":{"@id":"http://purl.org/dc/terms/"},"dcterms":"http://purl.org/dc/terms/","foaf":{"@id":"http://xmlns.com/foaf/0.1/"}}, "@id": "http://document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text" } |
-    Then Sesame should not contain a document with uri "http://document2.txt" in collection "Test"
-    And Sesame should contain a document with uri "http://example.org/catalog/Test/item1/document/document2.txt" in collection "Test"
+    Then Sesame should not contain a document with uri "http://document2.txt" in collection "test"
+    And Sesame should contain a document with uri "http://example.org/catalog/test/item1/document/document2.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Added the document document2.txt to item item1 in collection Test"}
+    {"success":"Added the document document2.txt to item item1 in collection test"}
     """
 
   @api_add_document
@@ -2994,7 +2994,7 @@ Feature: Browsing via API
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
     # Invalid metadata is space in dcterms: title
-    When I make a JSON post request for the add document to item page for "Test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
+    When I make a JSON post request for the add document to item page for "test:item1" with the API token for "data_owner@intersect.org.au" with JSON params
       | document_content | metadata |
       | "Hello World!"   | { "@context":{"dc":{"@id":"http://purl.org/dc/terms/"},"dcterms":"http://purl.org/dc/terms/","foaf":{"@id":"http://xmlns.com/foaf/0.1/"}}, "@id": "http://document2.txt", "@type": "foaf:Document", "dcterms:identifier":"document2.txt", "dcterms: title": "document2#Text", "dcterms:type": "Text" } |
     Then I should get a 400 response code
@@ -3017,7 +3017,7 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "Hello World" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "Test" page with the API token for "researcher1@intersect.org.au"
+    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "test" page with the API token for "researcher1@intersect.org.au"
     Then I should get a 403 response code
     And the JSON response should be:
     """
@@ -3032,7 +3032,7 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "Hello World" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON delete request for the delete document "false_document.raw" from "item "item1" in collection "Test" page with the API token for "data_owner@intersect.org.au"
+    When I make a JSON delete request for the delete document "false_document.raw" from "item "item1" in collection "test" page with the API token for "data_owner@intersect.org.au"
     Then I should get a 404 response code
     And the JSON response should be:
     """
@@ -3047,7 +3047,7 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "Hello World" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON delete request for the delete document "document1.txt" from "item "false_item" in collection "Test" page with the API token for "data_owner@intersect.org.au"
+    When I make a JSON delete request for the delete document "document1.txt" from "item "false_item" in collection "test" page with the API token for "data_owner@intersect.org.au"
     Then I should get a 404 response code
     And the JSON response should be:
     """
@@ -3077,11 +3077,11 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "Hello World" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "Test" page with the API token for "data_owner@intersect.org.au"
+    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "test" page with the API token for "data_owner@intersect.org.au"
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Deleted the document document1.txt from item item1 in collection Test"}
+    {"success":"Deleted the document document1.txt from item item1 in collection test"}
     """
 
   @api_delete_document  @javascript
@@ -3092,14 +3092,14 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "Hello World" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:extent": 72636, "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "Test" page with the API token for "data_owner@intersect.org.au"
-    Then the file "document1.txt" should not exist in the directory for the collection "Test"
-    And the document "document1.text" under item "item1" in collection "Test" should not exist in the database
-    And Sesame should not contain a document with file_name "document1.txt" in collection "Test"
+    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "test" page with the API token for "data_owner@intersect.org.au"
+    Then the file "document1.txt" should not exist in the directory for the collection "test"
+    And the document "document1.text" under item "item1" in collection "test" should not exist in the database
+    And Sesame should not contain a document with file_name "document1.txt" in collection "test"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Deleted the document document1.txt from item item1 in collection Test"}
+    {"success":"Deleted the document document1.txt from item item1 in collection test"}
     """
 
   @api_delete_document  @javascript
@@ -3110,19 +3110,19 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "Hello World" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "Test" page with the API token for "data_owner@intersect.org.au"
-    And I go to the catalog page for "Test:item1"
+    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "test" page with the API token for "data_owner@intersect.org.au"
+    And I go to the catalog page for "test:item1"
     Then I should see "Item Details"
     And I should see "Identifier: item1"
-    And I should see "Collection: Test"
+    And I should see "Collection: test"
     And I should not see "Documents: document1.txt"
     And I should not see "document1.txt"
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Deleted the document document1.txt from item item1 in collection Test"}
+    {"success":"Deleted the document document1.txt from item item1 in collection test"}
     """
 
   @api_delete_document  @javascript
@@ -3133,13 +3133,13 @@ Feature: Browsing via API
     And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "Hello World" }, { "identifier": "document2.txt", "content": "Foo Bar" } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" }, { "@id": "document2.txt", "@type": "foaf:Document", "dcterms:identifier": "document2.txt", "dcterms:title": "document2#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    And I reindex the collection "Test"
+    And I reindex the collection "test"
     And I am logged in as "data_owner@intersect.org.au"
-    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "Test" page with the API token for "data_owner@intersect.org.au"
-    And I go to the catalog page for "Test:item1"
+    When I make a JSON delete request for the delete document "document1.txt" from "item "item1" in collection "test" page with the API token for "data_owner@intersect.org.au"
+    And I go to the catalog page for "test:item1"
     Then I should see "Item Details"
     And I should see "Identifier: item1"
-    And I should see "Collection: Test"
+    And I should see "Collection: test"
     And I should not see "Documents: document1.txt, document2.txt"
     And I should see "Documents: document2.txt"
     And I should see "Documents"
@@ -3148,5 +3148,5 @@ Feature: Browsing via API
     And I should get a 200 response code
     And the JSON response should be:
     """
-    {"success":"Deleted the document document1.txt from item item1 in collection Test"}
+    {"success":"Deleted the document document1.txt from item item1 in collection test"}
     """

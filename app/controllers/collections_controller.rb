@@ -184,8 +184,8 @@ class CollectionsController < ApplicationController
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
     begin
       request_params = cleanse_params(params)
-      corpus_dir = corpus_dir(request_params[:id])
-      collection = validate_collection(request_params[:id], request_params[:api_key])
+      collection = validate_collection(sanitize_collection_name(request_params[:id]), request_params[:api_key])
+      corpus_dir = corpus_dir(collection.name)
       validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
       request_params[:items].each do |item_json|
         update_ids_in_jsonld(item_json["metadata"], collection)
@@ -202,8 +202,8 @@ class CollectionsController < ApplicationController
 
   def add_document_to_item
     begin
-      corpus_dir = corpus_dir(params[:collectionId])
-      collection = validate_collection(params[:collectionId], params[:api_key])
+      collection = validate_collection(sanitize_collection_name(params[:collectionId]), params[:api_key])
+      corpus_dir = corpus_dir(collection.name)
       item = validate_item_exists(collection, params[:itemId])
       doc_metadata = params[:metadata]
       doc_content = params[:document_content]
@@ -214,7 +214,7 @@ class CollectionsController < ApplicationController
       doc_metadata = format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
       create_document(item, doc_metadata)
       add_and_index_document(item, doc_metadata)
-      @success_message = "Added the document #{doc_filename} to item #{params[:itemId]} in collection #{params[:collectionId]}"
+      @success_message = "Added the document #{doc_filename} to item #{item.get_name} in collection #{collection.name}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -223,11 +223,11 @@ class CollectionsController < ApplicationController
 
   def delete_item_from_collection
     begin
-      corpus_dir = corpus_dir(params[:collectionId])
-      collection = validate_collection(params[:collectionId], params[:api_key])
+      collection = validate_collection(sanitize_collection_name(params[:collectionId]), params[:api_key])
+      corpus_dir = corpus_dir(collection.name)
       item = validate_item_exists(collection, params[:itemId])
       remove_item(item, collection, corpus_dir)
-      @success_message = "Deleted the item #{params[:itemId]} (and its documents) from collection #{params[:collectionId]}"
+      @success_message = "Deleted the item #{item.get_name} (and its documents) from collection #{collection.name}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -236,13 +236,13 @@ class CollectionsController < ApplicationController
 
   def delete_document_from_item
     begin
-      collection = validate_collection(params[:collectionId], params[:api_key])
+      collection = validate_collection(sanitize_collection_name(params[:collectionId]), params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
       document = validate_document_exists(item, params[:filename])
       remove_document(document, collection)
       delete_item_from_solr(item.id)
       update_item_in_solr(item)
-      @success_message = "Deleted the document #{params[:filename]} from item #{params[:itemId]} in collection #{params[:collectionId]}"
+      @success_message = "Deleted the document #{params[:filename]} from item #{item.get_name} in collection #{collection.name}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -251,7 +251,7 @@ class CollectionsController < ApplicationController
 
   def edit_collection
     begin
-      collection = validate_collection(params[:id], params[:api_key])
+      collection = validate_collection(sanitize_collection_name(params[:id]), params[:api_key])
       validate_jsonld(params[:collection_metadata])
       new_metadata = format_update_collection_metadata(collection, params[:collection_metadata], params[:replace])
       write_metadata_graph_to_file(new_metadata, collection.rdf_file_path, format=:ttl)
@@ -264,7 +264,7 @@ class CollectionsController < ApplicationController
 
   def update_item
     begin
-      collection = validate_collection(params[:collectionId], params[:api_key])
+      collection = validate_collection(sanitize_collection_name(params[:collectionId]), params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
       validate_jsonld(params[:metadata])
       new_metadata = format_update_item_metadata(item, params[:metadata])
