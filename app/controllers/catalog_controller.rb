@@ -939,9 +939,8 @@ class CatalogController < ApplicationController
   # Ensures that the item is indexed in Solr and displays an appropriate response otherwise
   #
   def check_item_indexed
-    item = nil
-    item = Item.find(params[:id]) unless params[:id].blank?
-    unless item.nil?
+    begin
+      item = Item.find(params[:id])
       if item.indexed_at.nil?
         respond_to do |format|
           format.html {
@@ -952,6 +951,8 @@ class CatalogController < ApplicationController
           format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
         end
       end
+    rescue ActiveRecord::RecordNotFound
+      return
     end
   end
 
