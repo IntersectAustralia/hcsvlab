@@ -4,6 +4,8 @@
   = text_field_tag :collection_name, nil, required: true
   = label_tag :collection_title, 'Collection Title:'
   = text_field_tag :collection_title, nil, required: true
+  = label_tag :licence_id, 'Licence'
+  = select_tag :licence_id, options_for_select(@licences.map {|l| [l.name, l.id]}), include_blank: true
 
   %h2 Additional Metadata
   See #{link_to 'searchable fields', catalog_searchable_fields_path} for suggestions

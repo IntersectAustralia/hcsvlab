@@ -127,7 +127,7 @@ Feature: Creating Collections
   Scenario: Verify the collection name needs to be unique within the system
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
-    When I fill in "collection_name" with "test"
+    And I fill in "collection_name" with "test"
     And I fill in "collection_title" with "Test"
     And I press "Create"
     When I am on the create collection page
@@ -136,3 +136,32 @@ Feature: Creating Collections
     And I press "Create"
     Then I should be on the create collection page
     And I should see "A collection with the name 'test' already exists"
+
+  Scenario: Verify licence can be selected when creating a collection
+    Given I am logged in as "data_owner@intersect.org.au"
+    And I ingest licences
+    And I am on the create collection page
+    And I fill in "collection_name" with "test"
+    And I fill in "collection_title" with "Test"
+    When I select "Creative Commons v3.0 BY-NC" from "licence_id"
+    And I press "Create"
+    Then I should be on the collection page for "test"
+    And I should see "New collection 'test' (http://www.example.com/catalog/test) created"
+    And I should see "test"
+    And I should see "Collection Details"
+    And I should see "RDF Type: dcmitype:Collection"
+    And I should see "Title: Test"
+    And I should see "SPARQL Endpoint: http://www.example.com/sparql/test"
+    
+  Scenario: Assign licence to a Collection
+    Given I am logged in as "data_owner@intersect.org.au"
+    And I ingest licences
+    And I am on the create collection page
+    And I fill in "collection_name" with "test"
+    And I fill in "collection_title" with "Test"
+    When I select "Creative Commons v3.0 BY-NC" from "licence_id"
+    And I press "Create"
+    And I am on the licences page
+    Then The Collection table should have
+      | collection | collection_list | licence                     | licence_terms      |
+      | test       |                 | Creative Commons v3.0 BY-NC | View Licence Terms |

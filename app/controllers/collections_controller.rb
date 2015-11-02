@@ -145,6 +145,10 @@ class CollectionsController < ApplicationController
 
   def web_create_collection
     authorize! :web_create_collection, Collection
+    # Provide public licences and the user licences
+    t = Licence.arel_table
+    @licences = Licence.where(t[:private].eq(false).or(t[:owner_id].eq(current_user.id)))
+    # Handle a submitted collection creation form
     if request.post?
       required_fields = {:collection_name => 'collection name', :collection_title => 'collection title'}
       protected_field_keys = ['@id', '@type', '@context',
@@ -157,7 +161,7 @@ class CollectionsController < ApplicationController
         name = sanitize_collection_name(params[:collection_name])
         title = params[:collection_title]
         json_ld = {'@context' => JsonLdHelper::default_context, '@type' => 'dcmitype:Collection', MetadataHelper::TITLE.to_s => title}
-
+        # Validate and sanitise any additional metadata fields
         additional_metadata = []
         if params.has_key?(:additional_key) && params.has_key?(:additional_value)
           additional_metadata = params[:additional_key].zip(params[:additional_value])
@@ -170,9 +174,14 @@ class CollectionsController < ApplicationController
             end
           end
         end
-
+        # Ingest new collection and assign a licence
         json_ld = JSON.parse(json_ld.to_json) # convert symbols in context to strings as expected in JSON-LD parser
         msg = create_collection_core(name, json_ld, current_user)
+        unless params[:licence_id].blank?
+          licence = Licence.find(params[:licence_id])
+          collection = Collection.find_by_name(name)
+          collection.set_licence(licence)
+        end
         redirect_to collection_path(id: name), notice: msg
       rescue ResponseError => e
         flash[:error] = e.message
