@@ -6,14 +6,14 @@ public
   #
   #
   def self::predefined_context_properties
-    predefined_properties = {}
-    predefined_properties[:commonProperties] = {:@id => "http://purl.org/dada/schema/0.2#commonProperties"}
-    predefined_properties[:dada] = {:@id => "http://purl.org/dada/schema/0.2#"}
-    predefined_properties[:type] = {:@id => "http://purl.org/dada/schema/0.2#type"}
-    predefined_properties[:start] = {:@id => "http://purl.org/dada/schema/0.2#start"}
-    predefined_properties[:end] = {:@id => "http://purl.org/dada/schema/0.2#end"}
-    predefined_properties[:label] = {:@id => "http://purl.org/dada/schema/0.2#label"}
-    predefined_properties[:"#{PROJECT_PREFIX_NAME}"] = {:@id => "#{PROJECT_SCHEMA_LOCATION}"}
+    predefined_properties = HashWithIndifferentAccess.new
+    predefined_properties['commonProperties'] = {'@id' => "http://purl.org/dada/schema/0.2#commonProperties"}
+    predefined_properties['dada'] = {'@id' => "http://purl.org/dada/schema/0.2#"}
+    predefined_properties['type'] = {'@id' => "http://purl.org/dada/schema/0.2#type"}
+    predefined_properties['start'] = {'@id' => "http://purl.org/dada/schema/0.2#start"}
+    predefined_properties['end'] = {'@id' => "http://purl.org/dada/schema/0.2#end"}
+    predefined_properties['label'] = {'@id' => "http://purl.org/dada/schema/0.2#label"}
+    predefined_properties["#{PROJECT_PREFIX_NAME}"] = {'@id' => "#{PROJECT_SCHEMA_LOCATION}"}
 
     predefined_properties
   end
@@ -69,12 +69,12 @@ public
   def self::default_context
     predefined_properties = predefined_context_properties
     avoid_context = restricted_predefined_vocabulary
-    vocab_hash = {}
+    vocab_hash = HashWithIndifferentAccess.new
     RDF::Vocabulary.each { |vocab|
       if !avoid_context.include?(vocab.to_uri) and vocab.to_uri.qname.present?
         prefix = vocab.to_uri.qname.first.to_s
         uri = vocab.to_uri.to_s
-        vocab_hash[prefix] = {:@id => uri}
+        vocab_hash[prefix] = {'@id' => uri}
       end
     }
     hash = {}

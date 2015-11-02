@@ -77,6 +77,20 @@ Feature: Creating Collections
     And I should see "Title: Test"
     And I should see "SPARQL Endpoint: http://www.example.com/sparql/test"
 
+  Scenario: Verify creating a collection with spaces in its name
+    Given I am logged in as "data_owner@intersect.org.au"
+    And I am on the create collection page
+    When I fill in "collection_name" with "Test With Space"
+    And I fill in "collection_title" with "Test"
+    And I press "Create"
+    Then I should be on the collection page for "testwithspace"
+    And I should see "New collection 'testwithspace' (http://www.example.com/catalog/testwithspace) created"
+    And I should see "testwithspace"
+    And I should see "Collection Details"
+    And I should see "RDF Type: dcmitype:Collection"
+    And I should see "Title: Test"
+    And I should see "SPARQL Endpoint: http://www.example.com/sparql/testwithspace"
+
   Scenario Outline: Verify collection name and title are required
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
@@ -91,21 +105,25 @@ Feature: Creating Collections
     | test |       | Required field 'collection title' is missing |
 
   @javascript
-  Scenario: Verify creating a collection a set of additional metadata
+  Scenario Outline: Verify creating a collection a set of additional metadata
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     And I click "Add Metadata Field"
     When I fill in "collection_name" with "test"
     And I fill in "collection_title" with "Test"
-    And I fill in "additional_key[]" with "dc:extent"
-    And I fill in "additional_value[]" with "foo"
+    And I fill in "additional_key[]" with "<key>"
+    And I fill in "additional_value[]" with "<value>"
     And I press "Create"
     Then I should be on the collection page for "test"
     And I should see "test"
     And I should see "Collection Details"
     And I should see "RDF Type: dcmitype:Collection"
     And I should see "Title: Test"
-    And I should see "Extent: foo"
+    And I should see "<expected>"
+  Examples:
+    | key        | value   | expected        |
+    | dc:extent  | foo     | Extent: foo     |
+    | dc:ex tent | foo bar | Extent: foo bar |
 
   @javascript
   Scenario Outline: Verify providing an empty metadata field returns an error response

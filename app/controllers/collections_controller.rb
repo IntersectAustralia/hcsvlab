@@ -66,7 +66,7 @@ class CollectionsController < ApplicationController
       else
         owner = User.find_by_authentication_token(params[:api_key])
         begin
-          @success_message = create_collection_core(collection_name, collection_metadata, owner)
+          @success_message = create_collection_core(sanitize_collection_name(collection_name), collection_metadata, owner)
         rescue ResponseError => e
           respond_with_error(e.message, e.response_code)
           return # Only respond with one error at a time
@@ -127,61 +127,32 @@ class CollectionsController < ApplicationController
     redirect_to licences_path
   end
 
-  def create_collection_core(name, metadata, owner)
-    name = sanitize_collection_name(name)
-    metadata = update_jsonld_collection_id(metadata, name)
-    uri = metadata['@id']
-    if Collection.find_by_uri(uri).present?  # ingest skips collections with non-unique uri
-      raise ResponseError.new(400), "A collection with the name '#{name}' already exists"
-    else
-      corpus_dir = create_metadata_and_manifest(name, convert_json_metadata_to_rdf(metadata))
-      # Create the collection without doing a full ingest since it won't contain any item metadata
-      collection = check_and_create_collection(name, corpus_dir)
-      collection.owner = owner
-      collection.save
-      "New collection '#{name}' (#{uri}) created"
-    end
-  end
-
   def web_create_collection
     authorize! :web_create_collection, Collection
-    # Provide public licences and the user licences
-    t = Licence.arel_table
-    @licences = Licence.where(t[:private].eq(false).or(t[:owner_id].eq(current_user.id)))
-    # Handle a submitted collection creation form
+    # Expose public licences and user created licences
+    licence_table = Licence.arel_table
+    @licences = Licence.where(licence_table[:private].eq(false).or(licence_table[:owner_id].eq(current_user.id)))
     if request.post?
-      required_fields = {:collection_name => 'collection name', :collection_title => 'collection title'}
-      protected_field_keys = ['@id', '@type', '@context',
-                             'dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s,
-                             'dc:title', 'dcterms:title', MetadataHelper::TITLE.to_s]
       begin
+        # Check required fields
+        required_fields = {:collection_name => 'collection name', :collection_title => 'collection title'}
         required_fields.each do |key, value|
           raise ResponseError.new(400), "Required field '#{value}' is missing" if params[key].blank?
         end
-        name = sanitize_collection_name(params[:collection_name])
-        title = params[:collection_title]
-        json_ld = {'@context' => JsonLdHelper::default_context, '@type' => 'dcmitype:Collection', MetadataHelper::TITLE.to_s => title}
-        # Validate and sanitise any additional metadata fields
-        additional_metadata = []
+
+        # Validate and sanitise additional metadata fields
+        additional_metadata = {}
         if params.has_key?(:additional_key) && params.has_key?(:additional_value)
-          additional_metadata = params[:additional_key].zip(params[:additional_value])
-          additional_metadata.delete(['','']) # delete any pairs with empty key and value
-          additional_metadata.each do |key, value|
-            unless key.blank? && value.blank?
-              raise ResponseError.new(400), 'An additional metadata field is missing a key' if key.blank?
-              raise ResponseError.new(400), "Additional metadata field '#{key}' is missing a value" if value.blank?
-              json_ld[key.strip] = value.strip unless protected_field_keys.include?(key.strip)
-            end
-          end
+          additional_metadata = validate_additional_metadata(params[:additional_key].zip(params[:additional_value]))
         end
-        # Ingest new collection and assign a licence
-        json_ld = JSON.parse(json_ld.to_json) # convert symbols in context to strings as expected in JSON-LD parser
-        msg = create_collection_core(name, json_ld, current_user)
-        unless params[:licence_id].blank?
-          licence = Licence.find(params[:licence_id])
-          collection = Collection.find_by_name(name)
-          collection.set_licence(licence)
-        end
+
+        # Construct collection Json-ld
+        json_ld = {'@context' => JsonLdHelper::default_context, '@type' => 'dcmitype:Collection', MetadataHelper::TITLE.to_s => params[:collection_title]}
+        json_ld.merge!(additional_metadata) {|key, val1, val2| val1}
+
+        # Ingest new collection
+        name = sanitize_collection_name(params[:collection_name])
+        msg = create_collection_core(name, json_ld, current_user, params[:licence_id])
         redirect_to collection_path(id: name), notice: msg
       rescue ResponseError => e
         flash[:error] = e.message
@@ -899,6 +870,45 @@ class CollectionsController < ApplicationController
 
   def sanitize_collection_name(name)
     name.downcase.delete(' ')
+  end
+
+  #
+  # Core functionality common to creating a collection
+  #
+  def create_collection_core(name, metadata, owner, licence_id=nil)
+    metadata = update_jsonld_collection_id(metadata, name)
+    uri = metadata['@id']
+    if Collection.find_by_uri(uri).present?  # ingest skips collections with non-unique uri
+      raise ResponseError.new(400), "A collection with the name '#{name}' already exists"
+    else
+      corpus_dir = create_metadata_and_manifest(name, convert_json_metadata_to_rdf(metadata))
+      # Create the collection without doing a full ingest since it won't contain any item metadata
+      collection = check_and_create_collection(name, corpus_dir)
+      collection.owner = owner
+      collection.licence_id = licence_id
+      collection.save
+      "New collection '#{name}' (#{uri}) created"
+    end
+  end
+
+  #
+  # Validates and sanitises a set of additional metadata provided by ingest web forms
+  # Expects a zipped array of additional metadata keys and values, returns a hash of sanitised metadata
+  #
+  def validate_additional_metadata(additional_metadata)
+    protected_field_keys = ['@id', '@type', '@context',
+                            'dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s,
+                            'dc:title', 'dcterms:title', MetadataHelper::TITLE.to_s]
+    additional_metadata.delete_if {|key, value| key.blank? && value.blank?}
+    metadata_hash = {}
+    additional_metadata.each do |key, value|
+      meta_key = key.delete(' ')
+      meta_value = value.strip
+      raise ResponseError.new(400), 'An additional metadata field is missing a key' if meta_key.blank?
+      raise ResponseError.new(400), "Additional metadata field '#{meta_key}' is missing a value" if meta_value.blank?
+      metadata_hash[meta_key] = meta_value unless protected_field_keys.include?(meta_key)
+    end
+    metadata_hash
   end
 
 end
