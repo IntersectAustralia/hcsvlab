@@ -30,6 +30,8 @@ class CatalogController < ApplicationController
 
   prepend_before_filter :retrieve_and_set_item_id
 
+  before_filter :check_item_indexed, :only => [:show, :document, :primary_text, :annotations, :upload_annotation]
+
   # These before_filters apply the hydra access controls
   before_filter :wrapped_enforce_show_permissions, :only => [:show, :document, :primary_text, :annotations, :upload_annotation]
   # This applies appropriate access controls to all solr queries
@@ -934,6 +936,27 @@ class CatalogController < ApplicationController
         end
       end
       params[:id] = item.id
+    end
+  end
+
+  #
+  # Ensures that the item is indexed in Solr and displays an appropriate response otherwise
+  #
+  def check_item_indexed
+    begin
+      item = Item.find(params[:id])
+      if item.indexed_at.nil?
+        respond_to do |format|
+          format.html {
+            flash.keep(:notice) # Persist flash notices from the previous request
+            flash[:error] = "Sorry, the item you requested is being indexed and will be available shortly."
+            redirect_to root_url and return
+          }
+          format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
+        end
+      end
+    rescue ActiveRecord::RecordNotFound
+      return
     end
   end
 

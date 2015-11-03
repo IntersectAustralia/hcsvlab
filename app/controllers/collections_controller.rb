@@ -204,13 +204,33 @@ class CollectionsController < ApplicationController
       collection = validate_collection(params[:collectionId], params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
       document = validate_document_exists(item, params[:filename])
-      remove_document(document, collection)
-      delete_item_from_solr(item.id)
-      update_item_in_solr(item)
-      @success_message = "Deleted the document #{params[:filename]} from item #{params[:itemId]} in collection #{params[:collectionId]}"
+      @success_message = delete_doc_core(collection, item, document)
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
+    end
+  end
+
+  def delete_doc_core (collection, item, document)
+    remove_document(document, collection)
+    delete_item_from_solr(item.id)
+    item.indexed_at = nil
+    item.save
+    update_item_in_solr(item)
+    "Deleted the document #{params[:filename]} from item #{params[:itemId]} in collection #{params[:collectionId]}"
+  end
+
+  def delete_document_via_web_app
+    authorize! :delete_document_via_web_app, Collection.find_by_name(params[:collectionId])
+    begin
+      item = Item.find_by_handle("#{params[:collectionId]}:#{params[:itemId]}")
+      collection = item.collection
+      document = item.documents.find_by_file_name(params[:filename])
+      msg = delete_doc_core(collection, item, document)
+      redirect_to catalog_path(params[:collectionId], params[:itemId]), notice: msg
+    rescue ResponseError => e
+      Rails.logger.error e.message
+      flash[:error] = e.message
     end
   end
 

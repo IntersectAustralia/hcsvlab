@@ -90,6 +90,8 @@ class Ability
 
     can :delete_item_via_web_app, Collection, owner_id: user_id
 
+    can :delete_document_via_web_app, Collection, owner_id: user_id
+
     # User can discover a collection only if he/she is the owner or if he/she was granted
     # with discover, read or edit access to that collection
     can :discover, Collection
