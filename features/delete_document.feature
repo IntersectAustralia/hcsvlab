@@ -61,8 +61,8 @@ Feature: Deleting Documents
     When I click the delete icon for document "1-001-plain.txt" of item "cooee:1-001"
     Then The popup text should contain "Are you sure you want to delete this document?"
 
-# ToDo: include this test if it can be  resolved why request.host gives 'www.example.org' during JSON request steps and 'http://127.0.0.1:58506' during web interface steps
-#  @web_delete_document @javascript
+## ToDo: include this test if it can be resolved why api uses host http://example.org and web interface uses host http://www.example.com
+#  @web_delete_document
 #  Scenario: Delete a document as the item owner (API ingested collection)
 #    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
 #      | name | collection_metadata |
@@ -72,12 +72,9 @@ Feature: Deleting Documents
 #      | [ { "documents": [ { "identifier": "document1.txt", "content": "This document had its content provided as part of the JSON request." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
 #    And I reindex the collection "Test"
 #    And I am logged in as "data_owner@intersect.org.au"
-#    And I am on the catalog page for "Test:item1"
-#    When I click the delete icon for document "document1.txt" of item "Test:item1"
-#    And The popup text should contain "Are you sure you want to delete this document?"
-#    And I confirm the popup
+#    When I go to the delete document web path for "document1.txt" in "Test:item1"
 #    Then I should be on the catalog page for "Test:item1"
-#    And the document "document1.text" under item "item1" in collection "Test" should not exist in the database
+#    And the document "document1.txt" under item "item1" in collection "Test" should not exist in the database
 #    And the file "document1.txt" should not exist in the directory for the collection "Test"
 #    And Sesame should not contain a document with file_name "document1.txt" in collection "Test"
 #    And I should not see link "Closebox" to "/catalog/Test/item1/document/document1.txt/delete"
