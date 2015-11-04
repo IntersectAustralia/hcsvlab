@@ -577,21 +577,45 @@ class CollectionsController < ApplicationController
     end
   end
 
+  #
+  # Gets the document URI from Sesame
+  # URI is obtained by querying the item's RDF documents for a doc with a metadata ID matching the doc filename in the db
+  #
+  def get_doc_subject_uri_from_sesame(document, repository)
+    document_uri = nil
+    item_documents = RDF::Query.execute(repository) do
+      pattern [RDF::URI.new(document.item.uri), MetadataHelper::DOCUMENT, :object]
+    end
+    item_documents.each do |doc|
+      doc_ids = RDF::Query.execute(repository) do
+        pattern [doc[:object], MetadataHelper::IDENTIFIER, :doc_id]
+      end
+      doc_ids.each do |doc_id|
+        if doc_id[:doc_id] == document.file_name
+          document_uri = doc[:object]
+        end
+      end
+    end
+    raise 'Could not obtain document URI from Sesame' if document_uri.nil?
+    document_uri
+  end
+
+  #
   # Deletes statements from Sesame where the RDF subject matches the document URI
+  #
   def delete_document_from_sesame(document, repository)
-    item_name = document.item.handle.split(":")[1]
-    document_URI = RDF::URI.new(format_document_url(document.item.collection.name, item_name, document.file_name))
+    document_uri = get_doc_subject_uri_from_sesame(document, repository)
     triples_with_doc_subject = RDF::Query.execute(repository) do
-      pattern [document_URI, :predicate, :object]
+      pattern [document_uri, :predicate, :object]
     end
     triples_with_doc_subject.each do |statement|
-      repository.delete(RDF::Statement(document_URI, statement[:predicate], statement[:object]))
+      repository.delete(RDF::Statement(document_uri, statement[:predicate], statement[:object]))
     end
     triples_with_doc_object = RDF::Query.execute(repository) do
-      pattern [:subject, :predicate, document_URI]
+      pattern [:subject, :predicate, document_uri]
     end
     triples_with_doc_object.each do |statement|
-      repository.delete(RDF::Statement(statement[:subject], statement[:predicate], document_URI))
+      repository.delete(RDF::Statement(statement[:subject], statement[:predicate], document_uri))
     end
   end
 
@@ -623,10 +647,10 @@ class CollectionsController < ApplicationController
   # Deletes an item and its documents from Sesame
   def delete_from_sesame(item, collection)
     repository = get_sesame_repository(collection)
-    delete_item_from_sesame(item, repository)
     item.documents.each do |document|
       delete_document_from_sesame(document, repository)
     end
+    delete_item_from_sesame(item, repository)
   end
 
   # Attempts to delete a file or logs any exceptions raised
