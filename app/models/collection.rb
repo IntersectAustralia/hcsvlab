@@ -13,6 +13,10 @@ class Collection < ActiveRecord::Base
 
   validates :name, presence: true
 
+  def self.sanitise_name(name)
+    name.downcase.delete(' ')
+  end
+
   def set_licence(licence)
     self.licence = licence
     self.save!
