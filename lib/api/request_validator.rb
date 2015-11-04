@@ -16,7 +16,7 @@ module RequestValidator
 
   # Validates the collection exists and the user is authorised to modify it
   def validate_collection(collection_id, api_key)
-    collection = validate_collection_exists(collection_id)
+    collection = validate_collection_exists(Collection.sanitise_name(collection_id))
     if api_key != User.find(collection.owner_id).authentication_token
       raise ResponseError.new(403), "User is unauthorised" # Authorise by comparing api key sent with collection owner's api key
     end

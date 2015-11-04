@@ -5,5 +5,8 @@
   - else
     %h2 Select a collection to view general information about that collection
     %p In order to access the data for a particular collection, you will need to agree to the licence for that collection.
+    - if can? :web_create_collection, Collection
+      %br
+      = link_to "Create New Collection", web_create_collection_path, :id => 'Create New Collection', :class => "btn"
 = render 'shared/nectar_attribution'
 = render 'shared/modal_waiting_panel'

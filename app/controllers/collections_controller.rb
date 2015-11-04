@@ -1,6 +1,7 @@
 require Rails.root.join('lib/tasks/fedora_helper.rb')
 require Rails.root.join('lib/api/response_error')
 require Rails.root.join('lib/api/request_validator')
+require Rails.root.join('lib/json-ld/json_ld_helper.rb')
 require 'fileutils'
 
 class CollectionsController < ApplicationController
@@ -63,17 +64,12 @@ class CollectionsController < ApplicationController
         err_message << " not found" unless err_message.nil?
         respond_with_error(err_message, 400)
       else
-        collection_metadata = update_jsonld_collection_id(collection_metadata, collection_name)
-        collection_uri = collection_metadata['@id']
-        if Collection.find_by_uri(collection_uri).present?  # ingest skips collections with non-unique uri
-          respond_with_error("Collection '#{collection_name}' (#{collection_uri}) already exists in the system - skipping", 400)
-        else
-          corpus_dir = create_metadata_and_manifest(collection_name, convert_json_metadata_to_rdf(collection_metadata))
-          # Create the collection without doing a full ingest since it won't contain any item metadata
-          collection = check_and_create_collection(collection_name, corpus_dir)
-          collection.owner = User.find_by_authentication_token(params[:api_key])
-          collection.save
-          @success_message = "New collection '#{collection_name}' (#{collection_uri}) created"
+        owner = User.find_by_authentication_token(params[:api_key])
+        begin
+          @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner)
+        rescue ResponseError => e
+          respond_with_error(e.message, e.response_code)
+          return # Only respond with one error at a time
         end
       end
     else
@@ -131,12 +127,42 @@ class CollectionsController < ApplicationController
     redirect_to licences_path
   end
 
+  def web_create_collection
+    authorize! :web_create_collection, Collection
+    # Expose public licences and user created licences
+    licence_table = Licence.arel_table
+    @licences = Licence.where(licence_table[:private].eq(false).or(licence_table[:owner_id].eq(current_user.id)))
+    if request.post?
+      begin
+        # Check required fields
+        required_fields = {:collection_name => 'collection name', :collection_title => 'collection title'}
+        required_fields.each do |key, value|
+          raise ResponseError.new(400), "Required field '#{value}' is missing" if params[key].blank?
+        end
+
+        # Validate and sanitise additional metadata fields
+        additional_metadata = validate_collection_additional_metadata(params)
+
+        # Construct collection Json-ld
+        json_ld = {'@context' => JsonLdHelper::default_context, '@type' => 'dcmitype:Collection', MetadataHelper::TITLE.to_s => params[:collection_title]}
+        json_ld.merge!(additional_metadata) {|key, val1, val2| val1}
+
+        # Ingest new collection
+        name = Collection.sanitise_name(params[:collection_name])
+        msg = create_collection_core(name, json_ld, current_user, params[:licence_id])
+        redirect_to collection_path(id: name), notice: msg
+      rescue ResponseError => e
+        flash[:error] = e.message
+      end
+    end
+  end
+
   def add_items_to_collection
     # referenced documents (HCSVLAB-1019) are already handled by the look_for_documents part of the item ingest
     begin
       request_params = cleanse_params(params)
-      corpus_dir = api_corpus_dir(request_params[:id])
       collection = validate_collection(request_params[:id], request_params[:api_key])
+      corpus_dir = api_corpus_dir(collection.name)
       validate_add_items_request(collection, corpus_dir, request_params[:items], request_params[:file])
       request_params[:items].each do |item_json|
         update_ids_in_jsonld(item_json["metadata"], collection)
@@ -153,8 +179,8 @@ class CollectionsController < ApplicationController
 
   def add_document_to_item
     begin
-      corpus_dir = api_corpus_dir(params[:collectionId])
       collection = validate_collection(params[:collectionId], params[:api_key])
+      corpus_dir = api_corpus_dir(collection.name)
       item = validate_item_exists(collection, params[:itemId])
       doc_metadata = params[:metadata]
       doc_content = params[:document_content]
@@ -165,7 +191,7 @@ class CollectionsController < ApplicationController
       doc_metadata = format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
       create_document(item, doc_metadata)
       add_and_index_document(item, doc_metadata)
-      @success_message = "Added the document #{doc_filename} to item #{params[:itemId]} in collection #{params[:collectionId]}"
+      @success_message = "Added the document #{doc_filename} to item #{item.get_name} in collection #{collection.name}"
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
@@ -895,6 +921,57 @@ class CollectionsController < ApplicationController
     #Reindex item in Solr
     delete_item_from_solr(item.id)
     update_item_in_solr(item)
+  end
+
+  #
+  # Core functionality common to creating a collection
+  #
+  def create_collection_core(name, metadata, owner, licence_id=nil)
+    metadata = update_jsonld_collection_id(metadata, name)
+    uri = metadata['@id']
+    if Collection.find_by_uri(uri).present?  # ingest skips collections with non-unique uri
+      raise ResponseError.new(400), "A collection with the name '#{name}' already exists"
+    else
+      corpus_dir = create_metadata_and_manifest(name, convert_json_metadata_to_rdf(metadata))
+      # Create the collection without doing a full ingest since it won't contain any item metadata
+      collection = check_and_create_collection(name, corpus_dir)
+      collection.owner = owner
+      collection.licence_id = licence_id
+      collection.save
+      "New collection '#{name}' (#{uri}) created"
+    end
+  end
+
+  #
+  # Returns a validated hash of the additional metadata params
+  #
+  def validate_collection_additional_metadata(params)
+    if params.has_key?(:additional_key) && params.has_key?(:additional_value)
+      protected_collection_fields = ['dc:title', 'dcterms:title', MetadataHelper::TITLE.to_s]
+      validate_additional_metadata(params[:additional_key].zip(params[:additional_value]), protected_collection_fields)
+    else
+      {}
+    end
+  end
+
+  #
+  # Validates and sanitises a set of additional metadata provided by ingest web forms
+  # Expects a zipped array of additional metadata keys and values, returns a hash of sanitised metadata
+  #
+  def validate_additional_metadata(additional_metadata, protected_field_keys)
+    default_protected_fields = ['@id', '@type', '@context',
+                                'dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s]
+    metadata_protected_fields = default_protected_fields | protected_field_keys
+    additional_metadata.delete_if {|key, value| key.blank? && value.blank?}
+    metadata_hash = {}
+    additional_metadata.each do |key, value|
+      meta_key = key.delete(' ')
+      meta_value = value.strip
+      raise ResponseError.new(400), 'An additional metadata field is missing a key' if meta_key.blank?
+      raise ResponseError.new(400), "Additional metadata field '#{meta_key}' is missing a value" if meta_value.blank?
+      metadata_hash[meta_key] = meta_value unless metadata_protected_fields.include?(meta_key)
+    end
+    metadata_hash
   end
 
 end

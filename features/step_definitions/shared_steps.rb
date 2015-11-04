@@ -37,6 +37,10 @@ Then /^I should see button "([^"]*)"$/ do |arg1|
   page.should have_xpath("//input[@value='#{arg1}']")
 end
 
+Then /^I should see button with text "([^"]*)"$/ do |arg1|
+  page.should have_xpath("//button[text()='#{arg1}']")
+end
+
 Then /^I should see image "([^"]*)"$/ do |arg1|
   page.should have_xpath("//img[contains(@src, #{arg1})]")
 end

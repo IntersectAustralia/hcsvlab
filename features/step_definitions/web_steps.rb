@@ -307,6 +307,10 @@ When /^I hover over "([^"]*)"$/ do |text|
   find(:xpath, "//a[contains(text(),'#{text}')]").hover
 end
 
+Then /^I should see the flash notice "([^"]*)"$/ do |notice|
+  page.should have_css('.flashnotice', text: notice)
+end
+
 Then /^I should (not )?have the link "([^"]*)"/ do |negation, text|
   if (negation)
     page.should_not have_selector(:link_or_button, text)
