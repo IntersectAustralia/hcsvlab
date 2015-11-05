@@ -89,6 +89,7 @@ public
   RIGHTS                 = RDF::URI(DC_TERMS_BASE_URI + 'rights') unless const_defined?(:RIGHTS)
   DESCRIPTION            = RDF::URI(DC_TERMS_BASE_URI + 'description') unless const_defined?(:DESCRIPTION)
   BIBLIOGRAPHIC_CITATION = RDF::URI(DC_TERMS_BASE_URI + 'bibliographicCitation') unless const_defined?(:BIBLIO_CITATION)
+  ABSTRACT               = RDF::URI(DC_TERMS_BASE_URI + 'abstract') unless const_defined?(:ABSTRACT)
 
   @@lookup[IS_PART_OF.to_s]             = prefixes[DC_TERMS_BASE_URI] + "_is_part_of"
   @@lookup[EXTENT.to_s]                 = prefixes[DC_TERMS_BASE_URI] + "_extent"
@@ -100,6 +101,7 @@ public
   @@lookup[RIGHTS.to_s]                 = prefixes[DC_TERMS_BASE_URI] + "_rights"
   @@lookup[DESCRIPTION.to_s]            = prefixes[DC_TERMS_BASE_URI] + "_description"
   @@lookup[BIBLIOGRAPHIC_CITATION.to_s] = prefixes[DC_TERMS_BASE_URI] + "_bibliographicCitation"
+  @@lookup[ABSTRACT.to_s]               = prefixes[DC_TERMS_BASE_URI] + "_abstract"
 
   #
   # OLAC
@@ -122,8 +124,10 @@ public
   # LoC
   #
   LOC_RESPONSIBLE_PERSON = RDF::URI(LOC_BASE_URI + 'rpy') unless const_defined?(:LOC_RESPONSIBLE_PERSON)
+  LOC_OWNER              = RDF::URI(LOC_BASE_URI + 'OWN') unless const_defined?(:LOC_OWNER)
 
   @@lookup[LOC_RESPONSIBLE_PERSON.to_s] = prefixes[LOC_BASE_URI] + "_responsible_person"
+  @@lookup[LOC_OWNER.to_s]              = prefixes[LOC_BASE_URI] + "_OWN"
 
   #
   # AUSTALK
