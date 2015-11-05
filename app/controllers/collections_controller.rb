@@ -135,7 +135,8 @@ class CollectionsController < ApplicationController
     if request.post?
       begin
         # Check required fields
-        required_fields = {:collection_name => 'collection name', :collection_title => 'collection title'}
+        required_fields = {:collection_name => 'collection name', :collection_title => 'collection title',
+                           :collection_owner => 'collection owner', :collection_abstract => 'collection abstract'}
         required_fields.each do |key, value|
           raise ResponseError.new(400), "Required field '#{value}' is missing" if params[key].blank?
         end
@@ -144,7 +145,11 @@ class CollectionsController < ApplicationController
         additional_metadata = validate_collection_additional_metadata(params)
 
         # Construct collection Json-ld
-        json_ld = {'@context' => JsonLdHelper::default_context, '@type' => 'dcmitype:Collection', MetadataHelper::TITLE.to_s => params[:collection_title]}
+        json_ld = {'@context' => JsonLdHelper::default_context, '@type' => 'dcmitype:Collection',
+                   MetadataHelper::TITLE.to_s => params[:collection_title],
+                   MetadataHelper::LOC_OWNER => params[:collection_owner],
+                   MetadataHelper::ABSTRACT.to_s => params[:collection_abstract]
+        }
         json_ld.merge!(additional_metadata) {|key, val1, val2| val1}
 
         # Ingest new collection
@@ -947,7 +952,9 @@ class CollectionsController < ApplicationController
   #
   def validate_collection_additional_metadata(params)
     if params.has_key?(:additional_key) && params.has_key?(:additional_value)
-      protected_collection_fields = ['dc:title', 'dcterms:title', MetadataHelper::TITLE.to_s]
+      protected_collection_fields = ['dc:title', 'dcterms:title', MetadataHelper::TITLE.to_s,
+                                     'dc:abstract', 'dcterms:abstract', MetadataHelper::ABSTRACT.to_s,
+                                     'marcrel:OWN', MetadataHelper::LOC_OWNER.to_s]
       validate_additional_metadata(params[:additional_key].zip(params[:additional_value]), protected_collection_fields)
     else
       {}

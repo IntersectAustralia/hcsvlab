@@ -16,10 +16,10 @@ After('@api_create_collection, @api_edit_collection, @api_add_item, @api_update_
 end
 
 # delete the ingest interface created collections before and after each test which makes them
-Before('@web_delete_document') do
+Before('@web_delete_document, @create_collection') do
   clear_api_directory
 end
 
-After('@web_delete_document') do
+After('@web_delete_document, @create_collection') do
   clear_api_directory
 end

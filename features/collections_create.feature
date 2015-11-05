@@ -40,6 +40,8 @@ Feature: Creating Collections
     Then I should see "Create Collection"
     And I should see "Collection Name:"
     And I should see "Collection Title:"
+    And I should see "Collection Owner:"
+    And I should see "Collection Abstract"
     And I should see "Additional Metadata"
     And I should see "See searchable fields for suggestions"
     And I should see link "searchable fields" to "/catalog/searchable_fields"
@@ -63,54 +65,71 @@ Feature: Creating Collections
     Then I should see "Key:"
     And I should see "Value:"
 
-  Scenario: Verify creating a collection with just a name and title
+  @create_collection
+  Scenario: Verify creating a collection with just a the required fields
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     When I fill in "collection_name" with "test"
-    And I fill in "collection_title" with "Test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
     And I press "Create"
     Then I should be on the collection page for "test"
     And I should see "New collection 'test' (http://www.example.com/catalog/test) created"
     And I should see "test"
     And I should see "Collection Details"
     And I should see "RDF Type: dcmitype:Collection"
-    And I should see "Title: Test"
+    And I should see "Title: Test Title"
+    And I should see "Owner: Test Owner"
+    And I should see "Abstract: Test Abstract"
     And I should see "SPARQL Endpoint: http://www.example.com/sparql/test"
 
+  @create_collection
   Scenario: Verify creating a collection with spaces in its name
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     When I fill in "collection_name" with "Test With Space"
-    And I fill in "collection_title" with "Test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
     And I press "Create"
     Then I should be on the collection page for "testwithspace"
     And I should see "New collection 'testwithspace' (http://www.example.com/catalog/testwithspace) created"
     And I should see "testwithspace"
     And I should see "Collection Details"
     And I should see "RDF Type: dcmitype:Collection"
-    And I should see "Title: Test"
+    And I should see "Title: Test Title"
+    And I should see "Owner: Test Owner"
+    And I should see "Abstract: Test Abstract"
     And I should see "SPARQL Endpoint: http://www.example.com/sparql/testwithspace"
 
-  Scenario Outline: Verify collection name and title are required
+  @create_collection
+  Scenario Outline: Verify collection name, title, owner and abstract are required
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     When I fill in "collection_name" with "<name>"
     And I fill in "collection_title" with "<title>"
+    And I fill in "collection_owner" with "<owner>"
+    And I fill in "collection_abstract" with "<abstract>"
     And I press "Create"
     Then I should be on the create collection page
     And I should see "<response>"
   Examples:
-    | name | title | response |
-    |      | Test  | Required field 'collection name' is missing  |
-    | test |       | Required field 'collection title' is missing |
+    | name | title | owner | abstract | response |
+    |      | Test  | Test  | Test     | Required field 'collection name' is missing  |
+    | test |       | Test  | Test     | Required field 'collection title' is missing |
+    | test | Test  |       | Test     | Required field 'collection owner' is missing |
+    | test | Test  | Test  |          | Required field 'collection abstract' is missing |
 
-  @javascript
+  @create_collection @javascript
   Scenario Outline: Verify creating a collection a set of additional metadata
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     And I click "Add Metadata Field"
     When I fill in "collection_name" with "test"
-    And I fill in "collection_title" with "Test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
     And I fill in "additional_key[]" with "<key>"
     And I fill in "additional_value[]" with "<value>"
     And I press "Create"
@@ -118,20 +137,24 @@ Feature: Creating Collections
     And I should see "test"
     And I should see "Collection Details"
     And I should see "RDF Type: dcmitype:Collection"
-    And I should see "Title: Test"
+    And I should see "Title: Test Title"
+    And I should see "Owner: Test Owner"
+    And I should see "Abstract: Test Abstract"
     And I should see "<expected>"
   Examples:
     | key        | value   | expected        |
     | dc:extent  | foo     | Extent: foo     |
     | dc:ex tent | foo bar | Extent: foo bar |
 
-  @javascript
+  @create_collection @javascript
   Scenario Outline: Verify providing an empty metadata field returns an error response
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     And I click "Add Metadata Field"
     When I fill in "collection_name" with "test"
-    And I fill in "collection_title" with "Test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
     And I fill in "additional_key[]" with "<key>"
     And I fill in "additional_value[]" with "<value>"
     And I press "Create"
@@ -142,25 +165,33 @@ Feature: Creating Collections
     |     | bar   | An additional metadata field is missing a key      |
     | foo |       | Additional metadata field 'foo' is missing a value |
 
+  @create_collection
   Scenario: Verify the collection name needs to be unique within the system
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     And I fill in "collection_name" with "test"
-    And I fill in "collection_title" with "Test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
     And I press "Create"
     When I am on the create collection page
     And I fill in "collection_name" with "test"
-    And I fill in "collection_title" with "duplicate name"
+    And I fill in "collection_title" with "Test Title 2"
+    And I fill in "collection_owner" with "Test Owner 2"
+    And I fill in "collection_abstract" with "Test Abstract 2"
     And I press "Create"
     Then I should be on the create collection page
     And I should see "A collection with the name 'test' already exists"
 
+  @create_collection
   Scenario: Verify licence can be selected when creating a collection
     Given I am logged in as "data_owner@intersect.org.au"
     And I ingest licences
     And I am on the create collection page
     And I fill in "collection_name" with "test"
-    And I fill in "collection_title" with "Test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
     When I select "Creative Commons v3.0 BY-NC" from "licence_id"
     And I press "Create"
     Then I should be on the collection page for "test"
@@ -168,15 +199,20 @@ Feature: Creating Collections
     And I should see "test"
     And I should see "Collection Details"
     And I should see "RDF Type: dcmitype:Collection"
-    And I should see "Title: Test"
+    And I should see "Title: Test Title"
+    And I should see "Owner: Test Owner"
+    And I should see "Abstract: Test Abstract"
     And I should see "SPARQL Endpoint: http://www.example.com/sparql/test"
-    
+
+  @create_collection
   Scenario: Assign licence to a Collection
     Given I am logged in as "data_owner@intersect.org.au"
     And I ingest licences
     And I am on the create collection page
     And I fill in "collection_name" with "test"
-    And I fill in "collection_title" with "Test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
     When I select "Creative Commons v3.0 BY-NC" from "licence_id"
     And I press "Create"
     And I am on the licences page
