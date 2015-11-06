@@ -2158,7 +2158,6 @@ Feature: Browsing via API
       | Test | {"@context": {"Test": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
-
       | [ { "documents": [ { "identifier": "document1.txt", "content": "A Test." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
     Then the file "manifest.json" should exist in the directory for the collection "test"
     And the file "item1-metadata.rdf" should exist in the directory for the collection "test"
@@ -2185,9 +2184,9 @@ Feature: Browsing via API
     When I make a JSON post request for the collection page for id "Collection1" with the API token for "data_owner@intersect.org.au" with JSON params
       | items |
       | [ { "documents": [ { "identifier": "document1.txt", "content": "A Test." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "dc:isPartOf": { "@id": "corpus:Collection2" }, "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
-    Then the file "manifest.json" should exist in the directory for the collection "Collection1"
-    And the file "item1-metadata.rdf" should exist in the directory for the collection "Collection1"
-    And the file "document1.txt" should exist in the directory for the collection "Collection1"
+    Then the file "manifest.json" should exist in the directory for the collection "collection1"
+    And the file "item1-metadata.rdf" should exist in the directory for the collection "collection1"
+    And the file "document1.txt" should exist in the directory for the collection "collection1"
     And the item "item1" in collection "collection1" should exist in the database
     And the document "document1.txt" under item "item1" in collection "collection1" should exist in the database
     And Sesame should contain an item with uri "http://example.org/catalog/collection1/item1" in collection "collection1"
