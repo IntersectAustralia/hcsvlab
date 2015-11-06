@@ -134,12 +134,8 @@ class CollectionsController < ApplicationController
     @licences = Licence.where(licence_table[:private].eq(false).or(licence_table[:owner_id].eq(current_user.id)))
     if request.post?
       begin
-        # Check required fields
-        required_fields = {:collection_name => 'collection name', :collection_title => 'collection title',
-                           :collection_owner => 'collection owner', :collection_abstract => 'collection abstract'}
-        required_fields.each do |key, value|
-          raise ResponseError.new(400), "Required field '#{value}' is missing" if params[key].blank?
-        end
+        validate_required_web_fields(params, {:collection_name => 'collection name', :collection_title => 'collection title',
+                                              :collection_owner => 'collection owner', :collection_abstract => 'collection abstract'})
 
         # Validate and sanitise additional metadata fields
         additional_metadata = validate_collection_additional_metadata(params)
@@ -180,56 +176,22 @@ class CollectionsController < ApplicationController
     end
   end
 
-  #
-  # Core functionality common to add item ingest (via api and web app)
-  # Returns a list of item identifiers corresponding to the items ingested
-  #
-  def add_item_core (collection, item_id_and_file_hash)
-    rdf_files = []
-    item_id_and_file_hash.each do |item|
-      rdf_files.push(item[:rdf_file])
-    end
-    update_collection_manifest(collection.corpus_dir, rdf_files)
-    ingest_items(collection.corpus_dir, item_id_and_file_hash)
-  end
-
   def web_add_item
     collection = Collection.find_by_name(params[:id])
     authorize! :web_add_item, collection
     if request.post?
       begin
-        # Check required fields
-        required_fields = {:item_name => 'item name', :item_title => 'item title'}
-        required_fields.each do |key, value|
-          raise ResponseError.new(400), "Required field '#{value}' is missing" if params[key].blank?
-        end
-
-        # Check item name is unique within the collection
-        item_name = Item.sanitise_name(params[:item_name])
-        if collection.items.find_by_handle("#{collection.name}:#{item_name}").present?
-          raise ResponseError.new(400), "An item with the name '#{item_name}' already exists in this collection"
-        end
-
-        # Validate and sanitise additional metadata fields
+        validate_required_web_fields(params, {:item_name => 'item name', :item_title => 'item title'})
+        item_name = validate_item_name_unique(collection, params[:item_name])
         additional_metadata = validate_item_additional_metadata(params)
-
-        # Construct item Json-ld
-        item_metadata = { '@id' => catalog_url(collection.name, item_name),
-                          MetadataHelper::IDENTIFIER.to_s => item_name,
-                          MetadataHelper::IS_PART_OF.to_s => {'@id' => collection.uri}
-        }
-        item_metadata.merge!(additional_metadata) {|key, val1, val2| val1}
-        json_ld = {'@context' => JsonLdHelper::default_context, '@graph' => [item_metadata]}
+        json_ld = construct_item_json_ld(collection, item_name, additional_metadata)
 
         # Write the item metadata to a rdf file and ingest the file
         processed_items = process_items(collection.name, collection.corpus_dir, {:items => [{'metadata' => json_ld}]})
         msg = add_item_core(collection, processed_items[:successes])
-
-        # Format the item creation message
-        msg = "Created new item: #{msg.first}"
+        msg = "Created new item: #{msg.first}" # Format the item creation message
 
         redirect_to catalog_path(collection: collection.name, itemId: item_name), notice: msg
-        # redirect_to collection_path(id: collection.name), notice: msg
       rescue ResponseError => e
         flash[:error] = e.message
       end
@@ -996,6 +958,28 @@ class CollectionsController < ApplicationController
   end
 
   #
+  # Core functionality common to add item ingest (via api and web app)
+  # Returns a list of item identifiers corresponding to the items ingested
+  #
+  def add_item_core (collection, item_id_and_file_hash)
+    rdf_files = []
+    item_id_and_file_hash.each do |item|
+      rdf_files.push(item[:rdf_file])
+    end
+    update_collection_manifest(collection.corpus_dir, rdf_files)
+    ingest_items(collection.corpus_dir, item_id_and_file_hash)
+  end
+
+  #
+  # Validates that the given request parameters contains the required fields
+  #
+  def validate_required_web_fields(request_params, required_fields)
+    required_fields.each do |key, value|
+      raise ResponseError.new(400), "Required field '#{value}' is missing" if request_params[key].blank?
+    end
+  end
+
+  #
   # Returns a validated hash of the collection additional metadata params
   #
   def validate_collection_additional_metadata(params)
@@ -1039,6 +1023,18 @@ class CollectionsController < ApplicationController
       metadata_hash[meta_key] = meta_value unless metadata_protected_fields.include?(meta_key)
     end
     metadata_hash
+  end
+
+  #
+  # Constructs Json-ld for a new item
+  #
+  def construct_item_json_ld(collection, item_name, metadata)
+    item_metadata = { '@id' => catalog_url(collection.name, item_name),
+                      MetadataHelper::IDENTIFIER.to_s => item_name,
+                      MetadataHelper::IS_PART_OF.to_s => {'@id' => collection.uri}
+    }
+    item_metadata.merge!(metadata) {|key, val1, val2| val1}
+    {'@context' => JsonLdHelper::default_context, '@graph' => [item_metadata]}
   end
 
 end
