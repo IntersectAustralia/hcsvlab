@@ -94,6 +94,8 @@ class Ability
 
     can :web_add_item, Collection, owner_id: user_id
 
+    can :web_add_document, Collection, owner_id: user_id
+
     # User can discover a collection only if he/she is the owner or if he/she was granted
     # with discover, read or edit access to that collection
     can :discover, Collection

@@ -1,0 +1,21 @@
+%h2 Add Document
+= form_tag({controller: 'collections', action: 'web_add_document'}, multipart: true, method: 'post', :id => 'add_document_form') do
+  = label_tag :document_file, 'Please select a file:'
+  = file_field_tag :document_file, required: true
+  %br
+  %h2 Document Metadata
+  = label_tag :language, 'Language:'
+  = select_tag :language, options_for_select(@language_codes, 'eng - English'), id: 'language_select', required: true
+  %br
+  = render 'display_additional_metadata'
+  %br
+  = link_to 'Cancel', catalog_path(collection: params[:collection], itemId: params[:itemId])
+  = submit_tag 'Create'
+
+= render 'shared/nectar_attribution'
+
+:javascript
+  $("#language_select").select2({
+    width: 'resolve',
+    minimumInputLength: 3
+  })

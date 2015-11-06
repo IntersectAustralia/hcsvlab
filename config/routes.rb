@@ -58,6 +58,9 @@ HcsvlabWeb::Application.routes.draw do
   get "add-item/:id", :to => 'collections#web_add_item', :as => 'web_add_item'
   post "add-item/:id", :to => 'collections#web_add_item'
 
+  get "add-document/:collection/:itemId", :to => 'collections#web_add_document', :as => 'web_add_document'
+  post "add-document/:collection/:itemId", :to => 'collections#web_add_document'
+
   HydraHead.add_routes(self)
 
   devise_for :users, controllers: {registrations: "user_registers", passwords: "user_passwords"}

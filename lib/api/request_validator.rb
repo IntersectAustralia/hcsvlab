@@ -42,7 +42,7 @@ module RequestValidator
 
   # Validates an item with a matching handle exists under the collection
   def validate_item_exists (collection, item_id)
-    item = collection.items.find_by_handle("#{collection.name}:#{item_id}")
+    item = collection.items.find_by_handle(Item.format_handle(collection.name, item_id))
     raise ResponseError.new(404), "Requested item not found" if item.nil?
     item
   end
@@ -113,7 +113,7 @@ module RequestValidator
   # Validates the item identifier
   def validate_item_identifier(item_identifier, collection_name)
     raise ResponseError.new(400), "There is an item with a missing or blank identifier" if item_identifier.blank?
-    existing_item = Item.find_by_handle("#{collection_name}:#{item_identifier}")
+    existing_item = Item.find_by_handle(Item.format_handle(collection_name, item_identifier))
     raise ResponseError.new(412), "The item #{item_identifier} already exists in the collection #{collection_name}" if existing_item
   end
 
