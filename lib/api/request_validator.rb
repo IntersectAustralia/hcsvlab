@@ -30,6 +30,16 @@ module RequestValidator
     collection
   end
 
+  # Validates that the given item name is not already in use by an existing item in the given collection
+  # Returns a sanitised copy of the item name
+  def validate_item_name_unique(collection, name)
+    item_name = Item.sanitise_name(name)
+    if collection.items.find_by_handle("#{collection.name}:#{item_name}").present?
+      raise ResponseError.new(400), "An item with the name '#{item_name}' already exists in this collection"
+    end
+    item_name
+  end
+
   # Validates an item with a matching handle exists under the collection
   def validate_item_exists (collection, item_id)
     item = collection.items.find_by_handle("#{collection.name}:#{item_id}")

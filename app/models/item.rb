@@ -11,6 +11,10 @@ class Item < ActiveRecord::Base
   scope :unindexed, where(indexed_at: nil)
   scope :indexed, where('indexed_at is not null')
 
+  def self.sanitise_name(name)
+    name.downcase.delete(' ')
+  end
+
   def has_primary_text?
     self.primary_text_path.present?
   end

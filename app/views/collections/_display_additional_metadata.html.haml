@@ -1,0 +1,15 @@
+%h2 Additional Metadata
+See #{link_to 'searchable fields', catalog_searchable_fields_path} for suggestions
+
+#additional_metadata
+
+.new_metadata_btns{:id => 'new_metadata_btns'}
+  %br
+  = button_tag 'Add Metadata Field', :id =>'add_metadata_btn', type: 'button'
+
+:javascript
+  $("#add_metadata_btn").click(function(){
+    var key_field = "<label>Key:</label><input type='text' name='additional_key[]' class='metadata_field'/>";
+    var value_field = "<label>Value:</label><input type='text' name='additional_value[]' class='metadata_field'/>";
+    $("#additional_metadata").append("<br><div class='metadata_pair'>"+key_field+value_field+"</div>");
+  });

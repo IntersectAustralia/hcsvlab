@@ -420,3 +420,10 @@ Then /^the owner of collection "(.+)" should be "(.+)"$/ do |collection_name, us
   user = User.find_by_email(user_email)
   expect(collection.owner).to eq(user)
 end
+
+And /^I ingest a new collection "(.*)" through the api with the API token for "(.*)"$/ do |name, email|
+  user = User.find_by_email!(email)
+  metadata = JSON.parse('{"@context": {"dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"}')
+  hash = {'name' => "#{name}", 'collection_metadata' => metadata}
+  post path_to('the collections page'), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
+end
