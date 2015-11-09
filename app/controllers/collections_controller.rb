@@ -184,7 +184,7 @@ class CollectionsController < ApplicationController
         validate_required_web_fields(params, {:item_name => 'item name', :item_title => 'item title'})
         item_name = validate_item_name_unique(collection, params[:item_name])
         additional_metadata = validate_item_additional_metadata(params)
-        json_ld = construct_item_json_ld(collection, item_name, additional_metadata)
+        json_ld = construct_item_json_ld(collection, item_name, params[:item_title], additional_metadata)
 
         # Write the item metadata to a rdf file and ingest the file
         processed_items = process_items(collection.name, collection.corpus_dir, {:items => [{'metadata' => json_ld}]})
@@ -1028,9 +1028,10 @@ class CollectionsController < ApplicationController
   #
   # Constructs Json-ld for a new item
   #
-  def construct_item_json_ld(collection, item_name, metadata)
+  def construct_item_json_ld(collection, item_name, item_title, metadata)
     item_metadata = { '@id' => catalog_url(collection.name, item_name),
                       MetadataHelper::IDENTIFIER.to_s => item_name,
+                      MetadataHelper::TITLE.to_s => item_title,
                       MetadataHelper::IS_PART_OF.to_s => {'@id' => collection.uri}
     }
     item_metadata.merge!(metadata) {|key, val1, val2| val1}
