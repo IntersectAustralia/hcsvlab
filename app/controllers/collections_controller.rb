@@ -219,9 +219,7 @@ class CollectionsController < ApplicationController
   def web_add_document
     collection = Collection.find_by_name(params[:collection])
     authorize! :web_add_document, collection
-    @language_codes = []
-    #ToDo: turn language code retrieval into a rake task to grab from CSV with a new language model containing the language code and name
-    LanguageHelper::language_codes.each {|code, name| @language_codes.push ["#{code} - #{name}", "#{code} - #{name}"]}
+    @languages = Language.all.collect {|l| [ "#{l.code} - #{l.name}", "#{l.code} - #{l.name}" ] }
     if request.post?
       item = Item.find_by_handle(Item.format_handle(collection.name, params[:itemId]))
       uploaded_file = params[:document_file]
