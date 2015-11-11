@@ -7,13 +7,10 @@ end
 
 # Populates the languages table with the language names and codes from the languages CSV file
 def populate_languages
-  Language.delete_all
-  languages = {}
   csv_file = File.join('lib', 'resources', 'languages-2015-11-09.csv')
   CSV.foreach(csv_file, :headers => true) do |csv_obj|
-    languages[csv_obj['Code']] = csv_obj['Name']
-  end
-  languages.each do |language_code, language_name|
-    Language.create!(:code => language_code, :name => language_name)
+    unless Language.exists?(code: csv_obj['Code'], name: csv_obj['Name'])
+      Language.create!(:code => csv_obj['Code'], :name => csv_obj['Name'])
+    end
   end
 end

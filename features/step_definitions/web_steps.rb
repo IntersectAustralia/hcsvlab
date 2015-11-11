@@ -337,3 +337,14 @@ Then /^I should receive a zip file(?: "([^"]*)")?/ do |file|
     page.response_headers['Content-Disposition'].should =~ /#{file}/
   end
 end
+
+#Todo: taken from Building Values, not currently working
+When /^(?:|I )select2 "([^"]*)" from "([^"]*)"$/ do |value, field|
+  if all("#s2id_#{field} > a").present?
+    find("#s2id_#{field} > a").click
+  else
+    click_link(field)
+  end
+  find(".select2-result-label", text: value).click
+
+end
