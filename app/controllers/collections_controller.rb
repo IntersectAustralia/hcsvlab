@@ -2,7 +2,6 @@ require Rails.root.join('lib/tasks/fedora_helper.rb')
 require Rails.root.join('lib/api/response_error')
 require Rails.root.join('lib/api/request_validator')
 require Rails.root.join('lib/json-ld/json_ld_helper.rb')
-require Rails.root.join('lib/language/language_helper.rb')
 require 'fileutils'
 
 class CollectionsController < ApplicationController
