@@ -11,6 +11,8 @@ set :whenever_command, "bundle exec whenever"
 
 require "whenever/capistrano"
 
+require Rails.root.join('db/seed_helper.rb')
+
 set :shared_file_dir, "files"
 set(:shared_file_path) { File.join(shared_path, shared_file_dir) }
 
@@ -101,6 +103,11 @@ after 'deploy:update' do
   #https://github.com/capistrano/capistrano/issues/474
   deploy.customcleanup
 
+end
+
+# Populate the languages table after deployment
+after 'deploy' do
+  populate_languages
 end
 
 namespace :deploy do
