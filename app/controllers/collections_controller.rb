@@ -132,6 +132,12 @@ class CollectionsController < ApplicationController
     # Expose public licences and user created licences
     licence_table = Licence.arel_table
     @licences = Licence.where(licence_table[:private].eq(false).or(licence_table[:owner_id].eq(current_user.id)))
+    @collection_name = params[:collection_name]
+    @collection_title = params[:collection_title]
+    @collection_owner = params[:collection_owner]
+    @collection_abstract = params[:collection_abstract]
+    @licence_id = params[:licence_id]
+    @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
       begin
         validate_required_web_fields(params, {:collection_name => 'collection name', :collection_title => 'collection title',
@@ -179,12 +185,15 @@ class CollectionsController < ApplicationController
   def web_add_item
     collection = Collection.find_by_name(params[:id])
     authorize! :web_add_item, collection
+    @item_name = params[:item_name]
+    @item_title = params[:item_title]
+    @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
       begin
         validate_required_web_fields(params, {:item_name => 'item name', :item_title => 'item title'})
         item_name = validate_item_name_unique(collection, params[:item_name])
         additional_metadata = validate_item_additional_metadata(params)
-        json_ld = construct_item_json_ld(collection, item_name, additional_metadata)
+        json_ld = construct_item_json_ld(collection, item_name, params[:item_title], additional_metadata)
 
         # Write the item metadata to a rdf file and ingest the file
         processed_items = process_items(collection.name, collection.corpus_dir, {:items => [{'metadata' => json_ld}]})
@@ -1068,7 +1077,7 @@ class CollectionsController < ApplicationController
     additional_metadata.each do |key, value|
       meta_key = key.delete(' ')
       meta_value = value.strip
-      raise ResponseError.new(400), 'An additional metadata field is missing a key' if meta_key.blank?
+      raise ResponseError.new(400), 'An additional metadata field is missing a name' if meta_key.blank?
       raise ResponseError.new(400), "Additional metadata field '#{meta_key}' is missing a value" if meta_value.blank?
       metadata_hash[meta_key] = meta_value unless metadata_protected_fields.include?(meta_key)
     end
@@ -1078,9 +1087,10 @@ class CollectionsController < ApplicationController
   #
   # Constructs Json-ld for a new item
   #
-  def construct_item_json_ld(collection, item_name, metadata)
+  def construct_item_json_ld(collection, item_name, item_title, metadata)
     item_metadata = { '@id' => catalog_url(collection.name, item_name),
                       MetadataHelper::IDENTIFIER.to_s => item_name,
+                      MetadataHelper::TITLE.to_s => item_title,
                       MetadataHelper::IS_PART_OF.to_s => {'@id' => collection.uri}
     }
     item_metadata.merge!(metadata) {|key, val1, val2| val1}
@@ -1100,6 +1110,14 @@ class CollectionsController < ApplicationController
     }
     document_metadata.merge!(metadata) {|key, val1, val2| val1}
     {'@context' => JsonLdHelper::default_context}.merge(document_metadata)
+  end
+
+  def zip_additional_metadata(meta_field_names, meta_field_values)
+    if meta_field_names.nil? || meta_field_values.nil?
+      []
+    else
+      meta_field_names.zip(meta_field_values)
+    end
   end
 
 end

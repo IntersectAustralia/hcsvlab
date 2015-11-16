@@ -1,5 +1,8 @@
 %h2 Additional Metadata
-See #{link_to 'searchable fields', catalog_searchable_fields_path} for suggestions
+See the RDF Names of #{link_to 'searchable fields', catalog_searchable_fields_path, target: :_blank} for examples of accepted metadata field names.
+%br
+Note: If the context for a field you want to enter is not available in the
+#{link_to 'default schema', annotation_context_path, target: :_blank} then you must provide the full URI for that metadata field.
 
 #additional_metadata
 
@@ -8,8 +11,16 @@ See #{link_to 'searchable fields', catalog_searchable_fields_path} for suggestio
   = button_tag 'Add Metadata Field', :id =>'add_metadata_btn', type: 'button'
 
 :javascript
-  $("#add_metadata_btn").click(function(){
-    var key_field = "<label>Key:</label><input type='text' name='additional_key[]' class='metadata_field'/>";
-    var value_field = "<label>Value:</label><input type='text' name='additional_value[]' class='metadata_field'/>";
+  function add_metadata_field(meta_key, meta_value) {
+    var key_field = "<label>Name:</label><input type='text' name='additional_key[]' class='metadata_field' value='"+meta_key+"'/>";
+    var value_field = "<label>Value:</label><input type='text' name='additional_value[]' class='metadata_field' value='"+meta_value+"'/>";
     $("#additional_metadata").append("<br><div class='metadata_pair'>"+key_field+value_field+"</div>");
+  }
+
+  $("#add_metadata_btn").click(function() {
+    add_metadata_field('', '');
   });
+
+- @additional_metadata.each do |meta_key, meta_value|
+  - unless meta_key.blank? && meta_value.blank?
+    = javascript_tag "add_metadata_field('#{meta_key}', '#{meta_value}')"
