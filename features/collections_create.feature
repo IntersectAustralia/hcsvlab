@@ -43,26 +43,27 @@ Feature: Creating Collections
     And I should see "Collection Owner:"
     And I should see "Collection Abstract"
     And I should see "Additional Metadata"
-    And I should see "See searchable fields for suggestions"
+    And I should see "See the RDF Names of searchable fields for examples of accepted metadata field names."
     And I should see link "searchable fields" to "/catalog/searchable_fields"
+    And I should see "Note: If the context for a field you want to enter is not available in the default schema then you must provide the full URI for that metadata field."
+    And I should see link "default schema" to "/schema/json-ld"
     And I should see "Add Metadata Field"
     And I should see button with text "Add Metadata Field"
     And I should see link "Cancel" to "/catalog"
     And I should see "Create"
     And I should see button "Create"
 
-  Scenario: Verify add metadata key/value fields not visible by default
+  Scenario: Verify add metadata name/value fields not visible by default
     Given I am logged in as "data_owner@intersect.org.au"
     When I am on the create collection page
-    Then I should not see "Key:"
-    And I should not see "Value:"
+    Then I should not see "Name: Value: "
 
   @javascript
-  Scenario: Verify add metadata key/value fields visible after clicking add metadata field button
+  Scenario: Verify add metadata name/value fields visible after clicking add metadata field button
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     When I click "Add Metadata Field"
-    Then I should see "Key:"
+    Then I should see "Name:"
     And I should see "Value:"
 
   @create_collection
@@ -164,6 +165,27 @@ Feature: Creating Collections
     | key | value | response|
     |     | bar   | An additional metadata field is missing a key      |
     | foo |       | Additional metadata field 'foo' is missing a value |
+
+  @create_collection @javascript
+  Scenario: Verify form is re-populated with previous input if an error occurs
+    Given I am logged in as "data_owner@intersect.org.au"
+    And I am on the create collection page
+    And I click "Add Metadata Field"
+    When I fill in "collection_name" with "test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
+    And I fill in "additional_key[]" with "foo"
+    And I fill in "additional_value[]" with ""
+    And I press "Create"
+    Then I should be on the create collection page
+    And I should see " Additional metadata field 'foo' is missing a value"
+    And the "collection_name" field should contain "test"
+    And the "collection_title" field should contain "Test Title"
+    And the "collection_owner" field should contain "Test Owner"
+    And the "collection_abstract" field should contain "Test Abstract"
+    And the "additional_key[]" field should contain "foo"
+    And the "additional_value[]" field should contain ""
 
   @create_collection
   Scenario: Verify the collection name needs to be unique within the system

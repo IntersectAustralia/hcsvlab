@@ -1,18 +1,21 @@
 %h2 Create Collection
 = form_tag({controller: 'collections', action: 'web_create_collection'}, method: 'post', :id => 'create_collection_form') do
   = label_tag :collection_name, 'Collection Name:'
-  = text_field_tag :collection_name, nil, required: true
+  = text_field_tag :collection_name, @collection_name, required: true
   = label_tag :collection_title, 'Collection Title:'
-  = text_field_tag :collection_title, nil, required: true
+  = text_field_tag :collection_title, @collection_title, required: true
   = label_tag :collection_owner, 'Collection Owner:'
-  = text_field_tag :collection_owner, nil, required: true
+  = text_field_tag :collection_owner, @collection_owner, required: true
   = label_tag :collection_abstract, 'Collection Abstract:'
-  = text_area_tag :collection_abstract, nil, required: true
+  = text_area_tag :collection_abstract, @collection_abstract, required: true
   = label_tag :licence_id, 'Licence'
   = select_tag :licence_id, options_for_select(@licences.map {|l| [l.name, l.id]}), include_blank: true
 
   %h2 Additional Metadata
-  See #{link_to 'searchable fields', catalog_searchable_fields_path} for suggestions
+  See the RDF Names of #{link_to 'searchable fields', catalog_searchable_fields_path, target: :_blank} for examples of accepted metadata field names.
+  %br
+  Note: If the context for a field you want to enter is not available in the
+  #{link_to 'default schema', annotation_context_path, target: :_blank} then you must provide the full URI for that metadata field.
 
   #additional_metadata
 
@@ -22,12 +25,19 @@
     = link_to 'Cancel', collections_path
     = submit_tag 'Create'
 
-
 = render 'shared/nectar_attribution'
 
 :javascript
-  $("#add_metadata_btn").click(function(){
-    var key_field = "<label>Key:</label><input type='text' name='additional_key[]' class='metadata_field'/>";
-    var value_field = "<label>Value:</label><input type='text' name='additional_value[]' class='metadata_field'/>";
+  function add_metadata_field(meta_key, meta_value) {
+    var key_field = "<label>Name:</label><input type='text' name='additional_key[]' class='metadata_field' value='"+meta_key+"'/>";
+    var value_field = "<label>Value:</label><input type='text' name='additional_value[]' class='metadata_field' value='"+meta_value+"'/>";
     $("#additional_metadata").append("<br><div class='metadata_pair'>"+key_field+value_field+"</div>");
+  }
+
+  $("#add_metadata_btn").click(function() {
+    add_metadata_field('', '');
   });
+
+- @additional_metadata.each do |meta_key, meta_value|
+  - unless meta_key.blank? && meta_value.blank?
+    = javascript_tag "add_metadata_field('#{meta_key}', '#{meta_value}')"

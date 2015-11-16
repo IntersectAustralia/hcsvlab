@@ -132,6 +132,15 @@ class CollectionsController < ApplicationController
     # Expose public licences and user created licences
     licence_table = Licence.arel_table
     @licences = Licence.where(licence_table[:private].eq(false).or(licence_table[:owner_id].eq(current_user.id)))
+    @collection_name = params[:collection_name]
+    @collection_title = params[:collection_title]
+    @collection_owner = params[:collection_owner]
+    @collection_abstract = params[:collection_abstract]
+    @licence_id = params[:licence_id]
+    @additional_metadata = []
+    unless params[:additional_key].nil? || params[:additional_value].nil?
+      @additional_metadata = params[:additional_key].zip(params[:additional_value])
+    end
     if request.post?
       begin
         validate_required_web_fields(params, {:collection_name => 'collection name', :collection_title => 'collection title',
