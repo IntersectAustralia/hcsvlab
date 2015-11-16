@@ -49,27 +49,28 @@ Feature: Creating Items
     And I should see "Item Name:"
     And I should see "Item Title:"
     And I should see "Additional Metadata"
-    And I should see "See searchable fields for suggestions"
+    And I should see "See the RDF Names of searchable fields for examples of accepted metadata field names."
     And I should see link "searchable fields" to "/catalog/searchable_fields"
+    And I should see "Note: If the context for a field you want to enter is not available in the default schema then you must provide the full URI for that metadata field."
+    And I should see link "default schema" to "/schema/json-ld"
     And I should see "Add Metadata Field"
     And I should see button with text "Add Metadata Field"
     And I should see link "Cancel" to "/catalog/cooee"
     And I should see "Create"
     And I should see button "Create"
 
-  Scenario: Verify add metadata key/value fields not visible by default
+  Scenario: Verify add metadata name/value fields not visible by default
     Given I am logged in as "data_owner@intersect.org.au"
     When I am on the add item page for "cooee"
-    Then I should not see "Key:"
-    And I should not see "Value:"
+    Then I should not see "Name: Value: "
 
   @javascript
-  Scenario: Verify add metadata key/value fields are visible after clicking add metadata field button
+  Scenario: Verify add metadata name/value fields are visible after clicking add metadata field button
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the add item page for "cooee"
     When I click "Add Metadata Field"
-    Then I should see "Key:"
-    And I should see "Value:"
+    Then the "additional_key[]" field should contain ""
+    And the "additional_value[]" field should contain ""
 
   Scenario Outline: Verify item name and title are required
     Given I am logged in as "data_owner@intersect.org.au"
@@ -176,8 +177,26 @@ Feature: Creating Items
     And I fill in "additional_value[]" with "<value>"
     And I press "Create"
     Then I should be on the add item page for "<collection_name>"
-    Then I should see "<response>"
+    And I should see "<response>"
   Examples:
     | collection_name | key | value | response |
-    | test            |     | foo   | An additional metadata field is missing a key      |
+    | test            |     | foo   | An additional metadata field is missing a name     |
     | test            | bar |       | Additional metadata field 'bar' is missing a value |
+
+  @javascript @create_collection
+  Scenario: Verify form is re-populated with previous input if an error occurs
+    Given I ingest a new collection "test" through the api with the API token for "data_owner@intersect.org.au"
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the add item page for "test"
+    And I click "Add Metadata Field"
+    When I fill in "item_name" with "test"
+    And I fill in "item_title" with "Test"
+    And I fill in "additional_key[]" with "foo"
+    And I fill in "additional_value[]" with ""
+    And I press "Create"
+    Then I should be on the add item page for "test"
+    And I should see "Additional metadata field 'foo' is missing a value"
+    And the "item_name" field should contain "test"
+    And the "item_title" field should contain "Test"
+    And the "additional_key[]" field should contain "foo"
+    And the "additional_value[]" field should contain ""
