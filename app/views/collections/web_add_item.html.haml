@@ -1,10 +1,11 @@
 %h2 Create Item
 = form_tag({controller: 'collections', action: 'web_add_item'}, method: 'post', :id => 'add_item_form') do
   = label_tag :item_name, 'Item Name:'
-  = text_field_tag :item_name, nil, required: true
+  = text_field_tag :item_name, @item_name, required: true
   = label_tag :item_title, 'Item Title:'
-  = text_field_tag :item_title, nil, required: true
+  = text_field_tag :item_title, @item_title, required: true
   = render 'display_additional_metadata'
+
   %br
   = link_to 'Cancel', collection_path(id: params[:id])
   = submit_tag 'Create'

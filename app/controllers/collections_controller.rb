@@ -137,10 +137,7 @@ class CollectionsController < ApplicationController
     @collection_owner = params[:collection_owner]
     @collection_abstract = params[:collection_abstract]
     @licence_id = params[:licence_id]
-    @additional_metadata = []
-    unless params[:additional_key].nil? || params[:additional_value].nil?
-      @additional_metadata = params[:additional_key].zip(params[:additional_value])
-    end
+    @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
       begin
         validate_required_web_fields(params, {:collection_name => 'collection name', :collection_title => 'collection title',
@@ -188,6 +185,9 @@ class CollectionsController < ApplicationController
   def web_add_item
     collection = Collection.find_by_name(params[:id])
     authorize! :web_add_item, collection
+    @item_name = params[:item_name]
+    @item_title = params[:item_title]
+    @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
       begin
         validate_required_web_fields(params, {:item_name => 'item name', :item_title => 'item title'})
@@ -1027,7 +1027,7 @@ class CollectionsController < ApplicationController
     additional_metadata.each do |key, value|
       meta_key = key.delete(' ')
       meta_value = value.strip
-      raise ResponseError.new(400), 'An additional metadata field is missing a key' if meta_key.blank?
+      raise ResponseError.new(400), 'An additional metadata field is missing a name' if meta_key.blank?
       raise ResponseError.new(400), "Additional metadata field '#{meta_key}' is missing a value" if meta_value.blank?
       metadata_hash[meta_key] = meta_value unless metadata_protected_fields.include?(meta_key)
     end
@@ -1045,6 +1045,14 @@ class CollectionsController < ApplicationController
     }
     item_metadata.merge!(metadata) {|key, val1, val2| val1}
     {'@context' => JsonLdHelper::default_context, '@graph' => [item_metadata]}
+  end
+
+  def zip_additional_metadata(meta_field_names, meta_field_values)
+    if meta_field_names.nil? || meta_field_values.nil?
+      []
+    else
+      meta_field_names.zip(meta_field_values)
+    end
   end
 
 end

@@ -63,8 +63,8 @@ Feature: Creating Collections
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
     When I click "Add Metadata Field"
-    Then I should see "Name:"
-    And I should see "Value:"
+    Then the "additional_key[]" field should contain ""
+    And the "additional_value[]" field should contain ""
 
   @create_collection
   Scenario: Verify creating a collection with just a the required fields
@@ -163,7 +163,7 @@ Feature: Creating Collections
     And I should see "<response>"
   Examples:
     | key | value | response|
-    |     | bar   | An additional metadata field is missing a key      |
+    |     | bar   | An additional metadata field is missing a name     |
     | foo |       | Additional metadata field 'foo' is missing a value |
 
   @create_collection @javascript
