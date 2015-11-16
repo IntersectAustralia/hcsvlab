@@ -8,6 +8,7 @@ end
 
 # delete the api created collections before and after each test which makes them
 Before('@api_create_collection, @api_edit_collection, @api_add_item, @api_update_item, @api_delete_item, @api_add_document, @api_delete_document') do
+  Rails.application.config.api_collections_location = "#{Rails.root}/test/api/collections"
   clear_api_directory
 end
 
@@ -16,10 +17,11 @@ After('@api_create_collection, @api_edit_collection, @api_add_item, @api_update_
 end
 
 # delete the ingest interface created collections before and after each test which makes them
-Before('@web_delete_document, @create_collection') do
+Before('@create_collection') do
+  Rails.application.config.api_collections_location = "#{Rails.root}/test/api/collections"
   clear_api_directory
 end
 
-After('@web_delete_document, @create_collection') do
+After('@create_collection') do
   clear_api_directory
 end
