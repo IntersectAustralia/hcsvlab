@@ -138,7 +138,7 @@ class CollectionsController < ApplicationController
     @collection_abstract = params[:collection_abstract]
     @licence_id = params[:licence_id]
     @additional_metadata = []
-    unless params[:additional_key].nil? || params[:additional_key].nil?
+    unless params[:additional_key].nil? || params[:additional_value].nil?
       @additional_metadata = params[:additional_key].zip(params[:additional_value])
     end
     if request.post?
