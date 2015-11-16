@@ -972,6 +972,8 @@ class CollectionsController < ApplicationController
     update_sesame_with_graph(append_item_graph, item.collection)
     #Reindex item in Solr
     delete_item_from_solr(item.id)
+    item.indexed_at = nil
+    item.save
     update_item_in_solr(item)
   end
 
