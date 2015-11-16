@@ -227,7 +227,10 @@ class CollectionsController < ApplicationController
   def web_add_document
     collection = Collection.find_by_name(params[:collection])
     authorize! :web_add_document, collection
+    @language = params[:language]
+    @language = 'eng - English' if @language.nil?
     @languages = Language.all.collect {|l| [ "#{l.code} - #{l.name}", "#{l.code} - #{l.name}" ] }
+    @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
       item = Item.find_by_handle(Item.format_handle(collection.name, params[:itemId]))
       uploaded_file = params[:document_file]

@@ -55,26 +55,27 @@ Feature: Creating Documents
     And I should see "Document Metadata"
     And I should see "Language: "
     And I should see "Additional Metadata"
-    And I should see "See searchable fields for suggestions"
+    And I should see "See the RDF Names of searchable fields for examples of accepted metadata field names."
     And I should see link "searchable fields" to "/catalog/searchable_fields"
+    And I should see "Note: If the context for a field you want to enter is not available in the default schema then you must provide the full URI for that metadata field."
+    And I should see link "default schema" to "/schema/json-ld"
     And I should see "Add Metadata Field"
     And I should see button with text "Add Metadata Field"
     And I should see link "Cancel" to "/catalog/cooee/1-001"
     And I should see button "Create"
 
-  Scenario: Verify add metadata key/value fields not visible by default
+  Scenario: Verify add metadata name/value fields not visible by default
     Given I am logged in as "data_owner@intersect.org.au"
     When I am on the add document page for "cooee:1-001"
-    Then I should not see "Key:"
-    And I should not see "Value:"
+    Then I should not see "Name: Value: "
 
   @javascript
-  Scenario: Verify add metadata key/value fields are visible after clicking add metadata field button
+  Scenario: Verify add metadata name/value fields are visible after clicking add metadata field button
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the add document page for "cooee:1-001"
     When I click "Add Metadata Field"
-    Then I should see "Key:"
-    And I should see "Value:"
+    Then the "additional_key[]" field should contain ""
+    And the "additional_value[]" field should contain ""
 
   Scenario: Verify uploading a document file is required
     Given I am logged in as "data_owner@intersect.org.au"
@@ -170,5 +171,24 @@ Feature: Creating Documents
     And I should see "<response>"
   Examples:
     | key        | value      | response |
-    |            | 10/11/2015 | An additional metadata field is missing a key             |
+    |            | 10/11/2015 | An additional metadata field is missing a name             |
     | dc:created |            | Additional metadata field 'dc:created' is missing a value |
+
+  @javascript @create_collection
+  Scenario: Verify form is re-populated with previous input if an error occurs
+    Given I ingest a new collection "test" through the api with the API token for "data_owner@intersect.org.au"
+    And I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "A Test." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the add document page for "test:item1"
+    And I attach the file "test/samples/api/sample1.txt" to "document_file"
+    When I click "Add Metadata Field"
+    And I fill in "additional_key[]" with "dc:created"
+    And I fill in "additional_value[]" with ""
+    And I press "Create"
+    Then I should be on the add document page for "test:item1"
+    And I should see "Additional metadata field 'dc:created' is missing a value"
+    And I should see "eng - English"
+    And the "additional_key[]" field should contain "dc:created"
+    And the "additional_value[]" field should contain ""

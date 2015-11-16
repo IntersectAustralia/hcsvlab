@@ -3,9 +3,11 @@
   = label_tag :document_file, 'Please select a file:'
   = file_field_tag :document_file, required: true
   %br
+  %br
   %h2 Document Metadata
   = label_tag :language, 'Language:'
-  = select_tag :language, options_for_select(@languages, 'eng - English'), id: 'language_select', required: true
+  = select_tag :language, options_for_select(@languages, @language), id: 'language_select', required: true
+  %br
   %br
   = render 'display_additional_metadata'
   %br
