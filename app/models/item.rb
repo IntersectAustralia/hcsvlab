@@ -42,7 +42,18 @@ class Item < ActiveRecord::Base
      MetadataHelper::short_form(MetadataHelper::INDEXABLE_DOCUMENT) + '_tesim']
   end
 
+  #
+  # Returns the item name
+  #
   def get_name
     self.handle.split(':').last
+  end
+
+
+  #
+  # Returns the format of the item handle for the given collection and item name
+  #
+  def self.format_handle(collection_name, item_name)
+    "#{collection_name}:#{item_name}"
   end
 end

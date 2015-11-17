@@ -18,6 +18,7 @@
 //= require blacklight/search_context.js
 //= require_tree .
 //= require bootstrap
+//= require select2
 //= require eopas
 //= require helpers
 //= require zeroclipboard

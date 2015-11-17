@@ -216,14 +216,35 @@ class CollectionsController < ApplicationController
       uploaded_file = params[:file]
       uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
       doc_filename = get_dc_identifier(doc_metadata) # the document filename is the document id
-
       doc_metadata = format_and_validate_add_document_request(collection.corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
-      create_document(item, doc_metadata)
-      add_and_index_document(item, doc_metadata)
-      @success_message = "Added the document #{doc_filename} to item #{item.get_name} in collection #{collection.name}"
+      @success_message = add_document_core(collection, item, doc_metadata, doc_filename)
     rescue ResponseError => e
       respond_with_error(e.message, e.response_code)
       return # Only respond with one error at a time
+    end
+  end
+
+  def web_add_document
+    collection = Collection.find_by_name(params[:collection])
+    authorize! :web_add_document, collection
+    @language = params[:language]
+    @language = 'eng - English' if @language.nil?
+    @languages = Language.all.collect {|l| [ "#{l.code} - #{l.name}", "#{l.code} - #{l.name}" ] }
+    @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
+    if request.post?
+      item = Item.find_by_handle(Item.format_handle(collection.name, params[:itemId]))
+      uploaded_file = params[:document_file]
+      begin
+        validate_required_web_fields(params, {:document_file => 'document file', :language => 'language'})
+        validate_new_document_file(collection.corpus_dir, uploaded_file.original_filename, collection)
+        additional_metadata = validate_document_additional_metadata(params)
+        uploaded_file_path = upload_document_using_multipart(collection.corpus_dir, uploaded_file.original_filename, uploaded_file, collection.name)
+        json_ld = construct_document_json_ld(collection, item, params[:language], uploaded_file_path, additional_metadata)
+        msg = add_document_core(collection, item, json_ld, uploaded_file_path)
+        redirect_to catalog_path(collection: collection.name, itemId: item.get_name), notice: msg
+      rescue ResponseError => e
+        flash[:error] = e.message
+      end
     end
   end
 
@@ -240,7 +261,7 @@ class CollectionsController < ApplicationController
 
   def delete_item_via_web_app
     authorize! :delete_item_via_web_app, Collection.find_by_name(params[:collectionId])
-    item = Item.find_by_handle("#{params[:collectionId]}:#{params[:itemId]}")
+    item = Item.find_by_handle(Item.format_handle(params[:collectionId], params[:itemId]))
     begin
       msg = delete_item_core(item)
       redirect_to catalog_index_path, notice: msg
@@ -278,7 +299,7 @@ class CollectionsController < ApplicationController
   def delete_document_via_web_app
     authorize! :delete_document_via_web_app, Collection.find_by_name(params[:collectionId])
     begin
-      item = Item.find_by_handle("#{params[:collectionId]}:#{params[:itemId]}")
+      item = Item.find_by_handle(Item.format_handle(params[:collectionId], params[:itemId]))
       collection = item.collection
       document = item.documents.find_by_file_name(params[:filename])
       msg = delete_doc_core(collection, item, document)
@@ -504,11 +525,18 @@ class CollectionsController < ApplicationController
     jsonld_graph
   end
 
+  #
+  # Returns a hash containing the metadata for a document source
+  #
+  def format_document_source_metadata(doc_source)
+    # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
+    {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
+  end
+
   # Updates the source of a specific document
   def update_doc_source(doc_metadata, doc_identifier, doc_source)
     if doc_metadata['dc:identifier'] == doc_identifier || doc_metadata['dcterms:identifier'] == doc_identifier || doc_metadata[MetadataHelper::IDENTIFIER.to_s] == doc_identifier
-      # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
-      formatted_source_path = {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
+      formatted_source_path = format_document_source_metadata(doc_source)
       doc_has_source = false
       # Replace any existing document source with the formatted one or add one in if there aren't any existing
       ['dc:source', 'dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
@@ -944,6 +972,8 @@ class CollectionsController < ApplicationController
     update_sesame_with_graph(append_item_graph, item.collection)
     #Reindex item in Solr
     delete_item_from_solr(item.id)
+    item.indexed_at = nil
+    item.save
     update_item_in_solr(item)
   end
 
@@ -980,6 +1010,15 @@ class CollectionsController < ApplicationController
   end
 
   #
+  # Core functionality common to add document ingest (via api and web app)
+  #
+  def add_document_core (collection, item, document_metadata, document_filename)
+    create_document(item, document_metadata)
+    add_and_index_document(item, document_metadata)
+    "Added the document #{File.basename(document_filename)} to item #{item.get_name} in collection #{collection.name}"
+  end
+
+  #
   # Validates that the given request parameters contains the required fields
   #
   def validate_required_web_fields(request_params, required_fields)
@@ -993,7 +1032,8 @@ class CollectionsController < ApplicationController
   #
   def validate_collection_additional_metadata(params)
     if params.has_key?(:additional_key) && params.has_key?(:additional_value)
-      protected_collection_fields = ['dc:title', 'dcterms:title', MetadataHelper::TITLE.to_s,
+      protected_collection_fields = ['dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s,
+                                     'dc:title', 'dcterms:title', MetadataHelper::TITLE.to_s,
                                      'dc:abstract', 'dcterms:abstract', MetadataHelper::ABSTRACT.to_s,
                                      'marcrel:OWN', MetadataHelper::LOC_OWNER.to_s]
       validate_additional_metadata(params[:additional_key].zip(params[:additional_value]), protected_collection_fields)
@@ -1007,7 +1047,22 @@ class CollectionsController < ApplicationController
   #
   def validate_item_additional_metadata(params)
     if params.has_key?(:additional_key) && params.has_key?(:additional_value)
-      protected_item_fields = ['dc:isPartOf', 'dcterms:isPartOf', MetadataHelper::IS_PART_OF.to_s]
+      protected_item_fields = ['dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s,
+                               'dc:isPartOf', 'dcterms:isPartOf', MetadataHelper::IS_PART_OF.to_s]
+      validate_additional_metadata(params[:additional_key].zip(params[:additional_value]), protected_item_fields)
+    else
+      {}
+    end
+  end
+
+  #
+  # Returns a validated hash of the document additional metadata params
+  #
+  def validate_document_additional_metadata(params)
+    if params.has_key?(:additional_key) && params.has_key?(:additional_value)
+      protected_item_fields = ['dc:identifier', 'dcterms:identifier', MetadataHelper::IDENTIFIER.to_s,
+                               'dc:source', 'dcterms:source', MetadataHelper::SOURCE,
+                               'olac:language', MetadataHelper::LANGUAGE.to_s]
       validate_additional_metadata(params[:additional_key].zip(params[:additional_value]), protected_item_fields)
     else
       {}
@@ -1045,6 +1100,21 @@ class CollectionsController < ApplicationController
     }
     item_metadata.merge!(metadata) {|key, val1, val2| val1}
     {'@context' => JsonLdHelper::default_context, '@graph' => [item_metadata]}
+  end
+
+  #
+  # Constructs Json-ld for a new document
+  #
+  def construct_document_json_ld(collection, item, language, document_file, metadata)
+    document_metadata = { '@id' => catalog_document_url(collection.name, item.get_name, File.basename(document_file)),
+                          '@type' => MetadataHelper::DOCUMENT.to_s,
+                          MetadataHelper::LANGUAGE.to_s => language,
+                          MetadataHelper::IDENTIFIER.to_s => File.basename(document_file),
+                          MetadataHelper::SOURCE.to_s => format_document_source_metadata(document_file),
+                          MetadataHelper::EXTENT.to_s => File.size(document_file)
+    }
+    document_metadata.merge!(metadata) {|key, val1, val2| val1}
+    {'@context' => JsonLdHelper::default_context}.merge(document_metadata)
   end
 
   def zip_additional_metadata(meta_field_names, meta_field_values)

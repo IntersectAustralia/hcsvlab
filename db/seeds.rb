@@ -8,3 +8,4 @@
 require File.dirname(__FILE__) + '/seed_helper.rb'
 
 create_roles_and_permissions
+populate_languages

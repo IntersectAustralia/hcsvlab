@@ -126,6 +126,11 @@ module NavigationHelpers
         itemIdentifier = $1.split(':').last
         delete_item_web_path(collectionName, itemIdentifier, options)
 
+      when /^the add document page for "(.*)"$/
+        collectionName = $1.split(':').first
+        itemIdentifier = $1.split(':').last
+        web_add_document_path(collectionName, itemIdentifier, options)
+
       when /^the delete document "(.*)" from "item "(.*)" in collection "(.*)" page/
         delete_item_document_path($3, $2, $1, options)
 
