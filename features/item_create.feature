@@ -137,6 +137,33 @@ Feature: Creating Items
     | test            | test2       | test2          | Test Spaces  |
     | test            | test3 space | test3space     | Test Spaces  |
 
+  @create_collection
+  Scenario Outline: Verify creating an item sanitises the item name
+    Given I ingest a new collection "test" through the api with the API token for "data_owner@intersect.org.au"
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the add item page for "test"
+    And I fill in "item_name" with "<name>"
+    And I fill in "item_title" with "test"
+    And I press "Create"
+    And I reindex all
+    When I go to the catalog page for "test:<sanitised_name>"
+    Then I should see a page with the title: "Alveo - test:<sanitised_name>"
+    And I should see "test:<sanitised_name>"
+    And I should see "This Item has no display document"
+    And I should see "This Item has no documents"
+    And I should see "Item Details"
+    And I should see "Title: test"
+    And I should see "Identifier: <sanitised_name>"
+    And I should see "Collection: test"
+    And I should see "SPARQL endpoint http://www.example.com/sparql/test"
+  Examples:
+    | name             | sanitised_name   |
+    | TESTUPPERCASE    | testuppercase    |
+    | test with spaces | testwithspaces   |
+    | test/with/slash  | testwithslash    |
+    | test.with.period | testwithperiod   |
+    | Test with/allthe/Sanitisations.to be.cleaned | testwithallthesanitisationstobecleaned|
+
   @javascript @create_collection
   Scenario Outline: Create an item with a set of additional metadata
     Given I ingest a new collection "<collection_name>" through the api with the API token for "data_owner@intersect.org.au"

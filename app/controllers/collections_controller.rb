@@ -169,6 +169,7 @@ class CollectionsController < ApplicationController
     begin
       request_params = cleanse_params(params)
       collection = validate_collection(request_params[:id], request_params[:api_key])
+      # ToDo: sanitise each item name (dc:identifier) once the new JSON-LD format is completed
       validate_add_items_request(collection, collection.corpus_dir, request_params[:items], request_params[:file])
       request_params[:items].each do |item_json|
         update_ids_in_jsonld(item_json["metadata"], collection)
@@ -191,7 +192,7 @@ class CollectionsController < ApplicationController
     if request.post?
       begin
         validate_required_web_fields(params, {:item_name => 'item name', :item_title => 'item title'})
-        item_name = validate_item_name_unique(collection, params[:item_name])
+        item_name = validate_item_name_unique(collection, Item.sanitise_name(params[:item_name]))
         additional_metadata = validate_item_additional_metadata(params)
         json_ld = construct_item_json_ld(collection, item_name, params[:item_title], additional_metadata)
 

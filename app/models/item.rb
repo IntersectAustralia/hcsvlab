@@ -12,7 +12,9 @@ class Item < ActiveRecord::Base
   scope :indexed, where('indexed_at is not null')
 
   def self.sanitise_name(name)
-    name.downcase.delete(' ')
+    # Spaces shouldn't be used since Sesame uses the name within the metadata URI
+    # . and / shouldn't be used in the name since they can break the routes mapping
+    name.downcase.delete(' ./')
   end
 
   def has_primary_text?
