@@ -11,7 +11,7 @@ set :whenever_command, "bundle exec whenever"
 
 require "whenever/capistrano"
 
-require Rails.root.join('db/seed_helper.rb')
+load 'db/seed_helper'
 
 set :shared_file_dir, "files"
 set(:shared_file_path) { File.join(shared_path, shared_file_dir) }
