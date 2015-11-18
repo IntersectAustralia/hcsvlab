@@ -86,23 +86,30 @@ Feature: Creating Collections
     And I should see "SPARQL Endpoint: http://www.example.com/sparql/test"
 
   @create_collection
-  Scenario: Verify creating a collection with spaces in its name
+  Scenario Outline: Verify creating a collection sanitises the collection name
     Given I am logged in as "data_owner@intersect.org.au"
     And I am on the create collection page
-    When I fill in "collection_name" with "Test With Space"
+    When I fill in "collection_name" with "<name>"
     And I fill in "collection_title" with "Test Title"
     And I fill in "collection_owner" with "Test Owner"
     And I fill in "collection_abstract" with "Test Abstract"
     And I press "Create"
-    Then I should be on the collection page for "testwithspace"
-    And I should see "New collection 'testwithspace' (http://www.example.com/catalog/testwithspace) created"
-    And I should see "testwithspace"
+    Then I should be on the collection page for "<sanitised_name>"
+    And I should see "New collection '<sanitised_name>' (http://www.example.com/catalog/<sanitised_name>) created"
+    And I should see "<sanitised_name>"
     And I should see "Collection Details"
     And I should see "RDF Type: dcmitype:Collection"
     And I should see "Title: Test Title"
     And I should see "Owner: Test Owner"
     And I should see "Abstract: Test Abstract"
-    And I should see "SPARQL Endpoint: http://www.example.com/sparql/testwithspace"
+    And I should see "SPARQL Endpoint: http://www.example.com/sparql/<sanitised_name>"
+  Examples:
+    | name             | sanitised_name   |
+    | TESTUPPERCASE    | testuppercase    |
+    | test with spaces | testwithspaces   |
+    | test/with/slash  | testwithslash    |
+    | test.with.period | testwithperiod   |
+    | Test with/allthe/Sanitisations.to be.cleaned | testwithallthesanitisationstobecleaned|
 
   @create_collection
   Scenario Outline: Verify collection name, title, owner and abstract are required
