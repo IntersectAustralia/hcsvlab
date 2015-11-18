@@ -14,7 +14,9 @@ class Collection < ActiveRecord::Base
   validates :name, presence: true
 
   def self.sanitise_name(name)
-    name.downcase.delete(' ')
+    # Spaces shouldn't be used since Sesame uses the name within the metadata URI
+    # . and / shouldn't be used in the name since they can break the routes mapping
+    name.downcase.delete(' ./')
   end
 
   # Returns the directory in which the collection manifest and item metadata files are stored in
