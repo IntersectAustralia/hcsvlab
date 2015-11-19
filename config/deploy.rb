@@ -11,8 +11,6 @@ set :whenever_command, "bundle exec whenever"
 
 require "whenever/capistrano"
 
-require Rails.root.join('db/seed_helper.rb')
-
 set :shared_file_dir, "files"
 set(:shared_file_path) { File.join(shared_path, shared_file_dir) }
 
@@ -102,10 +100,6 @@ after 'deploy:update' do
   # We need to use our own cleanup task since there is an issue on Capistrano deploy:cleanup task
   #https://github.com/capistrano/capistrano/issues/474
   deploy.customcleanup
-end
-
-after 'deploy:safe' do
-  populate_languages # Populate the languages table after deployment
 end
 
 namespace :deploy do
@@ -236,6 +230,7 @@ namespace :deploy do
     backup.db.dump
     backup.db.trim
     migrate
+    deploy.seed_languages # Populate the languages table after deployment
     restart
   end
 
@@ -273,6 +268,10 @@ namespace :deploy do
     run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
   end
 
+  desc "Install all languages"
+  task :seed_languages do
+    run("cd #{current_path} && bundle exec rake seed_languages", :env => {'RAILS_ENV' => "#{stage}"})
+  end
 
 end
 
