@@ -102,12 +102,10 @@ after 'deploy:update' do
   # We need to use our own cleanup task since there is an issue on Capistrano deploy:cleanup task
   #https://github.com/capistrano/capistrano/issues/474
   deploy.customcleanup
-
 end
 
-# Populate the languages table after deployment
-after 'deploy' do
-  populate_languages
+after 'deploy:safe' do
+  populate_languages # Populate the languages table after deployment
 end
 
 namespace :deploy do
