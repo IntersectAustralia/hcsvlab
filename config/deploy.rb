@@ -269,7 +269,7 @@ namespace :deploy do
   end
 
   desc "Install all languages"
-  task :seed_languages do
+  task :seed_languages, :roles => :app do
     run("cd #{current_path} && bundle exec rake seed_languages", :env => {'RAILS_ENV' => "#{stage}"})
   end
 
