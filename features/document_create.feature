@@ -8,10 +8,6 @@ Feature: Creating Documents
     And I have a user "data_owner@intersect.org.au" with role "data owner"
     And "data_owner@intersect.org.au" has an api token
     And I have a user "researcher@intersect.org.au" with role "researcher"
-    And I ingest "cooee:1-001"
-    And Collections ownership is
-      | collection | owner_email                 |
-      | cooee      | data_owner@intersect.org.au |
     And I have languages
       | code  | name      |
       | eng   | English   |
@@ -19,12 +15,20 @@ Feature: Creating Documents
       | xyj   | Mayi-Yapi |
 
   Scenario: Verify add document button is visible for collection owner
-    Given I am logged in as "data_owner@intersect.org.au"
+    Given I ingest "cooee:1-001"
+    And Collections ownership is
+      | collection | owner_email                 |
+      | cooee      | data_owner@intersect.org.au |
+    And I am logged in as "data_owner@intersect.org.au"
     When I am on the catalog page for "cooee:1-001"
     Then I should see link "Add New Document" to "/add-document/cooee/1-001"
 
   Scenario Outline: Verify add document button is not visible for users other than the collection owner
-    Given I am logged in as "<user>"
+    Given I ingest "cooee:1-001"
+    And Collections ownership is
+      | collection | owner_email                 |
+      | cooee      | data_owner@intersect.org.au |
+    And I am logged in as "<user>"
     When I am on the catalog page for "cooee:1-001"
     Then I should not see link "Add New Item" to "/add-document/cooee/1-001"
   Examples:
@@ -33,13 +37,21 @@ Feature: Creating Documents
     | researcher@intersect.org.au |
 
   Scenario: Verify add document button goes to new document form page
-    Given I am logged in as "data_owner@intersect.org.au"
+    Given I ingest "cooee:1-001"
+    And Collections ownership is
+      | collection | owner_email                 |
+      | cooee      | data_owner@intersect.org.au |
+    And I am logged in as "data_owner@intersect.org.au"
     When I am on the catalog page for "cooee:1-001"
     When I follow element with id "add_new_document"
     Then I should be on the add document page for "cooee:1-001"
 
   Scenario Outline: Verify users other than the collection owner are not authorised to load add document page
-    Given I am logged in as "<user>"
+    Given I ingest "cooee:1-001"
+    And Collections ownership is
+      | collection | owner_email                 |
+      | cooee      | data_owner@intersect.org.au |
+    And I am logged in as "<user>"
     When I am on the add document page for "cooee:1-001"
     Then I should see "You are not authorised to access this page."
   Examples:
@@ -48,7 +60,11 @@ Feature: Creating Documents
     | researcher@intersect.org.au |
 
   Scenario: Verify add document page has expected form fields
-    Given I am logged in as "data_owner@intersect.org.au"
+    Given I ingest "cooee:1-001"
+    And Collections ownership is
+      | collection | owner_email                 |
+      | cooee      | data_owner@intersect.org.au |
+    And I am logged in as "data_owner@intersect.org.au"
     When I am on the add document page for "cooee:1-001"
     Then I should see "Add Document"
     And I should see "Please select a file:"
@@ -65,20 +81,32 @@ Feature: Creating Documents
     And I should see button "Create"
 
   Scenario: Verify add metadata name/value fields not visible by default
-    Given I am logged in as "data_owner@intersect.org.au"
+    Given I ingest "cooee:1-001"
+    And Collections ownership is
+      | collection | owner_email                 |
+      | cooee      | data_owner@intersect.org.au |
+    And I am logged in as "data_owner@intersect.org.au"
     When I am on the add document page for "cooee:1-001"
     Then I should not see "Name: Value: "
 
   @javascript
   Scenario: Verify add metadata name/value fields are visible after clicking add metadata field button
-    Given I am logged in as "data_owner@intersect.org.au"
+    Given I ingest "cooee:1-001"
+    And Collections ownership is
+      | collection | owner_email                 |
+      | cooee      | data_owner@intersect.org.au |
+    And I am logged in as "data_owner@intersect.org.au"
     And I am on the add document page for "cooee:1-001"
     When I click "Add Metadata Field"
     Then the "additional_key[]" field should contain ""
     And the "additional_value[]" field should contain ""
 
   Scenario: Verify uploading a document file is required
-    Given I am logged in as "data_owner@intersect.org.au"
+    Given I ingest "cooee:1-001"
+    And Collections ownership is
+      | collection | owner_email                 |
+      | cooee      | data_owner@intersect.org.au |
+    And I am logged in as "data_owner@intersect.org.au"
     And I am on the add document page for "cooee:1-001"
     And I press "Create"
     Then I should be on the add document page for "cooee:1-001"
@@ -112,6 +140,23 @@ Feature: Creating Documents
     And Sesame should contain a document with file_name "sample1.txt" in collection "test"
 
   @create_collection
+  Scenario Outline: Verify a document with spaces in its filename cannot be created
+    Given I ingest a new collection "test" through the api with the API token for "data_owner@intersect.org.au"
+    When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
+      | items |
+      | [ { "documents": [ { "identifier": "document1.txt", "content": "A Test." } ], "metadata": { "@context": { "ausnc": "http://ns.ausnc.org.au/schemas/ausnc_md_model/", "corpus": "http://ns.ausnc.org.au/corpora/", "dc": "http://purl.org/dc/terms/", "dcterms": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/", "hcsvlab": "http://hcsvlab.org/vocabulary/" }, "@graph": [ { "@id": "item1", "@type": "ausnc:AusNCObject", "ausnc:document": [ { "@id": "document1.txt", "@type": "foaf:Document", "dcterms:identifier": "document1.txt", "dcterms:title": "document1#Text", "dcterms:type": "Text" } ], "dcterms:identifier": "item1", "hcsvlab:display_document": { "@id": "document1.txt" }, "hcsvlab:indexable_document": { "@id": "document1.txt" } } ] } } ] |
+    And I am logged in as "data_owner@intersect.org.au"
+    And I am on the add document page for "test:item1"
+    And I attach the file "test/samples/api/<file>" to "document_file"
+    And I press "Create"
+    Then I should see "Spaces are not permitted in the file name: <file> ×"
+    And I should be on the add document page for "test:item1"
+  Examples:
+    | file                     |
+    | filename space.txt       |
+    | filename with spaces.txt |
+
+  @create_collection
   Scenario: Create a document with just the required fields
     Given I ingest a new collection "test" through the api with the API token for "data_owner@intersect.org.au"
     When I make a JSON post request for the collection page for id "Test" with the API token for "data_owner@intersect.org.au" with JSON params
@@ -124,9 +169,9 @@ Feature: Creating Documents
     Then I should see "Added the document sample1.txt to item item1 in collection test ×"
     And I should be on the catalog page for "test:item1"
     And I should see "Documents"
-    And I should see "Filename        Type        Size"
+    And I should see "Filename        Type         Size"
     And I should see "document1.txt   Text"
-    And I should see "sample1.txt     unlabelled  12 B"
+    And I should see "sample1.txt     unlabelled   12 B"
 
   @javascript @create_collection
   Scenario Outline: Create a document with a set of additional metadata

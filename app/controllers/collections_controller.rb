@@ -529,8 +529,8 @@ class CollectionsController < ApplicationController
   # Returns a hash containing the metadata for a document source
   #
   def format_document_source_metadata(doc_source)
-    # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
-    {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
+    # Escape any filename symbols which need to be replaced with codes to form a valid URI
+    {'@id' => "file://#{URI.escape(doc_source)}"}
   end
 
   # Updates the source of a specific document

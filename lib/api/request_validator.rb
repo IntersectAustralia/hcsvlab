@@ -164,6 +164,9 @@ module RequestValidator
 
   # Validates that the document file to be created/uploaded doesn't already exist in the collection directory
   def validate_new_document_file(corpus_dir, file_basename, collection)
+    if file_basename.include? " "
+      raise ResponseError.new(400), "Spaces are not permitted in the file name: #{file_basename}"
+    end
     absolute_filename = File.join(corpus_dir, file_basename)
     if File.exists? absolute_filename
       raise ResponseError.new(412), "The file #{file_basename} has already been uploaded to the collection #{collection.name}"
