@@ -104,7 +104,7 @@ Feature: Creating Items
     And I press "Create"
     Then I should be on the home page
     And I should see "Created new item: <sanitised_name> ×"
-    And I should see "Sorry, the item you requested is being indexed and will be available shortly. ×"
+    And I should see "Sorry, the item you requested is being indexed and will be available shortly. You may need to wait a few moments and refresh the page to see your item. ×"
   Examples:
     | collection_name | name        | sanitised_name | title        |
     | test            | test        | test           | Test         |
