@@ -5,9 +5,13 @@ $(window).load(function() {
         if (alert.length > 0) {
             alert.slideDown();
 
+            alertTimeout = 9000;
+            if (alert.hasClass('long-alert')) {
+                alertTimeout = 20000;
+            }
             var alerttimer = window.setTimeout(function() {
                 alert.slideUp();
-            }, 9000);
+            }, alertTimeout);
             $(".alert").click(function () {
                 window.clearTimeout(alerttimer);
                 alert.slideUp();
