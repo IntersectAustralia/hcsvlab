@@ -938,7 +938,7 @@ class CatalogController < ApplicationController
         respond_to do |format|
           format.html {
             flash.keep(:notice) # Persist flash notices from the previous request
-            flash[:error] = "Sorry, the item you requested is being indexed and will be available shortly."
+            flash[:error] = "Sorry, the item you requested is being indexed and will be available shortly. You may need to wait a few moments and refresh the page to see your item."
             redirect_to root_url and return
           }
           format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
