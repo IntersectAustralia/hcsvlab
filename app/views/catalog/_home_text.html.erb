@@ -2,15 +2,11 @@
   <h2>Above and Beyond Speech, Language and Music</h2>
   <h4> A Virtual Lab for Human Communication Science </h4>
 </header>
-<% if !@hasAccessToEveryCollection and @hasAccessToSomeCollections %>
-  <div class="alert info">
-    <a class="close" data-dismiss="alert" href="#">×</a>
+<div class="alert long-alert">
+  <a class="close" data-dismiss="alert" href="#">×</a>
+  <% if !@hasAccessToEveryCollection and @hasAccessToSomeCollections %>
     <p><strong>Welcome!</strong> To gain access to more Collections, visit the <a href="account/licence_agreements" class="alert-link">Licence Agreements</a> page.</p>
-  </div>
-<% elsif !@hasAccessToEveryCollection %>
-  <div class="info">
-    <a class="close" data-dismiss="alert" href="#">×</a>
+  <% elsif !@hasAccessToEveryCollection %>
     <p><strong>Welcome!</strong> To gain access to Collections, visit the <a href="account/licence_agreements" class="alert-link">Licence Agreements</a> page.</p>
-  </div>
-<% end %>
-
+  <% end %>
+</div>
