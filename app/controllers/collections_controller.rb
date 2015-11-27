@@ -6,7 +6,6 @@ require 'fileutils'
 
 class CollectionsController < ApplicationController
   before_filter :authenticate_user!
-  #load_and_authorize_resource
   load_resource :only => [:create]
   skip_authorize_resource :only => [:create] # authorise create method with custom permission denied error
 
@@ -221,10 +220,7 @@ class CollectionsController < ApplicationController
       doc_content = params[:document_content]
       uploaded_file = params[:file]
       uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
-      # require 'pry'
-      # binding.pry
       doc_filename = doc_metadata['dc:identifier']
-      # doc_filename = get_dc_identifier(doc_metadata) # the document filename is the document id
       
       doc_metadata = format_and_validate_add_document_request(collection.corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
       @success_message = add_document_core(collection, item, doc_metadata, doc_filename)
@@ -340,8 +336,6 @@ class CollectionsController < ApplicationController
       validate_jsonld(params[:metadata])
       new_metadata = format_update_item_metadata(item, params[:metadata])
       update_sesame_with_graph(new_metadata, collection)
-      #require 'pry'
-      #binding.pry
       update_item_in_solr(item)
       @success_message = "Updated item #{item.get_name} in collection #{collection.name}"
     rescue ResponseError => e
@@ -351,38 +345,6 @@ class CollectionsController < ApplicationController
   end
 
   private
-
-  #
-  # Creates the model for blacklight pagination.
-  #
-  #def create_pagination_structure(params)
-  #  start = (params[:page].nil?)? 0 : params[:page].to_i-1
-  #  total = @collections.length
-  #
-  #  per_page = (params[:per_page].nil?)? PER_PAGE_RESULTS : params[:per_page].to_i
-  #  per_page = PER_PAGE_RESULTS if per_page < 1
-  #
-  #  current_page = (start / per_page).ceil + 1
-  #  num_pages = (total / per_page.to_f).ceil
-  #
-  #  total_count = total
-  #
-  #  @collections = @collections[(current_page-1)*per_page..current_page*per_page-1]
-  #
-  #  start_num = start + 1
-  #  end_num = start_num + @collections.length - 1
-  #
-  #  @paging = OpenStruct.new(:start => start_num,
-  #                           :end => end_num,
-  #                           :per_page => per_page,
-  #                           :current_page => current_page,
-  #                           :num_pages => num_pages,
-  #                           :limit_value => per_page, # backwards compatibility
-  #                           :total_count => total_count,
-  #                           :first_page? => current_page > 1,
-  #                           :last_page? => current_page < num_pages
-  #  )
-  #end
 
   # Creates a file at the specified path with the given content
   def create_file(file_path, content)
@@ -394,8 +356,6 @@ class CollectionsController < ApplicationController
 
   # Coverts JSON-LD formatted collection metadata and converts it to RDF
   def convert_json_metadata_to_rdf(json_metadata)
-    #require 'pry'
-    #binding.pry
     # Make sure source is mapped to a URI and not a string
     json_metadata['@context'].merge!({'dc:source' => {'@type' => '@id'}})
     graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
@@ -472,8 +432,6 @@ class CollectionsController < ApplicationController
   def process_items(collection_name, corpus_dir, request_params, uploaded_files=[])
     items = []
     failures = []
-    #require 'pry'
-    #binding.pry
     request_params[:items].each do |item|
       item = process_item_documents_and_update_graph(corpus_dir, item)
       item = update_item_graph_with_uploaded_files(uploaded_files, item)
@@ -536,37 +494,9 @@ class CollectionsController < ApplicationController
         end
       end
 
-      # Handle documents contained in the same hash as item metadata
-      # update_doc_source(graph_entry, doc_identifier, doc_source)
     end
     jsonld_graph
   end
-
-  #
-  # Returns a hash containing the metadata for a document source
-  #
-  # def format_document_source_metadata(doc_source)
-    # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
-    # {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
-  # end
-
-  # Updates the source of a specific document
-  # def update_doc_source(doc_metadata, doc_identifier, doc_source)
-  #   if doc_metadata['dc:identifier'] == doc_identifier || doc_metadata['dcterms:identifier'] == doc_identifier || doc_metadata[MetadataHelper::IDENTIFIER.to_s] == doc_identifier
-  #     formatted_source_path = format_document_source_metadata(doc_source)
-  #     doc_has_source = false
-  #     # Replace any existing document source with the formatted one or add one in if there aren't any existing
-  #     ['dc:source', 'dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
-  #       if doc_metadata.has_key?(source)
-  #         doc_metadata.update({source => formatted_source_path})
-  #         doc_has_source = true
-  #       end
-  #     end
-  #     doc_metadata.update({MetadataHelper::SOURCE.to_s => formatted_source_path}) unless doc_has_source
-  #   end
-    #require 'pry'
-    #binding.pry
-  # end
 
   # TODO: get rid of doc_identifier param since it's not used
   def update_doc_source(doc_metadata, doc_identifier, doc_source)
@@ -639,11 +569,6 @@ class CollectionsController < ApplicationController
     server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
     server.repository(collection.name)
   end
-
-  # Inserts the statements of the graph into the Sesame repository
-  #def insert_graph_into_repository(graph, repository)
-  #  graph.each_statement { |statement| repository.insert(statement) }
-  #end
 
   # Updates Sesame with the metadata graph
   # If statements already exist this updates the statement object rather than appending new statements
@@ -731,8 +656,6 @@ class CollectionsController < ApplicationController
     delete_document_from_sesame(document, get_sesame_repository(collection))
     delete_document_from_solr(document.id)
     document.destroy # Remove document and document audits from database
-    # require 'pry'
-    # binding.pry
   end
 
   # Removes an item and its documents from the database, filesystem, Sesame and Solr
@@ -845,19 +768,19 @@ class CollectionsController < ApplicationController
   #TODO get rif of these and just use helpers
 
   # Returns an Alveo formatted collection full URL
-  def format_collection_url(collection_name)
-    collection_url(collection_name)
-  end
+  # def collection_url(collection_name)
+  #   collection_url(collection_name)
+  # end
 
   # Returns an Alevo formatted item full URL
-  def format_item_url(collection_name, item_name)
-    catalog_url(collection_name, item_name)
-  end
+  #def format_item_url(collection_name, item_name)
+  #  catalog_url(collection_name, item_name)
+  #end
 
   # Retuns an Alveo formatted document full URL
-  def format_document_url(collection_name, item_name, document_name)
-    catalog_document_url(collection_name, item_name, document_name)
-  end
+  # def catalog_document_url(collection_name, item_name, document_name)
+  #   catalog_document_url(collection_name, item_name, document_name)
+  # end
 
   # Overrides the jsonld is_part_of_corpus with the collection's Alveo url
   def override_is_part_of_corpus(item_json_ld, collection_name)
@@ -867,12 +790,12 @@ class CollectionsController < ApplicationController
       unless is_doc
         ['dc:isPartOf', 'dcterms:isPartOf', MetadataHelper::IS_PART_OF.to_s].each do |is_part_of|
           if node.has_key?(is_part_of)
-            node[is_part_of]["@id"] = format_collection_url(collection_name)
+            node[is_part_of]["@id"] = collection_url(collection_name)
             part_of_exists = true
           end
         end
         unless part_of_exists
-          node[MetadataHelper::IS_PART_OF.to_s] = {"@id" => format_collection_url(collection_name)}
+          node[MetadataHelper::IS_PART_OF.to_s] = {"@id" => collection_url(collection_name)}
         end
       end
     end
@@ -891,7 +814,7 @@ class CollectionsController < ApplicationController
       doc_types.each do |doc_type|
         if item_metadata.has_key?(doc_type)
           doc_short_id = item_metadata[doc_type]["@id"]
-          item_metadata[doc_type]["@id"] = format_document_url(collection.name, item_id, doc_short_id)
+          item_metadata[doc_type]["@id"] = catalog_document_url(collection.name, item_id, doc_short_id)
         end
       end
     end
@@ -909,21 +832,21 @@ class CollectionsController < ApplicationController
 
   #Updates the @id of a collection in JSON-LD to the Alveo catalog URL for that collection
   def update_jsonld_collection_id(collection_metadata, collection_name)
-    collection_metadata["@id"] = format_collection_url(collection_name)
+    collection_metadata["@id"] = collection_url(collection_name)
     collection_metadata
   end
 
   # Updates the @id of an item in JSON-LD to the Alveo catalog URL for that item
   def update_jsonld_item_id(item_metadata, collection_name)
     item_id = get_dc_identifier(item_metadata)
-    item_metadata["@id"] = format_item_url(collection_name, item_id) unless item_id.nil?
+    item_metadata["@id"] = catalog_url(collection_name, item_id) unless item_id.nil?
     item_metadata
   end
 
   # Updates the @id of an document in JSON-LD to the Alveo catalog URL for that document
   def update_jsonld_document_id(document_metadata, collection_name, item_name)
     doc_id = get_dc_identifier(document_metadata)
-    document_metadata["@id"] = format_document_url(collection_name, item_name, doc_id) unless doc_id.nil?
+    document_metadata["@id"] = catalog_document_url(collection_name, item_name, doc_id) unless doc_id.nil?
     document_metadata
   end
 
@@ -947,8 +870,6 @@ class CollectionsController < ApplicationController
   def format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
     validate_add_document_request(corpus_dir, collection, doc_metadata, doc_filename, doc_content, uploaded_file)
     doc_metadata = format_add_document_metadata(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
-    #require 'pry'
-    #binding.pry
     validate_jsonld(doc_metadata)
     validate_document_source(doc_metadata) # TODO: Not sure if this is needed since we assign the dc:source?
     doc_metadata
@@ -968,16 +889,12 @@ class CollectionsController < ApplicationController
       document_content = document_metadata['alveo:fulltext']
       processed_file = upload_document_using_json(corpus_dir, document_filename, document_content)
     end
-    # require 'pry'
-    # binding.pry
     update_doc_source(document_metadata, document_filename, processed_file) unless processed_file.nil?
     document_metadata
   end
 
   # Creates a document in the database from Json-ld document metadata
   def create_document(item, document_json_ld)
-    #require 'pry'
-    #binding.pry
     file_path = URI(document_json_ld['dc:source']).path
     file_name = File.basename(file_path)
     doc_type = document_json_ld['dc:type']
@@ -1007,8 +924,6 @@ class CollectionsController < ApplicationController
                'alveo' => 'http://alveo.edu.au/schema/'}
     document_json_ld['@context'] = context
     document_RDF = RDF::Graph.new << JSON::LD::API.toRDF(document_json_ld)
-    #require 'pry'
-    #binding.pry
     update_sesame_with_graph(document_RDF, item.collection)
     #Add link in item rdf to doc rdf in sesame
     document_RDF_URI = RDF::URI.new(document_json_ld['@id'])
