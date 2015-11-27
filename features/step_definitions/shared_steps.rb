@@ -137,3 +137,8 @@ end
 And /^I wait (\d+) seconds$/ do |seconds|
   sleep seconds.to_i
 end
+
+And /^I pry$/ do
+  require 'pry'
+  binding.pry
+end

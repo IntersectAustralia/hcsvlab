@@ -211,11 +211,21 @@ class CollectionsController < ApplicationController
     begin
       collection = validate_collection(params[:collectionId], params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
+      # TODO: Update request structure to not have nested metadata keys
       doc_metadata = params[:metadata]
+      # Handle requests multipart form encoded
+      if doc_metadata.is_a? String
+        doc_metadata = JSON.parse(doc_metadata)
+      end 
+      doc_metadata = doc_metadata['alveo:metadata']
       doc_content = params[:document_content]
       uploaded_file = params[:file]
       uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
-      doc_filename = get_dc_identifier(doc_metadata) # the document filename is the document id
+      # require 'pry'
+      # binding.pry
+      doc_filename = doc_metadata['dc:identifier']
+      # doc_filename = get_dc_identifier(doc_metadata) # the document filename is the document id
+      
       doc_metadata = format_and_validate_add_document_request(collection.corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
       @success_message = add_document_core(collection, item, doc_metadata, doc_filename)
     rescue ResponseError => e
@@ -330,6 +340,8 @@ class CollectionsController < ApplicationController
       validate_jsonld(params[:metadata])
       new_metadata = format_update_item_metadata(item, params[:metadata])
       update_sesame_with_graph(new_metadata, collection)
+      #require 'pry'
+      #binding.pry
       update_item_in_solr(item)
       @success_message = "Updated item #{item.get_name} in collection #{collection.name}"
     rescue ResponseError => e
@@ -382,8 +394,11 @@ class CollectionsController < ApplicationController
 
   # Coverts JSON-LD formatted collection metadata and converts it to RDF
   def convert_json_metadata_to_rdf(json_metadata)
+    #require 'pry'
+    #binding.pry
+    # Make sure source is mapped to a URI and not a string
+    json_metadata['@context'].merge!({'dc:source' => {'@type' => '@id'}})
     graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
-    # graph.dump(:ttl, prefixes: {foaf: "http://xmlns.com/foaf/0.1/"})
     graph.dump(:ttl)
   end
 
@@ -457,6 +472,8 @@ class CollectionsController < ApplicationController
   def process_items(collection_name, corpus_dir, request_params, uploaded_files=[])
     items = []
     failures = []
+    #require 'pry'
+    #binding.pry
     request_params[:items].each do |item|
       item = process_item_documents_and_update_graph(corpus_dir, item)
       item = update_item_graph_with_uploaded_files(uploaded_files, item)
@@ -520,7 +537,7 @@ class CollectionsController < ApplicationController
       end
 
       # Handle documents contained in the same hash as item metadata
-      update_doc_source(graph_entry, doc_identifier, doc_source)
+      # update_doc_source(graph_entry, doc_identifier, doc_source)
     end
     jsonld_graph
   end
@@ -528,25 +545,36 @@ class CollectionsController < ApplicationController
   #
   # Returns a hash containing the metadata for a document source
   #
-  def format_document_source_metadata(doc_source)
+  # def format_document_source_metadata(doc_source)
     # Escape any filename spaces with '%20' as URIs with spaces are flagged as invalid when RDF loads
-    {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
-  end
+    # {'@id' => "file://#{doc_source.sub(" ", "%20")}"}
+  # end
 
   # Updates the source of a specific document
+  # def update_doc_source(doc_metadata, doc_identifier, doc_source)
+  #   if doc_metadata['dc:identifier'] == doc_identifier || doc_metadata['dcterms:identifier'] == doc_identifier || doc_metadata[MetadataHelper::IDENTIFIER.to_s] == doc_identifier
+  #     formatted_source_path = format_document_source_metadata(doc_source)
+  #     doc_has_source = false
+  #     # Replace any existing document source with the formatted one or add one in if there aren't any existing
+  #     ['dc:source', 'dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
+  #       if doc_metadata.has_key?(source)
+  #         doc_metadata.update({source => formatted_source_path})
+  #         doc_has_source = true
+  #       end
+  #     end
+  #     doc_metadata.update({MetadataHelper::SOURCE.to_s => formatted_source_path}) unless doc_has_source
+  #   end
+    #require 'pry'
+    #binding.pry
+  # end
+
+  # TODO: get rid of doc_identifier param since it's not used
   def update_doc_source(doc_metadata, doc_identifier, doc_source)
-    if doc_metadata['dc:identifier'] == doc_identifier || doc_metadata['dcterms:identifier'] == doc_identifier || doc_metadata[MetadataHelper::IDENTIFIER.to_s] == doc_identifier
-      formatted_source_path = format_document_source_metadata(doc_source)
-      doc_has_source = false
-      # Replace any existing document source with the formatted one or add one in if there aren't any existing
-      ['dc:source', 'dcterms:source', MetadataHelper::SOURCE.to_s].each do |source|
-        if doc_metadata.has_key?(source)
-          doc_metadata.update({source => formatted_source_path})
-          doc_has_source = true
-        end
-      end
-      doc_metadata.update({MetadataHelper::SOURCE.to_s => formatted_source_path}) unless doc_has_source
+    source = URI.escape("file://#{doc_source}")
+    if doc_metadata.has_key? 'dc:source'
+      source = URI.escape(doc_metadata['dc:source'])
     end
+    doc_metadata['dc:source'] = source
   end
 
   # Returns a cleansed copy of params for the add item api
@@ -613,9 +641,9 @@ class CollectionsController < ApplicationController
   end
 
   # Inserts the statements of the graph into the Sesame repository
-  def insert_graph_into_repository(graph, repository)
-    graph.each_statement { |statement| repository.insert(statement) }
-  end
+  #def insert_graph_into_repository(graph, repository)
+  #  graph.each_statement { |statement| repository.insert(statement) }
+  #end
 
   # Updates Sesame with the metadata graph
   # If statements already exist this updates the statement object rather than appending new statements
@@ -703,6 +731,8 @@ class CollectionsController < ApplicationController
     delete_document_from_sesame(document, get_sesame_repository(collection))
     delete_document_from_solr(document.id)
     document.destroy # Remove document and document audits from database
+    # require 'pry'
+    # binding.pry
   end
 
   # Removes an item and its documents from the database, filesystem, Sesame and Solr
@@ -812,6 +842,8 @@ class CollectionsController < ApplicationController
     new_metadata
   end
 
+  #TODO get rif of these and just use helpers
+
   # Returns an Alveo formatted collection full URL
   def format_collection_url(collection_name)
     collection_url(collection_name)
@@ -915,8 +947,10 @@ class CollectionsController < ApplicationController
   def format_and_validate_add_document_request(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
     validate_add_document_request(corpus_dir, collection, doc_metadata, doc_filename, doc_content, uploaded_file)
     doc_metadata = format_add_document_metadata(corpus_dir, collection, item, doc_metadata, doc_filename, doc_content, uploaded_file)
+    #require 'pry'
+    #binding.pry
     validate_jsonld(doc_metadata)
-    validate_document_source(doc_metadata)
+    validate_document_source(doc_metadata) # TODO: Not sure if this is needed since we assign the dc:source?
     doc_metadata
   end
 
@@ -925,23 +959,28 @@ class CollectionsController < ApplicationController
     # Update the document @id to the Alveo catalog URI
     document_metadata = update_jsonld_document_id(document_metadata, collection.name, item.get_name)
     processed_file = nil
+    # Case 1: File attached
+    # Case 2: by URI
+    # Case 3: Included in JSON
     unless uploaded_file.nil?
       processed_file = upload_document_using_multipart(corpus_dir, uploaded_file.original_filename, uploaded_file, collection.name)
-    end
-    unless document_content.blank?
+    else
+      document_content = document_metadata['alveo:fulltext']
       processed_file = upload_document_using_json(corpus_dir, document_filename, document_content)
     end
+    # require 'pry'
+    # binding.pry
     update_doc_source(document_metadata, document_filename, processed_file) unless processed_file.nil?
     document_metadata
   end
 
   # Creates a document in the database from Json-ld document metadata
   def create_document(item, document_json_ld)
-    expanded_metadata = JSON::LD::API.expand(document_json_ld).first
-    file_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+    #require 'pry'
+    #binding.pry
+    file_path = URI(document_json_ld['dc:source']).path
     file_name = File.basename(file_path)
-    doc_type = expanded_metadata[MetadataHelper::TYPE.to_s]
-    doc_type = doc_type.first['@value'] unless doc_type.nil?
+    doc_type = document_json_ld['dc:type']
     document = item.documents.find_or_initialize_by_file_name(file_name)
     if document.new_record?
       begin
@@ -962,8 +1001,14 @@ class CollectionsController < ApplicationController
 
   # Adds a document to Sesame and updates the corresponding item in Solr
   def add_and_index_document(item, document_json_ld)
-    # Upload doc rdf to seasame
+    # TODO: This really needs to be the submitted context in case other namespaces are used
+    context = {'dc' => 'http://purl.org/dc/terms/',
+              'dc:source' => {'@type' => '@id'},
+               'alveo' => 'http://alveo.edu.au/schema/'}
+    document_json_ld['@context'] = context
     document_RDF = RDF::Graph.new << JSON::LD::API.toRDF(document_json_ld)
+    #require 'pry'
+    #binding.pry
     update_sesame_with_graph(document_RDF, item.collection)
     #Add link in item rdf to doc rdf in sesame
     document_RDF_URI = RDF::URI.new(document_json_ld['@id'])

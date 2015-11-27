@@ -1,10 +1,14 @@
+require 'json-compare'
+
 module JsonCompare
 
   #
   # This class will compare to json objects without taking into account the order
   # of the objects in an array.
   #
+
   class OrderlessComparer < JsonCompare::Comparer
+
     def compare_arrays(old_array, new_array)
       old_array_length = old_array.count
       new_array_length = new_array.count
@@ -54,5 +58,13 @@ module JsonCompare
       end
       count
     end
+
   end
+
+  def self.get_diff(example_a, example_b, exclusion=[])
+    comparer = OrderlessComparer.new
+    comparer.excluded_keys = exclusion
+    comparer.compare_elements(example_a, example_b)
+  end
+
 end

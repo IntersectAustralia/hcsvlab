@@ -85,10 +85,12 @@ def reindex_item_to_solr(item_id, stomp_client)
   stomp_client.publish('/queue/alveo.solr.worker', "index #{item_id}")
 end
 
+#TODO: this method is unnecessary
 def delete_item_from_solr(item_id)
   delete_object_from_solr(item_id)
 end
 
+#TODO: this method is unnecessary
 def delete_document_from_solr(document_id)
   delete_object_from_solr(document_id)
 end

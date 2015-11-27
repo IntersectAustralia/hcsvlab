@@ -355,6 +355,7 @@ class CatalogController < ApplicationController
       @item = Item.find_by_handle("#{params[:collection]}:#{params[:itemId]}")
       @response, @document = get_solr_response_for_doc_id
 
+
       # For some reason blacklight stopped to fullfill the counter value in the session since we changed
       # the item url to use /catalog/:collection/:itemId. So will set this in here.
       session[:search][:counter] = params[:counter] if params[:counter].present?

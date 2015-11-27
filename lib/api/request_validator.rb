@@ -3,16 +3,19 @@ require Rails.root.join('lib/api/response_error')
 module RequestValidator
 
   # Validates JSON-LD metadata
-  def validate_jsonld(graph)
-    raise ResponseError.new(400), "Invalid metadata" if graph.blank?
-    rdf_graph = RDF::Graph.new << JSON::LD::API.toRDF(graph)
-    validate_rdf_graph(rdf_graph)
+  def validate_jsonld(json_ld)
+    #require 'pry'
+    #binding.pry
+    rdf_graph = RDF::Graph.new << JSON::LD::API.toRDF(json_ld)
+    if rdf_graph.invalid? or rdf_graph.empty?
+      raise ResponseError.new(400), "Invalid metadata"
+    end
   end
 
   # Validates RDF metadata
-  def validate_rdf_graph(graph)
-    raise ResponseError.new(400), "Invalid metadata" if graph.invalid?
-  end
+  #def validate_rdf_graph(graph)
+  #  raise ResponseError.new(400), "Invalid metadata" if graph.invalid?
+  #end
 
   # Validates the collection exists and the user is authorised to modify it
   def validate_collection(collection_id, api_key)
@@ -186,12 +189,27 @@ module RequestValidator
   end
 
   # Validates all the document filenames match (in the @id, dc:identifier, dc:source)
+  # def validate_document_source(document_json_ld)
+  #   expanded_metadata = JSON::LD::API.expand(document_json_ld).first
+  #   source_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+  #   meta_source_basename = File.basename(source_path)
+  #   rdf_subject_basename = File.basename(expanded_metadata['@id'])
+  #   meta_id = expanded_metadata[MetadataHelper::IDENTIFIER.to_s].first['@value']
+  #   raise ResponseError.new(400), "Document file name in @id doesn't match the document source file name" if meta_source_basename != rdf_subject_basename
+  #   raise ResponseError.new(400), "Document dc:identifier doesn't match the document source file name" if meta_source_basename != meta_id
+  # end
+
+  # TODO is this necessary?
   def validate_document_source(document_json_ld)
-    expanded_metadata = JSON::LD::API.expand(document_json_ld).first
-    source_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+    # expanded_metadata = JSON::LD::API.expand(document_json_ld).first
+    # source_path = URI(expanded_metadata[MetadataHelper::SOURCE.to_s].first['@id']).path
+    # meta_source_basename = File.basename(source_path)
+    # rdf_subject_basename = File.basename(expanded_metadata['@id'])
+    # meta_id = expanded_metadata[MetadataHelper::IDENTIFIER.to_s].first['@value']
+    source_path = URI(document_json_ld['dc:source']).path
     meta_source_basename = File.basename(source_path)
-    rdf_subject_basename = File.basename(expanded_metadata['@id'])
-    meta_id = expanded_metadata[MetadataHelper::IDENTIFIER.to_s].first['@value']
+    rdf_subject_basename = File.basename(document_json_ld['@id'])
+    meta_id = document_json_ld['dc:identifier']
     raise ResponseError.new(400), "Document file name in @id doesn't match the document source file name" if meta_source_basename != rdf_subject_basename
     raise ResponseError.new(400), "Document dc:identifier doesn't match the document source file name" if meta_source_basename != meta_id
   end

@@ -1,4 +1,4 @@
-require "#{Rails.root}/lib/json-compare/orderless_json_comparer.rb"
+require "#{Rails.root}/lib/json-compare/orderless_json_compare.rb"
 
 Then /^I should get a (\d+) response code$/ do |status|
   last_response.status.should == status.to_i
@@ -262,7 +262,7 @@ Then /^the (JSON )?response should be:$/ do |json, input|
   end
 
   if (json.present?)
-    result = OrderlessJsonCompare.get_diff(actual, expected)
+    result = JsonCompare.get_diff(actual, expected)
     if self.respond_to?(:should)
       #actual.should == expected
       result.should be_empty, "\n expected: #{expected} \n got: #{actual} \n"
@@ -343,6 +343,8 @@ Then /^the item "(.+)" in collection "(.+)" should (not )?exist in the database$
 end
 
 Then /^the document "(.+)" under item "(.+)" in collection "(.+)" should (not )?exist in the database$/ do |document_base_name, item_name, collection_name, not_exist|
+  #require 'pry'
+  #binding.pry
   status = true
   status = false if not_exist.present?
   item = Item.find_by_handle("#{collection_name}:#{item_name}")
@@ -408,6 +410,8 @@ Then /^Sesame should (not )?contain a document with file_path "(.+)" in collecti
     pattern [:subject, MetadataHelper::IDENTIFIER, "#{File.basename(file_path)}"]
     pattern [:subject, MetadataHelper::SOURCE, RDF::URI.new("file://#{file_path}")]
   end
+  #require 'pry'
+  #binding.pry
   if not_exist.present?
     repository.query(query).count.should be 0
   else
