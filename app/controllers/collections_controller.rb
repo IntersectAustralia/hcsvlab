@@ -765,23 +765,6 @@ class CollectionsController < ApplicationController
     new_metadata
   end
 
-  #TODO get rif of these and just use helpers
-
-  # Returns an Alveo formatted collection full URL
-  # def collection_url(collection_name)
-  #   collection_url(collection_name)
-  # end
-
-  # Returns an Alevo formatted item full URL
-  #def format_item_url(collection_name, item_name)
-  #  catalog_url(collection_name, item_name)
-  #end
-
-  # Retuns an Alveo formatted document full URL
-  # def catalog_document_url(collection_name, item_name, document_name)
-  #   catalog_document_url(collection_name, item_name, document_name)
-  # end
-
   # Overrides the jsonld is_part_of_corpus with the collection's Alveo url
   def override_is_part_of_corpus(item_json_ld, collection_name)
     item_json_ld["@graph"].each do |node|
