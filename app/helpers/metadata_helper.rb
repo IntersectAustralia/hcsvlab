@@ -14,6 +14,7 @@ private
   PURL_ROOT_URI = 'http://purl.org/'
     DC_TERMS_BASE_URI    = PURL_ROOT_URI + 'dc/terms/' unless const_defined?(:DC_TERMS_BASE_URI)
     DC_ELEMENTS_BASE_URI = PURL_ROOT_URI + 'dc/elements/1.1/' unless const_defined?(:DC_ELEMENTS_BASE_URI)
+    CLD_TERMS            = PURL_ROOT_URI + 'cld/terms/'
     PURL_BIBO_BASE_URI   = PURL_ROOT_URI + 'ontology/bibo/'
     PURL_VOCAB_BASE_URI  = PURL_ROOT_URI + 'vocab/bio/0.1/'
 
@@ -36,6 +37,7 @@ private
 
     DC_TERMS_BASE_URI    => "DC",
     DC_ELEMENTS_BASE_URI => "DC",
+    CLD_TERMS            => "CLD",
     PURL_BIBO_BASE_URI   => "PURL_BIBO",
     PURL_VOCAB_BASE_URI  => "PURL_VOCAB",
 

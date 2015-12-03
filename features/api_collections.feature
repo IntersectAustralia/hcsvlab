@@ -23,7 +23,7 @@ Feature: Accessing, creating collections via API
       | cooee          | read       |
     When I make a JSON request for the collection page for "cooee" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
-    And the JSON response should have "$..['alveo:metadata']['alveo:collection_name']" with the text "cooee"
+    And the JSON response should have "$..['alveo:metadata']['dc:identifier']" with the text "cooee"
 
   Scenario: Access collection details via the API matches JSON-LD
     Given I ingest "cooee:1-001"
@@ -34,7 +34,7 @@ Feature: Accessing, creating collections via API
     Then I should get a 200 response code
     And the JSON response should be:
     """
-    {"@context":"http://example.org/schema/json-ld","alveo:collection_url":"http://example.org/catalog/cooee","alveo:metadata":{"alveo:collection_name":"cooee","rdf:type":"http://purl.org/dc/dcmitype/Collection","dc11:title":"Corpus of Oz Early English","dc:alternative":"COOEE","dc:abstract":"Material to be included had to meet with a regional and a temporal criterion. The latter required texts to have been produced between 1788 and 1900 in order to become eligible for COOEE. It was mandatory for a text to have been written in Australia, New Zealand or Norfolk Island. But in a few cases, other localities were allowed. For example, if a person who was a native Australian or who had lived in Australia for a considerable time, wrote a shipboard diary or travelled in other countries.","dc:extent":"1353 text samples","dc:language":"eng","dc:itemType":"text with tags","dc:itemFormat":"Letters, published materials in book form, historical texts","dc:temporal":"1788-1900","dc:created":"2004","http://purl.org/cld/terms/dateItemsCreated":"1788-1900","dc11:creator":"Clemens Fritz","dc11:rights":"All rights reserved to Clemens Fritz","dc:accessRights":"See AusNC Terms of Use","loc:OWN":"None. Individual owner is Clemens Fritz.","alveo:sparql_endpoint":"http://example.org/sparql/cooee"}}
+    {"@context":"http://example.org/schema/json-ld","alveo:collection_url":"http://example.org/catalog/cooee","alveo:metadata":{"dc:identifier":"cooee","dc11:title":"Corpus of Oz Early English","dc:alternative":"COOEE","dc:abstract":"Material to be included had to meet with a regional and a temporal criterion. The latter required texts to have been produced between 1788 and 1900 in order to become eligible for COOEE. It was mandatory for a text to have been written in Australia, New Zealand or Norfolk Island. But in a few cases, other localities were allowed. For example, if a person who was a native Australian or who had lived in Australia for a considerable time, wrote a shipboard diary or travelled in other countries.","dc:extent":"1353 text samples","dc:language":"eng","dc:itemType":"text with tags","dc:itemFormat":"Letters, published materials in book form, historical texts","dc:temporal":"1788-1900","dc:created":"2004","cld:dateItemsCreated":"1788-1900","dc11:creator":"Clemens Fritz","dc11:rights":"All rights reserved to Clemens Fritz","dc:accessRights":"See AusNC Terms of Use","loc:OWN":"None. Individual owner is Clemens Fritz.","alveo:sparql_endpoint":"http://example.org/sparql/cooee"}}
     """
 
   Scenario: Access collection details via the API for non-existant collection
@@ -71,7 +71,7 @@ Feature: Accessing, creating collections via API
   Scenario: Create new collection via the API as a data owner using JSON-LD with URI for context
     When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
-      | Test | {"@context":"http://example.org/schema/json-ld","rdf:type":"http://purl.org/dc/dcmitype/Collection","dc:title":"Corpus of Oz Early English","dc:alternative":"COOEE","dc:abstract":"Material to be included had to meet with a regional and a temporal criterion. The latter required texts to have been produced between 1788 and 1900 in order to become eligible for COOEE. It was mandatory for a text to have been written in Australia, New Zealand or Norfolk Island. But in a few cases, other localities were allowed. For example, if a person who was a native Australian or who had lived in Australia for a considerable time, wrote a shipboard diary or travelled in other countries.","dc:extent":"1353 text samples","dc:language":"eng","dc:itemType":"text with tags","dc:itemFormat":"Letters, published materials in book form, historical texts","dc:temporal":"1788-1900","dc:created":"2004","http_purl_org_cld_terms_dateItemsCreated":"1788-1900","dc11:creator":"Clemens Fritz","dc11:rights":"All rights reserved to Clemens Fritz","dc:accessRights":"See AusNC Terms of Use","loc:OWN":"None. Individual owner is Clemens Fritz."} |
+      | Test | {"@context":"http://example.org/schema/json-ld","rdf:type":"http://purl.org/dc/dcmitype/Collection","dc:title":"Corpus of Oz Early English","dc:alternative":"COOEE","dc:abstract":"Material to be included had to meet with a regional and a temporal criterion. The latter required texts to have been produced between 1788 and 1900 in order to become eligible for COOEE. It was mandatory for a text to have been written in Australia, New Zealand or Norfolk Island. But in a few cases, other localities were allowed. For example, if a person who was a native Australian or who had lived in Australia for a considerable time, wrote a shipboard diary or travelled in other countries.","dc:extent":"1353 text samples","dc:language":"eng","dc:itemType":"text with tags","dc:itemFormat":"Letters, published materials in book form, historical texts","dc:temporal":"1788-1900","dc:created":"2004","dc11:creator":"Clemens Fritz","dc11:rights":"All rights reserved to Clemens Fritz","dc:accessRights":"See AusNC Terms of Use","loc:OWN":"None. Individual owner is Clemens Fritz."} |
     Then I should get a 200 response code
     And the JSON response should be:
     """
@@ -80,7 +80,23 @@ Feature: Accessing, creating collections via API
     And I make a JSON request for the collection page for "test" with the API token for "data_owner@intersect.org.au"
     Then the JSON response should be:
     """
-    {"@context":"http://example.org/schema/json-ld","alveo:collection_url":"http://example.org/catalog/test","alveo:metadata":{"alveo:collection_name":"test","dc11:creator":"Clemens Fritz","dc11:rights":"All rights reserved to Clemens Fritz","dc:abstract":"Material to be included had to meet with a regional and a temporal criterion. The latter required texts to have been produced between 1788 and 1900 in order to become eligible for COOEE. It was mandatory for a text to have been written in Australia, New Zealand or Norfolk Island. But in a few cases, other localities were allowed. For example, if a person who was a native Australian or who had lived in Australia for a considerable time, wrote a shipboard diary or travelled in other countries.","dc:accessRights":"See AusNC Terms of Use","dc:alternative":"COOEE","dc:created":"2004","dc:extent":"1353 text samples","dc:itemFormat":"Letters, published materials in book form, historical texts","dc:itemType":"text with tags","dc:language":"eng","dc:temporal":"1788-1900","dc:title":"Corpus of Oz Early English","loc:OWN":"None. Individual owner is Clemens Fritz.","rdf:type":"http://purl.org/dc/dcmitype/Collection","alveo:sparql_endpoint":"http://example.org/sparql/test"}}
+    {"@context":"http://example.org/schema/json-ld","alveo:collection_url":"http://example.org/catalog/test","alveo:metadata":{"dc:identifier":"test","dc11:creator":"Clemens Fritz","dc11:rights":"All rights reserved to Clemens Fritz","dc:abstract":"Material to be included had to meet with a regional and a temporal criterion. The latter required texts to have been produced between 1788 and 1900 in order to become eligible for COOEE. It was mandatory for a text to have been written in Australia, New Zealand or Norfolk Island. But in a few cases, other localities were allowed. For example, if a person who was a native Australian or who had lived in Australia for a considerable time, wrote a shipboard diary or travelled in other countries.","dc:accessRights":"See AusNC Terms of Use","dc:alternative":"COOEE","dc:created":"2004","dc:extent":"1353 text samples","dc:itemFormat":"Letters, published materials in book form, historical texts","dc:itemType":"text with tags","dc:language":"eng","dc:temporal":"1788-1900","dc:title":"Corpus of Oz Early English","loc:OWN":"None. Individual owner is Clemens Fritz.","alveo:sparql_endpoint":"http://example.org/sparql/test"}}
+    """
+
+  @api_create_collection
+  Scenario: Create new collection via the API using alveo:metadata structure
+    When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata |
+      | Test | {"@context":"http://example.org/schema/json-ld","alveo:metadata":{"dc:title":"Corpus of Oz Early English","dc:alternative":"COOEE","dc:abstract":"Material to be included had to meet with a regional and a temporal criterion.","dc:extent":"1353 text samples","dc:language":"eng","dc:itemType":"text with tags","dc:itemFormat":"Letters, published materials in book form, historical texts"}} |
+    Then I should get a 200 response code
+    And the JSON response should be:
+    """
+    {"success":"New collection 'test' (http://example.org/catalog/test) created"}
+    """
+    And I make a JSON request for the collection page for "test" with the API token for "data_owner@intersect.org.au"
+    Then the JSON response should be:
+    """
+    {"@context":"http://example.org/schema/json-ld","alveo:collection_url":"http://example.org/catalog/test","alveo:metadata":{"dc:identifier":"test","dc:abstract":"Material to be included had to meet with a regional and a temporal criterion.","dc:alternative":"COOEE","dc:extent":"1353 text samples","dc:itemFormat":"Letters, published materials in book form, historical texts","dc:itemType":"text with tags","dc:language":"eng","dc:title":"Corpus of Oz Early English","alveo:sparql_endpoint":"http://example.org/sparql/test"}}
     """
 
   @api_create_collection

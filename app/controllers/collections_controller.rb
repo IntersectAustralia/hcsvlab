@@ -363,6 +363,10 @@ class CollectionsController < ApplicationController
     else
       json_metadata['@context'].merge!(source_hash)
     end
+    if json_metadata["alveo:metadata"].is_a? Hash
+      meta = json_metadata.delete("alveo:metadata")
+      json_metadata = json_metadata.merge(meta)
+    end
     graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
     graph.dump(:ttl)
   end

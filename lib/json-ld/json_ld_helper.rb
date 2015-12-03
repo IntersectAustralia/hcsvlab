@@ -9,6 +9,7 @@ public
     predefined_properties = HashWithIndifferentAccess.new
     predefined_properties['commonProperties'] = {'@id' => "http://purl.org/dada/schema/0.2#commonProperties"}
     predefined_properties['dada'] = {'@id' => "http://purl.org/dada/schema/0.2#"}
+    predefined_properties['cld'] = {'@id' => "http://purl.org/cld/terms/"}
     predefined_properties['type'] = {'@id' => "http://purl.org/dada/schema/0.2#type"}
     predefined_properties['start'] = {'@id' => "http://purl.org/dada/schema/0.2#start"}
     predefined_properties['end'] = {'@id' => "http://purl.org/dada/schema/0.2#end"}

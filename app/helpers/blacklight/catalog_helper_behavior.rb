@@ -285,7 +285,7 @@ module Blacklight::CatalogHelperBehavior
 
           sols = repo.sparql_query(query)
 
-          fields_to_hide = [MetadataHelper::SOURCE]
+          fields_to_hide = [MetadataHelper::SOURCE, MetadataHelper::RDF_TYPE]
           sols.each do |sol|
             if !fields_to_hide.include? sol[:property]
               prop = RdfNamespace.get_shortened_uri(sol[:property].to_s, namespaces)
