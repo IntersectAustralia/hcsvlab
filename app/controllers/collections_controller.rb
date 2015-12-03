@@ -184,24 +184,24 @@ class CollectionsController < ApplicationController
   end
 
   def web_add_item
-    collection = Collection.find_by_name(params[:id])
-    authorize! :web_add_item, collection
+    @collection = Collection.find_by_name(params[:id])
+    authorize! :web_add_item, @collection
     @item_name = params[:item_name]
     @item_title = params[:item_title]
     @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
       begin
         validate_required_web_fields(params, {:item_name => 'item name', :item_title => 'item title'})
-        item_name = validate_item_name_unique(collection, Item.sanitise_name(params[:item_name]))
+        item_name = validate_item_name_unique(@collection, Item.sanitise_name(params[:item_name]))
         additional_metadata = validate_item_additional_metadata(params)
-        json_ld = construct_item_json_ld(collection, item_name, params[:item_title], additional_metadata)
+        json_ld = construct_item_json_ld(@collection, item_name, params[:item_title], additional_metadata)
 
         # Write the item metadata to a rdf file and ingest the file
-        processed_items = process_items(collection.name, collection.corpus_dir, {:items => [{'metadata' => json_ld}]})
-        msg = add_item_core(collection, processed_items[:successes])
+        processed_items = process_items(@collection.name, @collection.corpus_dir, {:items => [{'metadata' => json_ld}]})
+        msg = add_item_core(@collection, processed_items[:successes])
         msg = "Created new item: #{msg.first}" # Format the item creation message
 
-        redirect_to catalog_path(collection: collection.name, itemId: item_name), notice: msg
+        redirect_to catalog_path(collection: @collection.name, itemId: item_name), notice: msg
       rescue ResponseError => e
         flash[:error] = e.message
       end
