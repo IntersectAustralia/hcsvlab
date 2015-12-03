@@ -173,6 +173,20 @@ public
   end
 
   #
+  # rdf_form - return a rdf form with format prefix:value if exists
+  #
+  def self::rdf_form(uri)
+    uri = uri.to_s
+    @@prefixes.keys.each { |p|
+      if uri.start_with?(p)
+        uri = uri.sub(p, "#{@@prefixes[p].downcase}:")
+        return uri
+      end
+    }
+    return uri
+  end
+
+  #
   # tidy - return a version of the given string with "special"
   #        characters replaced by "safe" ones
   #

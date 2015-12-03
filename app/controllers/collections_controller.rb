@@ -357,7 +357,12 @@ class CollectionsController < ApplicationController
   # Coverts JSON-LD formatted collection metadata and converts it to RDF
   def convert_json_metadata_to_rdf(json_metadata)
     # Make sure source is mapped to a URI and not a string
-    json_metadata['@context'].merge!({'dc:source' => {'@type' => '@id'}})
+    source_hash = {'dc:source' => {'@type' => '@id'}}
+    if json_metadata['@context'].instance_of? String
+      json_metadata['@context'] = [json_metadata['@context'], source_hash]
+    else
+      json_metadata['@context'].merge!(source_hash)
+    end
     graph = RDF::Graph.new << JSON::LD::API.toRDF(json_metadata)
     graph.dump(:ttl)
   end

@@ -1,10 +1,17 @@
 object @collection
-node(:collection_url) { collection_url(@collection.name) }
-node(:collection_name) { @collection.name }
-node(:metadata) do
+node(:@context) { annotation_context_url }
+node(:"#{PROJECT_PREFIX_NAME}:collection_url") { collection_url(@collection.name) }
+node(:"#{PROJECT_PREFIX_NAME}:metadata") do
   hash = {}
-  collection_show_fields(@collection).each do |field|
-    hash[field.first[0]] = field.first[1].to_s
+  hash["#{PROJECT_PREFIX_NAME}:collection_name"] = @collection.name
+  @collection.rdf_graph.statements.each_with_index do |triple, index|
+    if triple.predicate.qname
+      key = triple.predicate.qname.join(":")
+    else
+      key = MetadataHelper::rdf_form(triple.predicate)
+    end
+    hash[key] = triple.object.to_s
   end
+  hash["#{PROJECT_PREFIX_NAME}:sparql_endpoint"] = catalog_sparqlQuery_url(@collection.name)
   hash
 end
