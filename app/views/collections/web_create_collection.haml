@@ -12,8 +12,8 @@
   = select_tag :licence_id, options_for_select(@licences.map {|l| [l.name, l.id]}), include_blank: true
   = render 'display_additional_metadata'
 
-  %br
-  = link_to 'Cancel', collections_path
-  = submit_tag 'Create'
+  .form-actions
+    = submit_tag 'Create', :class => "btn btn-primary"
+    = link_to 'Cancel', collections_path, :class => "btn"
 
 = render 'shared/nectar_attribution'

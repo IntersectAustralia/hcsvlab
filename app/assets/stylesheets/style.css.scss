@@ -1457,6 +1457,14 @@ border: 1px solid #BCBCBC;
   margin-bottom: 0.25em;
 }
 
+.metadata_pair label {
+  display: inline;
+}
+
+.metadata_pair input {
+  display: inline;
+}
+
 .metadata_field {
 //  float: left;
   margin-left: 0.5em;
@@ -1469,6 +1477,10 @@ border: 1px solid #BCBCBC;
 
 .new_metadata_btns button, .new_metadata_btns a, .new_metadata_btns input {
   margin: 0.5em;
+}
+
+#create_collection_form #collection_abstract {
+  height: 150px;
 }
 
 /* SHAME ///////////////////////////////////////////////////////////////////////////////////////////

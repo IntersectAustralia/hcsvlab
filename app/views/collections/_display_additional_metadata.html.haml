@@ -5,6 +5,7 @@ Note: If the context for a field you want to enter is not available in the
 #{link_to 'default schema', annotation_context_path, target: :_blank} then you must provide the full URI for that metadata field.
 
 #additional_metadata
+  %br
 
 .new_metadata_btns{:id => 'new_metadata_btns'}
   %br
@@ -14,7 +15,7 @@ Note: If the context for a field you want to enter is not available in the
   function add_metadata_field(meta_key, meta_value) {
     var key_field = "<label>Name:</label><input type='text' name='additional_key[]' class='metadata_field' value='"+meta_key+"'/>";
     var value_field = "<label>Value:</label><input type='text' name='additional_value[]' class='metadata_field' value='"+meta_value+"'/>";
-    $("#additional_metadata").append("<br><div class='metadata_pair'>"+key_field+value_field+"</div>");
+    $("#additional_metadata").append("<div class='metadata_pair'>"+key_field+value_field+"</div>");
   }
 
   $("#add_metadata_btn").click(function() {

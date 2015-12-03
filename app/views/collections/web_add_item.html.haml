@@ -6,8 +6,8 @@
   = text_field_tag :item_title, @item_title, required: true
   = render 'display_additional_metadata'
 
-  %br
-  = link_to 'Cancel', collection_path(id: params[:id])
-  = submit_tag 'Create'
+  .form-actions
+    = submit_tag 'Create', :class => "btn btn-primary"
+    = link_to 'Cancel', collection_path(@collection.name), :class => "btn"
 
 = render 'shared/nectar_attribution'

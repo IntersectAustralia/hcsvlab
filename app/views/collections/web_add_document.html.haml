@@ -10,9 +10,10 @@
   %br
   %br
   = render 'display_additional_metadata'
-  %br
-  = link_to 'Cancel', catalog_path(collection: params[:collection], itemId: params[:itemId])
-  = submit_tag 'Create'
+
+  .form-actions
+    = submit_tag 'Create', :class => "btn btn-primary"
+    = link_to 'Cancel', catalog_path(collection: params[:collection], itemId: params[:itemId]), :class => "btn"
 
 = render 'shared/nectar_attribution'
 
