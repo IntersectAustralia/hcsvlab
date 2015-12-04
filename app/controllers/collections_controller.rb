@@ -54,6 +54,7 @@ class CollectionsController < ApplicationController
     if request.format == 'json' && request.post?
       collection_metadata = params[:collection_metadata]
       collection_name = params[:name]
+      licence_id = params[:licence_id].present? ? params[:licence_id] : nil
       if collection_name.blank? || collection_name.length > 255 || collection_metadata.nil?
         invalid_name = (collection_name.nil? || collection_name.blank? || collection_name.length > 255)
         invalid_metadata = collection_metadata.nil?
@@ -66,7 +67,7 @@ class CollectionsController < ApplicationController
       else
         owner = User.find_by_authentication_token(params[:api_key])
         begin
-          @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner)
+          @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner, licence_id)
         rescue ResponseError => e
           respond_with_error(e.message, e.response_code)
           return # Only respond with one error at a time
@@ -987,6 +988,9 @@ class CollectionsController < ApplicationController
     if Collection.find_by_uri(uri).present?  # ingest skips collections with non-unique uri
       raise ResponseError.new(400), "A collection with the name '#{name}' already exists"
     else
+      if licence_id and Licence.find_by_id(licence_id).nil?
+        raise ResponseError.new(400), "Licence with id #{licence_id} does not exist"
+      end
       corpus_dir = create_metadata_and_manifest(name, convert_json_metadata_to_rdf(metadata))
       # Create the collection without doing a full ingest since it won't contain any item metadata
       collection = check_and_create_collection(name, corpus_dir)
