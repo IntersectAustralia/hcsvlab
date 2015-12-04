@@ -105,6 +105,8 @@ HcsvlabWeb::Application.routes.draw do
   get "document_audit", :to => 'admin#document_audit', :as => 'document_audit'
   get "document_audit/download", :to => 'admin#document_audit_download', :as => 'download_document_audit'
 
+  match 'licences' => 'licences#index'
+
   resources :admin, :only => [:index] do
     collection do
 

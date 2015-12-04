@@ -8,7 +8,6 @@ class LicencesController < ApplicationController
 
   def index
 
-
     bench_start = Time.now
 
     # gets PUBLIC licences and the user licences.
@@ -16,16 +15,20 @@ class LicencesController < ApplicationController
 
     @licences = Licence.where(t[:private].eq(false).or(t[:owner_id].eq(current_user.id)))
 
-    # gets the collection list of the logged user.
-    @collection_lists = current_user.collection_lists.includes(:owner, :licence).order(:name)
+    respond_to do |format|
+      format.html {
+        # gets the collection list of the logged user.
+        @collection_lists = current_user.collection_lists.includes(:owner, :licence).order(:name)
 
-    # gets the collections of the logged user.
-    @collections = current_user.collections.not_in_list.includes(:owner, :licence).order(:name)
-    bench_end = Time.now
-    @profiler = ["Time for fetching all collections, licences and collection lists took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
+        # gets the collections of the logged user.
+        @collections = current_user.collections.not_in_list.includes(:owner, :licence).order(:name)
+        bench_end = Time.now
+        @profiler = ["Time for fetching all collections, licences and collection lists took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)"]
 
-    # create_pagination_structure(params)
-
+        # create_pagination_structure(params)
+      }
+      format.json {}
+    end
   end
 
   def show

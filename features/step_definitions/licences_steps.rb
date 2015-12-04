@@ -168,3 +168,7 @@ And /^I click "([^"]*)" in the add to collection list dropdown$/ do |name|
     click_on(name)
   end
 end
+
+Given(/^I have licence "(.*?)" with id (\d+)$/) do |name, id|
+  FactoryGirl.create(:licence, name: name, id: id)
+end
