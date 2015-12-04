@@ -988,7 +988,7 @@ class CollectionsController < ApplicationController
     if Collection.find_by_uri(uri).present?  # ingest skips collections with non-unique uri
       raise ResponseError.new(400), "A collection with the name '#{name}' already exists"
     else
-      if licence_id and Licence.find_by_id(licence_id).nil?
+      if licence_id.present? and Licence.find_by_id(licence_id).nil?
         raise ResponseError.new(400), "Licence with id #{licence_id} does not exist"
       end
       corpus_dir = create_metadata_and_manifest(name, convert_json_metadata_to_rdf(metadata))
