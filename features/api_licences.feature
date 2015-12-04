@@ -49,3 +49,21 @@ Feature: Accessing, assigning licences via API
     """
     [{"name":"Creative Commons","id":100},{"name":"AusNC Terms of Use","id":101}]
     """
+
+  Scenario: Assigning an invalid licence in collection creation
+    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata | licence_id |
+      | Test | {"@context": "http://example.org/schema/json-ld", "alveo:metadata": {"@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"}} | 5 |
+    Then I should get a 400 response code
+    And the JSON response should be:
+    """
+    {"error":"Licence with id 5 does not exist"}
+    """
+
+  Scenario: Assigning a licence in collection creation
+    Given I have licence "Creative Commons" with id 8
+    And I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | collection_metadata | licence_id |
+      | Test | {"@context": "http://example.org/schema/json-ld", "alveo:metadata": {"@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"}} | 8 |
+    Then I should get a 200 response code
+    And collection "test" should have licence "Creative Commons"

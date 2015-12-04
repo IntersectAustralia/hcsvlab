@@ -172,3 +172,8 @@ end
 Given(/^I have licence "(.*?)" with id (\d+)$/) do |name, id|
   FactoryGirl.create(:licence, name: name, id: id)
 end
+
+Then(/^collection "(.*?)" should have licence "(.*?)"$/) do |collection, licence|
+  coll = Collection.find_by_name(collection)
+  coll.licence.name.should eq(licence)
+end
