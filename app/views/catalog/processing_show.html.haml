@@ -1,0 +1,26 @@
+.span9
+
+  %h1= @item.handle
+
+  .well.clearfix
+    .pull-left
+      = link_back_to_catalog
+      - if can? :delete_item_via_web_app, @item.collection
+        = render "delete_item"
+    .pull-right
+      = link_to "#{t('blacklight.search.start_over')}", catalog_index_path, :id => "startOverLink", :class => "btn"
+
+  %h3
+    %span Item Details
+  %dl.dl-horizontal.dl-invert
+    .alert.alert-warning.permanent
+      This item is currently being indexed meaning the item and document metadata is currently unavailable. Please wait a few moments then refresh the page to try again.
+
+  %h3
+    %span Documents
+  %dl.dl-horizontal.dl-invert
+  - if can? :web_add_document, @item.collection
+    %br
+      = link_to "Add New Document", web_add_document_path, :id => 'add_new_document', :class => "btn"
+
+= render 'shared/nectar_attribution'

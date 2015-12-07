@@ -353,6 +353,8 @@ class CatalogController < ApplicationController
   def show
     if Item.where(id: params[:id]).count != 0
       @item = Item.find_by_handle("#{params[:collection]}:#{params[:itemId]}")
+      render 'catalog/processing_show' and return if @processing_index
+
       @response, @document = get_solr_response_for_doc_id
 
       # For some reason blacklight stopped to fullfill the counter value in the session since we changed
@@ -606,9 +608,10 @@ class CatalogController < ApplicationController
   #
   def invalid_solr_id_error
     respond_to do |format|
-      format.html { flash[:error] = "Sorry, you have requested a document that doesn't exist."
-      params.delete(:id)
-      redirect_to catalog_path() and return
+      format.html {
+        flash[:error] = "Sorry, you have requested a document that doesn't exist."
+        params.delete(:id)
+        redirect_to catalog_path() and return
       }
       format.any { render :json => {:error => "not-found"}.to_json, :status => 404 }
     end
@@ -935,14 +938,8 @@ class CatalogController < ApplicationController
     begin
       item = Item.find(params[:id])
       if item.indexed_at.nil?
-        respond_to do |format|
-          format.html {
-            flash.keep(:notice) # Persist flash notices from the previous request
-            flash[:error] = "Sorry, the item you requested is being indexed and will be available shortly. You may need to wait a few moments and refresh the page to see your item."
-            redirect_to root_url and return
-          }
-          format.json { render :json => {:error => "not-found"}.to_json, :status => 404 }
-        end
+        @processing_index = true
+        flash.keep(:notice)
       end
     rescue ActiveRecord::RecordNotFound
       return
@@ -954,7 +951,7 @@ class CatalogController < ApplicationController
   #
   def wrapped_enforce_show_permissions(opts={})
     begin
-      enforce_show_permissions(opts)
+      enforce_show_permissions(opts) unless @processing_index
     rescue Hydra::AccessDenied => e
       respond_to do |format|
         format.html { raise e }
