@@ -2,10 +2,7 @@ $(window).load(function() {
 
     $(function () {
         var alert = $('.alert');
-        if (alert.length > 0) {
-            if (alert.hasClass('permanent')) {
-                return;
-            }
+        if (alert.length > 0 && !alert.hasClass('permanent')) {
             alert.slideDown();
 
             alertTimeout = 9000;
