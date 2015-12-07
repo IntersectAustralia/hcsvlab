@@ -56,7 +56,7 @@ class CollectionsController < ApplicationController
       collection_name = params[:name]
       licence_id = params[:licence_id].present? ? params[:licence_id] : nil
       privacy = true
-      privacy = (params[:private].downcase == 'true') unless params[:private].nil?
+      privacy = (params[:private].to_s.downcase == 'true') unless params[:private].nil?
       if collection_name.blank? || collection_name.length > 255 || collection_metadata.nil?
         invalid_name = (collection_name.nil? || collection_name.blank? || collection_name.length > 255)
         invalid_metadata = collection_metadata.nil?
