@@ -51,32 +51,18 @@ class CollectionsController < ApplicationController
   def create
     authorize! :create, @collection,
                :message => "Permission Denied: Your role within the system does not have sufficient privileges to be able to create a collection. Please contact an Alveo administrator."
-    if request.format == 'json' && request.post?
-      collection_metadata = params[:collection_metadata]
-      collection_name = params[:name]
-      licence_id = params[:licence_id].present? ? params[:licence_id] : nil
-      privacy = true
-      privacy = (params[:private].to_s.downcase == 'true') unless params[:private].nil?
-      if collection_name.blank? || collection_name.length > 255 || collection_metadata.nil?
-        invalid_name = (collection_name.nil? || collection_name.blank? || collection_name.length > 255)
-        invalid_metadata = collection_metadata.nil?
-        err_message = nil
-        err_message = "name parameter" if invalid_name
-        err_message = "metadata parameter" if invalid_metadata
-        err_message = "name and metadata parameters" if invalid_name && invalid_metadata
-        err_message << " not found" unless err_message.nil?
-        respond_with_error(err_message, 400)
-      else
-        owner = User.find_by_authentication_token(params[:api_key])
-        begin
-          @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner, licence_id, privacy)
-        rescue ResponseError => e
-          respond_with_error(e.message, e.response_code)
-          return # Only respond with one error at a time
-        end
-      end
-    else
-      respond_with_error("JSON-LD formatted metadata must be sent to the add collection api call as a POST request", 404)
+    collection_metadata = params[:collection_metadata]
+    collection_name = params[:name]
+    licence_id = params[:licence_id].present? ? params[:licence_id] : nil
+    privacy = true
+    privacy = (params[:private].to_s.downcase == 'true') unless params[:private].nil?
+    owner = User.find_by_authentication_token(params[:api_key])
+    begin
+      validate_new_collection(collection_metadata, collection_name, licence_id, privacy)
+      @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner, licence_id, privacy)
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
     end
   end
 

@@ -30,6 +30,19 @@ module RequestValidator
     collection
   end
 
+  def validate_new_collection(collection_metadata, collection_name, licence_id, private)
+    if collection_name.blank? || collection_name.length > 255 || collection_metadata.nil?
+      invalid_name = (collection_name.nil? || collection_name.blank? || collection_name.length > 255)
+      invalid_metadata = collection_metadata.nil?
+      err_message = nil
+      err_message = "name parameter" if invalid_name
+      err_message = "metadata parameter" if invalid_metadata
+      err_message = "name and metadata parameters" if invalid_name && invalid_metadata
+      err_message << " not found" unless err_message.nil?
+      raise ResponseError.new(400), err_message
+    end
+  end
+
   # Validates that the given item name is not already in use by an existing item in the given collection
   # Returns a sanitised copy of the item name
   def validate_item_name_unique(collection, item_name)
