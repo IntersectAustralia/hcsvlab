@@ -42,6 +42,9 @@ Feature: Creating Collections
     And I should see "Collection Title:"
     And I should see "Collection Owner:"
     And I should see "Collection Abstract"
+    And I should see "Licence"
+    And I should see "Privacy: (Approval required for collection access)"
+    And the "Privacy: (Approval required for collection access)" checkbox should be checked
     And I should see "Additional Metadata"
     And I should see "See the RDF Names of searchable fields for examples of accepted metadata field names."
     And I should see link "searchable fields" to "/catalog/searchable_fields"
@@ -182,6 +185,7 @@ Feature: Creating Collections
     And I fill in "collection_title" with "Test Title"
     And I fill in "collection_owner" with "Test Owner"
     And I fill in "collection_abstract" with "Test Abstract"
+    And I uncheck "approval_required"
     And I fill in "additional_key[]" with "foo"
     And I fill in "additional_value[]" with ""
     And I press "Create"
@@ -191,6 +195,7 @@ Feature: Creating Collections
     And the "collection_title" field should contain "Test Title"
     And the "collection_owner" field should contain "Test Owner"
     And the "collection_abstract" field should contain "Test Abstract"
+    And the "Privacy: (Approval required for collection access)" checkbox should not be checked
     And the "additional_key[]" field should contain "foo"
     And the "additional_value[]" field should contain ""
 
@@ -248,3 +253,22 @@ Feature: Creating Collections
     Then The Collection table should have
       | collection | collection_list | licence                     | licence_terms      |
       | test       |                 | Creative Commons v3.0 BY-NC | View Licence Terms |
+
+  @create_collection
+  Scenario Outline: Create a collection and set the privacy
+    Given I am logged in as "data_owner@intersect.org.au"
+    And I am on the create collection page
+    And I fill in "collection_name" with "test"
+    And I fill in "collection_title" with "Test Title"
+    And I fill in "collection_owner" with "Test Owner"
+    And I fill in "collection_abstract" with "Test Abstract"
+    And I <action> "approval_required"
+    When I press "Create"
+    And I am on the licences page
+    Then The Collection table should have
+      | collection | approval_required    | licence     | licence_terms |
+      | test       | <displayed_approval> | Add Licence |               |
+  Examples:
+    | action  | displayed_approval  |
+    | check   | required            |
+    | uncheck | not required        |

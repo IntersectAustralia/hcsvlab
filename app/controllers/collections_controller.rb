@@ -55,6 +55,8 @@ class CollectionsController < ApplicationController
       collection_metadata = params[:collection_metadata]
       collection_name = params[:name]
       licence_id = params[:licence_id].present? ? params[:licence_id] : nil
+      privacy = true
+      privacy = (params[:private].downcase == 'true') unless params[:private].nil?
       if collection_name.blank? || collection_name.length > 255 || collection_metadata.nil?
         invalid_name = (collection_name.nil? || collection_name.blank? || collection_name.length > 255)
         invalid_metadata = collection_metadata.nil?
@@ -67,7 +69,7 @@ class CollectionsController < ApplicationController
       else
         owner = User.find_by_authentication_token(params[:api_key])
         begin
-          @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner, licence_id)
+          @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner, licence_id, privacy)
         rescue ResponseError => e
           respond_with_error(e.message, e.response_code)
           return # Only respond with one error at a time
@@ -137,6 +139,8 @@ class CollectionsController < ApplicationController
     @collection_title = params[:collection_title]
     @collection_owner = params[:collection_owner]
     @collection_abstract = params[:collection_abstract]
+    # ToDo: set initial/default value of checkbox to false
+    @approval_required = params[:approval_required]
     @licence_id = params[:licence_id]
     @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
@@ -157,7 +161,7 @@ class CollectionsController < ApplicationController
 
         # Ingest new collection
         name = Collection.sanitise_name(params[:collection_name])
-        msg = create_collection_core(name, json_ld, current_user, params[:licence_id])
+        msg = create_collection_core(name, json_ld, current_user, params[:licence_id], params[:approval_required])
         redirect_to collection_path(id: name), notice: msg
       rescue ResponseError => e
         flash[:error] = e.message
@@ -982,7 +986,7 @@ class CollectionsController < ApplicationController
   #
   # Core functionality common to creating a collection
   #
-  def create_collection_core(name, metadata, owner, licence_id=nil)
+  def create_collection_core(name, metadata, owner, licence_id=nil, private=true)
     metadata = update_jsonld_collection_id(metadata, name)
     uri = metadata['@id']
     if Collection.find_by_uri(uri).present?  # ingest skips collections with non-unique uri
@@ -996,6 +1000,7 @@ class CollectionsController < ApplicationController
       collection = check_and_create_collection(name, corpus_dir)
       collection.owner = owner
       collection.licence_id = licence_id
+      collection.private = private
       collection.save
       "New collection '#{name}' (#{uri}) created"
     end

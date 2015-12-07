@@ -427,3 +427,7 @@ And /^I ingest a new collection "(.*)" through the api with the API token for "(
   hash = {'name' => "#{name}", 'collection_metadata' => metadata}
   post path_to('the collections page'), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
 end
+
+Then /^the collection "(.+)" should have privacy set to "(.*)" in the database$/ do |collection_name, privacy|
+  expect(Collection.find_by_name(collection_name).private).to eq (privacy.downcase == 'true')
+end
