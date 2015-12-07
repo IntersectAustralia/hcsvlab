@@ -139,8 +139,8 @@ class CollectionsController < ApplicationController
     @collection_title = params[:collection_title]
     @collection_owner = params[:collection_owner]
     @collection_abstract = params[:collection_abstract]
-    # ToDo: set initial/default value of checkbox to false
     @approval_required = params[:approval_required]
+    @approval_required = 'private' if request.get?
     @licence_id = params[:licence_id]
     @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
@@ -161,7 +161,7 @@ class CollectionsController < ApplicationController
 
         # Ingest new collection
         name = Collection.sanitise_name(params[:collection_name])
-        msg = create_collection_core(name, json_ld, current_user, params[:licence_id], params[:approval_required])
+        msg = create_collection_core(name, json_ld, current_user, params[:licence_id], @approval_required == 'private')
         redirect_to collection_path(id: name), notice: msg
       rescue ResponseError => e
         flash[:error] = e.message

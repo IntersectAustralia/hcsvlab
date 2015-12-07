@@ -9,8 +9,8 @@
   = label_tag :collection_abstract, 'Collection Abstract:'
   = text_area_tag :collection_abstract, @collection_abstract, required: true
   = label_tag :approval_required, 'Privacy: (Approval required for collection access)'
-  = hidden_field_tag :approval_required, false
-  = check_box_tag :approval_required, true, checked = @approval_required
+  = hidden_field_tag :approval_required, 'public'
+  = check_box_tag :approval_required, 'private', @approval_required == 'private'
   = label_tag :licence_id, 'Licence'
   = select_tag :licence_id, options_for_select(@licences.map {|l| [l.name, l.id]}), include_blank: true
   = render 'display_additional_metadata'
