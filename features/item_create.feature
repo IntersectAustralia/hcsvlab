@@ -102,9 +102,9 @@ Feature: Creating Items
     When I fill in "item_name" with "<name>"
     And I fill in "item_title" with "<title>"
     And I press "Create"
-    Then I should be on the home page
+    Then I should be on the catalog page for "<collection_name>:<sanitised_name>"
     And I should see "Created new item: <sanitised_name> ×"
-    And I should see "Sorry, the item you requested is being indexed and will be available shortly. You may need to wait a few moments and refresh the page to see your item. ×"
+    And I should see "This item is currently being indexed meaning the item and document metadata is currently unavailable. Please wait a few moments then refresh the page to try again."
   Examples:
     | collection_name | name        | sanitised_name | title        |
     | test            | test        | test           | Test         |

@@ -134,7 +134,8 @@ Feature: Creating Documents
     And I am on the add document page for "test:item1"
     And I attach the file "test/samples/api/sample1.txt" to "document_file"
     And I press "Create"
-    Then the file "sample1.txt" should exist in the directory for the collection "test"
+    Then I should be on the catalog page for "test:item1"
+    And the file "sample1.txt" should exist in the directory for the collection "test"
     And the document "sample1.txt" under item "item1" in collection "test" should exist in the database
     And Sesame should contain a document with uri "http://www.example.com/catalog/test/item1/document/sample1.txt" in collection "test"
     And Sesame should contain a document with file_name "sample1.txt" in collection "test"
