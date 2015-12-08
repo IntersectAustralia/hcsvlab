@@ -1,0 +1,5 @@
+
+<http://127.0.0.1:3000/catalog/ace> a <dcmitype:Collection>;
+   <http://purl.org/dc/terms/title> "ace";
+   <http://purl.org/dc/terms/abstract> "ace";
+   <http://www.loc.gov/loc.terms/relators/OWN> "jared@intersect.org.au" .

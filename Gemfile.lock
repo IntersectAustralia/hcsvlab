@@ -613,6 +613,3 @@ DEPENDENCIES
   xray-rails
   zeroclipboard-rails
   zeus
-
-BUNDLED WITH
-   1.10.6

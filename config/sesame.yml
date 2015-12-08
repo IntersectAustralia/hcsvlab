@@ -1,5 +1,5 @@
 development:
-  url: http://localhost:8983/openrdf-sesame
+  url: http://alveo-qa-sesame.intersect.org.au:8080/openrdf-sesame/
 test: &TEST
   url: http://localhost:8983/openrdf-sesame
 qa:
