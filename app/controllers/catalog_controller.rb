@@ -351,10 +351,13 @@ class CatalogController < ApplicationController
   # override default show method to allow for json response
   #
   def show
-    if Item.where(id: params[:id]).count != 0
-      @item = Item.find_by_handle("#{params[:collection]}:#{params[:itemId]}")
+    #require 'pry'
+    #binding.pry
+    @item = Item.find_by_handle("#{params[:collection]}:#{params[:itemId]}")
+    unless @item.nil?
       render 'catalog/processing_show' and return if @processing_index
 
+      
       @response, @document = get_solr_response_for_doc_id
 
       # For some reason blacklight stopped to fullfill the counter value in the session since we changed
@@ -916,6 +919,8 @@ class CatalogController < ApplicationController
   # sequential identifier.
   #
   def retrieve_and_set_item_id
+    # require 'pry'
+    # binding.pry
     handle = nil
     handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
 
@@ -927,7 +932,8 @@ class CatalogController < ApplicationController
           format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return }
         end
       end
-      params[:id] = item.id
+      # params[:id] = item.id
+      params[:id] = handle
     end
   end
 
@@ -950,6 +956,8 @@ class CatalogController < ApplicationController
   #
   #
   def wrapped_enforce_show_permissions(opts={})
+    # require 'pry'
+    # binding.pry
     begin
       enforce_show_permissions(opts) unless @processing_index
     rescue Hydra::AccessDenied => e
@@ -1159,8 +1167,11 @@ class CatalogController < ApplicationController
   # Get the display document for an item as a hash with id, type and source
   #
   def get_display_document(document)
-    item = Item.find(document[:id])
-
+    # TODO: this is a really silly, it uses a solr document to locate and item in postgres, then
+    # uses that result to finally query sesame. We'd be better off just putting it in postgress
+    # item = Item.find(document[:id])
+    item = Item.find_by_handle(document[:handle])
+    display_document = nil
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
       repository = server.repository(item.collection.name)
@@ -1171,18 +1182,26 @@ class CatalogController < ApplicationController
         pattern [:display_doc, MetadataHelper::SOURCE, :source]
         pattern [:display_doc, MetadataHelper::IDENTIFIER, :id]
       end
-
+      
       results = repository.query(query)
 
-      results.each do |res|
-        return {:id => res[:id].value, :type => res[:type].value, :source => res[:source].value}
-      end
+      # require 'pry'
+      # binding.pry
+
+      display_document = results.first.to_hash
+      display_document.each { |k,v| 
+        display_document[k] = v.value
+      }
+
+      # results.each do |res|
+      #   return {:id => res[:id].value, :type => res[:type].value, :source => res[:source].value}
+      # end
 
     rescue => e
       Rails.logger.error e.inspect
       Rails.logger.error "Could not connect to triplestore - #{SESAME_CONFIG["url"].to_s}"
     end
-    return nil
+    display_document
   end
 
   def user_params
