@@ -36,7 +36,7 @@ Feature: Creating Documents
     | admin@intersect.org.au      |
     | researcher@intersect.org.au |
 
-  Scenario: Verify add document button goes to new document form page
+  Scenario: Verify add document button goes to new document form page and shows item name
     Given I ingest "cooee:1-001"
     And Collections ownership is
       | collection | owner_email                 |
@@ -45,6 +45,7 @@ Feature: Creating Documents
     When I am on the catalog page for "cooee:1-001"
     When I follow element with id "add_new_document"
     Then I should be on the add document page for "cooee:1-001"
+    And I should see "Add Document to '1-001'"
 
   Scenario Outline: Verify users other than the collection owner are not authorised to load add document page
     Given I ingest "cooee:1-001"
