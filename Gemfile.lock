@@ -268,7 +268,7 @@ GEM
       rdf-trix (>= 1.0)
       rdf-turtle (>= 1.0.4)
     logger (1.2.8)
-    mail (2.5.4)
+    mail (2.6.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     marc (0.5.0)
