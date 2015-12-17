@@ -1,6 +1,8 @@
 # -*- encoding : utf-8 -*-
 # -*- coding: utf-8 -*-
-#
+require 'open-uri'
+
+
 # Methods added to this helper will be available to all templates in the hosting application
 #
 module Blacklight::BlacklightHelperBehavior
@@ -660,9 +662,9 @@ module Blacklight::BlacklightHelperBehavior
     val
   end
 
-  def render_display_text(source)
+  def render_display_text(url)
     begin
-      text = File.read(source.gsub("file://", "")).strip.force_encoding("UTF-8")
+      text = open(url) { |f| f.read }.strip.force_encoding("UTF-8")
       return "<div class='primary-text'>#{text}</div>"
     rescue => e
       Rails.logger.error e.message
@@ -674,20 +676,14 @@ module Blacklight::BlacklightHelperBehavior
     return "<em>This Item has no display document</em>"
   end
 
-  def item_documents(document, uris)
+  def item_documents(solr_document, uris)
     document_descriptors = []
-
-    fed_item = Item.find(document[:id])
-    item = fed_item.uri
-
+    item = Item.find_by_handle(solr_document[:handle])
     begin
       server = RDF::Sesame::HcsvlabServer.new(SESAME_CONFIG["url"].to_s)
-      repository = server.repository(fed_item.collection.name)
-
-      raise Exception.new "Repository not found - #{fed_item.collection.name}" if repository.nil?
-
-      document_results = repository.query(:subject => RDF::URI.new(item), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
-
+      repository = server.repository(item.collection.name)
+      raise Exception.new "Repository not found - #{item.collection.name}" if repository.nil?
+      document_results = repository.query(:subject => RDF::URI.new(item.uri), :predicate => RDF::URI.new(MetadataHelper::DOCUMENT))
       document_results.each { |result|
         document = result.to_hash[:object]
         descriptor = {}

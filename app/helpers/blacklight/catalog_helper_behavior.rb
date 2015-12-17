@@ -135,6 +135,7 @@ module Blacklight::CatalogHelperBehavior
   # of the given document.
   #
   def create_display_info_hash(document, userAnnotations=nil)
+    # TODO: This method is madness... :(
     default_url_options = Rails.application.config.action_mailer.default_url_options
 
     fieldDisplayName = create_display_field_name_mapping(document)
@@ -145,7 +146,6 @@ module Blacklight::CatalogHelperBehavior
       should_render_show_field? document, field
     }
     values = values.collect do |solr_fname, field|
-      #key = render_document_show_field_label(@document, :field => solr_fname)
       key = (fieldDisplayName[solr_fname].nil?)? solr_fname : fieldDisplayName[solr_fname]
 
       if solr_fname == 'OLAC_language_tesim'
@@ -176,7 +176,6 @@ module Blacklight::CatalogHelperBehavior
                       'read_access_person_ssim' => nil,
                       'edit_access_person_ssim' => nil
     }
-    #do_not_display = {} if Rails.env.development? # In development, display everything
     do_not_display.merge!(document_show_fields(document))
     document.keys.each do |k|
       v = document[k]
@@ -200,10 +199,13 @@ module Blacklight::CatalogHelperBehavior
     itemIdentifier = document[:handle].split(':').last
 
     # Prepare document PRIMARY_TEXT_URL information
-    solr_item = Item.find(document[:id])
+    solr_item = Item.find_by_handle(document[:handle])
     if solr_item.has_primary_text?
       begin
-        primary_text = catalog_primary_text_url(collectionName, format: :json)
+        # TODO: Why do we check if there is a primary_text, then override it anyway?
+        # primary_text = catalog_primary_text_url(collectionName, format: :json)
+
+        primary_text = solr_item.primary_text_path
       rescue NoMethodError => e
         # When we create the json metadata from the solr processor, we need to do the following work around
         # to have access to routes URL methods

@@ -351,8 +351,6 @@ class CatalogController < ApplicationController
   # override default show method to allow for json response
   #
   def show
-    #require 'pry'
-    #binding.pry
     @item = Item.find_by_handle("#{params[:collection]}:#{params[:itemId]}")
     unless @item.nil?
       render 'catalog/processing_show' and return if @processing_index
@@ -390,7 +388,6 @@ class CatalogController < ApplicationController
       if @document
 
         @item_info = create_display_info_hash(@document, @user_annotations)
-
         @document.export_formats.each_key do |format_name|
           # It's important that the argument to send be a symbol;
           # if it's a string, it makes Rails unhappy for unclear reasons.
@@ -919,8 +916,6 @@ class CatalogController < ApplicationController
   # sequential identifier.
   #
   def retrieve_and_set_item_id
-    # require 'pry'
-    # binding.pry
     handle = nil
     handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
 
@@ -932,7 +927,6 @@ class CatalogController < ApplicationController
           format.any { render :json => {:error => "not-found"}.to_json, :status => 404 and return }
         end
       end
-      # params[:id] = item.id
       params[:id] = handle
     end
   end
@@ -956,8 +950,6 @@ class CatalogController < ApplicationController
   #
   #
   def wrapped_enforce_show_permissions(opts={})
-    # require 'pry'
-    # binding.pry
     begin
       enforce_show_permissions(opts) unless @processing_index
     rescue Hydra::AccessDenied => e
@@ -1185,17 +1177,10 @@ class CatalogController < ApplicationController
       
       results = repository.query(query)
 
-      # require 'pry'
-      # binding.pry
-
       display_document = results.first.to_hash
       display_document.each { |k,v| 
         display_document[k] = v.value
       }
-
-      # results.each do |res|
-      #   return {:id => res[:id].value, :type => res[:type].value, :source => res[:source].value}
-      # end
 
     rescue => e
       Rails.logger.error e.inspect
