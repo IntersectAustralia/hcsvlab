@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151111011322) do
+ActiveRecord::Schema.define(:version => 20160114051837) do
 
   create_table "bookmarks", :force => true do |t|
     t.integer  "user_id",     :null => false
@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(:version => 20151111011322) do
 
   add_index "documents", ["file_name"], :name => "index_documents_on_file_name"
   add_index "documents", ["file_path"], :name => "index_documents_on_file_path"
+  add_index "documents", ["item_id"], :name => "index_documents_item_id"
 
   create_table "item_lists", :force => true do |t|
     t.integer  "user_id",    :null => false
