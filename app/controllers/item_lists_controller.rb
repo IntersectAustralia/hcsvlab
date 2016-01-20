@@ -45,16 +45,9 @@ class ItemListsController < ApplicationController
       format.html {
         @response = @item_list.get_items(params[:page], params[:per_page])
         @document_list = @response["response"]["docs"]
-        file_types = []
-        @item_list.get_item_handles.each do |handle|
-          item = Item.find_by_handle(handle)
-          item.documents.each do |doc|
-             file_types.push(File.extname(doc.file_name.downcase))
-          end
-        end
+        file_types = ItemList.joins(:items => :documents).where("item_lists.id = ?", @item_list.id).pluck("documents.file_name").map{|f| File.extname(f)}
         @doc_filetypes = Hash.new(0)
         file_types.each {|name| @doc_filetypes[name] += 1}
-
 
         authorised_item_handles = @item_list.get_authorised_item_handles
         if @response['response']['numFound'] > authorised_item_handles.size
