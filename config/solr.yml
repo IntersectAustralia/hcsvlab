@@ -16,3 +16,5 @@ staging2:
   url: http://localhost:8080/solr/hcsvlab
 production:
   url: http://localhost:8080/solr/hcsvlab 
+trove:
+  url: http://alveo-solr.intersect.org.au:8080/solr/hcsvlab 

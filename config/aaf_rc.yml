@@ -53,3 +53,9 @@ production:
   hostname: hostname.com
   secret_token: REPLACE_ME
   aaf_rc_login_url: https://rapid.aaf.edu.au/jwt/authnrequest/research/REPLACE_ME
+
+trove:
+  <<: *common
+  hostname: hostname.com
+  secret_token: REPLACE_ME
+  aaf_rc_login_url: https://rapid.aaf.edu.au/jwt/authnrequest/research/REPLACE_ME

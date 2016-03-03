@@ -1,0 +1,5 @@
+
+<http://127.0.0.1:3000/catalog/trove> a <dcmitype:Collection>;
+   <http://purl.org/dc/terms/title> "trove";
+   <http://purl.org/dc/terms/abstract> "trove";
+   <http://www.loc.gov/loc.terms/relators/OWN> "data_owner@intersect.org.au" .

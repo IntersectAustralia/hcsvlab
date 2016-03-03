@@ -42,3 +42,11 @@ staging2:
   default_data_owner: jared@intersect.org.au
   licence_access_request_notification_sender: jared@intersect.org.au
   licence_access_request_response_sender: jared@intersect.org.au
+
+trove:
+  password_reset_email_sender: steve.cassidy@mq.edu.au
+  account_request_user_status_email_sender: steve.cassidy@mq.edu.au
+  account_request_admin_notification_sender: steve.cassidy@mq.edu.au
+  default_data_owner: steve.cassidy@mq.edu.au
+  licence_access_request_notification_sender: steve.cassidy@mq.edu.au
+  licence_access_request_response_sender: steve.cassidy@mq.edu.au

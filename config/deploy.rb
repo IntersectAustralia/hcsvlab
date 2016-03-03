@@ -18,7 +18,7 @@ set(:shared_file_path) { File.join(shared_path, shared_file_dir) }
 
 set :keep_releases, 5
 set :application, 'hcsvlab-web'
-set :stages, %w(qa qa2 staging staging2 production)
+set :stages, %w(qa qa2 staging staging2 production trove)
 set :default_stage, "qa"
 set :rpms, "openssl openssl-devel curl-devel httpd-devel apr-devel apr-util-devel zlib zlib-devel libxml2 libxml2-devel libxslt libxslt-devel libffi mod_ssl mod_xsendfile"
 set :shared_children, shared_children + %w(log_archive)
@@ -89,7 +89,7 @@ after 'deploy:setup' do
 end
 
 before 'deploy:update' do
-  deploy.stop_services
+  # deploy.stop_services
 end
 
 after 'deploy:update' do
@@ -178,15 +178,15 @@ namespace :deploy do
     run("cd #{current_path} && bundle exec rake db:seed", :env => {'RAILS_ENV' => "#{stage}"})
   end
 
-  desc "Full redeployment, it runs deploy:update and deploy:refresh_db"
+  desc "Full redeployment, it runs deploy:update"
   task :full_redeploy, :except => {:no_release => true} do
     update
-    refresh_db
+    # refresh_db
 
     configure_activemq
-    configure_solr
-    configure_tomcat6
-
+    # configure_solr
+    # configure_tomcat6
+    deploy.seed_languages
   end
 
   task :configure do

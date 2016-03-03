@@ -1,5 +1,5 @@
 /home/devel/hcsvlab-web/shared/log/*.log {
-    rotate 520
+    rotate 52
     weekly
     copytruncate
     missingok
@@ -10,7 +10,7 @@
 }
 
 /home/devel/hcsvlab-web/shared/log/*.output {
-    rotate 520
+    rotate 52
     weekly
     copytruncate
     missingok

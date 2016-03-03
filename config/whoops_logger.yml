@@ -19,3 +19,6 @@ staging2:
 
 production:
   <<: *common
+
+trove:
+  <<: *common

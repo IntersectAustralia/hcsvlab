@@ -40,3 +40,7 @@ qa: &qa
 qa2: &qa2
   <<: *common
   database: hcsvlab
+
+trove:
+  <<: *common
+  database: hcsvlab

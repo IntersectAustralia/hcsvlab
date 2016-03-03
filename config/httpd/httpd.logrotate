@@ -1,5 +1,5 @@
 /var/log/httpd/*log {
-    rotate 520
+    rotate 52
     weekly
     copytruncate
     missingok

@@ -25,3 +25,10 @@
   :verify_ssl: true
   :user: 'alveo-aspera'
   :password: <%= ENV["NODE_USER_PASSWORD"] %>
+
+:trove:
+  :hostname: 'dtn-1.intersect.org.au'
+  :port: '9092'
+  :verify_ssl: true
+  :user: 'alveo-aspera'
+  :password: <%= ENV["NODE_USER_PASSWORD"] %>
