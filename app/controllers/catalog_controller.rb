@@ -537,8 +537,7 @@ class CatalogController < ApplicationController
   def primary_text
     bench_start = Time.now
     begin
-      item = Item.find(params[:id])
-
+      item = Item.find_by_handle(params[:id])
       send_file item.primary_text_path
       bench_end = Time.now
       Rails.logger.debug("Time for retrieving primary text for #{params[:id]} took: (#{'%.1f' % ((bench_end.to_f - bench_start.to_f)*1000)}ms)")

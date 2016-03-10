@@ -202,10 +202,7 @@ module Blacklight::CatalogHelperBehavior
     solr_item = Item.find_by_handle(document[:handle])
     if solr_item.has_primary_text?
       begin
-        # TODO: Why do we check if there is a primary_text, then override it anyway?
-        # primary_text = catalog_primary_text_url(collectionName, format: :json)
-
-        primary_text = solr_item.primary_text_path
+        primary_text = catalog_primary_text_url(collectionName, format: :json)
       rescue NoMethodError => e
         # When we create the json metadata from the solr processor, we need to do the following work around
         # to have access to routes URL methods

@@ -246,9 +246,10 @@ private
       logger.debug "\tAdding configured field #{:full_text} with value #{trim(full_text, 128)}"
       ::Solrizer::Extractor.insert_solr_field_value(document, :full_text, full_text)
     end
-    debug("Solr_Worker", "Adding configured field #{:id} with value #{object}")
-    ::Solrizer::Extractor.insert_solr_field_value(document, :id, object)
     ident = ident_parts[:collection] + ":" + ident_parts[:identifier]
+    #debug("Solr_Worker", "Adding configured field #{:id} with value #{object}")
+    # ::Solrizer::Extractor.insert_solr_field_value(document, :id, object)
+    ::Solrizer::Extractor.insert_solr_field_value(document, :id, ident)
     debug("Solr_Worker", "Adding configured field #{:handle} with value #{ident}")
     ::Solrizer::Extractor.insert_solr_field_value(document, :handle, ident)
 

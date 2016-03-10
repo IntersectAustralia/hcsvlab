@@ -321,4 +321,5 @@ after 'multistage:ensure' do
     config/newrelic.yml
     config/aspera.yml
     )
+  # TODO: add sesame.yml
 end
