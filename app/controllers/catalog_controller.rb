@@ -445,7 +445,7 @@ class CatalogController < ApplicationController
   #
   def annotations
     bench_start = Time.now
-    @item = Item.find(params[:id])
+    @item = Item.find_by_handle(params[:id])
     if @item
       @response, @document = get_solr_response_for_doc_id
     end
@@ -555,18 +555,12 @@ class CatalogController < ApplicationController
   #
   def document
     begin
-      # require 'pry'
-      # binding.pry
-      # doc = Document.find_by_file_name_and_item_id(params[:filename], params[:id])
       item = Item.find_by_handle(params[:id]) 
       doc = item.documents.find_by_file_name(params[:filename])
       # check if document exists in JSON metadata from Sesame/Solr
       # This is set during Solr indexing based on a variety of metadata from Solr and Sesame
       # See add_json_metadata_field in solr_worker.rb
-      # require 'pry'
-      # binding.pry
-      metadata = Item.where(handle: params[:id]).where("json_metadata like ?","%#{doc.file_path}%")
-      # doc = nil if doc.present? and Item.where(id: params[:id]).where("json_metadata like ?","%#{doc.file_path}%").blank?
+      metadata = Item.where(handle: params[:id]).where("json_metadata like ?","%#{doc.file_path}%") 
       doc = nil if doc.present? and metadata.blank?
 
       if doc.present?
