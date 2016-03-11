@@ -478,7 +478,7 @@ class CatalogController < ApplicationController
   #
   def annotation_properties
     begin
-      @item = Item.find(params[:id])
+      @item = Item.find_by_handle(params[:id])
 
       @properties = query_annotation_properties(@item)
       if @properties.present?
@@ -502,7 +502,7 @@ class CatalogController < ApplicationController
   #
   def annotation_types
     begin
-      @item = Item.find(params[:id])
+      @item = Item.find_by_handle(params[:id])
 
       @types = query_annotation_types(@item)
       if @types.present?
