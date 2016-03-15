@@ -25,7 +25,8 @@
     <field name="AUSNC_communication_medium_facet"  type="string" stored="true" indexed="true" multiValued="true" required="false"/>
 
     <field name="handle"       type="string"    stored="true" indexed="true" multiValued="false" required="false"/>
-    <!-- <field name="id"           type="string"    stored="true" indexed="true" multiValued="false" required="true"/> -->
+    <!-- Needed by Blacklight for permissions -->
+    <field name="id"           type="string"    stored="true" indexed="true" multiValued="false" required="true"/>
     <field name="timestamp"    type="date"      stored="true" indexed="true" default="NOW" multiValued="false"/>
     <field name="full_text"    type="full_text" stored="true" indexed="true" multiValued="false" termVectors="true" termPositions="true" termOffsets="true"/>
     <field name="all_metadata" type="text_ws"   stored="true" indexed="true" multiValued="true"/>

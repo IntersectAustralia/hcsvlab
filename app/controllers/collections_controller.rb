@@ -1005,7 +1005,7 @@ class CollectionsController < ApplicationController
   # Core functionality common to add item ingest (via api and web app)
   # Returns a list of item identifiers corresponding to the items ingested
   #
-  def add_item_core (collection, item_id_and_file_hash)
+  def add_item_core(collection, item_id_and_file_hash)
     rdf_files = []
     item_id_and_file_hash.each do |item|
       rdf_files.push(item[:rdf_file])
@@ -1017,7 +1017,7 @@ class CollectionsController < ApplicationController
   #
   # Core functionality common to add document ingest (via api and web app)
   #
-  def add_document_core (collection, item, document_metadata, document_filename)
+  def add_document_core(collection, item, document_metadata, document_filename)
     create_document(item, document_metadata)
     add_and_index_document(item, document_metadata)
     "Added the document #{File.basename(document_filename)} to item #{item.get_name} in collection #{collection.name}"
