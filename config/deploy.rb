@@ -229,8 +229,11 @@ namespace :deploy do
       abort "Exiting because you didn't type 'yes'" unless STDIN.gets.chomp == 'yes'
     end
 
-    backup.db.dump
-    backup.db.trim
+    print "Backup database? [no/YES] ".colorize(:green)
+    unless STDIN.gets.chomp.downcase == 'no'
+      backup.db.dump
+      backup.db.trim
+    end
     migrate
     deploy.seed_languages # Populate the languages table after deployment
     restart
