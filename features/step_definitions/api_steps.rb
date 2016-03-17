@@ -1,5 +1,11 @@
 require "#{Rails.root}/lib/json-compare/orderless_json_comparer.rb"
 
+When(/^I pry$/) do
+  require 'pry'
+  binding.pry
+end
+
+
 Then /^I should get a (\d+) response code$/ do |status|
   last_response.status.should == status.to_i
 end

@@ -21,7 +21,7 @@ module EopasHelper
     # 4) In the case of the transcript file, we need to load the content in memory to decide which type of
     #    transcript are we using, but that is not a problem, in general are very small text files.
 
-    item = Item.find(id)
+    item = Item.find_by_handle(id)
     item.documents.each do |document|
       file_name = document.file_name[0]
       next if file_name.nil?
