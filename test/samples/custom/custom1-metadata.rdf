@@ -6,7 +6,7 @@
 @prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://ns.ausnc.org.au/corpora/austlit/items/custom1.xml> a ausnc:AusNCObject ;
+<http://ns.ausnc.org.au/corpora/austlit/items/custom1> a ausnc:AusNCObject ;
     ausnc:collection "Primary Fiction and Poetry Texts" ;
     ausnc:mode ausnc:spoken ;
     ausnc:speech_style ausnc:spontaneous ;
@@ -29,7 +29,7 @@
     ns1:location "Sydney, Australia" ;
     dc:contributor "Francis Adams" ;
     dc:created "1886" ;
-    dc:identifier "custom1.xml" ;
+    dc:identifier "custom1" ;
     dc:isPartOf corpus:custom ;
     dc:publisher "University of Sydney Library" ;
     dc:title "Australian Essays" ;

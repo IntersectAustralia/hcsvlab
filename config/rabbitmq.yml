@@ -22,4 +22,7 @@ staging2:
 production:
   <<: *rabbitmq_common
   :host: alveo-qa-mq.intersect.org.au
+trove:
+  <<: *rabbitmq_common
+  :host: alveo-mq.intersect.org.au
 

@@ -237,3 +237,8 @@ staging2:
   <<: *default_settings
   monitor_mode: true
   app_name: Alveo (Staging 2)
+
+trove:
+  <<: *default_settings
+  monitor_mode: true
+  app_name: Alveo (Trove Production Candidate)

@@ -100,7 +100,6 @@ namespace :fedora do
     logger.info "rake fedora:clear_corpus corpus=#{corpus}"
 
     collection = Collection.find_by_name(corpus)
-    Document.where(item_id: Item.where(collection_id: collection)).delete_all
     Item.where(collection_id: collection).delete_all
     collection.try(:destroy)
 
