@@ -178,30 +178,29 @@ private
     configured_fields_found = Set.new
     ident_parts = {collection: "Unknown Collection", identifier: "Unknown Identifier"}
 
-    results.each { |binding|
+    results.each { |result|
 
-      binding = binding.to_hash
+      result = result.to_hash
       # Set the defaults for field and value
-      field = binding[:predicate].to_s
-      value = last_bit(binding[:object])
+      field = result[:predicate].to_s
+      value = last_bit(result[:object])
 
       # Now check for special cases
-      if binding[:predicate] == MetadataHelper::CREATED
-        value = binding[:object].to_s
-      elsif binding[:predicate] == MetadataHelper::IS_PART_OF
-        is_part_of = find_collection(binding[:object])
+      if result[:predicate] == MetadataHelper::CREATED
+        value = result[:object].to_s
+      elsif result[:predicate] == MetadataHelper::IS_PART_OF
+        is_part_of = find_collection(result[:object])
         unless is_part_of.nil?
           # This is pointing at a collection, so treat it differently
           field = MetadataHelper::COLLECTION
           value = is_part_of.name
           ident_parts[:collection] = value
         end
-      elsif binding[:predicate] == MetadataHelper::IDENTIFIER
+      elsif result[:predicate] == MetadataHelper::IDENTIFIER
         ident_parts[:identifier] = value
       elsif @@configured_fields.include?(MetadataHelper::short_form(field)+"_facet")
         field = MetadataHelper::short_form(field)+"_facet"
       end
-
 
       # When retrieving the information for a document, the RDF::Query library is forcing
       # the text to be encoding to UTF-8, but that produces that some characters get misinterpreted,
@@ -216,7 +215,7 @@ private
       # Map the field name to it's short form
       field = MetadataHelper::short_form(field)
       configured_fields_found.add(field) if @@configured_fields.include?(field)
-      add_field(document, field, value_encoded, binding)
+      add_field(document, field, value_encoded, result)
 
     }
 
