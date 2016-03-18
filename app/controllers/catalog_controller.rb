@@ -784,54 +784,6 @@ class CatalogController < ApplicationController
       end
     end
 
-    #
-    # I'll leave this code commented out since in the future we might have to include the
-    # SERVICE keyword and we'll have to validate that.
-    #
-
-    # In a sparql query the user can specify the keyword SERVICE in order
-    # to make a query in a particular repository.
-    # We need to parse those type of query and validate that the user
-    # has read access to those specified repositories.
-    #
-    # Regex will match: SERVICE [SILENT] <HOST_URL>/repositories/<repo_name>
-    #pattern = /SERVICE\s+(?:.*\s+)?<#{SESAME_CONFIG["url"]}\/repositories\/(\w+)>/i
-    #matchingWords = query.to_enum(:scan, pattern).map { Regexp.last_match }
-
-    # At this point we will collect
-    #collectionNames = []
-    #collectionNames << {name:collectionName, silent:false} if collectionName.present?
-    #matchingWords.each do |aMatching|
-    #  isSilent = !aMatching[0].to_s.match(/SERVICE\s+SILENT/i).nil?
-    #  collectionNames << {name: aMatching[1], silent:isSilent}
-    #end
-
-    #if (collectionNames.empty?)
-    #  respond_to do |format|
-    #    format.json { render :json => {:error => "Parameter 'collection' or SERVICE keyword in query is required."}.to_json, :status => 412 and return}
-    #  end
-    #end
-
-    #collections = []
-    #collectionNames.each do |aCollectionName|
-    #  Retrieve the collection
-    #collection = Collection.find_by_short_name(aCollectionName[:name]).to_a.first
-    #if (collection.nil? && !aCollectionName[:silent])
-    #  respond_to do |format|
-    #    format.json { render :json => {:error => "collection not-found"}.to_json, :status => 404 and return}
-    #  end
-    #end
-    #
-    #if (!collection.nil?)
-    #  Verify if the user has at least read access to the collection
-    #if !(current_user.has_agreement_to_collection?(collection, UserLicenceAgreement::READ_ACCESS_TYPE, false))
-    #  authorization_error(Exception.new("You are not authorized to access this resource."))
-    #  return
-    #end
-    #collections << collection
-    #end
-    #end
-
     # Create the URL for the sesame endpoint.
     params = {query: query}
     uri = URI("#{SESAME_CONFIG["url"]}/repositories/#{collection_name}")
@@ -843,7 +795,6 @@ class CatalogController < ApplicationController
     res = Net::HTTP.new(uri.host, uri.port).start do |http|
       http.request(req)
     end
-
     # If sesame returns an error, then we show the error received by sesame
     if (!res.is_a?(Net::HTTPSuccess))
       respond_to do |format|
@@ -918,7 +869,6 @@ class CatalogController < ApplicationController
   def retrieve_and_set_item_id
     handle = nil
     handle = "#{params[:collection]}:#{params[:itemId]}" if params[:collection].present? and params[:itemId].present?
-
     if handle.present?
       item = Item.find_by_handle(handle)
       if item.nil?
@@ -936,7 +886,7 @@ class CatalogController < ApplicationController
   #
   def check_item_indexed
     begin
-      item = Item.find(params[:id])
+      item = Item.find_by_handle(params[:id])
       if item.indexed_at.nil?
         @processing_index = true
         flash.keep(:notice)
