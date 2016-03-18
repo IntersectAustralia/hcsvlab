@@ -711,7 +711,7 @@ class CollectionsController < ApplicationController
   def remove_item(item, collection)
     delete_item_from_filesystem(item)
     delete_from_sesame(item, collection)
-    delete_item_from_solr(item.id)
+    delete_item_from_solr(item[:handle])
     item.destroy # Remove from database (item, its documents and their document audits)
   end
 
