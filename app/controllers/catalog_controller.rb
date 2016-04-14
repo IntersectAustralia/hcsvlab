@@ -4,7 +4,6 @@ require 'yaml'
 require Rails.root.join('lib/json-ld/json_ld_helper.rb')
 require "#{Rails.root}/lib/item/download_items_helper.rb"
 require "#{Rails.root}/lib/blacklight/blacklight_solrhelper_overrides.rb"
-require "#{Rails.root}/lib/blacklight/hydra_permissions_overrides.rb"
 require 'net/http'
 require 'uri'
 
