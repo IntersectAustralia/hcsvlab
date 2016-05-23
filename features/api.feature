@@ -1801,7 +1801,7 @@ Feature: Browsing via API
     {"error":"The identifier document1.txt is used for multiple documents"}
     """
 
-  @api_add_item @test
+  @api_add_item
   Scenario: Add an item with a single document file as a multipart http request
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
@@ -1824,7 +1824,7 @@ Feature: Browsing via API
     """
 
   # ToDo: fix rpec post request merging hashes (document hashes) in array, see: http://stackoverflow.com/questions/18337609/rspec-request-test-merges-hashes-in-array-in-post-json-params
-#  @api_add_item @test
+#  @api_add_item
 #  Scenario: Add an item with many document files as a multipart http request
 #    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
 #      | name | collection_metadata |
@@ -1852,7 +1852,7 @@ Feature: Browsing via API
 #    """
 
   # ToDo: remove following workaround test once previous api_steps are fixed so that the previous test passes
-  @api_add_item @test
+  @api_add_item
   Scenario: Add an item with many document files as a multipart http request
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
