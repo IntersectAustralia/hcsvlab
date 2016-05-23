@@ -78,10 +78,8 @@ When /^I make a JSON multipart request for (.*) with the API token for "(.*)" wi
         hash[k] = []
         file_paths = v.tr("\"", "").split(",") # this step requires file names to be enclosed in quotes and comma separated
         file_paths.each do |file_path|
-          hash[k].push Rack::Test::UploadedFile.new(Rails.root.join(file_path), "application/octet-stream")
+          hash[k].push Rack::Test::UploadedFile.new(Rails.root.join(file_path))
         end
-      else
-        hash[k] = JSON.parse(v)
       end
     rescue
       # not a json parameter, ignore
