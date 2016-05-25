@@ -203,7 +203,7 @@ class CollectionsController < ApplicationController
     begin
       collection = validate_collection(params[:collectionId], params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
-      doc_metadata = params[:metadata]
+      doc_metadata = parse_str_to_json(params[:metadata], 'JSON document metadata is ill-formatted')
       doc_content = params[:document_content]
       uploaded_file = params[:file]
       uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
@@ -543,16 +543,22 @@ class CollectionsController < ApplicationController
 
   # Returns a cleansed copy of params for the add item api
   def cleanse_params(request_params)
-    if request_params[:items].is_a? String
-      begin
-        request_params[:items] = JSON.parse(request_params[:items])
-      rescue JSON::ParserError
-        raise ResponseError.new(400), "JSON item metadata is ill-formatted"
-      end
-    end
+    request_params[:items] = parse_str_to_json(request_params[:items], 'JSON item metadata is ill-formatted')
     request_params[:file] = [] if request_params[:file].nil?
     request_params[:file] = [request_params[:file]] unless request_params[:file].is_a? Array
     request_params
+  end
+
+  # Parses a given JSON string and raises an exception with the given message if a ParserError occurs
+  def parse_str_to_json(json_string, parser_error_msg)
+    if json_string.is_a? String
+      begin
+        json_string = JSON.parse(json_string)
+      rescue JSON::ParserError
+        raise ResponseError.new(400), parser_error_msg
+      end
+    end
+    json_string
   end
 
   # Processes files uploaded as part of a multipart request
