@@ -549,15 +549,16 @@ class CollectionsController < ApplicationController
     request_params
   end
 
-  def parse_str_to_json(var, parser_error_msg)
-    if var.is_a? String
+  # Parses a given JSON string and raises an exception with the given message if a ParserError occurs
+  def parse_str_to_json(json_string, parser_error_msg)
+    if json_string.is_a? String
       begin
-        var = JSON.parse(var)
+        json_string = JSON.parse(json_string)
       rescue JSON::ParserError
         raise ResponseError.new(400), parser_error_msg
       end
     end
-    var
+    json_string
   end
 
   # Processes files uploaded as part of a multipart request
