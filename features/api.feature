@@ -1459,6 +1459,24 @@ Feature: Browsing via API
     """
 
   @api_create_collection
+  Scenario: Creating a new collection via the API sets Privacy to true by default
+    When I ingest a new collection "test" through the api with the API token for "data_owner@intersect.org.au"
+    Then I should get a 200 response code
+    And the collection "test" should have privacy set to "true" in the database
+
+  @api_create_collection
+  Scenario Outline: Create a new collection via the API with Privacy set
+    When I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
+      | name | private    | collection_metadata |
+      | Test | <private>  | {"@context": {"TEST": "http://collection.test", "dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@id": "http://collection.test", "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"} |
+    Then I should get a 200 response code
+    And the collection "test" should have privacy set to "<private>" in the database
+  Examples:
+    | private |
+    | true    |
+    | false   |
+
+  @api_create_collection
   Scenario: Create new collection via the API with duplicate name
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
@@ -1783,7 +1801,7 @@ Feature: Browsing via API
     {"error":"The identifier document1.txt is used for multiple documents"}
     """
 
-  @api_add_item @test
+  @api_add_item
   Scenario: Add an item with a single document file as a multipart http request
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |
@@ -1806,7 +1824,7 @@ Feature: Browsing via API
     """
 
   # ToDo: fix rpec post request merging hashes (document hashes) in array, see: http://stackoverflow.com/questions/18337609/rspec-request-test-merges-hashes-in-array-in-post-json-params
-#  @api_add_item @test
+#  @api_add_item
 #  Scenario: Add an item with many document files as a multipart http request
 #    Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
 #      | name | collection_metadata |
@@ -1834,7 +1852,7 @@ Feature: Browsing via API
 #    """
 
   # ToDo: remove following workaround test once previous api_steps are fixed so that the previous test passes
-  @api_add_item @test
+  @api_add_item
   Scenario: Add an item with many document files as a multipart http request
     Given I make a JSON post request for the collections page with the API token for "data_owner@intersect.org.au" with JSON params
       | name | collection_metadata |

@@ -51,30 +51,18 @@ class CollectionsController < ApplicationController
   def create
     authorize! :create, @collection,
                :message => "Permission Denied: Your role within the system does not have sufficient privileges to be able to create a collection. Please contact an Alveo administrator."
-    if request.format == 'json' && request.post?
-      collection_metadata = params[:collection_metadata]
-      collection_name = params[:name]
-      licence_id = params[:licence_id].present? ? params[:licence_id] : nil
-      if collection_name.blank? || collection_name.length > 255 || collection_metadata.nil?
-        invalid_name = (collection_name.nil? || collection_name.blank? || collection_name.length > 255)
-        invalid_metadata = collection_metadata.nil?
-        err_message = nil
-        err_message = "name parameter" if invalid_name
-        err_message = "metadata parameter" if invalid_metadata
-        err_message = "name and metadata parameters" if invalid_name && invalid_metadata
-        err_message << " not found" unless err_message.nil?
-        respond_with_error(err_message, 400)
-      else
-        owner = User.find_by_authentication_token(params[:api_key])
-        begin
-          @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner, licence_id)
-        rescue ResponseError => e
-          respond_with_error(e.message, e.response_code)
-          return # Only respond with one error at a time
-        end
-      end
-    else
-      respond_with_error("JSON-LD formatted metadata must be sent to the add collection api call as a POST request", 404)
+    collection_metadata = params[:collection_metadata]
+    collection_name = params[:name]
+    licence_id = params[:licence_id].present? ? params[:licence_id] : nil
+    privacy = true
+    privacy = (params[:private].to_s.downcase == 'true') unless params[:private].nil?
+    owner = User.find_by_authentication_token(params[:api_key])
+    begin
+      validate_new_collection(collection_metadata, collection_name, licence_id, privacy)
+      @success_message = create_collection_core(Collection.sanitise_name(collection_name), collection_metadata, owner, licence_id, privacy)
+    rescue ResponseError => e
+      respond_with_error(e.message, e.response_code)
+      return # Only respond with one error at a time
     end
   end
 
@@ -137,6 +125,8 @@ class CollectionsController < ApplicationController
     @collection_title = params[:collection_title]
     @collection_owner = params[:collection_owner]
     @collection_abstract = params[:collection_abstract]
+    @approval_required = params[:approval_required]
+    @approval_required = 'private' if request.get?
     @licence_id = params[:licence_id]
     @additional_metadata = zip_additional_metadata(params[:additional_key], params[:additional_value])
     if request.post?
@@ -157,7 +147,7 @@ class CollectionsController < ApplicationController
 
         # Ingest new collection
         name = Collection.sanitise_name(params[:collection_name])
-        msg = create_collection_core(name, json_ld, current_user, params[:licence_id])
+        msg = create_collection_core(name, json_ld, current_user, params[:licence_id], @approval_required == 'private')
         redirect_to collection_path(id: name), notice: msg
       rescue ResponseError => e
         flash[:error] = e.message
@@ -213,7 +203,7 @@ class CollectionsController < ApplicationController
     begin
       collection = validate_collection(params[:collectionId], params[:api_key])
       item = validate_item_exists(collection, params[:itemId])
-      doc_metadata = params[:metadata]
+      doc_metadata = parse_str_to_json(params[:metadata], 'JSON document metadata is ill-formatted')
       doc_content = params[:document_content]
       uploaded_file = params[:file]
       uploaded_file = uploaded_file.first if uploaded_file.is_a? Array
@@ -553,16 +543,22 @@ class CollectionsController < ApplicationController
 
   # Returns a cleansed copy of params for the add item api
   def cleanse_params(request_params)
-    if request_params[:items].is_a? String
-      begin
-        request_params[:items] = JSON.parse(request_params[:items])
-      rescue JSON::ParserError
-        raise ResponseError.new(400), "JSON item metadata is ill-formatted"
-      end
-    end
+    request_params[:items] = parse_str_to_json(request_params[:items], 'JSON item metadata is ill-formatted')
     request_params[:file] = [] if request_params[:file].nil?
     request_params[:file] = [request_params[:file]] unless request_params[:file].is_a? Array
     request_params
+  end
+
+  # Parses a given JSON string and raises an exception with the given message if a ParserError occurs
+  def parse_str_to_json(json_string, parser_error_msg)
+    if json_string.is_a? String
+      begin
+        json_string = JSON.parse(json_string)
+      rescue JSON::ParserError
+        raise ResponseError.new(400), parser_error_msg
+      end
+    end
+    json_string
   end
 
   # Processes files uploaded as part of a multipart request
@@ -982,7 +978,7 @@ class CollectionsController < ApplicationController
   #
   # Core functionality common to creating a collection
   #
-  def create_collection_core(name, metadata, owner, licence_id=nil)
+  def create_collection_core(name, metadata, owner, licence_id=nil, private=true)
     metadata = update_jsonld_collection_id(metadata, name)
     uri = metadata['@id']
     if Collection.find_by_uri(uri).present?  # ingest skips collections with non-unique uri
@@ -996,6 +992,7 @@ class CollectionsController < ApplicationController
       collection = check_and_create_collection(name, corpus_dir)
       collection.owner = owner
       collection.licence_id = licence_id
+      collection.private = private
       collection.save
       "New collection '#{name}' (#{uri}) created"
     end

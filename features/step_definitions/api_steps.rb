@@ -84,10 +84,8 @@ When /^I make a JSON multipart request for (.*) with the API token for "(.*)" wi
         hash[k] = []
         file_paths = v.tr("\"", "").split(",") # this step requires file names to be enclosed in quotes and comma separated
         file_paths.each do |file_path|
-          hash[k].push Rack::Test::UploadedFile.new(Rails.root.join(file_path), "application/octet-stream")
+          hash[k].push Rack::Test::UploadedFile.new(Rails.root.join(file_path))
         end
-      else
-        hash[k] = JSON.parse(v)
       end
     rescue
       # not a json parameter, ignore
@@ -430,4 +428,8 @@ And /^I ingest a new collection "(.*)" through the api with the API token for "(
   metadata = JSON.parse('{"@context": {"dc": "http://purl.org/dc/elements/1.1/", "dcmitype": "http://purl.org/dc/dcmitype/", "marcrel": "http://www.loc.gov/loc.terms/relators/", "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdfs": "http://www.w3.org/2000/01/rdf-schema#", "xsd": "http://www.w3.org/2001/XMLSchema#" }, "@type": "dcmitype:Collection", "dc:creator": "Pam Peters", "dc:rights": "All rights reserved to Data Owner", "dc:subject": "English Language", "dc:title": "A test collection", "marcrel:OWN": "Data Owner"}')
   hash = {'name' => "#{name}", 'collection_metadata' => metadata}
   post path_to('the collections page'), hash.merge({:format => :json}), {'X-API-KEY' => user.authentication_token}
+end
+
+Then /^the collection "(.+)" should have privacy set to "(.*)" in the database$/ do |collection_name, privacy|
+  expect(Collection.find_by_name(collection_name).private).to eq (privacy.downcase == 'true')
 end

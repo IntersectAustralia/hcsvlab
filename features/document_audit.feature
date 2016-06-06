@@ -46,7 +46,7 @@ Feature: Document Audit
     And I am logged in as "data_owner@intersect.org.au"
     And I am on the document audit page
     Then I should see "Showing 3 audits"
-    And I should see "document-audits" table with
+    Then I should see a table with the following rows in any order:
       | Collection | Item         | Document         | User Name    | User Email                  |
       | cooee      | cooee:1-001  | 1-001-plain.txt  | Fred Bloggs  | researcher@intersect.org.au |
       | cooee      | cooee:1-001  | 1-001-raw.txt    | Fred Bloggs  | researcher@intersect.org.au |

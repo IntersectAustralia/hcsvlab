@@ -1,4 +1,4 @@
-%h2 Add Document
+%h2= "Add Document to '#{params[:itemId]}'"
 = form_tag({controller: 'collections', action: 'web_add_document'}, multipart: true, method: 'post', :id => 'add_document_form') do
   = label_tag :document_file, 'Please select a file:'
   = file_field_tag :document_file, required: true

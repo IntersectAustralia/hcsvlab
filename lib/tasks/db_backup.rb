@@ -17,7 +17,7 @@ def db_backup(output_dir)
   end
 
   out_file = File.join(output_dir, "#{Time.now.strftime('%Y%m%d-%H%M%S')}.dump")
-  puts `env PGPASSFILE=#{pgpass_filename} pg_dump -U #{username} -h #{host} #{database} > #{out_file}`
+  puts `env PGPASSFILE=#{pgpass_filename} pg_dump -U #{username} -h #{host} #{database} | gzip > #{out_file}`
 
   File.delete pgpass_filename
 end

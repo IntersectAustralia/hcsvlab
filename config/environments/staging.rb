@@ -6,7 +6,7 @@ HcsvlabWeb::Application.configure do
   # TODO: set your own correct URL for action mailer
   config.action_mailer.default_url_options = { :host => 'alveo-staging1.intersect.org.au' }
 
-  config.galaxy_url = 'http://alveo-staging1.intersect.org.au:8081/root'
+  config.galaxy_url = 'http://alveo-galaxy-staging.intersect.org.au/root'
 
   # Base directory where user contributed annotations will be stored
   config.user_annotations_location = "/data/contributed_annotations/"
