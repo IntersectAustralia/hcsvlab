@@ -93,8 +93,12 @@
       - documents.each_with_index do |values, index|
         %tr
           - if values.has_key?(MetadataHelper::SOURCE)
-            %td
-              %a{:href => "/catalog/#{document[:handle].split(':').first}/#{document[:handle].split(':').last}/document/#{values[MetadataHelper::IDENTIFIER]}"}= values[MetadataHelper::IDENTIFIER]
+            - if values[MetadataHelper::SOURCE].to_s.starts_with? 'http'
+              %td
+                %a{:href => values[MetadataHelper::SOURCE]}= values[MetadataHelper::IDENTIFIER]
+            - else
+              %td
+                %a{:href => "/catalog/#{document[:handle].split(':').first}/#{document[:handle].split(':').last}/document/#{values[MetadataHelper::IDENTIFIER]}"}= values[MetadataHelper::IDENTIFIER]
           - else
             %td= values[MetadataHelper::IDENTIFIER]
           - if values.has_key?(MetadataHelper::TYPE)

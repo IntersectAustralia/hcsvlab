@@ -1,0 +1,35 @@
+@prefix ausnc: <http://ns.ausnc.org.au/schemas/ausnc_md_model/> .
+@prefix bibo: <http://purl.org/ontology/bibo/> .
+@prefix bio: <http://purl.org/vocab/bio/0.1/> .
+@prefix corpus: <http://ns.ausnc.org.au/corpora/> .
+@prefix dbpedia: <http://dbpedia.org/resource/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix hcsvlab: <http://hcsvlab.org/vocabulary/> .
+@prefix ns1: <http://ns.ausnc.org.au/schemas/cooee/> .
+@prefix olac: <http://www.language-archives.org/OLAC/1.1/> .
+@prefix schema: <http://ns.ausnc.org.au/schemas/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://ns.ausnc.org.au/corpora/cooee/items/4-425> a ausnc:AusNCObject ;
+    hcsvlab:display_document <http://ns.ausnc.org.au/corpora/cooee/source/4-425#Text> ;
+    hcsvlab:indexable_document <http://ns.ausnc.org.au/corpora/cooee/source/4-425#Text> ;
+    ausnc:discourse_type ausnc:verse ;
+    ausnc:document <http://ns.ausnc.org.au/corpora/cooee/source/4-425#Original> ;
+    ausnc:itemwordcount 142 ;
+    ns1:register "Public Written" ;
+    ns1:texttype "Verse" ;
+    schema:localityName dbpedia:Queensland ;
+    dc:created "1895" ;
+    dc:identifier "4-425" ;
+    dc:isPartOf corpus:remote ;
+    dc:source "Paterson, 1895" ;
+    bibo:pages "x" ;
+    olac:language "eng" .
+
+<http://ns.ausnc.org.au/corpora/cooee/source/4-425#Original> a foaf:Document ;
+    dc:extent 927 ;
+    dc:identifier "4-425.txt" ;
+    dc:source <http://www.example.org/4-425.txt> ;
+    dc:title "4-425#Original" ;
+    dc:type "Original" .

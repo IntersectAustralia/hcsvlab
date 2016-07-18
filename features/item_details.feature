@@ -125,3 +125,11 @@ Feature: Displaying Items
       | Identifier | utf8_test_1    |
       | russian    | котята         |
       | chinese    | 双喜/雙喜 shuāngxǐ |
+
+  Scenario: Verify items with special characters in its id (1 dot, 2 underscores)
+    Given I ingest "remote:remote"
+    And I have user "researcher@intersect.org.au" with the following groups
+      | collectionName | accessType |
+      | remote        | read       |
+    Given I am on the catalog page for "remote:4-425"
+    Then I should see link "4-425.txt" to "http://www.example.org/4-425.txt"
