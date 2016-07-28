@@ -41,6 +41,7 @@ class ItemListsController < ApplicationController
     end
 
     params[:per_page] = params[:per_page].to_i if params[:per_page].is_a? String
+    download_max_files = APP_CONFIG['download_max_files']
     respond_to do |format|
       format.html {
         @response = @item_list.get_items(params[:page], params[:per_page])
@@ -84,6 +85,11 @@ class ItemListsController < ApplicationController
           else
             doc_filter = params[:doc_filter]
           end
+        end
+        document_count = @item_list.get_document_count(doc_filter)
+        if document_count > download_max_files
+          flash[:error] = "Zip download is limited to #{download_max_files} files"
+          redirect_to @item_list and return
         end
         download_as_zip(@item_list.get_item_handles, "#{@item_list.name}.zip", doc_filter)
       }

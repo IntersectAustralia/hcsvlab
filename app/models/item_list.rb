@@ -69,6 +69,15 @@ class ItemList < ActiveRecord::Base
     response["response"]["docs"]
   end
 
+  def get_document_count(document_filter)
+    documents = []
+    items.each { |item|
+      documents.concat(item.documents)
+    }
+    documents = Item::DownloadItemsHelper.filter_item_files(documents, document_filter)
+    documents.count
+  end
+
   #
   # Get the list of Item handles which this ItemList contains.
   # Return an array of Strings.

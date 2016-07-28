@@ -23,6 +23,18 @@ When /^the item list "(.*)" has items (.*)$/ do |list_name, ids|
   list.add_items(ids.split(", "))
 end
 
+Given(/^the item list "(.*?)" has (\d+) text documents$/) do |list_name, n|
+  items = []
+  n = n.to_i
+  (0...n).each { |i| 
+    filename = "file_#{i}.txt"
+    documents = [FactoryGirl.create(:document, file_name: filename, file_path: filename)]
+    items << FactoryGirl.create(:item, handle: "corpus:item_#{i}", documents: documents)
+  }
+  ItemList.find_by_name(list_name).items = items
+end
+
+
 And /^I follow the delete icon for item list "(.*)"$/ do |list_name|
   list = ItemList.find_by_name(list_name)
   find("#delete_item_list_#{list.id}").click

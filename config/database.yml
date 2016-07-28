@@ -9,7 +9,7 @@ common: &common
 development:
   <<: *common
   database: hcsvlab
-  host: alveo-qa-pg.intersect.org.au
+  #host: alveo-qa-pg.intersect.org.au
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

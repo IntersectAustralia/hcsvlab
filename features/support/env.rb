@@ -64,6 +64,13 @@ require 'spreewald/table_steps'
 # end
 # Capybara.current_driver = :chrome
 
+# Capybara.register_driver :selenium do |app| 
+#    profile = Selenium::WebDriver::Firefox::Profile.new 
+#    Capybara::Selenium::Driver.new( app, :browser => :firefox, :profile => profile ) 
+# end
+# Capybara.run_server = true
+# Capybara.default_driver = :selenium
+
 Capybara.javascript_driver = :poltergeist
 # Capybara.javascript_driver = :poltergeist_debug
 # Capybara.javascript_driver = :selenium

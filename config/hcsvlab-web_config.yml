@@ -5,6 +5,7 @@ defaults: &defaults
   default_data_owner: data_owner@intersect.org.au
   licence_access_request_notification_sender: kali@intersect.org.au
   licence_access_request_response_sender: kali@intersect.org.au
+  download_max_files: 200
 
 development:
   <<: *defaults

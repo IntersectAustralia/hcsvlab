@@ -15,14 +15,10 @@
             = link_to("Use in Galaxy", "#", :onclick => 'jQuery("#galaxy_list").submit()')
           %li
             %a{"data-toggle" => "modal", :href => "#get_r_script", :role => "button"} Use in Emu/R
-            =# link_to("Concordance search", {:controller => "item_lists", :action => "concordance"}, :method => 'GET', :id => params[:id].to_i)
           %li
             %a{"data-toggle" => "modal", :href => "#download_item_list", :role => "button"} Download as ZIP
-            -#{:controller => "item_lists", :action => "show", :format=>"zip"}, :method => 'GET', :id => params[:id].to_i,
-            -#=#:onclick => 'showProgressAnimation(); self.setInterval("checkCompleteCookie();", 4000);')
           %li
             %a{"data-toggle" => "modal", :href => "#download_item_list_using_aspera", :role => "button"} Download using Aspera
-            -#= link_to("Download using Aspera", '#', :onclick => "performAsperaDownloadTransferForItemList(#{params[:id]});")
           - if @item_list.user_id == current_user.id
             %li
               - if @item_list.shared?

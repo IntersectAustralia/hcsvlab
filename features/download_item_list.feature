@@ -8,26 +8,21 @@ Feature: Managing Item Lists
     And I have users
       | email                        | first_name | last_name |
       | researcher@intersect.org.au  | Researcher | One       |
-      | data_owner@intersect.org.au  | Data       | Owner     |
     And "researcher@intersect.org.au" has role "researcher"
-    And "data_owner@intersect.org.au" has role "data owner"
     And "researcher@intersect.org.au" has an api token
-    And I ingest "cooee:1-001"
-    And I ingest "cooee:1-002"
     And I have user "researcher@intersect.org.au" with the following groups
       | collectionName | accessType |
       | cooee          | read       |
     And I am logged in as "researcher@intersect.org.au"
     And "researcher@intersect.org.au" has item lists
       | name |
-      | Test |
+      | Test1 |
 
   Scenario: I have option to download item list as a zip
     Given "researcher@intersect.org.au" has item lists
       | name  |
       | Test1 |
-    And the item list "Test1" has items cooee:1-001
-    And the item list "Test1" has items cooee:1-002
+    And the item list "Test1" has 1 text documents
     When I am on the item list page for "Test1"
     Then I should see "Download as ZIP"
 
@@ -35,8 +30,7 @@ Feature: Managing Item Lists
     Given "researcher@intersect.org.au" has item lists
       | name  |
       | Test1 |
-    And the item list "Test1" has items cooee:1-001
-    And the item list "Test1" has items cooee:1-002
+    And the item list "Test1" has 1 text documents
     When I am on the item list page for "Test1"
     And I click "Download as ZIP"
     Then I should see "Download Options for Item List: Test1"
@@ -47,3 +41,15 @@ Feature: Managing Item Lists
     And I should see "Download Selected"
     And I should see "Download only files that match a particular regular expression"
     And I should see "Download Matches"
+
+  Scenario: I try to download more than 200 items as a zip
+    Given "researcher@intersect.org.au" has item lists
+      | name  |
+      | Test1 |
+    And the item list "Test1" has 201 text documents
+    When I am on the item list page for "Test1"
+    And I click "Download as ZIP"
+    And I press "Download All"
+    Then I should see "Zip download is limited to 200 files"
+
+
