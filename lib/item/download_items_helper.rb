@@ -35,8 +35,10 @@ module Item::DownloadItemsHelper
 
       bench_start = Time.now
 
+      # require 'pry'
+      # binding.pry
       # Creates a ZIP file containing the documents and item's metadata
-      zip_path = DownloadItemsInFormat.new(current_user, current_ability).createAndRetrieveZipPath(itemHandles, document_filter)
+      zip_path = DownloadItemsInFormat.new(current_user, current_ability).create_and_retrieve_zip_path(itemHandles, document_filter)
 
       # Sends the zipped file
       send_data IO.read(zip_path), :type => 'application/zip',
@@ -151,15 +153,53 @@ module Item::DownloadItemsHelper
     #
     #
     #
-    def createAndRetrieveZipPath(itemHandles, document_filter)
-      get_zip_with_documents_and_metadata_powered(itemHandles, document_filter)
-    end
-
-    #
-    #
-    #
     def createAndRetrieveWarcPath(itemHandles, url, &block)
       get_warc_with_documents_and_metadata(itemHandles, url, &block)
+    end
+
+        #
+    # Creates a ZIP file containing all the documents and metadata for the items listed in 'itemHandles'.
+    # The returned format respect the BagIt format (http://en.wikipedia.org/wiki/BagIt)
+    #
+    def create_and_retrieve_zip_path(item_handles, document_filter)
+      if item_handles.present?
+        begin
+          result = verify_items_permissions_and_extract_metadata(item_handles)
+
+          fileNamesByItem = get_filenames_from_item_results(result)
+          # require 'pry'
+          # binding.pry
+          digest_filename = Digest::MD5.hexdigest(result[:valids].inspect.to_s)
+          bagit_path = "#{Rails.root.join("tmp", "#{digest_filename}_tmp")}"
+          Dir.mkdir bagit_path
+
+          # make a new bag at base_path
+          bag = BagIt::Bag.new bagit_path
+
+          # add items metadata to the bag
+          add_items_metadata_to_the_bag_powered(result[:metadata], bag)
+
+          # add items documents to the bag
+          add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter)
+
+          # Add Log File
+          bag.add_file("log.json") do |io|
+            io.puts generate_json_log(result[:valids], result[:invalids])
+          end
+
+          # generate the manifest and tagmanifest files
+          bag.manifest!
+
+          zip_path = "#{Rails.root.join("tmp", "#{digest_filename}.tmp")}"
+          zip_file = File.new(zip_path, 'a+')
+          ZipBuilder.build_zip(zip_file, Dir["#{bagit_path}/*"])
+
+          zip_path
+        ensure
+          zip_file.close if !zip_file.nil?
+          FileUtils.rm_rf bagit_path if !bagit_path.nil?
+        end
+      end
     end
 
     private
@@ -348,49 +388,6 @@ module Item::DownloadItemsHelper
     # -------------------------------------------------------------------------
     #
 
-    #
-    # Creates a ZIP file containing all the documents and metadata for the items listed in 'itemHandles'.
-    # The returned format respect the BagIt format (http://en.wikipedia.org/wiki/BagIt)
-    #
-    def get_zip_with_documents_and_metadata_powered(item_handles, document_filter)
-      if item_handles.present?
-        begin
-          result = verify_items_permissions_and_extract_metadata(item_handles)
-
-          fileNamesByItem = get_filenames_from_item_results(result)
-
-          digest_filename = Digest::MD5.hexdigest(result[:valids].inspect.to_s)
-          bagit_path = "#{Rails.root.join("tmp", "#{digest_filename}_tmp")}"
-          Dir.mkdir bagit_path
-
-          # make a new bag at base_path
-          bag = BagIt::Bag.new bagit_path
-
-          # add items metadata to the bag
-          add_items_metadata_to_the_bag_powered(result[:metadata], bag)
-
-          # add items documents to the bag
-          add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter)
-
-          # Add Log File
-          bag.add_file("log.json") do |io|
-            io.puts generate_json_log(result[:valids], result[:invalids])
-          end
-
-          # generate the manifest and tagmanifest files
-          bag.manifest!
-
-          zip_path = "#{Rails.root.join("tmp", "#{digest_filename}.tmp")}"
-          zip_file = File.new(zip_path, 'a+')
-          ZipBuilder.build_zip(zip_file, Dir["#{bagit_path}/*"])
-
-          zip_path
-        ensure
-          zip_file.close if !zip_file.nil?
-          FileUtils.rm_rf bagit_path if !bagit_path.nil?
-        end
-      end
-    end
 
     #
     # =========================================================================
@@ -409,16 +406,36 @@ module Item::DownloadItemsHelper
     #
     def add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter)
       fileNamesByItem.each_pair do |itemId, info|
-        filenames = info[:files]
+        file_uris = info[:files]
         handle = (info[:handle].nil?)? itemId.gsub(":", "_") : info[:handle]
 
-        filenames = Item::DownloadItemsHelper.filter_item_files(filenames, document_filter)
-        filenames.each do |file|
-          if (File.exist?(file))
-            title = file.split('/').last
-            bag.add_file_link("#{handle}/#{title}", file)
+        file_uris = Item::DownloadItemsHelper.filter_item_files(file_uris, document_filter)
+
+        begin
+          tmpdir = Dir.mktmpdir
+              
+          file_uris.each do |file_uri|
+            uri = RDF::URI.new(file_uri)
+            filename = File.basename(uri.path)
+            if uri.scheme.starts_with? 'http'
+                            
+              filepath = File.join(tmpdir, filename)
+              File.open(filepath, 'w') { |file|
+                file.write(open(uri).read)
+              }
+
+            else
+              filepath = file_uri
+            end
+
+            bag.add_file_link("#{handle}/#{filename}", filepath)
+
           end
+
+        ensure
+          FileUtils.remove_entry_secure tmpdir
         end
+
       end
     end
 

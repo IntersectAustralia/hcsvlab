@@ -25,15 +25,31 @@ end
 
 Given(/^the item list "(.*?)" has (\d+) text documents$/) do |list_name, n|
   items = []
+  file_paths = []
   n = n.to_i
   (0...n).each { |i| 
     filename = "file_#{i}.txt"
     documents = [FactoryGirl.create(:document, file_name: filename, file_path: filename)]
     items << FactoryGirl.create(:item, handle: "corpus:item_#{i}", documents: documents)
+    file_paths << filename
   }
   ItemList.find_by_name(list_name).items = items
 end
 
+Given(/^the item list "(.*?)" has (\d+) remote documents$/) do |list_name, n|
+  items = []
+  handle_mapping = {}
+  n = n.to_i
+  (0...n).each { |i| 
+    filename = "http://www.example.com/file_#{i}.txt"
+    handle = "corpus_item_#{i}"
+    documents = [FactoryGirl.create(:document, file_name: filename, file_path: filename)]
+    items << FactoryGirl.create(:item, handle: "corpus:item_#{i}", documents: documents)
+    handle_mapping[filename] = {handle: handle, files: [filename]}
+  }
+  ItemList.find_by_name(list_name).items = items
+  Item::DownloadItemsHelper::DownloadItemsInFormat.any_instance.stub(:get_filenames_from_item_results).and_return(handle_mapping)
+end
 
 And /^I follow the delete icon for item list "(.*)"$/ do |list_name|
   list = ItemList.find_by_name(list_name)
@@ -87,6 +103,9 @@ Then /^concordance search for "(.*)" in item list "(.*)" should show error$/ do 
   result = list.doConcordanceSearch(term)
   result[:error].empty?.should eq(false)
 end
+
+
+
 
 Then /^frequency search for "(.*)" in item list "(.*)" should show this results$/ do |term, list_name, table|
   list = ItemList.find_by_name(list_name)

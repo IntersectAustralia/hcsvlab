@@ -134,6 +134,6 @@ And /^I fill in tiny_mce editor with "([^"]*)"$/ do |text|
   evaluate_script("tinyMCE.activeEditor.setContent('" + text + "');")
 end
 
-And /^I wait (\d+) seconds$/ do |seconds|
+And /^I wait for (\d+) seconds$/ do |seconds|
   sleep seconds.to_i
 end

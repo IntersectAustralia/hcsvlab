@@ -42,7 +42,7 @@ Feature: Managing Item Lists
     And I should see "Download only files that match a particular regular expression"
     And I should see "Download Matches"
 
-  Scenario: I try to download more than 200 items as a zip
+  Scenario: Downloading more than 200 items as a zip results in an error
     Given "researcher@intersect.org.au" has item lists
       | name  |
       | Test1 |
@@ -52,4 +52,13 @@ Feature: Managing Item Lists
     And I press "Download All"
     Then I should see "Zip download is limited to 200 files"
 
+  Scenario: Downloading remotely hosted files
+    Given "researcher@intersect.org.au" has item lists
+      | name  |
+      | Test1 |
+    And the item list "Test1" has 10 remote documents
+    When I am on the item list page for "Test1"
+    And I click "Download as ZIP"
+    And I press "Download All"
+    And I wait for 10 seconds
 
