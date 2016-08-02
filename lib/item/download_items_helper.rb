@@ -482,7 +482,7 @@ module Item::DownloadItemsHelper
               files << doc['dc:source']
             }
             metadata[item.id][:files] = files
-            json['metadata'] = {metadata: {handle: item.handle}}
+            json['metadata'] = { 'handle' =>item.handle}}
           end
           metadata[item.id][:metadata] = json
           item.documents.each do |doc|
