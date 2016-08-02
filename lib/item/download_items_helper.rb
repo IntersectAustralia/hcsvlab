@@ -417,17 +417,13 @@ module Item::DownloadItemsHelper
           file_uris.each do |file_uri|
             uri = RDF::URI.new(file_uri)
             filename = File.basename(uri.path)
+            filepath = file_uri
             if uri.scheme.starts_with? 'http'
-                            
               filepath = File.join(tmpdir, filename)
               File.open(filepath, 'w') { |file|
                 file.write(open(uri).read)
               }
-
-            else
-              filepath = file_uri
             end
-
             bag.add_file_link("#{handle}/#{filename}", filepath)
 
           end
@@ -477,8 +473,16 @@ module Item::DownloadItemsHelper
             Rails.logger.debug("Error parsing json_metadata for document #{item.id}")
           end
           metadata[item.id] = {}
-          metadata[item.id][:files] = json['documentsLocations'].clone.values.flatten
-          json.delete('documentsLocations')
+          if json.has_key? 'documentsLocations'
+            metadata[item.id][:files] = json['documentsLocations'].clone.values.flatten
+            json.delete('documentsLocations')
+          else
+            files = []
+            json['ausnc:document'].each{ |doc|
+              files << doc['dc:source']
+            }
+            metadata[item.id][:files] = files
+          end
           metadata[item.id][:metadata] = json
           item.documents.each do |doc|
             DocumentAudit.create(document: doc, user: current_user)
