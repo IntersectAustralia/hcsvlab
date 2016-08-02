@@ -38,7 +38,7 @@ Feature: Managing Collection Lists and Licences
   Scenario: Creating an empty Collection List
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
@@ -49,7 +49,7 @@ Feature: Managing Collection Lists and Licences
     And I choose the 1st Collection in the list
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
@@ -65,7 +65,7 @@ Feature: Managing Collection Lists and Licences
     When I check "allnonecheckbox"
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
@@ -79,7 +79,7 @@ Feature: Managing Collection Lists and Licences
     And I choose the 1st Collection in the list
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
@@ -92,7 +92,7 @@ Feature: Managing Collection Lists and Licences
     Then I check "allnonecheckbox"
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 2"
     And I press "Create Collection List"
@@ -108,7 +108,7 @@ Feature: Managing Collection Lists and Licences
     And I choose the 1st Collection in the list
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
@@ -118,7 +118,7 @@ Feature: Managing Collection Lists and Licences
     Then I check "allnonecheckbox"
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
@@ -151,7 +151,7 @@ Feature: Managing Collection Lists and Licences
     And I choose the 1st Collection in the list
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
@@ -175,7 +175,7 @@ Feature: Managing Collection Lists and Licences
     And I choose the 1st Collection in the list
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
@@ -292,7 +292,7 @@ Feature: Managing Collection Lists and Licences
     When I check "allnonecheckbox"
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I fill in "Name" with "Collection List 1"
     And I press "Create Collection List"
     Then I click on the privacy remove icon for the 1st collection list
@@ -337,7 +337,7 @@ Feature: Managing Collection Lists and Licences
     When I check "allnonecheckbox"
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I fill in "Name" with "Collection List 1"
     And I check "collection_list_private"
     And I press "Create Collection List"
@@ -367,7 +367,7 @@ Feature: Managing Collection Lists and Licences
     When I check "allnonecheckbox"
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I fill in "Name" with "Collection List 1"
     And I check "collection_list_private"
     And I press "Create Collection List"
@@ -414,7 +414,7 @@ Feature: Managing Collection Lists and Licences
     And I choose the 1st Collection in the list
     And I follow "Add selected to Collection list"
     And I follow "Create New Collection List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Collection list"
     And I fill in "Name" with "Collection List 1"
     And I check "collection_list_private"

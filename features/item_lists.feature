@@ -31,7 +31,7 @@ Feature: Managing Item Lists
     And I should see "Add All to list"
     And I follow "Add All to list"
     And I follow "Create New List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Item List"
     And I fill in "Name" with ""
     And I press "Create List"
@@ -43,7 +43,7 @@ Feature: Managing Item Lists
     And I should see "Add All to list"
     And I follow "Add All to list"
     And I follow "Create New List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Item List"
     And I fill in "Name" with "This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name This is a long item list name"
     And I press "Create List"
@@ -55,11 +55,11 @@ Feature: Managing Item Lists
     And I should see "Add All to list"
     And I follow "Add All to list"
     And I follow "Create New List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Item List"
     And I fill in "Name" with "Add All Test"
     And I press "Create List"
-    And I wait 5 seconds
+    And I wait for 5 seconds
     And I should be on the item list page for "Add All Test"
     And I should see "Item list created successfully"
     And the item list "Add All Test" should have 2 items
@@ -76,7 +76,7 @@ Feature: Managing Item Lists
       | name          |
       | Existing Test |
     And the item list "Existing Test" has items hcsvlab:1
-    And I wait 3 seconds
+    And I wait for 3 seconds
     And I have done a search with collection "non-existant"
     And I follow "Add All to list"
     And I follow "Existing Test"
@@ -88,7 +88,7 @@ Feature: Managing Item Lists
     And I should see "Add Selected to list"
     And I follow "Add Selected to list"
     And I follow "Create New List"
-    And I wait 2 seconds
+    And I wait for 2 seconds
     And I should see "Create New Item List"
     And I fill in "Name" with "Add Selected Test"
     And I press "Create List"
@@ -124,7 +124,7 @@ Feature: Managing Item Lists
       | name        |
       | Rename Test |
     And the item list "Rename Test" has items cooee:1-001
-    And I wait 5 seconds
+    And I wait for 5 seconds
     And I am on the item list page for "Rename Test"
     And I follow "Rename"
     And I fill in "Name" with "New Name"
@@ -137,7 +137,7 @@ Feature: Managing Item Lists
       | name        |
       | Rename Test |
     And the item list "Rename Test" has items cooee:1-001
-    And I wait 5 seconds
+    And I wait for 5 seconds
     And I am on the item list page for "Rename Test"
     And I follow "Rename"
     And I fill in "Name" with ""
@@ -151,7 +151,7 @@ Feature: Managing Item Lists
       | Rename Test |
       | Exists Test |
     And the item list "Rename Test" has items cooee:1-001
-    And I wait 5 seconds
+    And I wait for 5 seconds
     And I am on the item list page for "Rename Test"
     And I follow "Rename"
     And I fill in "Name" with "Exists Test"
@@ -164,7 +164,7 @@ Feature: Managing Item Lists
       | name       |
       | Clear Test |
     And the item list "Clear Test" has items cooee:1-001, cooee:1-002
-    And I wait 5 seconds
+    And I wait for 5 seconds
     And I am on the item list page for "Clear Test"
     And the item list "Clear Test" should have 2 items
     And I follow "Clear"
@@ -175,7 +175,7 @@ Feature: Managing Item Lists
       | name        |
       | Delete Test |
     And the item list "Delete Test" has items cooee:1-001, cooee:1-002
-    And I wait 5 seconds
+    And I wait for 5 seconds
     And I am on the item list page for "Delete Test"
     And the item list "Delete Test" should have 2 items
     And I follow the delete icon for item list "Delete Test"

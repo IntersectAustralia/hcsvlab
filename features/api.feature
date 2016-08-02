@@ -669,7 +669,7 @@ Feature: Browsing via API
       | name   |
       | Test 1 |
     And the item list "Test 1" has items cooee:1-001
-    And I wait 5 seconds
+    And I wait for 5 seconds
     Given I make a WARC request for the item list page for "Test 1" with the API token for "researcher1@intersect.org.au"
     Then I should get a 200 response code
 

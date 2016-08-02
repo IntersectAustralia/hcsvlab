@@ -35,8 +35,6 @@ module Item::DownloadItemsHelper
 
       bench_start = Time.now
 
-      # require 'pry'
-      # binding.pry
       # Creates a ZIP file containing the documents and item's metadata
       zip_path = DownloadItemsInFormat.new(current_user, current_ability).create_and_retrieve_zip_path(itemHandles, document_filter)
 
@@ -167,8 +165,6 @@ module Item::DownloadItemsHelper
           result = verify_items_permissions_and_extract_metadata(item_handles)
 
           fileNamesByItem = get_filenames_from_item_results(result)
-          # require 'pry'
-          # binding.pry
           digest_filename = Digest::MD5.hexdigest(result[:valids].inspect.to_s)
           bagit_path = "#{Rails.root.join("tmp", "#{digest_filename}_tmp")}"
           Dir.mkdir bagit_path

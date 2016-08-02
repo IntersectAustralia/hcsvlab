@@ -164,7 +164,7 @@ Feature: Searching for items
     date_group_facet:"1880 - 1889"
     """
     And I press "search_metadata"
-    And I wait 3 seconds
+    And I wait for 3 seconds
     Then I should see a table with the following rows in any order:
       | Identifier          | Created Date | Type(s)             |
       | austlit:adaessa.xml | 1886         | Text, Original, Raw |
