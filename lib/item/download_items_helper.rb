@@ -179,8 +179,10 @@ module Item::DownloadItemsHelper
           # add items metadata to the bag
           add_items_metadata_to_the_bag_powered(result[:metadata], bag)
 
+          remote_tmpdir = Dir.mktmpdir
+
           # add items documents to the bag
-          add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter)
+          add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter, remote_tmpdir)
 
           # Add Log File
           bag.add_file("log.json") do |io|
@@ -198,6 +200,7 @@ module Item::DownloadItemsHelper
         ensure
           zip_file.close if !zip_file.nil?
           FileUtils.rm_rf bagit_path if !bagit_path.nil?
+          FileUtils.remove_entry_secure remote_tmpdir
         end
       end
     end
@@ -404,32 +407,27 @@ module Item::DownloadItemsHelper
     #                            "hcsvlab:1034"=>{handle: "handle2", files:["full_path4, full_path5, .."]}}
     # bag = BagIt::Bag object
     #
-    def add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter)
+    def add_items_documents_to_the_bag(fileNamesByItem, bag, document_filter, remote_tmpdir)
       fileNamesByItem.each_pair do |itemId, info|
         file_uris = info[:files]
         handle = (info[:handle].nil?)? itemId.gsub(":", "_") : info[:handle]
 
         file_uris = Item::DownloadItemsHelper.filter_item_files(file_uris, document_filter)
-
-        begin
-          tmpdir = Dir.mktmpdir
               
-          file_uris.each do |file_uri|
-            uri = RDF::URI.new(file_uri)
-            filename = File.basename(uri.path)
-            filepath = file_uri
-            if uri.scheme.starts_with? 'http'
-              filepath = File.join(tmpdir, filename)
-              File.open(filepath, 'w') { |file|
-                file.write(open(uri).read)
-              }
-            end
-            bag.add_file_link("#{handle}/#{filename}", filepath)
-
+        file_uris.each do |file_uri|
+          uri = RDF::URI.new(file_uri)
+          filename = File.basename(uri.path)
+          filepath = file_uri
+          if uri.scheme.starts_with? 'http'
+            filepath = File.join(remote_tmpdir, filename)
+            File.open(filepath, 'w') { |file|
+              contents = open(uri).read
+              contents = contents.force_encoding(Encoding::UTF_8)
+              file.write(contents)
+            }
           end
+          bag.add_file_link("#{handle}/#{filename}", filepath)
 
-        ensure
-          FileUtils.remove_entry_secure tmpdir
         end
 
       end
@@ -482,7 +480,7 @@ module Item::DownloadItemsHelper
               files << doc['dc:source']
             }
             metadata[item.id][:files] = files
-            json['metadata'] = { 'handle' =>item.handle}}
+            json['metadata'] = { 'handle' =>item.handle}
           end
           metadata[item.id][:metadata] = json
           item.documents.each do |doc|
