@@ -72,7 +72,10 @@ class ItemList < ActiveRecord::Base
   def get_document_count(document_filter)
     documents = []
     items.each { |item|
-      documents.concat(item.documents)
+      filepaths = item.documents.collect { |document|
+        document.file_path
+      }
+      documents.concat(filepaths)
     }
     documents = Item::DownloadItemsHelper.filter_item_files(documents, document_filter)
     documents.count

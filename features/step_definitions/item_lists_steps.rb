@@ -41,15 +41,28 @@ Given(/^the item list "(.*?)" has (\d+) remote documents$/) do |list_name, n|
   handle_mapping = {}
   n = n.to_i
   (0...n).each { |i| 
-    filename = "http://www.example.com/file_#{i}.txt"
+    documents = []
+    filepaths = []
+    filename = "file_#{i}.txt"
+    filepath = "http://www.example.com/file_#{i}.txt"
     handle = "corpus_item_#{i}"
-    documents = [FactoryGirl.create(:document, file_name: filename, file_path: filename)]
+    documents << FactoryGirl.create(:document, file_name: filename, file_path: filepath)
+    
+    filename = "file_#{i}"
+    filepath = "http://www.example.com/file_#{i}"
+    documents << FactoryGirl.create(:document, file_name: filename, file_path: filepath)
+
     items << FactoryGirl.create(:item, handle: "corpus:item_#{i}", documents: documents)
-    handle_mapping[filename] = {handle: handle, files: [filename]}
+    handle_mapping[filename] = {handle: handle, files: [filepaths]}
   }
   ItemList.find_by_name(list_name).items = items
   Item::DownloadItemsHelper::DownloadItemsInFormat.any_instance.stub(:get_filenames_from_item_results).and_return(handle_mapping)
 end
+
+When(/^I filter by "(.*?)"$/) do |extension|
+  page.find("//input[value='*#{extension}']").set(true)
+end
+
 
 And /^I follow the delete icon for item list "(.*)"$/ do |list_name|
   list = ItemList.find_by_name(list_name)
