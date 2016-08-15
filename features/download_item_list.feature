@@ -46,7 +46,7 @@ Feature: Managing Item Lists
     Given "researcher@intersect.org.au" has item lists
       | name  |
       | Test1 |
-    And the item list "Test1" has 101 remote documents
+    And the item list "Test1" has 201 text documents
     When I am on the item list page for "Test1"
     And I click "Download as ZIP"
     And I press "Download All"
@@ -56,7 +56,7 @@ Feature: Managing Item Lists
     Given "researcher@intersect.org.au" has item lists
       | name  |
       | Test1 |
-    And the item list "Test1" has 101 remote documents
+    And the item list "Test1" has 101 items with two remote documents each
     When I am on the item list page for "Test1"
     And I click "Download as ZIP"
     And I filter by "*.txt"
@@ -67,7 +67,7 @@ Feature: Managing Item Lists
     Given "researcher@intersect.org.au" has item lists
       | name  |
       | Test1 |
-    And the item list "Test1" has 101 remote documents
+    And the item list "Test1" has 101 items with two remote documents each
     When I am on the item list page for "Test1"
     And I click "Download as ZIP"
     And I filter by "no extension"
