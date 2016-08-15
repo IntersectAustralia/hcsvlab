@@ -112,7 +112,11 @@ module Item::DownloadItemsHelper
     else
       filtered_filenames = []
       filenames.each do |filename|
-        filtered_filenames.push filename if File.fnmatch(filter, File.basename(filename), File::FNM_EXTGLOB)
+        if filter == 'no extension' and File.extname(filename) == ""
+          filtered_filenames << filename
+        else
+          filtered_filenames.push filename if File.fnmatch(filter, File.basename(filename), File::FNM_EXTGLOB)
+        end
       end
       filtered_filenames
     end

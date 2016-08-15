@@ -60,7 +60,7 @@ Given(/^the item list "(.*?)" has (\d+) remote documents$/) do |list_name, n|
 end
 
 When(/^I filter by "(.*?)"$/) do |extension|
-  page.find("//input[value='*#{extension}']").set(true)
+  page.find("//input[value='#{extension}']").set(true)
 end
 
 

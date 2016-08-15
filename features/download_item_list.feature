@@ -42,7 +42,6 @@ Feature: Managing Item Lists
     And I should see "Download only files that match a particular regular expression"
     And I should see "Download Matches"
 
-
   Scenario: Downloading more than 200 documents results in an error
     Given "researcher@intersect.org.au" has item lists
       | name  |
@@ -60,6 +59,17 @@ Feature: Managing Item Lists
     And the item list "Test1" has 101 remote documents
     When I am on the item list page for "Test1"
     And I click "Download as ZIP"
-    And I filter by ".txt"
+    And I filter by "*.txt"
+    And I press "Download Selected"
+    Then I should not see "Zip download is limited to 200 files"
+
+  Scenario: Documents without extensions can be filtered
+    Given "researcher@intersect.org.au" has item lists
+      | name  |
+      | Test1 |
+    And the item list "Test1" has 101 remote documents
+    When I am on the item list page for "Test1"
+    And I click "Download as ZIP"
+    And I filter by "no extension"
     And I press "Download Selected"
     Then I should not see "Zip download is limited to 200 files"
