@@ -103,7 +103,7 @@
 
   function checkCompleteCookie() {
     if ($.cookie("download_finished") ) {
-      $.removeCookie("download_finished");
+      $.removeCookie("download_finished", { path: '/'} );
       location.reload();
     }
   }
